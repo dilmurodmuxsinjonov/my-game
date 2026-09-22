@@ -1,7 +1,7 @@
 # MASTER GAME DESIGN DOCUMENT (GDD)
 # "Voxel Lord: Feudal Realm" 👑
 
-> **Hujjat Maqomi:** To'liq Texnik Loyiha (Specification 1.1 — Yangilangan)  
+> **Hujjat Maqomi:** To'liq Texnik Loyiha (Specification 1.2 — Fasllar va Sanitariya Qo'shildi)  
 > **Janr:** Birinchi Shaxs / Voxel Sandbox / O'rta Asrlar Koloniya Simulyatori (Colony Sim & Strategy)  
 > **Dvigatel:** Godot Engine 4.3+ (Forward+ / GDScript & C#)  
 > **Platforma:** PC (Steam / Windows, Linux)  
@@ -24,7 +24,9 @@
 12. [Sehr, Alkimyo va Runa Temirchiligi](#12-sehr-alkimyo-va-runa-temirchiligi)
 13. [Boshqaruv Daftari (The Royal Ledger) va Zanjirli Iqtisodiyot](#13-boshqaruv-daftari-the-royal-ledger-va-zanjirli-iqtisodiyot)
 14. [Qurilish Tizimi, Kattalik Darajalari va Masshtab](#14-qurilish-tizimi-kattalik-darajalari-va-masshtab)
-15. [Godot 4 Texnik Arxitekturasi va Dasturiy Modullar](#15-godot-4-texnik-arxitekturasi-va-dasturiy-modullar)
+15. [4 Fasl (Mavsumlar) va Dinamik Ob-havo Tizimi](#15-4-fasl-mavsumlar-va-dinamik-ob-havo-tizimi)
+16. [Oziq-ovqat Aynishi, Saqlash Usullari, Sanitariya va Vabo](#16-oziq-ovqat-aynishi-saqlash-usullari-sanitariya-va-vabo)
+17. [Godot 4 Texnik Arxitekturasi va Dasturiy Modullar](#17-godot-4-texnik-arxitekturasi-va-dasturiy-modullar)
 
 ---
 
@@ -69,14 +71,8 @@
 
 ## 4. SHAXSIY MEHNATDAN AVTOMATLASHUVGACHA (HANDS-ON TO AUTOMATION)
 
-O'yinda shaxsiy mehnat va boshqaruv o'rtasida ajoyib evolyutsiya bor:
-* **Dastlab (Odam kam paytda):** O'yinchi shaxsan o'zi:
-  * Dalaga ketmon uradi, paqirda suv tashib ekinlarni sug'oradi va o'radi.
-  * O'rmondan qo'y, sigir, tovuqlarni olib kelib, yem beradi va juftlashtiradi.
-  * O'zi bolta bilan o'tin chopadi, shaxtada tosh qaziydi.
-* **Aholi ko'paygach (Feodal Avtomatlashuv):**
-  * Vazifalar fuqarolarga topshiriladi: Fermer dalani o'zi sug'oradi, Chorvador podani boqadi, Novvoy non yopadi.
-  * Hukmdor faqat strategiya va rivojlanishga e'tibor qaratadi (lekin istalgan vaqtda o'zi ham dalaga chiqishi mumkin!).
+* **Dastlab (Odam kam paytda):** O'yinchi shaxsan o'zi dalaga ketmon uradi, paqirda suv tashib sug'oradi, hayvonlarga yem beradi, o'tin chopadi.
+* **Aholi ko'paygach (Feodal Avtomatlashuv):** Vazifalar fuqarolarga topshiriladi (Fermer, Chorvador, Novvoy). Hukmdor faqat strategiyaga qaraydi, lekin istalgan payt o'zi ham dalaga chiqishi mumkin.
 
 ---
 
@@ -164,7 +160,7 @@ O'yinda shaxsiy mehnat va boshqaruv o'rtasida ajoyib evolyutsiya bor:
 
 ## 11. HARBIY TIZIM: ASKARLARNI SARALASH, O'QITISH VA TA'MINOT
 
-### 11.1. Shaxsiy Fazilatlar (Attributes)
+### 11.1. Shaxsiy Fazilatlar
 * **Jasorat (Bravery):** Qo'rqoqlik vs Qahramonlik.
 * **Kuch (Strength):** Og'ir po'lat sovut va qurollarni ko'tarish qobiliyati.
 * **Chaqqonlik & Ko'rish (Vision/Agility):** Kamon va arbalet aniqligi.
@@ -178,7 +174,6 @@ O'yinda shaxsiy mehnat va boshqaruv o'rtasida ajoyib evolyutsiya bor:
 
 ### 11.3. Ta'minot va Narx:
 * Askar dalada ishlamaydi: kuniga **2 ta to'yimli non + go'sht** va haftalik **kumush tanga maosh** talab qiladi.
-* Maosh to'lanmasa ruhiyat tushadi, askar qochib ketishi yoki qo'zg'olon ko'tarishi mumkin.
 
 ---
 
@@ -238,7 +233,45 @@ O'yinda shaxsiy mehnat va boshqaruv o'rtasida ajoyib evolyutsiya bor:
 
 ---
 
-## 15. GODOT 4 TEXNIK ARXITEKTURASI VA DASTURIY MODULLAR
+## 15. 4 FASL (MAVSUMLAR) VA DINAMIK OB-HAVO TIZIMI
+
+* **1 O'yin Yili = 28 Kun (Har bir fasl 7 kun):**
+  * **🌸 Bahor (1–7 kunlar):** Qor erishi, daryo toshqinlari, serob yumshoq tuproq, ekin ekish unumi +30%, chorva bolalashi.
+  * **☀️ Yoz (8–14 kunlar):** Oltin quyosh, qurilish uchun eng quruq fasl (g'ishtlar tez quriydi), qurg'oqchilik xavfi (sug'orilmasa hosil quriydi), quruq o'tlar yong'ini.
+  * **🍂 Kuz (15–21 kunlar):** Hosilni o'rib g'amlash, o'tin yig'ish poygasi, tuzlash va dudlash, jun kiyimlar tikish, 20-kunda Hosildorlik Bayrami.
+  * **❄️ Qish (22–28 kunlar):** Abadiy qor, muzlagan daryolar, ochiq dalalarda dehqonchilik 0%, pechlarda o'tin sarfi 2x, uylar sovusa muzlab o'lish, och bo'rilar qishloq qo'ralariga hujumi.
+* **Dinamik Ofatlar:** Qalin Tuman (kamonchilar ko'rolmaydi), Momaqaldiroq & Yashin (Yashinqaytargich kerak), Qor Bo'roni (harakat -70%), Do'l (ochiq ekinlarni sindiradi).
+
+---
+
+## 16. OZIQ-OVQAT AYNISHI, SAQLASH USULLARI, SANITARIYA VA VABO
+
+### 16.1. Oziq-ovqat Aynish Muddatlari
+* Xom go'sht/baliq: 2–3 kun.
+* Yangi sut: 1–2 kun.
+* Meva/sabzavot: 5–7 kun.
+* Pishirilgan non: 6–8 kun.
+* Quruq don (Bug'doy/Arpa): 1–2 yil (buzilmaydi).
+* *Buzilgan oziq-ovqat:* Qurtlaydi, sassiq hid tarqatadi, kalamushlarni jalb qiladi. Ochlikdan yeyilsa og'ir kasallik va o'lim keladi.
+
+### 16.2. Saqlashning 4 Xil Usuli:
+1. **Tuzlash (Salting):** `Go'sht/Baliq + Tosh Tuzi (Halite)` = 1 yil saqlanadi.
+2. **Dudlash (Smokehouse):** O'tin tutunida 20–30 kun saqlanadi, xushbo'y ta'm (baxt +15%).
+3. **Muzxona / Podval (Cold Cellar):** Qishda daryo muzidan katta bloklar keltirib taxlanadi (0°C, sabzavotlar 3x uzoq turadi).
+4. **Quritish (Sun Drying):** Meva, qo'ziqorin va baliqlarni oftobda quritish.
+
+### 16.3. Sanitariya va Vabo (The Black Plague)
+* **Axlat Chuquri (Compost Pit):** Chiqindilar shahar tashqarisiga chiqariladi (o'g'it bo'ladi).
+* **Kalamushlar Bosqini:** Ko'chalarda axlat to'plansa kalamushlar ko'payadi, quduqlarni zaharlaydi. *Yechim:* Mushuklar va Qorovul Itlar.
+* **Qora O'lat Epidemiyasi:** Tozalik 30% dan tushsa vabo boshlanadi. Odamdan odamga yuqadi.
+* **Hukmdor Favqulodda Qarorlari:**
+  * Qattiq karantin (aholi uylarga qamaladi).
+  * O'lat Tabibi (Plague Doctor) chaqiriladi.
+  * Kasallangan to'shaklar va uylar olov bilan tozalanadi.
+
+---
+
+## 17. GODOT 4 TEXNIK ARXITEKTURASI VA DASTURIY MODULLAR
 
 * **Face Culling & Greedy Meshing:** `scripts/core/voxel_chunk.gd` — ko'rinmaydigan blok yuzalarini birlashtirib 120+ FPS ta'minlash.
 * **Aholi FSM & Yo'l topish:** `scripts/entities/citizen.gd` — NavigationAgent3D yordamida dinamik yo'l topish.
