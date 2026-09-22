@@ -930,32 +930,180 @@ Voxel Lord feodal iqtisodiyoti chuqur ixtisoslashgan mehnat taqsimotiga tayanadi
 
 # 22. DIPLOMATIYA, RAQIB FRAKTSIYALAR VA MULTIPLAYER (CO-OP)
 
-## 22.1. Qo'shni AI Qirolliklar va Fraktsiyalar
-Dunyo procedural generatsiya qilinayotganda turli biomlarda mustaqil AI lordlar va neytral fraktsiyalar paydo bo'ladi:
-* **Savdogar Gildiyalari (Merchant Guilds):** Qirg'oq bo'yi va tekisliklarda joylashgan. Noyob resurslarga (ziravorlar, maxsus shisha, ekzotik matolar) ega. Monopoliya va erkin savdoni xohlaydi.
-* **Harbiy Feodallar (Warlords):** Tog'li va o'rmonli hududlardagi agressiv qo'shnilar. Chegarasini doimiy kengaytiradi va o'lpon talab qiladi.
-* **Diniy Ordenlar (Theocratic Orders):** Qat'iy diniy qoidalarga tayanadi. Buyuk Sobor qursangiz ittifoqchi, qora joduga berilsangiz "bid'atchi" deb urush ochadi.
+Voxel Lord feodal dunyosida koloniya yakkalanib yashamaydi. Mintaqaviy xarita (Overworld Map) procedural yaratilganda o'yinchi atrofida mustaqil, iqtisodiy va harbiy jihatdan o'zini o'zi ta'minlovchi 4 ta yirik feodal fraktsiya qaror topadi. Diplomatiya tizimi shunchaki menyudagi tugmalar emas, balki real vaqt rejimida karvonlar qatnovi, chegara postlari, josuslik operatsiyalari, o'lpon to'lovlari va vayron bo'luvchi venzel qamallaridan iborat ko'p qatlamli simulyatsiyadir.
 
-## 22.2. Savdo va Diplomatiya Tizimi
-Tier 3 Elchixona (Embassy) binosi orqali Dunyo Xaritasi interfeysida boshqariladi:
-* **Karvon Yo'llari (Trade Routes):** Ikki tomonlama savdo shartnomasi, ot-aravali qatnovlar. O'yinchi karvonlarni qaroqchilardan himoya qiladi.
-* **Diplomatik Harakatlar:**
-  * **O'lpon (Tribute):** Hujumni to'xtatish yoki hurmat qozonish uchun har mavsum to'lov.
-  * **Ittifoq (Alliance):** Umumiy dushmanga qarshi birlashish, qamalda yordam chaqirish.
-  * **Josuslik (Espionage):** Raqib qasri omboriga o't qo'yish yoki tungi qamalda darvozani ichkaridan ochish.
+## 22.1. Feodal Fraktsiya Arxeotiplari va Dunyodagi Geopolitik Kuchlar
 
-## 22.3. Chegara To'qnashuvlari va Urush Mexanikasi
-* **Voxel Qamallari (Destructible Voxel Sieges):** AI va o'yinchi trebuchetlar, katapultalar va taranlar (Battering Ram) yordamida tosh devorlarni jismonan buzib kiradi.
-* **Hududni Bosib Olish:** Raqib Asosiy Zali (Great Hall) egallansa va AI Lord yengilsa, o'sha yer barcha infratuzilmasi bilan tobelikka o'tadi.
-* **Asirlar Tizimi:** Mag'lub lordlar zindonga tashlanadi — katta tovon puli talab qilish, qatl etish yoki vassalga aylantirish mumkin.
+Har bir fraktsiya o'zining ijtimoiy-siyosiy tuzilmasi, afzal ko'rgan biomi, iqtisodiy resurslar monopoliyasi va o'ziga xos harbiy doktrinasiga ega:
 
-## 22.4. Multiplayer va Co-op Rejimi (Steam P2P 2–4 O'yinchi)
-* **Yagona Taxt (Shared Kingdom / Co-op):** Do'stlar bitta shahar-davlatni birgalikda boshqaradi:
-  * *1-O'yinchi (Hukmdor):* Iqtisodiyot, binolar loyihasi, soliqlar va diplomatiya.
-  * *2-O'yinchi (Bosh Qomondon):* Kazarma, qo'shin tayyorlash va jangovar yurishlar.
-  * *3-O'yinchi (Bosh Usta):* Konchilik tarmog'i, chuqur shaxtalar va metallurgiya zanjiri.
-* **Feodal Tarqoqlik (Rival Kingdoms / PvPvE):** O'yinchilar bitta katta xaritaning turli burchaklarida o'z qasrlarini quradi — ittifoq tuzishi yoki konlar uchun o'zaro qamal urushlari olib borishi mumkin.
-* **Texnik Yechim:** Host-Authoritative Client-Server arxitekturasi. Dunyo simulyatsiyasi va NPC AIsi Hostda hisoblanadi, boshqa o'yinchilarga holat paketlari uzatiladi.
+1. **Sohil Savdogarlari Ligasi (The League of Coastal Merchants):**
+   - **Tuzilmasi va Boshqaruvi:** Boy savdogar oligarxlar kengashi (Merchant Guilds) tomonidan boshqariladigan plutokratiya. Asosiy qarorgohi qirg'oq bo'yi estuariyalari va unumdor tekisliklarda joylashgan.
+   - **Iqtisodiy Monopoliya:** Dengiz savdosi, xorijiy ziravorlar, ipak matolar, sayqallangan shisha idishlar, dengiz tuzi va dori-darmonlar. Bozor narxlarini manipulyatsiya qilish va kredit foizlarini belgilash qobiliyatiga ega.
+   - **Harbiy Doktrina:** Yollanma arbaletchilar (Mercenary Crossbowmen), qirg'oq floti, to'siq pikelari va qimmatbaho plitali gvardiya. Urushda uzoq qamal qilishdan ko'ra iqtisodiy embargo, karvon yo'llarini to'sish va qaroqchilarni yollashni afzal biladi.
+   - **Diplomatik Reaktsiyasi:** Past bojxona to'lovlari va ochiq chegaralarni yoqtiradi. Agar o'yinchi ularning karvonlariga hujum qilsa yoki savdo shartnomasini buzsa, darhol qattiq iqtisodiy sanktsiyalar joriy etadi.
+
+2. **Shimoliy Temir Harbiy Feodallari (The Northern Iron Warlords):**
+   - **Tuzilmasi va Boshqaruvi:** Shon-sharaf, kuch va jangovar tajribaga tayanuvchi harbiy gertsogliklar. Qarorgohlari baland tog' cho'qqilarida, basalt va granit qoyalar ustiga qurilgan qasrlarda joylashgan.
+   - **Iqtisodiy Monopoliya:** Yuqori sifatli temir rudasi, koks ko'miri, qattiq po'lat xomashyosi, quyma sovutlar, og'ir qurollar va tosh kesish texnologiyalari.
+   - **Harbiy Doktrina:** Og'ir ritsarlar (Knights), zarbdor ikki qo'lli qilichbozlar (Shock Infantry), mustahkam toshbuzar taranlar (Battering Rams) va og'ir katapultalar.
+   - **Diplomatik Reaktsiyasi:** Har mavsum qat'iy o'lpon talab qiladi. O'yinchi armiyasining qudratini baholaydi — agar o'yinchi kuchsiz bo'lsa, o'lponni oshiradi va qamal urushini boshlaydi; agar o'yinchi harbiy kuchi teng yoki ustun bo'lsa, hurmat ko'rsatib sulh tuzadi.
+
+3. **Muqaddas Quyosh Diniy Ordeni (The Holy Sun Order):**
+   - **Tuzilmasi va Boshqaruvi:** Oliy Inkvizitor va Patriarx boshchiligidagi teokratik orden. Shaharlari oppoq marmar ibodatxonalar, soborlar va baland qo'ng'iroqxonalardan iborat.
+   - **Iqtisodiy Monopoliya:** Marmar toshlari, muqaddas shamlar, asalarichilik mumi, monastir uzumzorlari va sharoblari, diniy yozuvlar va muqaddas artefaktlar.
+   - **Harbiy Doktrina:** Templar ritsarlari, intizomli nayzabardorlar va yonuvchi neft snaryadlarini otuvchi muqaddas trebuchetlar.
+   - **Diplomatik Reaktsiyasi:** O'yinchidan ibodatxonalar qurishni va diniy soliqlarni to'lashni talab qiladi. Qora jodu, qabrlarni qazish, bidsat yoki cherkov mulkiga daxl qilish holatlarini mutlaq kechirmaydi va darhol muqaddas urush (Crusade) e'lon qiladi.
+
+4. **Dasht Otliqlari Qabilasi (The Steppe Horse Clans):**
+   - **Tuzilmasi va Boshqaruvi:** Dasht xonlari va beklari ittifoqi. Harakatchan o'tovlar, ot boqiladigan yaylovlar va quruq dasht biomlarida yashaydi.
+   - **Iqtisodiy Monopoliya:** Elita zotdor jangovar otlar, murakkab kompozit egik kamonlar, charmdan ishlangan engil sovutlar, qimiz va jun mahsulotlari.
+   - **Harbiy Doktrina:** Tezkor otliq kamonchilar (Horse Archers), dasht nayzabardorlari. Taktikasi — to'g'ridan-to'g'ri devorga urilmasdan, tezkor pistirmalar, tashqi qishloqlarni talash va ta'minot zanjirlarini uzish.
+   - **Diplomatik Reaktsiyasi:** Yaylov huquqlarini hurmat qilishni talab qiladi. Agar o'yinchi chegarasini dasht yaylovlariga qarab noqonuniy kengaytirsa, tezkor otliq bosqinlari bilan javob qaytaradi.
+
+| Fraktsiya Nomi | Afzal Biomi | Asosiy Monopoliya Mahsulotlari | Harbiy Elita Birligi | Diplomatik Asosiy Talab |
+|---|---|---|---|---|
+| **League of Coastal Merchants** | Qirg'oq va Tekislik | Ziravorlar, Shisha, Ipak, Dori-darmon | Yollanma Arbaletchilar | Past savdo boji, erkin port |
+| **Northern Iron Warlords** | Qoyali Tog'lar va Tayga | Temir, Po'lat, Koks, Toshbuzar Taran | Og'ir Plitali Ritsarlar | Mavsumiy oltin/kumush o'lpon |
+| **Holy Sun Order** | Quyoshli Tekislik va Vodiy | Marmar, Mum, Monastir Sharobi, Kitoblar | Templar Paladinlari | Sobor qurish, diniy bay'at |
+| **Steppe Horse Clans** | Quruq Dasht va Yaylov | Jangovar Otlar, Kompozit Kamon, Jun | Otliq Kamonchilar | Yaylov chegaralari daxlsizligi |
+
+## 22.2. Xalqaro Aloqalar Spektri, O'lpon (Tribute) va Savdo Arbitraji
+
+### 22.2.1. Munosabatlar Shkalasi (-100 dan +100 gacha)
+
+O'yinchi va har bir fraktsiya o'rtasidagi aloqalar $-100$ dan $+100$ gacha bo'lgan sonli qiymat bilan o'lchanadi va 7 ta aniq pog'onaga ajratiladi:
+
+| Pog'ona | Holat Nomi | Diapazon | Iqtisodiy Qoidalar | Chegara va Harakat Huquqi | Harbiy Harakatlar |
+|---|---|---|---|---|---|
+| **Tier 1** | Urush (War) | $[-100, -60]$ | Savdo butunlay to'xtatilgan, barcha aktivlar musodara qilinadi. | Chegaralar yopiq, ko'rilgan zahoti o'ldirish buyrug'i. | Doimiy harbiy qamallar, karvonlarni talash, qasrlarni buzish. |
+| **Tier 2** | Dushmanlik (Hostile) | $[-59, -20]$ | To'liq iqtisodiy embargo, tovarlar almashinuvi taqiqlanadi. | Fuqarolar va elchilar chegaradan qaytariladi. | Chegara to'qnashuvlari, doimiy josuslik va diversiyalar. |
+| **Tier 3** | Sovuq / Noqulay (Unfriendly) | $[-19, -1]$ | Eksport va import tovarlariga $+50\%$ og'ir bojxona solig'i. | Qurolli otryadlar o'tishi qat'iyan taqiqlanadi. | Diplomatik tahdidlar, o'lpon talablarini oshirish. |
+| **Tier 4** | Neytral (Neutral) | $[0, +19]$ | Standart bozor narxlari va bazaviy tariflar ($0\%$ ustama). | Tinch fuqarolar va tijorat karvonlari erkin o'tadi. | Qo'shinlar neytral zonalarda to'qnashmaydi. |
+| **Tier 5** | Do'stona (Friendly) | $[+20, +59]$ | Savdo bojlariga $-25\%$ chegirma, chegara bozorlariga ruxsat. | Hujum qilmaslik pakti (NAP), hududiy o'tish huquqi. | Razvedka ma'lumotlarini almashish, qaroqchilarga qarshi kurash. |
+| **Tier 6** | Harbiy Ittifoq (Allied) | $[+60, +89]$ | Maxsus imtiyozli savdo, nodir texnologiyalar chizmalarini berish. | To'liq harbiy koridor, istehkomlardan birgalikda foydalanish. | Birgalikda mudofaa va umumiy dushmanga qarshi qo'shma qamal. |
+| **Tier 7** | Qaramlik / Konfederatsiya | $[+90, +100]$ | O'yinchiga har mavsum $15\%$ sof daromad solig'i to'laydi. | To'liq birlashgan hududiy suverenitet. | Fraktsiya qo'shini o'yinchi amriga bo'ysunadi. |
+
+Munosabatlar dinamikasi o'zgaruvchan bo'lib, faol aloqalar bo'lmaganda tabiiy ravishda neytral nuqtaga ($0$) qarab so'nib boradi:
+$$\frac{dR}{dt} = -\lambda_{decay} \cdot (R - R_{neutral}) + \sum \Delta R_{actions}$$
+Bunda $\lambda_{decay} = 0.02$ ball/kun. Ijobiy amallar (karvon savdosi hajmi $+1$ dan $+5$ gacha, o'lponni vaqtida to'lash $+12$, hadyalar berish $+10$) munosabatni oshirsa, tajovuzkorlik (chegara buzish $-15$, josuslik fosh bo'lishi $-50$, o'lpon to'lamaslik $-30$) uni keskin pasaytiradi.
+
+### 22.2.2. Mavsumiy O'lpon (Tribute Demand) Tenglamasi
+
+Agressiv Harbiy Feodallar va Diniy Ordenlar o'yinchidan mavsumiy o'lpon talab qiladi. Talab qilinadigan kumush tangalar miqdori quyidagi formula asosida hisoblanadi:
+
+$$\text{Tribute}_{\text{demand}} = K_{base} \cdot \left(\frac{\text{Power}_{warlord}}{\text{Power}_{player} + 1.0}\right)^{1.35} \cdot \left(\text{Treasury}_{player}^{0.55} + 0.1 \cdot \text{Population}_{player}\right) \cdot \left(1.0 - \frac{\text{Distance}}{D_{max}}\right)$$
+
+Formuladagi parametrlar:
+- $K_{base} = 50.0$ (o'lponning bazaviy koeffitsiyenti).
+- $\text{Power}_{warlord}$ va $\text{Power}_{player}$: Tomonlarning umumiy harbiy kuchi (askarlar soni, qurol sifati va qal'a darajasi yig'indisi).
+- $\text{Treasury}_{player}$: O'yinchining xazinasidagi joriy kumush tanga zaxirasi.
+- $\text{Population}_{player}$: Shahardagi jami fuqarolar soni.
+- $\text{Distance}$: O'yinchi poytaxti bilan lord qal'asi orasidagi venzel masofasi (metrlarda).
+- $D_{max} = 5000.0$ metr (diplomatik ta'sir doirasining maksimal chegarasi).
+
+**Natijalar:**
+- **To'lov o'z vaqtida amalga oshirilsa:** Munosabat $\Delta R = +12$ ga ko'tariladi, fraktsiya tajovuzkorlik hisobi (Aggression Score) nolga tushiriladi va 90 o'yin kuniga tinchlik kafolatlanadi.
+- **To'lov rad etilsa yoki kechiktirilsa:** Fraktsiya tajovuzkorligi $\Delta \text{Aggression} = +45$ ga oshadi, munosabat $\Delta R = -35$ ga qulaydi va 48 o'yin soatiga mo'ljallangan qamal hisoblagichi (War Countdown Timer) ishga tushadi.
+
+### 22.2.3. Karvon Yo'llari Logistikasi va Savdo Arbitraji
+
+Karvonlar orqali amalga oshiriladigan ikki tomonlama savdo sayohat vaqti quyidagi formula bilan hisoblanadi:
+$$T_{roundtrip} = 2 \times \sum_{k=1}^{N} \frac{D_k}{v_{caravan} \cdot M_{road, k}} + T_{post}$$
+
+Bunda:
+- $D_k$: Marshrutning $k$-segmenti uzunligi (metrlarda).
+- $v_{caravan}$: Karvonning bazaviy tezligi (Yuk xachiri: $4.0\text{ km/soat}$, O'giz aravasi: $2.5\text{ km/soat}$, To'rt g'ildirakli og'ir furgon: $3.2\text{ km/soat}$).
+- $T_{post} = 6.0$ soat (manzildagi tushirish-ortish va bojxona rasmiylashtiruvi vaqti).
+- $M_{road, k}$: Yo'l qoplamasining harakat tezligi multiplikatori:
+  - Yo'lsiz yovvoyi tabiat (Wilderness / Mud): $0.70\times$
+  - Shag'al / Tuproq yo'l (Dirt Path): $1.15\times$
+  - Toshlangan yo'l (Cobblestone Road): $1.35\times$
+  - Qirollik shoh ko'chasi (Royal Highway): $1.60\times$
+
+Karvon sayohatidan olinadigan sof foyda (Net Profit):
+$$\text{NetProfit} = \sum_{i=1}^{M} Q_i \cdot \left(\text{Price}_{dest, i} - \text{Price}_{origin, i}\right) - \left(C_{escort} + C_{rations} + \text{Tariff}_{border}\right)$$
+
+Bunda yuk sig'imi: Yuk xachiri ($150\text{ kg}$), O'g'iz aravasi ($600\text{ kg}$), Og'ir furgon ($1800\text{ kg}$). Agar savdo yo'lida qaroqchilar xavfi yuqori bo'lsa, qurolli soqchilar narxi ($C_{escort}$) keskin ortadi.
+
+### 22.2.4. Josuslik Mexanikasi va Diversiya Turlari
+
+Tier 3 Elchixona yoki Qorong'u Taverna orqali yollanadigan josuslar raqib qal'asiga yuboriladi. 5 ta diversiya topshirig'i mavjud:
+1. **Texnologiya va Chizmalarni O'g'irlash (Steal Blueprint/Tech):** O'rganilmagan ishlab chiqarish retseptlari va arxitektura chizmalarini qo'lga kiritadi.
+2. **Don Omborini Zaharlash (Poison Granary):** Ombordagi don zaxirasining $30\% - 60\%$ qismini yaroqsiz qiladi, shahar aholisi kayfiyatini $-25$ ballga tushiradi.
+3. **Qasroga O't Qo'yish (Arson):** Yog'och taxta omborlari yoki qurilayotgan qamal qurollarini yoqib yuboradi.
+4. **Dehqonlar Qo'zg'olonini Qo'zg'atish (Incite Peasant Revolt):** Fuqarolar sadoqatini pasaytirib, mahalliy qurolli isyonchilarni vujudga keltiradi.
+5. **Qal'a Darvozasini Buzish (Sabotage Portcullis):** Qamal boshlanishi arafasida dushman darvozasining temir mexanizmini ishdan chiqarib, uni ochiq qoldiradi.
+
+Josuslik muvaffaqiyati ehtimolligi ($P_{success}$):
+$$P_{success} = \frac{\text{Skill}_{spy} \cdot (1.0 - \text{Security}_{target}) \cdot \left(1.0 + \frac{\text{Bribe}}{500}\right)}{\text{BaseDifficulty}_{mission} + \text{GuardAlertness}_{target}}$$
+
+Agar operatsiya barbod bo'lsa, josus asir olinadi va qiynoqqa solinadi. Natijada dushman darhol $+60$ Casus Belli oladi, munosabat $\Delta R = -50$ ga pasayadi va butun mintaqa bo'ylab o'yinchi sha'niga la'nat e'lon qilinadi.
+
+### 22.2.5. Urush E'lon Qilish Sabablari (Casus Belli Tizimi)
+
+AI Lordlar o'zlarining Tajovuzkorlik Hisobi ($A_{score} \in [0, 150]$) $100$ balldan oshganda rasmiy urush e'lon qiladi:
+1. To'lanmagan o'lpon muddati tugashi: $+50$ ball.
+2. Bahsli chegara zonasida o'yinchi tomonidan Istehkom yoki Qorovul minorasi qurilishi: $+35$ ball.
+3. Tijorat karvonining talanishi yoki savdogarlarning o'ldirilishi: $+40$ ball.
+4. Diversiya paytida fosh etilgan josusning qo'lga olinishi: $+60$ ball.
+5. Chegara ibodatxonalarining majburiy diniy o'zgartirilishi: $+40$ ball.
+6. Qonuniy sulolaviy nikoh taklifining haqoratomuz rad etilishi: $+25$ ball.
+
+## 22.3. Feodal Urushlar, Qamal Jangi va Hududlarni Bo'ysundirish
+
+Urush holatida simulyatsiya keng ko'lamli taktik bosqichga o'tadi:
+- **Voxel Qamallari va Istehkomlarning Buzilishi:** Dushman trebuchetlar, katapultalar va og'ir taranlar bilan hujum qiladi. Har bir tosh devor venzeli o'zining jismoniy mustahkamligiga ega — snaryadlar zarbidan devorlar real vaqtda parchalanadi, xarsanglar qulab tushadi va himoyachilarni ezib yuboradi.
+- **Asosiy Qasr Zalini (Great Hall) Egallash:** Shahar mudofaasini yorib o'tib, markaziy taxt zali (`KeepCore`) egallansa va AI Lord taslim qilinsa, uning barcha qishloqlari, konlari va infratuzilmasi o'yinchining tobeligiga o'tadi.
+- **Asirlar va Tovon Pulini Undirish:** Asirga olingan lordlar qasr zindoniga tashlanadi. O'yinchi ularga 3 xil chora ko'rishi mumkin:
+  1. *Katta Tovon Puli (Ransom):* 5,000 dan 25,000 gacha kumush tanga evaziga ozod qilish.
+  2. *Qat'iy Vassallik Qasamyodi:* Lordni o'z yerlarida qoldirib, har mavsumiy soliq to'lovchi vassalga aylantirish.
+  3. *Ommaviy Qatl Qilish:* Boshqa dushman lordlarga qo'rquv solish, lekin ularning ittifoqchilari bilan munosabatni abadiy $-100$ darajasida muzlatish.
+
+## 22.4. Ko'p O'yinchili Rejim (Steam P2P 2–4 O'yinchi) va Tarmoq Arxitekturasi
+
+Voxel Lord Godot 4.3 platformasida 2 nafardan 4 nafargacha o'yinchilar uchun mo'ljallangan Steamworks P2P (Peer-to-Peer) ko'p o'yinchili kooperativ va raqobat rejimlarini taqdim etadi.
+
+### 22.4.1. Tarmoq Topologiyasi va Boshqaruv Qoidalari
+
+Tarmoq arxitekturasi **Host-Authoritative Client-Server** modeliga tayanadi. Bitta o'yinchi xost (Server) vazifasini bajaradi, qolgan 1–3 nafar o'yinchi esa mijoz (Client) sifatida ulanadi. Bog'lanish `SteamMultiplayerPeer` (GodotSteam GDExtension) orqali amalga oshiriladi, bu esa NAT-traversal, xavfsiz Steam ID autentifikatsiyasi va Steam Relay tarmoqlari orqali to'g'ridan-to'g'ri port ochmasdan o'ynash imkonini beradi. Mahalliy tarmoq (LAN) uchun esa Godotning standart `ENetMultiplayerPeer` drayveriga to'liq o'tish ta'minlangan.
+
+- **Server Simulyatsiya Chastotasi (Tick Rate):** Qat'iy $20\text{ Hz}$ ($50\text{ ms}$ interval). Voxel fizikasi, qulashlar, shaxta gazi tarqalishi, AI FSM qarorlari va iqtisodiy oqimlar faqat xostda hisoblanadi.
+- **Mijoz Render Interpolyatsiyasi:** $60 - 144\text{ Hz}$. Mijoz tomonida barcha personajlar va jonzotlar harakati Hermite kubik splayn (Hermite cubic spline) interpolyatsiyasi orqali silliqlanadi.
+- **Tarmoq O'tkazuvchanlik Byudjeti (Bandwidth Budget):** Har bir ulangan mijoz uchun sekundiga ko'pi bilan $35\text{ KB/s}$ ma'lumotlar oqimi belgilangan.
+
+### 22.4.2. Binar Tarmoq Paketlari Tuzilmasi (Packet Bit-Packing Layout)
+
+Tarmoq uzatishlarida ortiqcha JSON yoki String formatlaridan voz kechilib, barcha ma'lumotlar ixcham xom baytlar (`PackedByteArray`) sifatida uzatiladi:
+
+| Paket ID | Paket Nomi | Tarmoq Kanali | Hajmi (Bayt) | Aniq Binar Maydonlar Tuzilishi (Byte Layout) |
+|---|---|---|---|---|
+| `0x01` | **ClientInputPacket** | Unreliable Ordered (Kanal 0) | **14 B** | `[tick: uint32 (4B)]` `[move_x: int8 (1B)]` `[move_z: int8 (1B)]` `[pitch: int16 (2B)]` `[yaw: int16 (2B)]` `[input_flags: uint16 (2B)]` `[equipped_slot: uint16 (2B)]` |
+| `0x02` | **VoxelDeltaModify** | Reliable Ordered (Kanal 1) | **11 B** | `[chunk_x: int16 (2B)]` `[chunk_y: int16 (2B)]` `[chunk_z: int16 (2B)]` `[local_voxel_idx: uint16 (2B)]` `[block_type: uint8 (1B)]` `[meta_flags: uint8 (1B)]` `[actor_id: uint8 (1B)]` |
+| `0x03` | **EntitySnapshot** | Unreliable (Kanal 2) | **10 B / ob'ekt** | `[entity_id: uint16 (2B)]` `[pos_x: float16 (2B)]` `[pos_y: float16 (2B)]` `[pos_z: float16 (2B)]` `[packed_yaw_state: uint8 (1B)]` `[health_pct: uint8 (1B)]` |
+| `0x04` | **CaveInEventPacket** | Reliable Ordered (Kanal 1) | **13 B** | `[center_x: int16 (2B)]` `[center_y: int16 (2B)]` `[center_z: int16 (2B)]` `[radius: uint8 (1B)]` `[collapse_seed: uint32 (4B)]` `[debris_count: uint16 (2B)]` |
+| `0x05` | **GasPocketUpdate** | Unreliable (Kanal 2) | **8 B** | `[chunk_id: uint32 (4B)]` `[gas_type: uint8 (1B)]` `[concentration_pct: uint8 (1B)]` `[pressure: uint16 (2B)]` |
+| `0x06` | **WorldChunkStream** | Reliable Fragmented (Kanal 3) | **O'zgaruvchan** | `[chunk_x: int16 (2B)]` `[chunk_y: int16 (2B)]` `[chunk_z: int16 (2B)]` `[compressed_len: uint16 (2B)]` `[zlib_compressed_voxels: 32x32x32 nibbles]` |
+
+### 22.4.3. Voxel O'zgarishi RPC Ketma-ketligi va Reconciliation
+
+Dunyo venzellarini o'zgartirish (qazish yoki qo'yish) jarayoni kechikishni (ping) yashirish uchun quyidagi aniq tartibda kechadi:
+1. **Mijozning Vizual Taxmini (Client Prediction):** O'yinchi sichqoncha bilan venzelni burg'ulaganda, mijoz darhol bolg'alash ovozi, chaqnoq zarralari va yoriqlar teksturasini ko'rsatadi.
+2. **Serverga So'rov Yuborish:** Mijoz `@rpc("call_local", "reliable") func request_voxel_modify(pos: Vector3i, new_type: int)` funktsiyasini chaqiradi.
+3. **Xostning Avtoritar Tekshiruvi (Host Validation):**
+   - O'yinchi va venzel orasidagi masofa $\le 4.5\text{ metr}$ ekanligi tekshiriladi.
+   - O'yinchining qo'lida ushbu venzel qattiqligiga mos asbob (Pickaxe Tier) mavjudligi tekshiriladi.
+   - Asbob sovish vaqti (cooldown) va o'yinchi harakat qoidalari tekshiriladi.
+4. **Xostning Tasdiqlashi va Tarqatishi (Host Commit & Broadcast):** Xost dunyo matritsasini yangilaydi, saqlash buferiga delta o'zgarishini kiritadi, shaxta tayanch barqarorligini (`MinePhysicsServer`) tekshiradi va barcha ulangan mijozlarga `0x02` (`VoxelDeltaModify`) binar paketini jo'natadi.
+5. **Xatolikni Qaytarish (Reconciliation):** Agar xost so'rovni rad etsa (masalan, boshqa o'yinchi shu venzelni bir necha millisekund oldin olib qo'ygan bo'lsa), xost tuzatuvchi paket yuboradi va mijozning vizual holati darhol asl holatiga qaytariladi (rollback).
+
+### 22.4.4. O'yin Rejimlari: Yagona Qirollik va Feodal Tarqoqlik
+
+1. **Yagona Taxt (Shared Kingdom / Co-op):**
+   - Barcha o'yinchilar bitta umumiy g'azna, umumiy omborlar va yagona fuqarolar tarmog'iga ega bo'ladi.
+   - Rollar ixtisoslashuvi: 1-O'yinchi — Iqtisodiyot va diplomatiya lordi; 2-O'yinchi — Qal'a me'mori va shaxtalar muhandisi; 3-O'yinchi — Mudofaa marshali va qo'shin qo'mondoni; 4-O'yinchi — Karvonlar va qishloq xo'jaligi boshqaruvchisi.
+2. **Feodal Tarqoqlik (Rival Dynasties / PvPvE):**
+   - Har bir o'yinchi $1000\times 1000$ masshtabdagi umumiy dunyoning turli nuqtalarida o'z mustaqil qasrlarini quradi.
+   - O'yinchilar o'zaro savdo shartnomalari, ittifoqlar tuzishi, bir-birlariga josus yuborishi yoki nodir konlar uchun qamal urushlarini olib borishi mumkin.
 
 ---
 
@@ -3485,19 +3633,124 @@ Vaqtinchalik shoshilinch choralar (Masalan: Shoshilinch hosil yig'ish — mehnat
 
 # 83. TASHQI MUNOSABATLAR VA STATUSTLAR
 
-Dushman (Hostile), Sovuq (Unfriendly), Neytral (Neutral), Do'stona (Friendly), Ittifoqchi (Allied), Vassal (Qaram tobe).
+Feodal dunyoda suverenitet faqat harbiy qudrat bilan emas, balki mintaqadagi qo'shni lordlar, diniy iyerarxiya va savdogarlar gildiyalari bilan o'rnatilgan o'zaro diplomatik aloqalar orqali kafolatlanadi. O'yinchi har bir mustaqil hukmdor bilan o'zaro ishonch ($Trust \in [0, 100]$), xalqaro obro' ($Honor \in [0, 100]$) va diplomatik munosabat ($Relation \in [-100, +100]$) ko'rsatkichlariga ega bo'ladi.
+
+### 83.1. Diplomatik Statuslar Matritsasi
+
+O'yinchi va AI davlatlar o'rtasida quyidagi 7 ta yuridik status amal qiladi:
+
+| Status Nomi | Munosabat Diapazoni | Diplomatik Harakatlar Huquqi | Chegara va Bojxona Qoidalari | Harbiy Eskalatsiya Xavfi |
+|---|---|---|---|---|
+| **Urush (War)** | $[-100, -60]$ | Har qanday diplomatik muzokara faqat taslim bo'lish yoki tovon to'lash sharti bilan ochiladi. | Chegaralar mutlaq yopiq. Barcha elchilar hibsga olinadi yoki qatl etiladi. | Maksimal; qamal qo'shinlari, qishloqlarni yoqish va reydlar doimiy kechadi. |
+| **Dushmanlik (Hostile)** | $[-59, -20]$ | Faqat norozilik notalari va chegara demarkatsiyasi talablari yuborilishi mumkin. | To'liq iqtisodiy embargo, tovarlar almashinuvi taqiqlangan, savdo yo'llari yopilgan. | Yuqori; chegarada qurolli to'qnashuvlar va josuslik diversiyalari faol olib boriladi. |
+| **Sovuq (Unfriendly)** | $[-19, -1]$ | Savdo tariflarini pasaytirish bo'yicha cheklangan muzokaralar olib borish mumkin. | Tovarlarga $+50\%$ eksport-import boji qo'llaniladi. Qurolli otryadlar kirishi taqiqlanadi. | O'rtacha; kichik chegaraviy tushunmovchiliklar ham jiddiy mojaroga olib kelishi mumkin. |
+| **Neytral (Neutral)** | $[0, +19]$ | Elchilar almashinuvi, asosiy tijorat shartnomalari, karvonsaroy ochish huquqi. | Standart bozor narxlari ($0\%$ boj). Tinch fuqarolar erkin harakatlanadi. | Past; tomonlar faqat o'z manfaatlarini himoya qiladi, tajovuz qilmaydi. |
+| **Do'stona (Friendly)** | $[+20, +59]$ | Hujum qilmaslik pakti (NAP), texnologiya litsenziyalari, mudofaa maslahatlashuvlari. | Bojxona to'lovlariga $-25\%$ chegirma. Chegarada qurolsiz tranzit o'tishga ruxsat. | Minimal; har ikki tomon do'stona aloqalarni mustahkamlashga intiladi. |
+| **Harbiy Ittifoq (Allied)** | $[+60, +89]$ | Umumiy harbiy rejalashtirish, birgalikda qamal boshlash, o'zaro qurol-yarog' yetkazib berish. | To'liq erkin savdo koridori. Qo'shinlar ittifoqchi qal'alarda bepul davolanadi va ta'minlanadi. | Nol; ittifoqchilar bir-biriga hujum qilmaydi va dushmanga qarshi birgalikda kurashadi. |
+| **Vassallik / Qaramlik (Vassalage)** | $[+90, +100]$ | Vassal lord o'yinchi farmonlariga bo'ysunadi, harbiy chaqiriqlarga majburiy askar yuboradi. | Vassal o'zining sof mavsumiy daromadining $15\%$ qismini o'yinchi xazinasiga o'tkazadi. | Maxsus; agar vassalning sadoqati (Loyalty) $30$ balldan tushib ketsa, ozodlik isyoni ko'taradi. |
+
+### 83.2. Ishonch (Trust) va Obro' (Honor) Dinamikasi
+
+Munosabatlar balansi vaqt o'tishi bilan o'zgaradi:
+- **Ishonchning Tabiiy So'nishi (Trust Decay):** Har qanday faol shartnomasiz qolgan munosabatlar har mavsumda $50$ bazaviy nuqtaga qarab siljiydi:
+  $$\frac{d(Trust)}{dt} = -\mu \cdot (Trust - 50)$$
+  Bunda $\mu = 0.015$ kunlik koeffitsiyent.
+- **Xalqaro Obro' (Honor):** Shartnomalarni buzish (masalan, Hujum qilmaslik paktini buzib to'satdan qamal boshlash) o'yinchining obro'sini $-50$ ga tushiradi. Past obro' barcha neytral lordlarning o'yinchiga nisbatan shubhasini oshiradi va yangi ittifoqlar tuzish narxini $3.0\times$ barobar qimmatlashtiradi.
+
+### 83.3. Diplomatik Elchilar (Emissaries) Mexanikasi
+
+Diplomatik takliflar darhol menyu orqali yetib bormaydi. O'yinchi Elchixonadan (Embassy) maxsus chopar yoki elchini (Emissary) jo'natishi shart:
+- Elchi dunyo xaritasi bo'ylab jismoniy personaj sifatida yo'lga chiqadi ($v_{emissary} = 5.5\text{ km/soat}$).
+- Yo'lda elchiga qaroqchilar hujum qilishi yoki dushman josuslari tomonidan o'ldirilishi xavfi mavjud.
+- Elchi dushman qal'asiga kirgach, 12 soat davomida muzokaralar o'tkazadi va javob maktubi bilan qaytib keladi.
 
 ---
 
 # 84. DIPLOMATIK SHARTNOMALAR
 
-Savdo bitimi, Hujum qilmaslik pakti, Mudofaa ittifoqi, Nikoh diplimatiyasi, O'lpon to'lash, Sulh yoki Urush e'lon qilish.
+Feodal diplomatiya tizimida shartnomalar tomonlarning iqtisodiy va harbiy imkoniyatlarini mustahkamlovchi yuridik bitimlardir. O'yinchi elchilar orqali quyidagi 6 ta asosiy shartnomani imzolashi mumkin:
+
+### 84.1. Asosiy Shartnoma Turlari
+
+1. **Savdo Bitimi (Bilateral Trade Agreement):**
+   - Ikki shahar o'rtasida muntazam karvonlar qatnovini ochadi.
+   - Har ikki tomonda import tovarlariga qo'yiladigan soliqlar $50\%$ kamaytiriladi.
+   - O'yinchining bozorlarida chet el mahsulotlari (ipak, noyob rudalar, ziravorlar) paydo bo'ladi.
+2. **Hujum Qilmaslik Pakti (Non-Aggression Pact - NAP):**
+   - 120 o'yin kuniga mo'ljallangan mudofaa kafolati.
+   - Tomonlar bir-birining chegara zonasida istehkomlar qurmaslik majburiyatini oladi.
+   - Agar bir tomon paktni buzsa, xalqaro maydonda "Qasamyodbuzar" (Oathbreaker) tamg'asini oladi va barcha boshqa fraktsiyalar bilan munosabati $-40$ ga tushadi.
+3. **Mudofaa Ittifoqi (Mutual Defense Treaty):**
+   - Agar ittifoqchilardan biriga uchinchi tomon hujum qilsa, ikkinchi tomon 72 soat ichida kamida 25 nafar qurolli askar yoki har mavsum $2,000$ kumush tanga harbiy yordam yuborishga majbur.
+4. **Sulolaviy Nikoh Diplimatiyasi (Dynastic Marriage):**
+   - O'yinchi sulolasining shahzoda yoki malikasini qo'shni lord xonadoniga uzatish yoki kelin qilish.
+   - Munosabatlar darhol $+40$ ga ko'tariladi va 360 kunga mustahkamlanadi.
+   - Kelajakda qo'shni lord vafot etsa, uning taxtiga qonuniy merosxo'rlik da'vosini (Dynastic Claim) qo'yish imkonini beradi.
+5. **Mavsumiy O'lpon va Himoya Bitimi (Tribute & Protectorate Treaty):**
+   - Zaif shahar-davlat qudratli lordga har 30 kunda belgilangan miqdorda kumush yoki oziq-ovqat to'lab turish evaziga uning harbiy soyaboniga kiradi.
+6. **Sulh va Tovon Shartnomasi (Armistice & Peace Treaty):**
+   - Urushni to'xtatuvchi 180 kunlik qat'iy sulh.
+   - Mag'lub tomon g'olibga urush tovonini (War Indemnity: $5,000 - 30,000$ kumush) to'laydi va chegaradagi bahsli konlarni topshiradi.
+
+### 84.2. AI Lordlarning Takliflarni Qabul Qilish Ehtimoli (Acceptance Score)
+
+AI lordlar o'yinchi taklif qilgan shartnomani qabul qilish yoki rad etishni quyidagi ko'p faktorli baholash formulasi orqali hisoblaydi:
+
+$$AcceptanceScore = \left(Relation \times 0.40\right) + \left(\frac{Power_{player}}{Power_{AI}} \times 25.0\right) + \left(OfferValue \times 0.15\right) - \left(DemandValue \times 0.20\right) + \left(Honor_{player} \times 0.20\right)$$
+
+Bunda:
+- $Relation \in [-100, +100]$: Joriy diplomatik munosabat bali.
+- $\frac{Power_{player}}{Power_{AI}}$: Harbiy kuchlar nisbati.
+- $OfferValue$: O'yinchi taklif qilayotgan to'lov yoki hadyalar qiymati (har 100 kumush tangaga 1 ball).
+- $DemandValue$: O'yinchi so'rayotgan talablar (yer, texnologiya, soliq) og'irligi.
+- $Honor_{player} \in [0, 100]$: O'yinchining obro' darajasi.
+
+**Qaror chegaralari:**
+- $AcceptanceScore \ge 60.0$: Bitim to'liq qabul qilinadi va muhr bosiladi.
+- $40.0 \le AcceptanceScore < 60.0$: AI lord qo'shimcha tovon yoki o'zgartirish talab qiladi (Counter-offer).
+- $AcceptanceScore < 40.0$: Taklif qat'iy rad etiladi va elchi sharmandalik bilan qaytariladi.
 
 ---
 
 # 85. HUDUD CHEGARALARI (TERRITORY CONTROL)
 
-Qorovul minoralari (Watchtowers) qurish orqali hududni o'z mulkiga qo'shib olish. Kengayish uchun yetarli aholi va ma'muriy boshqaruv kuchi talab qilinadi.
+Feodal qirollikning yer chegaralari faqat xaritadagi chiziq emas, balki real venzel olamida fuqarolar xavfsiz harakatlanadigan, dehqonchilik qilinadigan, daraxtlar kesiladigan va konlar qaziladigan suveren hududdir.
+
+### 85.1. Hududiy Ta'sir Sohalari va Radiusi
+
+Chegara nazorati ma'muriy va harbiy binolardan tarqaluvchi ta'sir maydoniga (Influence Radius) asoslanadi:
+
+| Bino / Inshoot Nomi | Bazaviy Ta'sir Radiusi ($R_{influence}$) | Qurilish Narxi | Chegara Vazifasi va Imkoniyatlari |
+|---|---|---|---|
+| **Asosiy Qasr Zali (Great Keep Core)** | $150.0\text{ metr}$ | 500 Tosh, 200 Yog'och, 50 Temir | Poytaxtning markaziy suverenitet o'zagi; barcha soliqlar shu yerdan hisoblanadi. |
+| **Toshli Qorovul Minorasi (Watchtower)** | $45.0\text{ metr}$ | 120 Tosh, 40 Yog'och | Chegarani kengaytiradi, 4 nafar kamonchi uchun kuzatuv va o't ochish pozitsiyasi. |
+| **Chegara Tosh Belgisi (Boundary Stone)** | $25.0\text{ metr}$ | 10 Kesilgan Tosh, 2 Ohak | Arzon demarkatsiya belgisi; yaylov va o'rmon chegaralarini rasmiylashtiradi. |
+| **Harbiy Fort / Chegara Istehkomi (Border Fort)** | $80.0\text{ metr}$ | 300 Tosh, 150 Yog'och, 20 Temir | Strategik tog' yo'llari va daryo kechuvlarini nazorat qiluvchi mustahkam garnizon. |
+
+### 85.2. Chegara Ta'sirining Matematik Dala Formulasi
+
+Biror venzel koordinatasidagi $(x, z)$ nuqtada shaharning suverenitet ta'sir kuchi ($I_{border}$) markazdan uzoqlashgan sari pasayadi:
+
+$$I_{border}(d) = \frac{Power_{settlement}}{1.0 + \left(\frac{d}{R_{influence}}\right)^2}$$
+
+Bunda:
+- $d$: Nuqtadan eng yaqin chegara inshootigacha bo'lgan gorizontal masofa (metrlarda).
+- $Power_{settlement} = 100.0 \times \left(1.0 + 0.05 \cdot Population\right)$: Shaharning ma'muriy kuchi.
+- Agar bir nuqtada ikki raqib davlatning ta'sir kuchi to'qnashsa, qaysi tomonning $I_{border}$ ko'rsatkichi yuqori bo'lsa, o'sha tomon hududiy nazoratni o'z qo'liga oladi.
+
+### 85.3. Neytral Bufer Hududlar (Neutral Wilderness Buffer Zones)
+
+Ikkala davlat ta'sir doirasi yetib bormagan oraliq zonalar "Neytral Bufer Hudud" hisoblanadi:
+- Bu hududda o'yinchi ham, AI lordlar ham daraxt kesishi, loy va tosh qazishi mumkin.
+- Ushbu zonalarda qonun va tartib yo'q — qaroqchilar to'dalari lager quradi, yovvoyi yirtqichlar ko'payadi va karvonlarga pistirmalar uyushtiriladi.
+- Bufer zonada o'yinchi yangi Qorovul minorasi qursa, bu raqib davlat tomonidan tajovuz deb baholanadi va ularning tajovuzkorlik hisobiga (Aggression Score) darhol $+35$ ball qo'shiladi.
+
+### 85.4. Chegara Buzilishi va Mojaroning Eskalatsiyasi
+
+Chegara daxlsizligi qat'iy nazorat qilinadi:
+1. **1-Darajali Qoidabuzarlik (Tranzit Ogohlantirish):** Agar qurolli dushman otryadi shartnomasiz chegaradan $10\text{ metrdan}$ ko'proq ichkariga kirsa, diplomatik ogohlantirish yuboriladi va har soatda chegara zo'riqishi $+5$ ga oshadi.
+2. **2-Darajali Qoidabuzarlik (Iqtisodiy O'g'rilik):** Chet el fuqarolari o'yinchi chegarasida ruda qazisa yoki o'rmon kessa, soqchilar ularni hibsga oladi, asboblari va qazilgan resurslari musodara qilinadi.
+3. **3-Darajali Qoidabuzarlik (Istehkom Qurilishi):** O'zga davlat chegarasi ichida noqonuniy bino qurilsa, bu to'g'ridan-to'g'ri urush sababi (Casus Belli $+60$) bo'lib xizmat qiladi va mahalliy garnizonga binoni buzish va himoyachilarni yo'q qilish amri beriladi.
 
 ---
 
@@ -3797,73 +4050,599 @@ Har bir save fayl o'z versiyasiga ega bo'lib, o'yin yangilanishlari chiqqanda du
 
 # 114. GODOT 4 DASTURIY ARXITEKTURASI
 
-- **Core:** `GameManager`, `TimeManager`, `EventBus`, `SaveManager`.
-- **World:** `WorldManager`, `ChunkManager`, `VoxelGenerator`, `WeatherManager`.
-- **Entities:** `Citizen`, `Player`, `Animal`, `Enemy`, `Boss`.
-- **AI:** `TaskManager`, `JobManager`, `CitizenBrain`, `FactionAI`.
-- **Economy:** `ItemDatabase`, `InventorySystem`, `ProductionManager`, `TradeManager`.
-- **Settlement:** `BuildingManager`, `HousingManager`, `TerritoryManager`, `CultureManager`.
-- **Combat:** `CombatManager`, `ProjectileSystem`, `SiegeSystem`.
-- **UI:** `HUD`, `RoyalLedger`, `WorldMap`, `DialogueManager`.
+Voxel Lord: Feudal Realm o'yini Godot 4.3 Forward Plus renderlash dvijogiga asoslangan bo'lib, uning arxitekturasi modullilik, yuqori unumdorlik va ko'p oqimli hisob-kitoblar (Multithreaded computing) tamoyillariga tayanadi. O'yin tizimlari o'zaro zaif bog'langan (loosely coupled) holda EventBus (Signal avtomagistrali) va Autoload Singletonlari orqali boshqariladi.
+
+### 114.1. Dasturiy Sahna Daraxti (Node Hierarchy & Scene Tree)
+
+Dvigatel sahnasi quyidagi qat'iy iyerarxiya bo'yicha tuzilgan:
+
+```
+Main (Node3D)
+├── Environment (WorldEnvironment, DirectionalLight3D)
+├── VoxelWorld (Node3D)
+│   ├── ChunkContainer (Node3D) — barcha faol 32x32x32 VoxelChunk instansiyalari
+│   └── NavigationRegionContainer (Node3D) — dinamik o'zgaruvchi NavigationRegion3D qismlari
+├── Entities (Node3D)
+│   ├── Players (Node3D) — mahalliy va tarmoqdagi o'yinchilar
+│   ├── Citizens (Node3D) — fuqarolar (LOD 0 va LOD 1 guruhlari)
+│   └── Enemies (Node3D) — qaroqchilar va qamal qo'shinlari
+├── Systems (Node)
+│   ├── GasSimulationSystem (Node)
+│   ├── GreenhouseThermalSystem (Node)
+│   └── DiplomacyManager (Node)
+├── NetworkSync (Node) — Steam P2P host-authoritative paket marshrutizatori
+└── UILayer (CanvasLayer)
+    ├── HUD (Control) — tezkor resurslar va asboblar paneli
+    ├── RoyalLedger (Control) — shahar hisob-kitoblari va soliq daftari
+    └── WorldMap (Control) — mintaqaviy xarita va diplomatiya interfeysi
+```
+
+### 114.2. Asosiy Autoload Singletonlar (Global Service Registry)
+
+O'yinda 7 ta asosiy tizimli Autoload skriptlari global xizmat sifatida ro'yxatdan o'tgan:
+
+1. **`GameManager` (`res://scripts/core/game_manager.gd`):** O'yin sessiyasini boshqarish, pauza, simulyatsiya tezligi ($1\times, 2\times, 5\times$), o'yin rejimi (Yagona qirollik yoki Feodal tarqoqlik) va saqlash/yuklash jarayonlarini nazorat qiladi.
+2. **`ChunkManager` (`res://scripts/core/chunk_manager.gd`):** Dunyoning fazoviy venzel matritsasini ($32\times 32\times 32$ blokli chunklar) boshqaradi. O'yinchi atrofidagi $9\times 7\times 9$ faol mintaqani xotirada saqlaydi va fon oqimlarida yangi chunklarni yuklaydi.
+3. **`GeologyManager` (`res://scripts/core/geology_manager.gd`):** Chuqur qatlamlarning mineral tarkibini, Gauss ehtimollik zichligi bo'yicha 24 ta mineralning paydo bo'lishini va shovqin generatsiyasini boshqaradi.
+4. **`MinePhysicsServer` (`res://scripts/core/mine_physics_server.gd`):** Shaxta shiftining tayanch barqarorlik indeksini ($S_c$) hisoblaydi, ustunlar radiusi va xavfli qulash (cave-in) kaskadlarini simulyatsiya qiladi.
+5. **`GreenhouseThermalSystem` (`res://scripts/core/greenhouse_thermal_system.gd`):** Issiqxonalarning termodinamik muvozanatini, geotermal bug' quvurlari issiqligini va Tundrada ekinlarni sovuqdan himoyalashni hisoblaydi.
+6. **`NetworkPacketManager` (`res://scripts/network/network_packet_manager.gd`):** Steam P2P orqali uzatiluvchi barcha binar tarmoq paketlarini (`ClientInputPacket`, `VoxelDeltaModify`, `EntitySnapshot`, `CaveInEventPacket`) xom baytlarga o'rash va ochishni amalga oshiradi.
+7. **`DiplomacyManager` (`res://scripts/diplomacy/diplomacy_manager.gd`):** 4 ta feodal fraktsiyalar bilan o'zaro munosabatlar, mavsumiy o'lpon hisob-kitoblari, karvonlar logistikasi va Casus Belli holatlarini boshqaradi.
 
 ---
 
 # 115. SCRIPT VAZIFALARI (GDSCRIPT & C#)
 
-- **GDScript:** O'yin mantig'i, kvestlar, personajlar muloqoti, UI boshqaruvi.
-- **C# / GDExtension:** Yuqori unumdorlik talab qiluvchi Voxel Meshing, Greedy algoritmlari, ko'p sonli aholining yo'l topish hisob-kitoblari.
+Tizimda tillar vazifasiga ko'ra aniq taqsimlangan:
+- **GDScript:** Yuqori darajadagi o'yin mantig'i, fuqarolar AI FSM holatlari, kvestlar, dialoglar, diplomatiya, iqtisodiy resurslar boshqaruvi va UI voqealari uchun qo'llaniladi.
+- **C# / GDExtension:** Yuqori unumdorlik va chuqur xotira manipulyatsiyasi talab qiluvchi hisob-kitoblar — Greedy Voxel Meshing, fon oqimlarida 3D shovqin (FastNoiseLite) matritsalarini to'ldirish va yuzlab fuqarolarning binar yo'l topish so'rovlari uchun mo'ljallangan.
+
+Quyida asosiy o'yin tizimlarining to'liq va ishlab chiqarishga tayyor GDScript implementatsiyalari keltirilgan:
+
+### 115.1. Geologiya Menejeri (`res://scripts/core/geology_manager.gd`)
+
+```gdscript
+class_name GeologyManager
+extends Node
+
+## 3D chuqur qatlamlar geologiyasi va 24 ta mineralning fazoviy taqsimotini boshqaruvchi tizim.
+
+@export var world_seed: int = 1337
+var noise_strata: FastNoiseLite
+var noise_veins: FastNoiseLite
+
+var mineral_catalog: Dictionary = {}
+
+func _ready() -> void:
+	noise_strata = FastNoiseLite.new()
+	noise_strata.seed = world_seed
+	noise_strata.noise_type = FastNoiseLite.TYPE_SIMPLEX_SMOOTH
+	noise_strata.frequency = 0.015
+
+	noise_veins = FastNoiseLite.new()
+	noise_veins.seed = world_seed + 101
+	noise_veins.noise_type = FastNoiseLite.TYPE_CELLULAR
+	noise_veins.frequency = 0.04
+
+	_register_all_minerals()
+
+func _register_all_minerals() -> void:
+	# 24 ta mineralning qatlam chegaralari, cho'qqi chuqurligi, sigma tarqalishi va bazaviy qiymati
+	_add_mineral(1, "Topsoil", 0, -15, -2, 5.0, 1.00, 1, 0.05)
+	_add_mineral(2, "Clay", 0, -35, -10, 8.0, 0.45, 2, 0.20)
+	_add_mineral(3, "Peat", 0, -25, -8, 6.0, 0.35, 2, 0.30)
+	_add_mineral(4, "Sandstone", -5, -60, -25, 15.0, 0.60, 3, 0.40)
+	_add_mineral(5, "Limestone", -15, -90, -45, 20.0, 0.50, 4, 0.60)
+	_add_mineral(6, "Halite", -20, -120, -60, 25.0, 0.30, 3, 2.50)
+	_add_mineral(7, "Coal", -15, -180, -75, 35.0, 0.55, 4, 1.00)
+	_add_mineral(8, "Copper Ore", -10, -110, -50, 22.0, 0.40, 5, 1.80)
+	_add_mineral(9, "Tin Ore", -25, -130, -70, 24.0, 0.32, 5, 2.20)
+	_add_mineral(10, "Sulfur", -40, -220, -120, 30.0, 0.25, 4, 3.00)
+	_add_mineral(11, "Saltpeter", -30, -160, -90, 28.0, 0.22, 3, 3.50)
+	_add_mineral(12, "Iron Ore", -45, -240, -130, 40.0, 0.45, 7, 4.00)
+	_add_mineral(13, "Lead", -60, -210, -140, 35.0, 0.28, 6, 3.20)
+	_add_mineral(14, "Zinc", -70, -230, -150, 35.0, 0.25, 6, 3.80)
+	_add_mineral(15, "Nickel", -90, -260, -175, 38.0, 0.20, 8, 5.50)
+	_add_mineral(16, "Marble", -50, -280, -160, 50.0, 0.30, 8, 6.00)
+	_add_mineral(17, "Granite", -80, -350, -220, 65.0, 0.65, 10, 2.00)
+	_add_mineral(18, "Silver Ore", -110, -280, -195, 35.0, 0.18, 8, 15.00)
+	_add_mineral(19, "Gold Ore", -160, -340, -250, 40.0, 0.12, 10, 100.00)
+	_add_mineral(20, "Platinum Ore", -220, -350, -290, 30.0, 0.06, 12, 220.00)
+	_add_mineral(21, "Basalt", -250, -350, -320, 45.0, 0.50, 12, 3.00)
+	_add_mineral(22, "Emerald", -120, -260, -190, 25.0, 0.04, 14, 180.00)
+	_add_mineral(23, "Ruby", -180, -320, -260, 30.0, 0.03, 16, 280.00)
+	_add_mineral(24, "Diamond", -280, -350, -330, 22.0, 0.015, 20, 500.00)
+
+func _add_mineral(id: int, m_name: String, y_max: int, y_min: int, y_peak: int, sigma: float, prob_peak: float, hardness: int, val: float) -> void:
+	mineral_catalog[id] = {
+		"name": m_name, "y_max": y_max, "y_min": y_min,
+		"y_peak": y_peak, "sigma": sigma, "prob_peak": prob_peak,
+		"hardness": hardness, "base_value": val
+	}
+
+func sample_voxel_type(global_x: int, global_y: int, global_z: int) -> int:
+	if global_y > 0:
+		return 0 # Havo yoki yer usti qatlami
+	if global_y >= -15:
+		return 1 # Unumdor tuproq qatlami
+	if global_y < -350:
+		return 21 # Tub basalt / Bedrock
+
+	var base_block: int = 17 # Granit matritsasi
+
+	for m_id in mineral_catalog.keys():
+		var data = mineral_catalog[m_id]
+		if global_y <= data["y_max"] and global_y >= data["y_min"]:
+			var depth_factor: float = exp(-pow(float(global_y - data["y_peak"]), 2.0) / (2.0 * pow(data["sigma"], 2.0)))
+			var current_prob: float = data["prob_peak"] * depth_factor
+			var n_val: float = (noise_veins.get_noise_3d(global_x, global_y, global_z) + 1.0) * 0.5
+			if n_val < current_prob:
+				return m_id
+
+	return base_block
+```
+
+### 115.2. Shaxta Fizikasi Serveri (`res://scripts/core/mine_physics_server.gd`)
+
+```gdscript
+class_name MinePhysicsServer
+extends Node
+
+## Shaxta shiftining mustahkamligi, tayanch nurlari va o'pirilish fizikasini hisoblovchi avtoritar server.
+
+signal cave_in_triggered(center_pos: Vector3i, radius: float)
+
+const SUPPORT_RADII: Dictionary = {
+	"wood_soft": 3.0,
+	"wood_hard": 5.0,
+	"stone_pillar": 7.5,
+	"steel_arch": 11.0
+}
+
+const ROCK_TENSILE_K: Dictionary = {
+	1: 0.20,  # Tuproq / Loy
+	4: 0.55,  # Qumtosh
+	5: 0.55,  # Ohaktosh
+	16: 0.90, # Marmar
+	17: 0.90, # Granit
+	21: 1.00  # Basalt
+}
+
+var active_supports: Dictionary = {}
+
+func register_support_beam(pos: Vector3i, beam_type: String) -> void:
+	if SUPPORT_RADII.has(beam_type):
+		active_supports[pos] = {
+			"type": beam_type,
+			"radius": SUPPORT_RADII[beam_type]
+		}
+
+func remove_support_beam(pos: Vector3i) -> void:
+	active_supports.erase(pos)
+
+func evaluate_ceiling_stability(pos: Vector3i, rock_type: int, unsupported_span: float) -> float:
+	var k_rock: float = ROCK_TENSILE_K.get(rock_type, 0.50)
+	var support_sum: float = 0.0
+
+	for sup_pos in active_supports.keys():
+		var sup_data = active_supports[sup_pos]
+		var dist_sq: float = float(pos.distance_squared_to(sup_pos))
+		var r: float = sup_data["radius"]
+		if dist_sq <= (r * r):
+			support_sum += (r * r) / (dist_sq + 0.1)
+
+	var effective_support: float = max(1.0, support_sum)
+	var depth: float = abs(float(pos.y))
+	var denominator: float = 1.0 + (0.08 * pow(unsupported_span * 0.5, 2.0) * (1.0 + 0.35 * (depth / 100.0)))
+
+	var stability_index: float = (k_rock * effective_support) / denominator
+	return stability_index
+
+func process_mined_voxel(pos: Vector3i, rock_type: int, unsupported_span: float) -> void:
+	var ceiling_pos: Vector3i = pos + Vector3i(0, 1, 0)
+	var stability: float = evaluate_ceiling_stability(ceiling_pos, rock_type, unsupported_span)
+	if stability < 0.75:
+		trigger_cave_in(ceiling_pos, 4.0)
+
+func trigger_cave_in(center: Vector3i, radius: float) -> void:
+	emit_signal("cave_in_triggered", center, radius)
+```
+
+### 115.3. Issiqxona Termodinamika Tizimi (`res://scripts/core/greenhouse_thermal_system.gd`)
+
+```gdscript
+class_name GreenhouseThermalSystem
+extends Node
+
+## Tundra biomidagi issiqxonalarning termodinamik muvozanati va ekinlar hosildorligini hisoblovchi tizim.
+
+@export var ambient_temperature: float = -25.0
+@export var solar_irradiance: float = 350.0
+
+func calculate_greenhouse_temp(volume_m3: float, glass_area: float, insulated_wall_area: float, geothermal_vent_kw: float) -> float:
+	var u_glass: float = 1.0 / 0.18 # 5.55 W/m2*K
+	var u_wall: float = 1.0 / 1.60  # 0.625 W/m2*K
+
+	var total_conductance: float = (glass_area * u_glass) + (insulated_wall_area * u_wall)
+	var q_solar_watts: float = glass_area * solar_irradiance * 0.75
+	var q_geo_watts: float = geothermal_vent_kw * 1000.0
+
+	var total_heat_in: float = q_solar_watts + q_geo_watts
+	var delta_t: float = total_heat_in / max(1.0, total_conductance)
+	return ambient_temperature + delta_t
+
+func get_crop_yield_multiplier(internal_temp: float) -> float:
+	if internal_temp < 0.0:
+		return 0.0 # Muzlab nobud bo'ldi
+	elif internal_temp < 10.0:
+		return 0.25 # Rivojlanish sust
+	elif internal_temp < 18.0:
+		return 0.65 # O'rtacha o'sish
+	elif internal_temp <= 28.0:
+		return 1.00 # Optimal hosil
+	else:
+		return 0.30 # Issiqdan so'ligan
+```
+
+### 115.4. Binar Tarmoq Paketlari Menejeri (`res://scripts/network/network_packet_manager.gd`)
+
+```gdscript
+class_name NetworkPacketManager
+extends Node
+
+## Steam P2P ko'p o'yinchili rejim uchun binar paketlarni ixcham qadoqlovchi va yechuvchi tizim.
+
+enum PacketType {
+	CLIENT_INPUT = 1,
+	VOXEL_DELTA_MODIFY = 2,
+	ENTITY_SNAPSHOT = 3,
+	CAVE_IN_EVENT = 4,
+	GAS_UPDATE = 5,
+	CHUNK_STREAM = 6
+}
+
+static func pack_voxel_modify(chunk_pos: Vector3i, local_idx: int, block_type: int, meta: int, actor_id: int) -> PackedByteArray:
+	var buf = StreamPeerBuffer.new()
+	buf.big_endian = false
+	buf.put_u8(PacketType.VOXEL_DELTA_MODIFY)
+	buf.put_16(chunk_pos.x)
+	buf.put_16(chunk_pos.y)
+	buf.put_16(chunk_pos.z)
+	buf.put_u16(local_idx)
+	buf.put_u8(block_type)
+	buf.put_u8(meta)
+	buf.put_u8(actor_id)
+	return buf.data_array
+
+static func unpack_voxel_modify(data: PackedByteArray) -> Dictionary:
+	var buf = StreamPeerBuffer.new()
+	buf.big_endian = false
+	buf.data_array = data
+	var p_type = buf.get_u8()
+	if p_type != PacketType.VOXEL_DELTA_MODIFY:
+		return {}
+
+	var chunk_pos = Vector3i(buf.get_16(), buf.get_16(), buf.get_16())
+	var local_idx = buf.get_u16()
+	var block_type = buf.get_u8()
+	var meta = buf.get_u8()
+	var actor = buf.get_u8()
+
+	return {
+		"chunk_pos": chunk_pos,
+		"local_idx": local_idx,
+		"block_type": block_type,
+		"meta": meta,
+		"actor_id": actor
+	}
+```
+
+### 115.5. Diplomatiya Menejeri (`res://scripts/diplomacy/diplomacy_manager.gd`)
+
+```gdscript
+class_name DiplomacyManager
+extends Node
+
+## Fraktsiyalararo munosabatlar, o'lpon talablari va karvon sayohatlarini boshqaruvchi tizim.
+
+signal tribute_demanded(faction_id: int, amount: int)
+signal war_declared(faction_id: int, reason: String)
+
+var factions: Dictionary = {
+	1: {"name": "Coastal Merchants", "relation": 15, "power": 120.0, "aggression": 10},
+	2: {"name": "Northern Warlords", "relation": -25, "power": 250.0, "aggression": 35},
+	3: {"name": "Holy Sun Order", "relation": 5, "power": 180.0, "aggression": 15},
+	4: {"name": "Steppe Horse Clans", "relation": 0, "power": 150.0, "aggression": 20}
+}
+
+func calculate_tribute(faction_id: int, player_power: float, player_treasury: float, player_pop: int, dist: float) -> int:
+	var f_data = factions.get(faction_id)
+	if not f_data:
+		return 0
+
+	var k_base: float = 50.0
+	var d_max: float = 5000.0
+	var power_ratio: float = pow(f_data["power"] / (player_power + 1.0), 1.35)
+	var wealth_factor: float = pow(player_treasury, 0.55) + (0.1 * float(player_pop))
+	var dist_factor: float = max(0.1, 1.0 - (dist / d_max))
+
+	var raw_tribute: float = k_base * power_ratio * wealth_factor * dist_factor
+	return int(round(raw_tribute))
+
+func process_tribute_response(faction_id: int, accepted: bool) -> void:
+	var f = factions.get(faction_id)
+	if not f:
+		return
+
+	if accepted:
+		f["relation"] = mini(100, f["relation"] + 12)
+		f["aggression"] = 0
+	else:
+		f["aggression"] += 45
+		f["relation"] = maxi(-100, f["relation"] - 35)
+		if f["aggression"] >= 100:
+			emit_signal("war_declared", faction_id, "Tribute Default")
+```
 
 ---
 
 # 116. VOXEL RENDERLASH SAMARADORLIGI
 
-Face Culling, Greedy Meshing, Fon oqimlarida (Background Threads) chunk yaratish. Asosiy render oqimi (Main Thread) hech qachon qotib qolmasligi shart.
+To'liq o'zgaruvchan 3D venzel dunyosida har bir blokni alohida kub sifatida chizish (naive cubic rendering) bitta $32\times 32\times 32$ chunk uchun 49,152 ta uchburchak hosil qilib, GPU renderlash konveyerini falajlaydi. Voxel Lord renderlashda ilg'or **Greedy Voxel Meshing** algoritmidan foydalanadi.
+
+### 116.1. Greedy Meshing Algoritmi Ishlash Bosqichlari
+
+1. **Yo'nalishli Ko'rinish Filtratsiyasi (Face Culling):** Har bir venzelning 6 ta tomoni (+X, -X, +Y, -Y, +Z, -Z) tekshiriladi. Faqat yonidagi qo'shnisi havo (`AIR`) yoki shaffof bo'lgan yuzalargina renderlash ro'yxatiga kiritiladi.
+2. **2D Kesim Niqobini Shakllantirish (Slice Sweeping):** Chunkning har bir o'qi bo'ylab 32 ta qatlam kesimi hosil qilinadi. Har bir kesimda bir xil blok turiga va bitta teksturaga ega bo'lgan qo'shni yuzalar $32\times 32$ massivda binar belgilanadi.
+3. **To'g'ri To'rtburchaklarni Birlashtirish (Greedy Merging):**
+   - Algoritm birinchi band qilinmagan yuzani topadi va gorizontal o'q bo'yicha bir xil bloklar tugaguncha chiziq tortadi (kenglik $W$).
+   - Keyin ushbu kenglikdagi chiziqni vertikal o'q bo'yicha pastga qarab, to'liq bir xil blokli qatorlar tugaguncha kengaytiradi (balandlik $H$).
+   - Natijada $W \times H$ o'lchamli bitta yagona katta kvad (2 ta uchburchak) hosil bo'ladi.
+   - Birlashtirilgan barcha venzellar "ishlangan" deb belgilanadi va jarayon davom etadi.
+4. **Natijaviy Samaradorlik:** Ushbu algoritm poligonlar sonini $75\%$ dan $85\%$ gacha kamaytiradi (o'rtacha zich chunkda poligonlar soni 49,152 tadan 4,200 tagacha qisqaradi).
+
+### 116.2. Vertex Packing va SurfaceTool Optimallashtirish
+
+- **Uchlar Ma'lumotlarini Siqish (Vertex Packing):** Venzel koordinatalari $0$ dan $32$ gacha butun son bo'lganligi sababli, 32-bitli float o'rniga 8-bitli unsigned butun sonlar (`uint8`) ishlatiladi. Normal vektorlar va Tekstura ID ko'rsatkichi 16-bitli binar formatga joylanadi.
+- **Yagona Draw Call:** Har bir chunk uchun barcha kvadlar Godotning `SurfaceTool` va `ArrayMesh` vositalari orqali yagona geometriya buferiga birlashtiriladi. Bitta chunk bitta GPU Draw Call orqali chiziladi.
+- **WorkerThreadPool orqali Ko'p Oqimlilik:** Shovqin namunalari va mesh generatsiyasi Godot 4 ning `WorkerThreadPool` tizimi orqali fonga o'tkaziladi. Asosiy render oqimi (Main Thread) faqat tayyor bo'lgan mesh resursini GPU VisualServer ga topshiradi, bu esa kadr tushib ketishi (frame stutter) ning oldini oladi.
+- **Teksturalar Massivi (Texture2DArray):** Barcha 24 ta mineral, tuproq, daraxt va qurilish teksturalari bitta `Texture2DArray` (qatlamli 2D tekstura) resursida saqlanadi. Bu shaderlarda tekstura almashish (texture bind switching) xarajatlarini butunlay yo'q qiladi.
 
 ---
 
 # 117. O‘ZGARUVCHAN DUNYODA YO‘L TOPISH (NAVIGATION)
 
-Statik NavMesh ishlamaydi. Har bir chunk o'zining dinamik NavigationRegion3D qismiga ega bo'ladi. Voxel buzilganda yoki qo'yilganda faqat shu mintaqa yangilanadi.
+Statik dunyolarda qo'llaniladigan bir butun monolit NavMesh o'zgaruvchan venzel dunyosiga to'g'ri kelmaydi — har bir blok qazilganda butun dunyo navmeshini qayta hisoblash o'yinni qotirib qo'yadi. Voxel Lord dinamik, modulli va asinxron yo'l topish tizimini amalga oshiradi.
+
+### 117.1. Bo'lingan Mintaqaviy NavMesh (Chunk-Partitioned Navigation)
+
+- Dunyo $32\times 32\times 32$ o'lchamli har bir chunk bo'yicha alohida `NavigationRegion3D` nodlariga ajratilgan.
+- Qo'shni chunklarning navmesh qirralari Godot 4 `NavigationServer3D` tomonidan chegarada avtomatik birlashtiriladi (Edge Connection Margin $= 0.1\text{m}$).
+- Fuqarolar bir chunkdan ikkinchisiga hech qanday to'siqsiz, silliq harakatlanadi.
+
+### 117.2. Asinxron Qayta Hisoblash (Asynchronous Dirty Re-baking)
+
+- O'yinchi yoki fuqaro biror venzelni qaziganda yoki yangi blok qo'yganda:
+  1. Faqat shu venzel joylashgan chunk (va agar blok chegarada bo'lsa, unga yondosh qo'shni chunk) "ifloslangan" (`dirty`) deb belgilanadi.
+  2. Qayta hisoblash so'rovi fonga `WorkerThreadPool` ga yuboriladi.
+  3. Fon oqimi `NavigationServer3D.region_bake_navigation_mesh()` funktsiyasini asinxron bajaradi.
+  4. Yangi navmesh tayyor bo'lgach, navigatsiya serveriga almashtiriladi.
+  5. Navigatsiya qayta qurilayotgan paytda fuqarolar eski navmesh keshidan foydalanib harakatni davom ettiradi (Double-buffered Navigation).
+
+### 117.3. Fuqarolar Harakati va To'siqlarni Aylanib O'tish
+
+- Fuqarolar `NavigationAgent3D` n ګرځi orqali harakatlanadi.
+- **RVO2 Dinamik To'qnashuv Algoritmi:** Tor yo'llarda va ko'priklarda ikki fuqaro to'qnashib qolmasligi uchun RVO2 (Reciprocal Velocity Obstacles) orqali bir-birini avtomatik chetlab o'tadi.
+- **Pog'onali Ko'tarilish (Step Traversal):** Fuqaro $1.0\text{ metr}$ balandlikdagi bitta venzel pog'onasiga sakrashsiz, tabiiy qadam bilan ko'tariladi. Tik devorlar uchun maxsus narvon (`Ladder`) va zinalar (`Stairs`) qo'llaniladi.
+- **Tiqilib Qolishga Qarshi Nazoratchi (Anti-stuck Watchdog):** Agar fuqaro $3.0\text{ soniya}$ davomida mo'ljallangan nuqtaga qarab siljimasa, uning yo'li bekor qilinadi, to'siq atrofida yangi A* marshruti hisoblanadi.
 
 ---
 
 # 118. AHOLI SUN’IY INTELLEKTI LOD TIZIMI (AI LOD)
 
-- Yaqin fuqarolar: To'liq 3D animatsiya va individual fizik hisob-kitob.
-- O'rta masofa: Soddalashtirilgan yo'l topish.
-- Uzoq masofa: Statistik simulyatsiya (Fermer dalada matematik ishlaydi, kadrma-kadr render qilinmaydi).
+Shaharda 200 dan ortiq fuqaro bir paytda yashaganda, ularning barchasini to'liq 3D skelet animatsiyasi va fizikasi bilan yurgizish CPU va GPU resurslarini tugatadi. Shu sababli 3 bosqichli sun'iy intellekt LOD tizimi joriy etilgan:
+
+### 118.1. AI LOD Bosqichlari Matritsasi
+
+| Parametr | LOD 0 (Yaqin Masofa) | LOD 1 (O'rta Masofa) | LOD 2 (Uzoq / Ko'rinmas Masofa) |
+|---|---|---|---|
+| **Kamera Masofasi** | $0\text{ m} \to 40\text{ m}$ | $40\text{ m} \to 120\text{ m}$ | $> 120\text{ m}$ yoki ko'rinishdan tashqarida |
+| **Vizual Ko'rinish** | To'liq 3D model, kiyim va qurol meshlar | Vertex Animation Texture (VAT) shader | Vizual model sahnadan o'chiriladi ($0$ poligon) |
+| **Animatsiya** | Skeletli suyak animatsiyasi, IK oyoq qadami | Soddalashtirilgan kadrma-kadr shader | Animatsiya hisoblanmaydi |
+| **Fizika va Yo'l Topish**| To'liq CharacterBody3D, RVO2 avoidance | NavMesh agenti, harakat $10\text{ Hz}$ yangilanish | Matematik koordinata interpolyatsiyasi |
+| **Ehtiyojlar Ticki** | Har soniyada real vaqt tekshiruvi ($60\text{ Hz}$) | Har $2.0$ soniyada tekshiruv ($0.5\text{ Hz}$) | Har $10.0$ soniyada statistik tekshiruv ($0.1\text{ Hz}$) |
+| **Hisoblash yuki** | $100\%$ (To'liq individual simulyatsiya) | $15\%$ (Soddalashtirilgan) | $1\%$ (Sof statistik hisob-kitob) |
+
+### 118.2. LOD 2 Statistik Simulyatsiya Mexanikasi
+
+Uzoq dalalarda ishlayotgan dehqonlar yoki chuqur shaxtalardagi konchilar kamera ulardan uzoqlashganda `StatisticalCitizenSimulator` ga o'tkaziladi:
+- Fuqaroning 3D tuguni (`Node3D`) xotirada qoladi, lekin sahnadan (`Tree`) vaqtinchalik chiqariladi.
+- Uning ishi formulalar bilan hisoblanadi:
+  $$P_{work}(t + \Delta t) = P_{work}(t) + \left(Skill_{craft} \cdot Efficiency_{station} \cdot \Delta t\right)$$
+  $$Hunger(t + \Delta t) = Hunger(t) - \left(k_{hunger} \cdot \Delta t\right)$$
+- Fuqaro o'z smenasini tugatgach, matematik koordinatasi uyiga ko'chiriladi.
+- O'yinchi uning yoniga kelgan zahoti fuqaroning barcha holatlari (ochlik, charchoq, sumkasidagi narsalar) to'liq saqlangan holda darhol LOD 0 yoki LOD 1 holatida sahnada paydo bo'ladi (Seamless Materialization).
 
 ---
 
 # 119. UNUMDORLIK NISHONLARI (PERFORMANCE TARGETS)
 
-- Ekran: 1080p / 1440p.
-- FPS: Minimal 60 FPS, Ideal 120 FPS.
-- Sinov me'yori: 100–150 ta faol fuqaro, yirik tosh qal'a, qor bo'roni va faol ishlab chiqarish paytida.
+Voxel Lord o'yinining barcha arxitekturasi va renderlash zanjirlari quyidagi qat'iy apparat va unumdorlik talablariga muvofiq optimallashtiriladi:
+
+### 119.1. Mo'ljallangan Tizim Talablari
+
+- **Minimal Tizim Talabi (1080p @ 60 FPS, O'rta sozlamalar):**
+  - GPU: Nvidia GeForce GTX 1660 (6GB) yoki AMD Radeon RX 580 (8GB).
+  - CPU: Intel Core i5-8400 yoki AMD Ryzen 5 2600 (6 yadro, 3.4 GHz).
+  - RAM: 8 GB DDR4.
+- **Tavsiya Qilingan Tizim (1440p @ 120 FPS, Yuqori sozlamalar):**
+  - GPU: Nvidia GeForce RTX 3060 (12GB) yoki AMD Radeon RX 6600 XT (8GB).
+  - CPU: Intel Core i5-12400F yoki AMD Ryzen 5 5600X.
+  - RAM: 16 GB DDR4/DDR5.
+
+### 119.2. Aniq Miqdoriy Byudjet Me'yorlari
+
+| Ko'rsatkich Nomi | Qat'iy Byudjet Chegarasi | Izoh va Sinov Shartlari |
+|---|---|---|
+| **Minimal Kadrlar Soni (FPS)** | $\ge 60\text{ FPS}$ | 200 ta fuqaro, yomg'ir/qor yog'ishi va qamal jangi paytida |
+| **Kadr Hisoblash Vaqti (Frame Time)**| $\le 16.6\text{ ms}$ | Standart o'yin jarayonida barqaror $16.6\text{ ms}$ |
+| **Maksimal Kadr Sakrashi (Peak Spike)**| $\le 35.0\text{ ms}$ | Katta tosh qal'a devori qulaganda yoki metan gazi portlaganda |
+| **GPU Draw Calls Soni** | $< 180\text{ ta draw call}$ | Greedy Meshing va Texture2DArray orqali birlashtirilgan |
+| **Video Xotira Sarfi (VRAM)** | $< 2.2\text{ GB}$ | Barcha chunk mesh buferlari va teksturalar yig'indisi |
+| **Bir Paytdagi Faol Venzellar** | $\ge 100,000\text{ ta venzel}$ | O'yinchi kamerasida bir paytda chizilayotgan yuzalar |
+| **Simulyatsiyadagi Aholi Soni** | $\ge 200\text{ nafar fuqaro}$ | Barcha LOD guruhlari (LOD 0, 1, 2) bo'yicha to'liq taqsimot |
 
 ---
 
 # 120. DUNYO XARITASINI YUKLASH CHEGARALARI
 
-1000×1000 masshtabdagi dunyo bir paytda to'liq chizilmaydi — qat'iy asinxron Chunk Streaming tizimi ishlaydi.
+$1000\times 1000$ blokli ulkan feodal xaritasida xotirani tejash va barqarorlikni ta'minlash uchun qat'iy asinxron Chunk Streaming tizimi ishlaydi.
+
+### 120.1. Faol Chunklar Radiusi va Matritsasi
+
+- O'yinchi kamerasi atrofida gorizontaliga $\pm 4$ ta chunk ($128\text{ metr}$ har bir tomonga) va vertikaliga $\pm 3$ ta chunk ($96\text{ metr}$ yuqori va pastga) yuklanadi.
+- Umumiy faol mintaqa: $9 \times 7 \times 9 = 567$ ta chunk xotirada saqlanadi.
+- O'yinchi harakatlanganda kamerasidan $5$ chunkdan ko'proq uzoqlashgan chekka chunklar xotiradan chiqariladi (unload), yangi yaqinlashgan chunklar esa fon oqimlarida yuklanadi.
+
+### 120.2. Ob'ektlar Hovuzi (VoxelChunk Node Pool)
+
+- Dinamik xotira ajratish (heap allocation) paytidagi qotishlarni bartaraf etish uchun 650 ta `VoxelChunk` nodidan iborat oldindan yaratilgan ob'ektlar hovuzi (`NodePool`) ishlatiladi.
+- Bo'shatilgan chunklar o'chirilmaydi, balki tozalab qayta yangi koordinatalarga biriktiriladi. Bu esa Godot xotira tozalagichining (Garbage Collector) ishga tushishini nolga tushiradi.
+
+### 120.3. LRU Kesh va Voxel Deltalarni Siqib Saqlash
+
+- **O'zgarmagan Chunklar:** Agar procedural generatsiyadan so'ng o'yinchi chunkdagi bloklarni qazmagan bo'lsa, u diskka yozilmaydi; qayta yaqinlashganda dunyo urug'idan (`world_seed`) bir zumda qayta generatsiya qilinadi.
+- **O'zgargan Chunklar (Voxel Deltas):** O'zgartirilgan bloklar RLE (Run-Length Encoding) va Zlib yordamida siqilib, saqlash fayliga faqat farqlar (deltalar) sifatida yoziladi.
+- **Xotira Chegarasi (LRU Threshold):** Faol chunklar soni 700 tadan oshganda, eng uzoq vaqt murojaat qilinmagan (Least Recently Used) toza chunklar xotiradan majburiy haydaladi.
 
 ---
 
 # 121. SIMULYATOR SINOVLARI (SIMULATION TESTING)
 
-`prototype_sim.py` vositasi orqali: 30 kunlik balans, 100 kunlik qishki omon qolish, aholi o'sishi, vabo epidemiyasi va soliq bosimi matematik tekshiriladi.
+O'yin iqtisodiyoti, aholi demografiyasi, soliqlar va qishki omon qolish balansini tekshirish uchun o'yin oynasini ochmasdan, buyruqlar satrida ishlaydigan deterministik Headless simulyatsiya sinovlari tizimi mavjud.
+
+### 121.1. Avtomatlashtirilgan Headless Sinovlar Tuzilishi
+
+Sinovlar Godotning maxsus `--headless` rejimi hamda Python asosidagi `prototype_sim.py` va `tests/test_gdd_e2e.py` orqali ishga tushiriladi:
+- **Deterministik Urug' (Fixed Seed):** Barcha sinovlar $Seed = 1337$ bilan ishga tushirilib, natijalar har safar $100\%$ bir xil va takrorlanuvchan bo'lishi kafolatlanadi.
+- **Vaqtni Tezlashtirish (Fast-Forward Ticking):** 30 kunlik koloniya hayoti 1 soniyada, 100 kunlik qattiq qish sinovi esa 3 soniyada matematik hisoblab chiqiladi (10,000 simulyatsiya ticki grafik renderlashsiz o'tkaziladi).
+
+### 121.2. Avtomatlashtirilgan Tekshiruv Shartlari (Assertions)
+
+Sinov ssenariylari quyidagi mezonlar buzilganda darhol xatolik (failure) e'lon qiladi:
+1. **Demografik Inqiroz:** Aholi soni hech qachon nolga tushmasligi shart ($Population > 0$).
+2. **Ochlik Balansi:** 100 kunlik simulyatsiyada ochlikdan o'lim darajasi jami aholining $15\%$ idan oshmasligi kerak.
+3. **Inflyatsiya va G'azna:** Pul emissiyasi va narxlar tebranishi yiliga $[-10\%, +25\%]$ koridorida saqlanishi shart.
+4. **Shaxta Xavfsizligi:** Tayanch nurlari qo'yilgan zonalarda spontan qulashlar yuz bermasligi shart ($S_c \ge 1.0$).
 
 ---
 
 # 122. MA’LUMOTLAR BILAN BOSHQARILUVCHI DIZAYN (DATA-DRIVEN)
 
-Barcha qurollar, binolar, retseptlar, ekinlar va qonunlar qattiq kodlanmasdan, JSON va Godot Custom Resource fayllarida saqlanadi.
+Voxel Lord o'yinidagi barcha o'yin ob'ektlari dasturiy koddan to'liq ajratilgan bo'lib, Godot 4 ning `CustomResource` (`.tres`) fayllari orqali boshqariladi. Bu geym-dizaynerlarga dasturchilarsiz balansni o'zgartirish va mod yasovchilarga yangi kontent kiritish imkonini beradi.
+
+### 122.1. Maxsus Resurs Klasslari Schemalari
+
+1. **`ItemData` (`res://scripts/resources/item_data.gd`):**
+   ```gdscript
+   class_name ItemData
+   extends Resource
+
+   @export var item_id: StringName = &"item_iron_sword"
+   @export var display_name: String = "Temir Qilich"
+   @export var category: int = 2 # WEAPON
+   @export var weight_kg: float = 1.8
+   @export var stack_size: int = 1
+   @export var max_durability: int = 250
+   @export var base_value: int = 25 # Kumush tanga
+   @export var quality_tier: int = 1
+   ```
+
+2. **`RecipeData` (`res://scripts/resources/recipe_data.gd`):**
+   ```gdscript
+   class_name RecipeData
+   extends Resource
+
+   @export var recipe_id: StringName = &"recipe_smelt_iron"
+   @export var workstation_tier: int = 2 # Blast Furnace
+   @export var craft_time_seconds: float = 8.0
+   @export var inputs: Dictionary = {"iron_ore": 2, "coal": 1}
+   @export var output_item: StringName = &"item_iron_ingot"
+   @export var output_count: int = 1
+   @export var required_skill_level: int = 15
+   ```
+
+3. **`MineralData` (`res://scripts/resources/mineral_data.gd`):**
+   ```gdscript
+   class_name MineralData
+   extends Resource
+
+   @export var mineral_id: int = 12
+   @export var mineral_name: String = "Iron Ore"
+   @export var strata_y_range: Vector2i = Vector2i(-45, -240)
+   @export var peak_depth_y: int = -130
+   @export var peak_probability: float = 0.45
+   @export var hardness_hits: int = 7
+   @export var drop_item_id: StringName = &"item_raw_iron_ore"
+   ```
+
+4. **`CropData` (`res://scripts/resources/crop_data.gd`):**
+   ```gdscript
+   class_name CropData
+   extends Resource
+
+   @export var crop_id: StringName = &"crop_wheat"
+   @export var display_name: String = "Bug'doy"
+   @export var growth_hours: float = 96.0
+   @export var optimal_temp_c: float = 22.0
+   @export var optimal_hydration: float = 0.15
+   @export var base_yield: int = 12
+   @export var harvest_item_id: StringName = &"food_wheat_sheaf"
+   ```
 
 ---
 
 # 123. MARKAZIY BALANS BAZASI (BALANCE CONFIG)
 
-Hosil ko'paytiruvchilari, soliq narxlari, askarlar oyligi va fuqarolarning non iste'moli yagona balans faylida boshqariladi.
+Barcha o'yin konstantalari yagona global konfiguratsiya resursida jamlangan bo'lib, o'yin ichida va ishlab chiqish paytida yagona haqiqat manbai (Single Source of Truth) vazifasini bajaradi.
+
+### 123.1. Markaziy Balans Resursi (`res://scripts/core/balance_config.gd`)
+
+```gdscript
+class_name BalanceConfig
+extends Resource
+
+## O'yinning global iqtisodiy, ekologik va harbiy parametrlarining markaziy bazasi.
+
+@export_group("Fuqarolar Ehtiyojlari")
+@export var base_hunger_drain_per_hour: float = 4.16 # 24 soatda 100% ochlik
+@export var base_thirst_drain_per_hour: float = 8.33 # 12 soatda 100% chanqoqlik
+@export var base_warmth_drain_freezing: float = 12.5 # Qishki sovuqda sovish tezligi
+@export var citizen_base_speed_m_s: float = 3.5
+
+@export_group("Dehqonchilik va Oziq-ovqat")
+@export var global_crop_growth_multiplier: float = 1.0
+@export var arrhenius_q10_spoilage_factor: float = 2.0
+@export var food_spoilage_reference_temp: float = 15.0
+
+@export_group("Konchilik va Qurilish")
+@export var mine_ceiling_collapse_threshold: float = 0.75
+@export var natural_span_stress_factor: float = 0.08
+@export var overburden_depth_scale: float = 0.35
+
+@export_group("Diplomatiya va Soliqlar")
+@export var tribute_base_coefficient: float = 50.0
+@export var default_tax_efficiency: float = 0.85
+@export var casus_belli_war_threshold: int = 100
+```
+
+### 123.2. Jonli Yangilanish (Hot-Reloading in Debug Builds)
+
+Ishlab chiqish va balanslash bosqichida o'yinni o'chirib yoqmasdan parametrlar bilan tajriba o'tkazish uchun `BalanceConfig` drayveri Hot-Reload tizimiga ega:
+- Fayl o'zgartirilganda Godotning `EditorFileSystem` yoki mustaqil `FileAccess` kuzatuvchisi buni aniqlaydi.
+- `ResourceLoader.load("res://data/balance_config.tres", "", ResourceLoader.CACHE_MODE_REPLACE)` orqali yangi parametrlar xotiraga qayta yuklanadi.
+- Barcha faol tizimlar (`ChunkManager`, `DiplomacyManager`, `GreenhouseThermalSystem`) yangilangan qiymatlarni darhol qabul qiladi.
+- Debug konsolidan buyruqlar orqali qiymatlarni jonli o'zgartirish mumkin (Masalan: `cfg.global_crop_growth_multiplier = 2.5`).
 
 ---
 

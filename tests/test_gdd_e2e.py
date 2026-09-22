@@ -273,7 +273,9 @@ class TestGDD_Tier2_BoundaryAndCorner(unittest.TestCase):
             "Market Base Prices (M1)": ["Bazaviy Narx", "food_wheat_sheaf"],
             "Geological Minerals (M4)": ["Qatlam Chuqurligi", "24 ta Mineral", "K_{rock}"],
             "Weapons & Armor Matrix (M3)": ["Slash", "Pierce", "Blunt", "Deflection", "Absorption"],
-            "Military Unit Tiers (M3)": ["Piyoda Askari", "Ritsar", "Trebuchet", "Mangonel"]
+            "Military Unit Tiers (M3)": ["Piyoda Askari", "Ritsar", "Trebuchet", "Mangonel"],
+            "Diplomacy & Factions (M5)": ["League of Coastal Merchants", "Northern Iron Warlords", "Holy Sun Order", "Steppe Horse Clans"],
+            "Steam P2P Packets (M5)": ["ClientInputPacket", "VoxelDeltaModify", "EntitySnapshot", "CaveInEventPacket"]
         }
 
         found_systems = {}
@@ -292,11 +294,13 @@ class TestGDD_Tier2_BoundaryAndCorner(unittest.TestCase):
             print(f"\n[INFO: Core Tables Status] Present: {[s for s, ok in found_systems.items() if ok]}")
             print(f"[INFO: Pending Milestone Tables]: {unexpanded_milestones}")
 
-        # Assert M1 tables are strictly present
+        # Assert M1 & M5 tables are strictly present
         self.assertTrue(found_systems["Crops (M1)"], "Crops table must be present")
         self.assertTrue(found_systems["Food & Preservation (M1)"], "Food table must be present")
         self.assertTrue(found_systems["Tools Progression (M1)"], "Tools table must be present")
         self.assertTrue(found_systems["Market Base Prices (M1)"], "Market pricing table must be present")
+        self.assertTrue(found_systems["Diplomacy & Factions (M5)"], "Diplomacy & Factions table must be present")
+        self.assertTrue(found_systems["Steam P2P Packets (M5)"], "Steam P2P Packets table must be present")
 
 
 class TestGDD_Tier3_CrossFeature(unittest.TestCase):
@@ -591,6 +595,120 @@ class TestGDD_Tier4_Simulations(unittest.TestCase):
         # Verify T_eq is strictly within crop growth limits (e.g. Wheat T_opt = 22C, T_min = 5C)
         self.assertGreaterEqual(t_eq, 18.0)
         self.assertLessEqual(t_eq, 28.0)
+
+    def test_tribute_demand_formula_simulation(self):
+        """
+        Formula:
+        Tribute = K_base * (Power_warlord / (Power_player + 1.0))^1.35 * (Treasury^0.55 + 0.1 * Population) * max(0.0, 1.0 - (Distance / D_max))
+        With K_base = 50.0, D_max = 5000.0.
+        Verify power scaling, wealth proportionality, and distance attenuation.
+        """
+        k_base = 50.0
+        d_max = 5000.0
+
+        def calc_tribute(p_warlord, p_player, treasury, pop, dist):
+            power_ratio = (p_warlord / (p_player + 1.0)) ** 1.35
+            wealth = (treasury ** 0.55) + (0.1 * pop)
+            dist_factor = max(0.0, 1.0 - (dist / d_max))
+            return k_base * power_ratio * wealth * dist_factor
+
+        # 1. Baseline: Equal power (ratio = 1.0), Treasury = 1000, Pop = 50, Dist = 1000m
+        tribute_base = calc_tribute(100.0, 99.0, 1000.0, 50, 1000.0)
+        self.assertGreater(tribute_base, 1000.0)
+        self.assertLess(tribute_base, 3000.0)
+
+        # 2. Stronger Warlord (2x power) demands significantly higher tribute:
+        tribute_strong = calc_tribute(200.0, 99.0, 1000.0, 50, 1000.0)
+        self.assertGreater(tribute_strong, tribute_base * 2.0)
+
+        # 3. Far distance (4000m vs 1000m) reduces tribute demand:
+        tribute_far = calc_tribute(100.0, 99.0, 1000.0, 50, 4000.0)
+        self.assertLess(tribute_far, tribute_base)
+
+        # 4. Out of range (Dist >= D_max): Zero tribute demand
+        tribute_out_of_range = calc_tribute(100.0, 99.0, 1000.0, 50, 5500.0)
+        self.assertEqual(tribute_out_of_range, 0.0)
+
+    def test_trade_route_roundtrip_travel_time_simulation(self):
+        """
+        Formula:
+        T_roundtrip = 2 * sum(D_k / (v_caravan * M_road,k)) + T_post
+        With Pack Mule v = 4.0 km/h, T_post = 6.0 h.
+        Verify Royal Highway (M=1.60x) is significantly faster than Wilderness (M=0.70x).
+        """
+        v_mule = 4000.0  # 4000 m/h (4.0 km/h)
+        t_post = 6.0     # 6 hours
+        distance = 8000.0 # 8 km one-way
+
+        def calc_roundtrip(dist, m_road):
+            v_eff = v_mule * m_road
+            one_way = dist / v_eff
+            return (2.0 * one_way) + t_post
+
+        # 1. Wilderness trail (M = 0.70x)
+        t_wild = calc_roundtrip(distance, 0.70)
+        # 2 * (8000 / 2800) + 6 = 2 * 2.857 + 6 = 11.714 hours
+        self.assertAlmostEqual(t_wild, 11.714, places=2)
+
+        # 2. Royal Highway (M = 1.60x)
+        t_highway = calc_roundtrip(distance, 1.60)
+        # 2 * (8000 / 6400) + 6 = 2 * 1.25 + 6 = 8.50 hours
+        self.assertAlmostEqual(t_highway, 8.50, places=2)
+
+        # Highway saves more than 3 hours of travel time!
+        self.assertLess(t_highway, t_wild)
+        self.assertAlmostEqual(t_wild - t_highway, 3.214, places=2)
+
+    def test_espionage_success_probability_simulation(self):
+        """
+        Formula:
+        P_success = (Skill_spy * (1.0 - Security_target) * (1.0 + Bribe / 500)) / (BaseDifficulty + GuardAlertness)
+        Verify that higher spy skill & bribes increase success, and high security/alertness mitigates it.
+        """
+        def calc_p_success(skill, security, bribe, difficulty, alertness):
+            num = skill * (1.0 - security) * (1.0 + (bribe / 500.0))
+            denom = difficulty + alertness
+            return num / max(1.0, denom)
+
+        # 1. Standard mission: Skill=50, Security=0.20, Bribe=0, Diff=40, Alert=10 -> P = (50 * 0.8) / 50 = 0.80
+        p_std = calc_p_success(50.0, 0.20, 0.0, 40.0, 10.0)
+        self.assertAlmostEqual(p_std, 0.80, places=3)
+
+        # 2. With Bribe of 500 silver: (1 + 500/500) = 2.0x -> P = 1.60 (doubles success rate)
+        p_bribed = calc_p_success(50.0, 0.20, 500.0, 40.0, 10.0)
+        self.assertAlmostEqual(p_bribed, 1.60, places=3)
+
+        # 3. High alert fortress: Security=0.70, Alert=50 -> P = (50 * 0.3) / 90 = 15 / 90 = 0.167
+        p_fortress = calc_p_success(50.0, 0.70, 0.0, 40.0, 50.0)
+        self.assertAlmostEqual(p_fortress, 15.0 / 90.0, places=3)
+        self.assertLess(p_fortress, p_std)
+
+    def test_territory_border_influence_decay_simulation(self):
+        """
+        Formula:
+        I_border(d) = Power_settlement / (1.0 + (d / R_influence)^2)
+        Verify that influence is maximum at center (d=0), halves at d=R, and decays quadratically.
+        """
+        power = 100.0
+        r_influence = 50.0
+
+        def calc_influence(d):
+            return power / (1.0 + ((d / r_influence) ** 2))
+
+        # 1. At center (d = 0): I = Power = 100.0
+        self.assertEqual(calc_influence(0.0), 100.0)
+
+        # 2. At boundary radius (d = R = 50m): I = 100 / (1 + 1) = 50.0 (exactly half)
+        self.assertEqual(calc_influence(50.0), 50.0)
+
+        # 3. At double boundary (d = 2R = 100m): I = 100 / (1 + 4) = 20.0
+        self.assertEqual(calc_influence(100.0), 20.0)
+
+        # 4. Monotonic decrease
+        distances = [0.0, 20.0, 50.0, 75.0, 100.0, 150.0]
+        influences = [calc_influence(d) for d in distances]
+        for i in range(len(influences) - 1):
+            self.assertGreater(influences[i], influences[i + 1])
 
 
 def print_suite_report(result):
