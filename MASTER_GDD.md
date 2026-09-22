@@ -1,361 +1,1093 @@
-# MASTER GAME DESIGN DOCUMENT (GDD)
-# "Voxel Lord: Feudal Realm" 👑
+# MASTER GAME DESIGN DOCUMENT
 
-> **Hujjat Maqomi:** To'liq Texnik Loyiha (Specification 1.4 — Madaniyat va Turnirlar Qo'shildi)  
-> **Janr:** Birinchi Shaxs / Voxel Sandbox / O'rta Asrlar Koloniya Simulyatori (Colony Sim & Strategy)  
-> **Dvigatel:** Godot Engine 4.3+ (Forward+ / GDScript & C#)  
-> **Platforma:** PC (Steam / Windows, Linux)  
-> **Biznes Model:** Pullik Indie Reliz ($14.99 – $19.99), Early Access  
+# VOXEL LORD: FEUDAL REALM 👑
 
----
-
-## MUNDARIJA
-1. [O'yin Konsepsiyasi va Asosiy Falsafasi](#1-oyin-konsepsiyasi-va-asosiy-falsafasi)
-2. [O'yinchi Boshlanishi va O'tmish Arxetiplari (Origins)](#2-oyinchi-boshlanishi-va-otmish-arxetiplari-origins)
-3. [Aholining Real Paydo Bo'lishi va Bolalar Ulg'ayishi](#3-aholining-real-paydo-bolishi-va-bolalar-ulgayishi)
-4. [Shaxsiy Mehnatdan Avtomatlashuvgacha (Hands-on to Automation)](#4-shaxsiy-mehnatdan-avtomatlashuvgacha-hands-on-to-automation)
-5. [Feodal Mansab Zinapoyasi va Qirollikka 3 Xil Yo'l](#5-feodal-mansab-zinapoyasi-va-qirollikka-3-xil-yol)
-6. [4 Ta Feodal Rivojlanish Bosqichi (Tech Tree Tiers 1–4)](#6-4-ta-feodal-rivojlanish-bosqichi-tech-tree-tiers-14)
-7. [Biomlar Tizimi va Tundra Issiqxonalari](#7-biomlar-tizimi-va-tundra-issiqxonalari)
-8. [Yer Chuqurligi Qatlamlari va Shaxta Mexanikasi](#8-yer-chuqurligi-qatlamlari-va-shaxta-mexanikasi)
-9. [20+ Geologik Rudalar, Minerallar va Metallurgiya](#9-20-geologik-rudalar-minerallar-va-metallurgiya)
-10. [Mahluqlar Tizimi, Oddiy Dushmanlar va 5 Ta Ulug'vor Boss](#10-mahluqlar-tizimi-oddiy-dushmanlar-va-5-ta-ulugvor-boss)
-11. [Harbiy Tizim: Askarlarni Saralash, O'qitish va Ta'minot](#11-harbiy-tizim-askarlarni-saralash-oqitish-va-taminot)
-12. [Sehr, Alkimyo va Runa Temirchiligi](#12-sehr-alkimyo-va-runa-temirchiligi)
-13. [Boshqaruv Daftari (The Royal Ledger) va Zanjirli Iqtisodiyot](#13-boshqaruv-daftari-the-royal-ledger-va-zanjirli-iqtisodiyot)
-14. [Qurilish Tizimi, Kattalik Darajalari va Masshtab](#14-qurilish-tizimi-kattalik-darajalari-va-masshtab)
-15. [4 Fasl (Mavsumlar) va Dinamik Ob-havo Tizimi](#15-4-fasl-mavsumlar-va-dinamik-ob-havo-tizimi)
-16. [Oziq-ovqat Aynishi, Saqlash Usullari, Sanitariya va Vabo](#16-oziq-ovqat-aynishi-saqlash-usullari-sanitariya-va-vabo)
-17. [Jinoyatchilik, Sud, Qonunlar va Zindon Tizimi](#17-jinoyatchilik-sud-qonunlar-va-zindon-tizimi)
-18. [Madaniyat, Bayramlar va Shohona Ritsarlar Turniri](#18-madaniyat-bayramlar-va-shohona-ritsarlar-turniri)
-19. [Godot 4 Texnik Arxitekturasi va Dasturiy Modullar](#19-godot-4-texnik-arxitekturasi-va-dasturiy-modullar)
+**Hujjat maqomi:** Production Game Design Document  
+**Versiya:** Specification 1.5 — Consolidated Production Edition  
+**Janr:** First-Person / Voxel Sandbox / Colony Simulation / Strategy / Survival RPG  
+**Dvigatel:** Godot Engine 4.3+  
+**Asosiy dasturlash:** GDScript + zarur yuqori unumli modullar uchun C#  
+**Platforma:** PC — Windows / Linux  
+**Distribusiya:** Steam  
+**Rejim:** Single Player + 2–4 kishilik Co-op / Multiplayer (Steam P2P)  
+**Biznes model:** Premium Indie Game  
+**Rejalashtirilgan narx:** $14.99–$19.99  
+**Reliz modeli:** Early Access → 1.0  
 
 ---
 
-## 1. O'YIN KONSEPSIYASI VA ASOSIY FALSAFASI
+# 0. LOYIHANING ASOSIY MAQSADI
 
-*Voxel Lord: Feudal Realm* — bu o'yinchini tayyor taxtga o'tqazib qo'ymaydigan, balki uni oddiy sarson qochqindan tortib, butun mintaqa tan oladigan Buyuk Qirol darajasigacha o'z mehnati bilan ko'tarilishga majbur qiluvchi chuqur birinchi shaxs koloniya simulyatoridir.
+Voxel Lord: Feudal Realm — o‘yinchini tayyor hukmdor sifatida emas, balki deyarli hech narsaga ega bo‘lmagan oddiy inson sifatida dunyoga tashlaydigan birinchi shaxs voxel koloniya simulyatori.
 
-### 4 Ta Asosiy Ustun:
-1. **Hukmdor Nigohi (First-Person Monarch):** O'yinchi osmondan qarab buyruq beruvchi emas, fuqarolari bilan birga yerda yuradi, kerak bo'lsa o'zi bug'doy o'radi, devor tiklaydi va kitob orqali davlatni boshqaradi.
-2. **Mantiqiy Aholi va Zanjir (Living Citizens & Logistics):** Aholi havodan tushmaydi. Har bir odam qutqarilgan qochqin yoki yangi tug'ilgan go'dak.
-3. **Voxel Erkinligi + Rejalar (Voxel Freedom & Blueprints):** Xohlagancha qo'lda blok qo'yish yoki Blueprint orqali quruvchi fuqarolarga qurdirish.
-4. **Feodalizm va Shon-shuhrat (Feudal Ladder & Glory):** Sargardondan Qirolgacha 5 ta unvon va 3 xil toj kiyish yo'li.
+O‘yinchi:
 
----
+**tirik qoladi → resurs yig‘adi → boshpana quradi → odamlarni qutqaradi → aholi tashkil qiladi → ishlab chiqarishni avtomatlashtiradi → qishloq quradi → qo‘shin tuzadi → yerlarini kengaytiradi → feodal hukmdorga aylanadi → sulola yaratadi → qirollik barpo qiladi.**
 
-## 2. O'YINCHI BOSHLANISHI VA O'TMISH ARXETIPLARI (ORIGINS)
+O‘yinchining asosiy farqi:
+u osmonda uchib yuradigan RTS boshqaruvchisi emas.
+Hukmdor o‘z shahrining ichida birinchi shaxs nigohida yashaydi.
 
-| Arxetip | Boshlang'ich Holat | Afzalligi | Kamchiligi |
-| :--- | :--- | :--- | :--- |
-| **Surgun Ritsar** | Qilich, eski zanjir sovut, qalqon | Dastlabki yirtqich va qaroqchilardan qo'rqmaydi, jangovar mahorati yuqori | Dehqonchilik va qurilishdan bexabar, asboblar yasashni bilmaydi |
-| **Xonavayron Savdogar**| 25 ta kumush tanga, bo'sh aravacha, xarita | Sayyor karvonlar bilan savdoda 25% chegirma, resurslarni tez baholaydi | Jang qilishni bilmaydi, joni kam, qurol ko'tara olmaydi |
-| **Qochoq Ovchi** | Kamon, 20 ta o'q, bolta, tuzoqlar | O'rmonda omon qolish, ovchilik va o'tin kesishda 2 barobar tez | Hech qanday sarmoyasi yo'q, xalqaro diplomatiyaga qobiliyatsiz |
+U:
+- daraxt kesishi;
+- kon qazishi;
+- ov qilishi;
+- dehqonchilik qilishi;
+- devor qurishi;
+- askarlar bilan jang qilishi;
+- sud o‘tkazishi;
+- soliq belgilashi;
+- odamlar bilan gaplashishi;
+- turnirda qatnashishi;
+- qo‘shin boshqarishi
+mumkin.
 
----
-
-## 3. AHOLINING REAL PAYDO BO'LISHI VA BOLALAR ULG'AYISHI
-
-### 3.1. Aholining 5 Ta Mantiqiy Manbasi
-1. **Gulxan Nuri (The Signal Fire):** Tepalikdagi olov tutuniga kelgan och sarsonlar (har 2–3 kunda 1 kishi).
-2. **Qafaslardan Qutqaruv (Captive Rescue):** Qaroqchilar lagerlaridagi asir hunarmandlarni ozod qilish.
-3. **Qishloq Qo'ng'irog'i (The Village Bell):** Bronza qo'ng'iroq sadosi va shahar boyligi tufayli ko'chib keluvchi oilalar.
-4. **Daryo Pristani (River Docks):** Daryo oqimi bo'ylab qayiqlarda keluvchi yollanma hunarmandlar.
-5. **Nikoh & Tug'ilish (Generations):** Baxtli fuqarolar oila qurib farzand ko'rishadi.
-
-### 3.2. Bolalar Ulg'ayishi Zanjiri:
-* **Chaqaloq (0–3 yosh):** Faqat ona suti, iliq uy va xavfsizlik talab qiladi.
-* **Kichik bola (4–10 yosh):** Ko'chada o'ynaydi, yengil yordam beradi (tovuq tuxumini yig'ish, meva terish).
-* **Shogird (11–15 yosh):** Usta temirchi, novvoy yoki fermerga shogird tushadi va hunar o'rganadi.
-* **Voyaga yetgan fuqaro (16+ yosh):** To'laqonli askar, konchi yoki hunarmandga aylanadi.
+Ammo qirollik rivojlangan sari bu ishlarni fuqarolar o‘z zimmasiga oladi.
 
 ---
 
-## 4. SHAXSIY MEHNATDAN AVTOMATLASHUVGACHA (HANDS-ON TO AUTOMATION)
+# 1. O‘YINNING 5 ASOSIY USTUNI
 
-* **Dastlab (Odam kam paytda):** O'yinchi shaxsan o'zi dalaga ketmon uradi, paqirda suv tashib sug'oradi, hayvonlarga yem beradi, o'tin chopadi.
-* **Aholi ko'paygach (Feodal Avtomatlashuv):** Vazifalar fuqarolarga topshiriladi (Fermer, Chorvador, Novvoy). Hukmdor faqat strategiyaga qaraydi, lekin istalgan payt o'zi ham dalaga chiqishi mumkin.
+## 1.1. Hukmdor nigohi (First-Person Monarch)
+O‘yin to‘liq birinchi shaxs nuqtayi nazaridan boshqariladi. O‘yinchi dunyoning fizik qismi hisoblanadi. U jang maydonida ham, qurilishda ham, shahar boshqaruvida ham mavjud.
 
----
+## 1.2. Living Citizens
+Har bir fuqaro mustaqil simulyatsiya qilinadigan shaxs:
+- ismi, yoshi, oilasi;
+- sog‘ligi, kasbi, mahorati;
+- xarakteri, ehtiyojlari;
+- boyligi, uy-joyi, munosabatlari, tajribasi.
+Fuqarolar havodan spawn bo‘lmaydi. Har bir yangi insonning mantiqiy kelib chiqishi mavjud.
 
-## 5. FEODAL MANSAB ZINAPOYASI VA QIROLLIKKA 3 XIL YO'L
+## 1.3. Voxel Freedom
+Dunyo to‘liq voxel asosida:
+- yer qazish, tog‘ teshib o‘tish;
+- tunnel yaratish, devor qurish;
+- binoni buzish, relyefni o‘zgartirish.
 
-* **0-daraja: Sargardon (Wanderer)** — 1 kishi. Omon qoluvchi.
-* **1-daraja: Oqsoqol (Camp Elder)** — 3–8 kishi. Birinchi qo'nalg'a.
-* **2-daraja: Baron (Lord / Baron)** — 10–30 kishi. Birinchi yog'och qal'a va shaxsiy bayroq.
-* **3-daraja: Graf / Gersog (Count / Duke)** — 30–80 kishi. Tosh qal'a, armiya va soliqlar.
-* **4-daraja: QIROL (Sovereign King)** — 100+ kishi. Butun mintaqa hukmdori.
+## 1.4. Hands-on → Automation
+O‘yinning eng muhim progression mexanikasi:
+* Dastlab: *“Men buni qilishim kerak.”*
+* Keyinchalik: *“Kimdir buni men uchun qilishi kerak.”*
+* Oxirida: *“Qanday qilib butun davlatni samaraliroq ishlataman?”*
 
-### Qirollikka 3 Xil Yo'l:
-1. **Qilich Yo'li (Fotih / Warlord):** Mintaqadagi barcha qaroqchi qal'alarni qamal qilib yoqib yuborish va kuch bilan toj kiyish.
-2. **Oltin Yo'li (Savdo / Merchant King):** Xazinaga 10,000 oltin yig'ish, barcha neytral yerlarni sotib olish.
-3. **Xalq Mehri Yo'li (Adolatli Qirol):** Buyuk Sobor qurish, yo'qolgan Ajdodlar Tojini topish va xalq mehrini 95%+ ga yetkazish.
-
----
-
-## 6. 4 TA FEODAL RIVOJLANISH BOSQICHI (TECH TREE TIERS 1–4)
-
-* **Tier 1: Qochqinlar Qo'nalg'asi (3–8 kishi):** Kulbalar, aravacha, gulxan, oddiy quduq. Dehqon, o'rmonchi, yukchi.
-* **Tier 2: Hunarmandlar Qishlog'i (8–25 kishi):** Tegirmon, nonvoyxona, temirchilik, yog'och devor, **Chorva Molxonasi**.
-  * *Chorvadorlik:* Qo'y (jun $\to$ issiq kiyim), Sigir (teri $\to$ sovut/sut), Tovuq (patlar $\to$ o'qlar/tuxum), Otlar (chavandozlik).
-* **Tier 3: Feodal Qal'asi (25–60 kishi):** Tosh devorlar, qorovul minorasi, kazarma, taverna, kasalxona, bozor. Farmonlar (Edicts).
-* **Tier 4: Mustahkam Qirollik (60–150+ kishi):** Qirollik Saroyi, Zarbxona, Balista/Katapulta minoralari, Buyuk Sobor, Ritsarlar.
-
----
-
-## 7. BIOMLAR TIZIMI VA TUNDRA ISSIQXONALARI
-
-| Biom | Afzalliklari (Pros) | Kamchiliklari (Cons) | Strategik Yechim |
-| :--- | :--- | :--- | :--- |
-| **Unumdor Tekislik** | Dehqonchilik +50%, daryo suvi, oson qurilish | Tabiiy to'siq yo'q, yog'och va ruda kam | Shahar atrofiga tosh devorlar tortish |
-| **Qalin O'rmon** | Cheksiz yog'och, ov hayvonlari, yovvoyi asal | Yer tozalash qiyin, yirtqichlar ko'p | Qishloq chetiga doimiy gulxan va tuzoqlar |
-| **Qoyali Tog'lik** | Barcha rudalar xazinasi, yengilmas mudofaa | Ekin o'smaydi (-80%), qulash xavfi, qahraton | Vodiydan oziq-ovqat import qilish, terrasalar |
-| **Zax Botqoqlik** | Torf (yoqilg'i), loy, botqoq temiri, dori o'tlar | Kasalliklar ko'p, uylar zaxdan tez chiriydi | Doimiy Tabib saqlash, tosh poydevor qurish |
-| **Qorli Tundra** | Go'sht muzlab buzilmaydi, qimmatbaho mo'ynalar | Shafqatsiz sovuq, ochiq havoda dehqonchilik 0% | **Maxsus Isitiladigan Issiqxona qurish!** |
-| **Qurg'oqchil Dasht**| Cheksiz yaylovlar, tuz konlari, kvars qumi | Ichimlik suvi taqchilligi, katta daraxtlar yo'q | Chuqur quduqlar va tosh/loy arxitekturasi |
-
-### Tundra Maxsus Isitiladigan Issiqxonasi (Heated Greenhouse)
-* Shisha gumbaz (kvars eritish), tosh poydevor, ko'mir pechi va mo'rilar (yoki geotermal qaynoq buloq).
-* Qishki ekinlar: Sholg'om, qora javdar, qizilcha va dorivor Muzlik guli.
+## 1.5. Feudal Rise
+O‘yinchi bosqichma-bosqich:
+**Sargardon → Oqsoqol → Baron → Graf/Gersog → Qirol** darajalaridan o‘tadi.
 
 ---
 
-## 8. YER CHUQURLIGI QATLAMLARI VA SHAXTA MEXANIKASI
+# 2. CORE GAMEPLAY LOOP
 
-* **[0m dan -30m gacha] 1-Qatlam (Tuproq va Loy):** Gil, torf, shag'al, quduqlar poydevori.
-* **[-30m dan -100m gacha] 2-Qatlam (Toshlar va Bronza):** Ko'mir, mis, qalay, tuz, gematit.
-* **[-100m dan -200m gacha] 3-Qatlam (Temir va Zaharli G'orlar):** Magnetit, rux, kumush, oltingugurt, metan gazi. Shamollatgich quvurlari zarur.
-* **[-200m dan -350m gacha] 4-Qatlam (Abadiy Zulmat va Javohirlar):** Oltin, platina, olmos, yoqut, zumrad.
-* **[-350m va pastda] 5-Qatlam (Magma va Bedrock):** Lava, obsidian, geotermal issiqlik, dunyo tubi.
-* **Shaxta Mexanizatsiyasi:** Yog'och tirgaklar (struts), Shaxta Lifti va ruda yuk aravachalari (Minecart Hoist).
+## 2.1. 30 soniyalik loop
+O‘yinchi: resurs topadi → yig‘adi → foydalanadi → ehtiyojini qondiradi. (Masalan: daraxt → yog‘och → gulxan → issiqlik).
 
----
+## 2.2. 5–10 daqiqalik loop
+Resurs yig‘ish → asbob yasash → bino qurish → yangi imkoniyat ochish.
 
-## 9. 20+ GEOLOGIK RUDALAR, MINERALLAR VA METALLURGIYA
-
-1. **Qurilish:** Ohaktosh (ohak/sement), Loy (pech g'ishtlari), Marmar (saroy ustunlari), Granit/Bazalt (qamalga chidamli tosh).
-2. **Yoqilg'i & Kimyo:** Ko'mir, Torf, **Tosh Tuzi** (go'shtni tuzlab saqlash), Oltingugurt, Selitra (porox va olovli o'qlar).
-3. **Rangli Metallar:** Mis + Qalay = Bronza; Qo'rg'oshin (og'ir qamal toshlari); Rux (Latun/Brass); Nikel (zanglamas po'lat).
-4. **Qora Metallar:** Gematit/Magnetit (Temir); Po'lat (Domna pechi); Damashq Po'lati (afsonaviy ritsar quroli).
-5. **Javohirlar:** Kumush, Oltin, Platina, Yoqut, Zumrad, Safir, Olmos.
+## 2.3. Bir o‘yin kuni
+O‘yinchi:
+- ishlarni taqsimlaydi;
+- ishlab chiqarishni tekshiradi;
+- oziq-ovqat holatini nazorat qiladi;
+- xavfsizlikni tekshiradi;
+- qurilish buyurtmalarini beradi;
+- ekspeditsiyaga chiqadi.
 
 ---
 
-## 10. MAHLUQLAR TIZIMI, ODDIY DUSHMANLAR VA 5 TA ULUG'VOR BOSS
+# 3. VAQT TIZIMI
 
-### 10.1. Oddiy Dushmanlar
-* **Bo'rilar to'dasi:** Kechalari hujum qiladi, gulxandan qo'rqadi.
-* **Qaroqchi o'g'rilar:** Tunda omborni talaydi.
-* **G'or kalamushlari (-30m):** Vabo va isitma tarqatadi.
-* **Ipak o'rgimchaklari (-100m):** To'r otadi; pishiq kamon iplari beradi.
-* **Ko'r maxluqlar (-200m):** Tovushga qarab hujum qiladi.
-* **Qonli Oy (Blood Moon):** Har 15–20 kunda uyushgan katta qamal to'lqini.
+## 3.1. Kalendar
+* **1 o‘yin yili = 28 o‘yin kuni.**
+* Har fasl = 7 kun:
+  * Bahor — 1–7 kunlar
+  * Yoz — 8–14 kunlar
+  * Kuz — 15–21 kunlar
+  * Qish — 22–28 kunlar
 
-### 10.2. 5 Ta Ulug'vor Epic Boss:
-1. **O'rmon Bossi — «Qonli Tirnoq» (Alpha Bear):** *Mukofot:* Hukmdor Mantiyasi (+20% xalq hurmati).
-2. **Qamal Bossi — «Temir Soqol» Valdemar (Warlord):** *Mukofot:* Feodal Gerb Nizomi (Baronlik unvoni) va Damashq qilichi.
-3. **G'or Bossi — «Zulmat Onasi» (Broodmother: -150m):** *Mukofot:* Titan Ipak (afsonaviy kamonlar uchun).
-4. **Tog' Bossi — Qoya Kolossi (Crag Colossus):** *Mukofot:* «Yer Yuragi» Kristali (avtomatik aravachalar quvvati).
-5. **Muzlik Bossi — «Muz Qanoti» (Frost Wyvern):** *Mukofot:* Muz Yadrosi (oziq-ovqatlarni abadiy saqlovchi artefakt).
+## 3.2. Real vaqt
+* Standart balans: **1 o‘yin kuni ≈ 24 real daqiqa** (1 game soat ≈ 1 real daqiqa).
+* Tezlik boshqaruvi: Pause, x1, x2, x4 (Jang yoki birinchi shaxs harakatida x1).
 
 ---
 
-## 11. HARBIY TIZIM: ASKARLARNI SARALASH, O'QITISH VA TA'MINOT
+# 4. BIOLOGIK VAQT VA YOSH BOSQICHLARI
 
-### 11.1. Shaxsiy Fazilatlar
-* **Jasorat (Bravery):** Qo'rqoqlik vs Qahramonlik.
-* **Kuch (Strength):** Og'ir po'lat sovut va qurollarni ko'tarish qobiliyati.
-* **Chaqqonlik & Ko'rish (Vision/Agility):** Kamon va arbalet aniqligi.
-* **Intizom (Discipline):** Tungi soqchilik va buyruqlarni bekamu-ko'st bajarish.
+Biologik yosh kalendar yiliga to‘g‘ridan-to‘g‘ri bog‘lanmaydi, balki o‘yin davomida avlodlar almashinuvini ta'minlash uchun maxsus simulyatsiya soati orqali hisoblanadi.
 
-### 11.2. O'qitish Zanjiri (Barracks Pipeline)
-1. **Chaqiriluvchi (Recruit):** Yog'och qilich bilan somon manekenlarda 3 kunlik mashq.
-2. **Ixtisoslashuv:** Kamonchi, Qalqonli nayzachi, Og'ir piyoda.
-3. **Ritsarlar Akademiyasi:** Jangovar otlar ustida nayza urishish va saf buzish.
-4. **Faxriylik (Veterancy):** Har bir omon qolgan jang tajriba beradi; faxriylar qo'rqmaydi.
-
-### 11.3. Ta'minot va Narx:
-* Askar dalada ishlamaydi: kuniga **2 ta to'yimli non + go'sht** va haftalik **kumush tanga maosh** talab qiladi.
+* **0–3 yosh:** Chaqaloq (Ona qaramog'ida).
+* **4–10 yosh:** Bola. Yengil vazifalar: tuxum yig‘ish, meva terish, chorvaga yem berish.
+* **11–15 yosh:** Shogird (Apprentice). Usta bilan ishlab kasb o'rganadi.
+* **16–45 yosh:** Voyaga yetgan fuqaro. Maksimal jismoniy unumdorlik va harbiy xizmat.
+* **46–60 yosh:** Tajribali fuqaro. Mahorat va donolik yuqori.
+* **61–75 yosh:** Oqsoqol. Jismoniy kuch pasayadi, ammo Wisdom va Mastery eng yuqori darajada.
 
 ---
 
-## 12. SEHR, ALKIMYO VA RUNA TEMIRCHILIGI
+# 5. SULOLA VA HUKMDORLIK (PLAYER DYNASTY)
 
-### 12.1. Alkimyo va Eliksirlar (Qozonxona)
-* **Hayot Sharobi (Healing):** Og'ir yarador askarni darhol davolaydi.
-* **Tosh Teri (Stoneskin):** 5 daqiqa davomida jismoniy zararni 50% ga kamaytiradi.
-* **Hosildorlik Damlamasi (Fertility):** Ekinlarni bir kechada pishiradi.
-* **Yunon Olovi (Alchemical Fire):** O'chmas qamal olovi.
+Hukmdor ham keksayadi:
+- turmush qurishi;
+- farzand ko‘rishi;
+- voris tayinlashi mumkin.
 
-### 12.2. Runa Temirchiligi (Enchanting)
-* **Olov Runasi:** Dushman sovutini qizdirib o't qo'yadi.
-* **Buzilmaslik Runasi:** Asbob va qurollar hech qachon sinmaydi.
-* **Shamol Runasi:** Kamon o'qlari 2 barobar uzoqroqqa to'g'ri uchadi.
-* **Yengillik Runasi:** Po'lat sovutli ritsarga yengil yugurish imkonini beradi.
-
-### 12.3. Shohona Marosimlar va Munajjim Minorasi
-* **Yomg'ir Chaqirish:** Qurg'oqchilikda ekinlarni qutqarish.
-* **Quyosh Nuri:** Tundrada qahraton bo'ronni eritish.
-* **Nurli Qalqon (Sanctuary Ward):** Qonli Oyda shahar darvozasini 30 daqiqa yopib turuvchi nurli gumbaz.
-* **Munajjim Minorasi (Observatory):** Yulduzlarga qarab dushman hujumini 3–5 kun oldin xabar beradi.
+### Hukmdor o‘lsa:
+- Agar voris mavjud bo‘lsa: boshqaruv vorisga o‘tadi, qirollik davom etadi.
+- Agar voris bo‘lmasa: regency (muvaqqat noib) yoki succession crisis yuz beradi.
 
 ---
 
-## 13. BOSHQARUV DAFTARI (THE ROYAL LEDGER) VA ZANJIRLI IQTISODIYOT
+# 6. HUKMDOR O‘LIMI VA JANGDA YIQILISH (PLAYER DEATH)
 
-* **Daftar Menyusi (`Tab` tugmasi):** Fuqarolar ro'yxati, ombor balansi, soliq siyosati va farmonlar.
-* **Zanjirli Ishlab Chiqarish:**
-  $$\text{Bug'doy} \to \text{Tegirmon (Un)} \to \text{Pech (Non)} \to \text{Aholi to'qligi}$$
-  $$\text{Ruda} + \text{Ko'mir} \to \text{Temir quyma} \to \text{Asboblar (Ish unumi +50\%) & Qurollar}$$
-* **Farovonlik Formulasi:**
-  $$\text{Morale} = \frac{\text{Oziq-ovqat xilma-xilligi} + \text{Uylar sifati} + \text{Xavfsizlik}}{3} - \text{Soliq}$$
+Jangda yiqilish oddiy arcade respawn emas:
+1. **Og‘ir yaralanish:** Hukmdor jangdan askarlari tomonidan olib chiqiladi va bir necha kun gospitalda davolanadi.
+2. **O‘lim va Vorislik:** Agar qahramon halok bo'lsa, o'yin voris nomidan davom etadi.
+3. **Sulola tugashi (Dynasty End):** Hech qanday qonuniy voris bo'lmasa — shonli mag'lubiyat tarixi qayd etiladi.
 
 ---
 
-## 14. QURILISH TIZIMI, KATTALIK DARAJALARI VA MASSHTAB
+# 7. ORIGIN (KELIB CHIQISH) TIZIMI
 
-### 14.1. Ikki Xil Qurilish Rejimi
-* **Erkin Voxel Rejimi:** Qo'lda blok qo'yish (kichik tuzatishlar, interyer).
-* **Blueprint Rejimi (`B` tugmasi):** Shaffof gologramma bloklar bilan reja chizish. Quruvchi fuqarolar ombordan g'isht tashib binoni tiklaydi.
-* **Struktura Chidamliligi (Gravity):** Keng tosh shiftlar ostiga yog'och yoki tosh to'sinlar qo'yilishi shart.
+## 7.1. Surgun Ritsar (Exiled Knight)
+* Boshlaydi: qilich, eski zanjir sovut, qalqon.
+* Bonus: Combat Skill (+20%).
+* Kamchilik: Crafting va farming zaif.
 
-### 14.2. Binolar Kattalik Darajalari:
-* **Kichik (3x3 dan 5x5 gacha):** Chayla, quduq, soqchi budkasi.
-* **O'rtacha (7x7 dan 10x10 gacha):** Novvoyxona, tegirmon, temirchilik, 2 qavatli oilaviy uy, taverna.
-* **Katta (15x15 dan 20x20 gacha):** Kazarma, markaziy ombor, chorva molxonasi.
-* **Monumental (30x30 dan 60x60+ gacha):** Qirollik Saroyi, Buyuk Sobor, Qal'a Keep.
+## 7.2. Xonavayron Savdogar (Bankrupt Merchant)
+* Boshlaydi: 25 kumush tanga, aravacha, xarita.
+* Bonus: savdo narxlari ancha qulay, karvonlar bilan aloqa oson.
+* Kamchilik: jang qobiliyati past.
 
-### 14.3. Hudud va Shahar Masshtablari:
-1. **Qo'nalg'a (Homestead):** 50x50 blok (1–5 kishi).
-2. **Qishloqcha (Hamlet):** 100x100 blok (6–15 kishi).
-3. **Katta Qishloq (Village):** 200x200 blok (16–35 kishi).
-4. **Feodal Shaharcha (Town):** 400x400 blok (35–80 kishi).
-5. **Qirollik Poytaxti (Metropolis):** 800x800 – 1000x1000 blok (80–200+ kishi).
-* *Chegarani Kengaytirish:* Qorovul minorasi qurilib, askar tayinlangach, atrofidagi 50–70 blok yer rasman davlatga qo'shiladi.
+## 7.3. Qochoq Ovchi (Runaway Hunter)
+* Boshlaydi: kamon, 20 o‘q, bolta, tuzoq.
+* Bonus: ov, iztoparlik va yovvoyi tabiatda omon qolish.
+* Kamchilik: boshlang‘ich puli 0.
 
 ---
 
-## 15. 4 FASL (MAVSUMLAR) VA DINAMIK OB-HAVO TIZIMI
+# 8. PLAYER STATS
 
-* **1 O'yin Yili = 28 Kun (Har bir fasl 7 kun):**
-  * **🌸 Bahor (1–7 kunlar):** Qor erishi, daryo toshqinlari, serob yumshoq tuproq, ekin ekish unumi +30%, chorva bolalashi.
-  * **☀️ Yoz (8–14 kunlar):** Oltin quyosh, qurilish uchun eng quruq fasl, qurg'oqchilik xavfi, quruq o'tlar yong'ini.
-  * **🍂 Kuz (15–21 kunlar):** Hosilni o'rib g'amlash, o'tin yig'ish poygasi, tuzlash va dudlash, 20-kunda Hosildorlik Bayrami.
-  * **❄️ Qish (22–28 kunlar):** Abadiy qor, muzlagan daryolar, dehqonchilik 0%, pechlarda o'tin sarfi 2x, uylar sovusa muzlab o'lish, och bo'rilar hujumi.
-* **Dinamik Ofatlar:** Qalin Tuman, Momaqaldiroq & Yashin (Yashinqaytargich), Qor Bo'roni (harakat -70%), Do'l.
-
----
-
-## 16. OZIQ-OVQAT AYNISHI, SAQLASH USULLARI, SANITARIYA VA VABO
-
-### 16.1. Oziq-ovqat Aynish Muddatlari
-* Xom go'sht/baliq: 2–3 kun | Yangi sut: 1–2 kun | Meva/sabzavot: 5–7 kun | Non: 6–8 kun | Bug'doy/Arpa: 1–2 yil.
-* Buzilgan oziq-ovqat yeyilsa og'ir kasallik va o'lim keladi.
-
-### 16.2. Saqlashning 4 Xil Usuli:
-1. **Tuzlash (Salting):** `Go'sht/Baliq + Tosh Tuzi (Halite)` = 1 yil saqlanadi.
-2. **Dudlash (Smokehouse):** 20–30 kun saqlanadi, xushbo'y ta'm (baxt +15%).
-3. **Muzxona / Podval (Cold Cellar):** Qishki muz bloklari bilan sovitiladi (0°C).
-4. **Quritish (Sun Drying):** Meva va qo'ziqorinlarni oftobda quritish.
-
-### 16.3. Sanitariya va Vabo (The Black Plague)
-* **Axlat Chuquri:** Chiqindilar shahar tashqarisiga chiqariladi.
-* **Kalamushlar Bosqini:** Ko'chalarda axlat to'plansa kalamushlar ko'payadi. *Yechim:* Mushuklar va Qorovul Itlar.
-* **Qora O'lat Epidemiyasi:** Karantin e'lon qilish, O'lat Tabibi (Plague Doctor) chaqirish, kasallangan to'shaklarni yoqish.
+Hukmdor quyidagi fizik ko'rsatkichlarga ega:
+- **Health (Salomatlik)**
+- **Stamina (Chidamlilik)**
+- **Hunger (Ochlik)**
+- **Thirst (Chanqoqlik)**
+- **Temperature (Tana harorati)**
+- **Fatigue (Charchoq)**
+- **Armor (Himoya)**
+- **Carry Weight (Ko'tarish vazni)**
 
 ---
 
-## 17. JINOYATCHILIK, SUD, QONUNLAR VA ZINDON TIZIMI
+# 9. INVENTORY TIZIMI
 
-### 17.1. Jinoyat Sabablari:
-* Ochlik (fuqaro 2 kun och qolsa ombordan o'g'irlaydi), haddan tashqari yuqori soliqlar (> 30%), taverna mushtlashuvlari, qaroqchilar josusi (Infiltrator).
-
-### 17.2. Huquq-Tartibot va Jazo Binolari:
-1. **Shahar Soqchilari (Constables):** Ko'chalarda patrul qilib jinoyatchini hibsga oladi.
-2. **Jazo Ustuni (Stocks & Pillory):** Kichik o'g'rilarni 3 kun taxtaga qisib qo'yish (xalq loy otadi, obro'si tushadi).
-3. **Qasr Zindoni (The Dungeon):** Og'ir jinoyatchilar temir panjara ortida saqlanadi.
-4. **Qatl Maydoni (Gallows):** Xiyonatchilar va josuslar uchun dor.
-
-### 17.3. Hukmdor Sudi (The Royal Trials):
-* Og'ir jinoyat sodir bo'lganda Hukmdor shaxsan hukm chiqaradi (Rahmdillik vs Qonun vs Shaxtada majburiy mehnat).
+- **Hotbar:** 8 ta tezkor slot.
+- **Backpack:** 24 ta bazaviy inventar sloti (sumkalar orqali kengaytiriladi).
+- **Equipment Slotlari:** Head, Chest, Legs, Boots, Gloves, Main Hand, Off Hand, Back, Accessory ×2.
 
 ---
 
-## 18. MADANIYAT, BAYRAMLAR VA SHOHONA RITSARLAR TURNIRI
+# 10. ITEM TIZIMI
 
-### 18.1. Aholining Quvonch Ehtiyoji
-Madaniyat va quvonch bo'lmasa fuqarolar tushkunlikka tushadi (ish unumi -30%, nikohlar to'xtaydi). Bayramlar esa baxtni 100% ga chiqaradi va nikohlarni 3 barobar ko'paytiradi.
-
-### 18.2. Katta Shohlik Bayramlari:
-1. **Buyuk Hosildorlik Bayrami (Kuzning 20-kuni):** Ulkan gulxan, bepul ziyofat, pivo, bardlar musiqasi.
-2. **Qishki Yule Bayrami (Qishning 25-kuni):** Shamlar, qishki sovuq tushkunligiga qarshi sovg'alar ulashish.
-3. **Shohona Ritsarlar Turniri (Jousting Arena):**
-   * Kamonchilar musobaqasi, qilichbozlik duellari va ot ustida nayza urishtirish (Jousting).
-   * G'olib ritsarga dafna gulchambari va 100 ta oltin mukofot. Butun qirollik obro'si (Prestige) ko'tariladi, yangi ritsarlar ko'chib keladi.
-
-### 18.3. Madaniy Infratuzilma:
-* **Taverna & Bardlar:** Minstrel NPC lirasini chalib fuqarolar stressini 0 ga tushiradi.
-* **Buyuk Sobor:** Vitrajli shisha derazalar, yakshanba ibodatlari (axloqiy poklik va intizom).
-* **Hukmdor Haykali:** Maydondagi bronza/marmar haykal (shohga sadoqat ramzi).
+Har bir ashyo quyidagi atributlarga ega:
+`ItemID, Name, Category, Weight, StackSize, Durability, Quality, Value, Rarity, Tags`.
 
 ---
 
-## 19. FUQAROLAR QARISHI, OʻLIM, QABRISTON VA AJDODLAR MEROSI
+# 11. ITEM QUALITY (BUYUM SIFATI)
 
-### 19.1. Umr Davrlari va Qarish Dinamikasi
-* **1 Yil = 28 Kun.** Har bir inson to'liq hayot siklini bosib o'tadi:
-  * **Chaqaloqlik va Bolalik (0–15 yosh / 0–15 kun):** Ota-ona qaramog'ida, o'ynaydi va maktabda ta'lim oladi. 10 yoshdan yengil ishlarda yordam beradi.
-  * **Kuch-quvvat Davri (16–45 yosh):** Mehnat samaradorligi va harakat tezligi maksimal (+20%). Harbiy xizmat va og'ir konchilik uchun oltin davr.
-  * **Oqsoqollik va Donolik (46–70 yosh):** Jismoniy kuch va yuk ko'tarish -25% pasayadi, ammo "Donolik" (Wisdom) va "Mahorat" (Mastery) eng cho'qqisiga chiqadi. Qariyalar shahar maktablarida eng zo'r ustoz, kutubxonachi, qozixona maslahatchisi va alkimyogar bo'lishadi.
-  * **Tabiiy Keksayish va O'lim (60–75 yosh oralig'ida):** Har bir oqsoqol o'z uyida to'shagida qarindoshlari davrasida tinch jon taslim qiladi.
-
-### 19.2. O'lim Sabablari va Shahar Ruhiyatiga Ta'siri
-* **Tabiiy O'lim:** Oila motam tutadi (3 kun ish unumi -15%), ammo shahar xalqi vahimaga tushmaydi.
-* **Jangovar Qahramonlik O'limi:** Qolgan askarlarga "Qasos Shijoati" buffini beradi (+15% hujum kuchi, shon-sharaf hissi).
-* **Baxtsiz Hodisa va Muzlash:** Aholining xavfsizlik va boshpanaga bo'lgan ishonchini pasaytiradi.
-* **Qora O'lat O'limi:** Jasad o'ta yuqumli hisoblanadi, darhol xavfsiz utilizatsiya qilinishi yoki maxsus dafn qilinishi shart.
-
-### 19.3. Dafn Logistikasi va Jasadlarni Yig'ish
-* **Ko'chada Qolgan Jasad Xavfi:** 1 kundan keyin badbo'y hid tarqaladi. Jasadni ko'rgan har qanday fuqaroning ruhiyati (Sanity/Morale) -30% ga qulaydi ("Dafn etilmagan qardosh" fojiasi). Kalamushlar to'planib, vabo 5 barobar tez tarqaladi.
-* **G'assol / Qabr Qazuvchi (Gravedigger & Mortician):**
-  * Maxsus **O'liklar Aravasi (Morgue Cart)** bilan shahar bo'ylab jasadlarni yig'adi.
-  * Jasadni Kanop Kafan (Linen Shroud) yoki Yog'och Tobut (Wooden Coffin) ga joylab qabristonga olib boradi.
-  * Favqulodda vabo paytida: Jasadlarni maxsus gulxanda kuydirish (Plague Pyre).
-
-### 19.4. Muqaddas Qabriston, Qabr Toshlari va Daxmalar
-* **Muqaddas Qabriston (The Graveyard):** Sobor yoki cherkov yonidagi panjara bilan o'ralgan, sarv daraxtlari ekilgan sokin ziyoratgoh.
-* **Shaxsiy Qabr Toshlari:** Har bir qabr toshida fuqaroning ismi, kasbi va qilgan xizmatlari bitiladi (masalan: *"Temirchi Eldor — Qirollikning 500 ta qilichini yasagan buyuk usta, 68 yoshida vafot etdi"*).
-* **Qirollik Daxmasi (Royal Crypt & Sarcophagus):** Qasr ostidagi tosh daxma — shohlar va afsonaviy ritsarlar uchun marmar sarkofaglar.
-
-### 19.5. Ajdodlar Duosi va Meros Tizimi
-* **Meros (Inheritance):** O'lgan fuqaroning jamg'argan oltin va asboblari uning farzandlariga yoki eng yaqin shogirdiga meros qoladi.
-* **Ajdodlar Duosi (Ancestral Blessing):** Agar qabristonga gullar ekilsa, shamlar yoqilib obod saqlansa, butun shaharga "Ajdodlar Duosi" aurasi tarqaladi (Baxt +10%, shahar ruhi mustahkam bo'ladi).
-* **Qarovsizlik Oqibati:** Qabriston vayron qilinsa yoki qarovsiz qolsa, tunda Tinchliksiz Arvohlar (Restless Wraiths) chiqib aholini vahimaga soladi.
+Quality darajalari:
+`Poor → Common → Fine → Masterwork → Royal → Legendary`
+Yuqori sifat qurol zararini, asbob tezligini, kiyim mustahkamligini va savdo narxini oshiradi.
 
 ---
 
-## 20. BUYUK GʻALABA SHARTLARI VA CHEKSIZ QUMDON REJIMI (ENDGAME & VICTORY)
+# 12. ASBOBLAR PROGRESSIYASI (TOOL PROGRESSION)
 
-### 20.1. Uch Xil Tarixiy G'alaba Yo'li:
-1. **Me'moriy Mo'jiza — Buyuk Imperatorlik Qasri va Sobori (Wonder of the Realm):**
-   * 100x100x80 blokli mahobatli Oq Marmar Sobor yoki Imperator Saroyi.
-   * Resurslar talabi: 10,000 O'yma Tosh, 2,000 Oq Marmar, 500 Zargarlik Oltin Qoplamasi, 150 Rangli Vitraj Shisha.
-   * Qurib bitkazilganda "Asrlar Me'mori" unvoni beriladi va butun qit'adan ziyoratchilar oqib keladi.
-2. **Qit'ani Birlashtirish — 6 Bioma Hukmronligi (Pax Feudalis / Realm Unification):**
-   * Barcha 6 ta biomda (Tekislik, O'rmon, Tog', Cho'l, Botqoqlik, Tundra) mustahkam forpost va qasrlarni barpo etish.
-   * Xaritadagi 5 ta Afsonaviy Bossni (Ajdaho, Lich, Muz Giganti, O'rmon Devi, Qum Chuvali) batamom mag'lub etib, yerlarni tinchitish.
-3. **Iqtisodiy Gegemonlik — Savdo Monopoliyasi (The Sovereign Guild):**
-   * 100,000 Oltin Tanga jamg'arish, eng hashamatli Savdo Porti va Bank tizimini qurish, qit'adagi barcha qo'shni feodal mulklarni iqtisodiy qaramlikka tushirish.
-
-### 20.2. Cheksiz Hukmronlik Rejimi (Endless Sandbox Reign)
-* G'alaba qozonilgandan keyin ham o'yin to'xtamaydi. O'yinchi istalgan paytda saltanatini avlodlar osha boshqarishda davom etishi, yangi megashaharlar qurishi va o'z sulolasini cheksiz asrlar davomida davom ettirishi mumkin.
+`Stone (Tosh) → Copper (Mis) → Bronze (Bronza) → Iron (Temir) → Steel (Po'lat) → Damascus Steel (Damashq Po'lati) → Runic / Legendary (Runik)`.
 
 ---
 
-## 21. GODOT 4 TEXNIK ARXITEKTURASI VA DASTURIY MODULLAR
+# 13. CRAFTING (YASASH) TIZIMI
 
-* **Face Culling & Greedy Meshing:** `scripts/core/voxel_chunk.gd` — 120+ FPS ta'minlash.
-* **Aholi FSM & Yo'l topish:** `scripts/entities/citizen.gd` — NavigationAgent3D.
-* **Iqtisodiyot va Ta'minot:** `scripts/economy/supply_chain.gd` — resurslar sarfi va kundalik hisob-kitob.
-* **Boshqaruv UI:** `scripts/ui/royal_ledger.gd` — Hukmdor daftari interfeysi.
-* **Simulyator:** `prototype_sim.py` — 30 kunlik avtomatlashtirilgan iqtisodiy sinov vositasi.
+1. **Hand Crafting:** Oddiy mayda vositalar va mash'alalar.
+2. **Workstation Crafting:** Temirchilik, Duradgorlik, Tegirmon, Nonvoyxona, To'quvchilik, Alkimyo dastgohlari.
+3. **Citizen Production:** O'yinchi retsept va kvota belgilaydi, fuqarolar avtomatik ishlab chiqaradi.
+
+---
+
+# 14. AHOLINING PAYDO BO‘LISHI
+
+1. **Signal Fire (Xaloskor Gulxan):** Dastlabki sarson-sargardonlarni jalb qiladi.
+2. **Captive Rescue (Asirlarni Qutqarish):** Qaroqchilar lageridagi tutqunlarni ozod qilish.
+3. **Village Bell (Shahar Qo'ng'irog'i):** Farovon shahar migrant va ustalarni chaqiradi.
+4. **River Docks (Daryo Porti):** Yollanma ishchilar va sayohatchilar kelishi.
+5. **Generations (Tug'ilish):** Baxtli oilalar nikohi va bolalar dunyoga kelishi.
+
+---
+
+# 15. MIGRATSIYA VA KETISH (EMIGRATION)
+
+Aholi shaharni tashlab ketish sabablari:
+- uzoq davom etgan ochlik;
+- boshpana yetishmasligi;
+- xavfsizlik pastligi (doimiy reydlar);
+- yuqori soliqlar (>30%);
+- davolanmagan vabo va kasallik;
+- zolimona hukmronlik.
+
+---
+
+# 16. OILA VA QARINDOSHLIK TIZIMI
+
+Har bir fuqaro: `Partner, Parents, Children, Siblings, Household` aloqalariga ega.
+Nikoh ehtimoliga yosh, uy mavjudligi, ma'naviy ruhiyat (morale) va xavfsizlik ta'sir qiladi.
+
+---
+
+# 17. UY-JOY TALABLARI (HOUSING)
+
+Uy parametrlari:
+- **Capacity (Sig'im)**
+- **Beds (To'shaklar)**
+- **Warmth (Issiqlik - Pechka)**
+- **Privacy (Shaxsiy hudud)**
+- **Beauty (Go'zallik va bezaklar)**
+- **Safety (Mustahkam devorlar)**
+Uy sifati to'g'ridan-to'g'ri unumdorlik va tug'ilishga ijobiy ta'sir ko'rsatadi.
+
+---
+
+# 18. FUQAROLAR EHTIYOJLARI (CITIZEN NEEDS)
+
+Food, Water, Sleep, Warmth, Safety, Housing, Social, Entertainment, Health.
+
+---
+
+# 19. CITIZEN AI ARXITEKTURASI
+
+1. **High-Level Planner:** Kun tartibi va nima qilish kerakligini rejalashtiradi.
+2. **Finite State Machine (FSM):**
+   `Walk, Work, Eat, Sleep, Fight, Flee, Socialize, Heal, Transport, Rest`.
+
+---
+
+# 20. VAZIFALAR USTUVORLIGI (TASK PRIORITY)
+
+`Critical → High → Normal → Low`.
+- Yong'in o'chirish = Critical.
+- Jasadlarni yig'ish = High.
+- Shaharni bezatish = Low.
+
+---
+
+# 21. KASBLAR TIZIMI (JOB ROLES)
+
+Farmer, Lumberjack, Miner, Builder, Hauler, Blacksmith, Carpenter, Hunter, Fisherman, Cook, Baker, Brewer, Tailor, Merchant, Doctor, Alchemist, Teacher, Guard, Soldier, Knight, Gravedigger, Priest, Bard va boshqalar.
+
+---
+
+# 22. DIPLOMATIYA, RAQIB FRAKTSIYALAR VA MULTIPLAYER (CO-OP)
+
+## 22.1. Qo'shni AI Qirolliklar va Fraktsiyalar
+Dunyo procedural generatsiya qilinayotganda turli biomlarda mustaqil AI lordlar va neytral fraktsiyalar paydo bo'ladi:
+* **Savdogar Gildiyalari (Merchant Guilds):** Qirg'oq bo'yi va tekisliklarda joylashgan. Noyob resurslarga (ziravorlar, maxsus shisha, ekzotik matolar) ega. Monopoliya va erkin savdoni xohlaydi.
+* **Harbiy Feodallar (Warlords):** Tog'li va o'rmonli hududlardagi agressiv qo'shnilar. Chegarasini doimiy kengaytiradi va o'lpon talab qiladi.
+* **Diniy Ordenlar (Theocratic Orders):** Qat'iy diniy qoidalarga tayanadi. Buyuk Sobor qursangiz ittifoqchi, qora joduga berilsangiz "bid'atchi" deb urush ochadi.
+
+## 22.2. Savdo va Diplomatiya Tizimi
+Tier 3 Elchixona (Embassy) binosi orqali Dunyo Xaritasi interfeysida boshqariladi:
+* **Karvon Yo'llari (Trade Routes):** Ikki tomonlama savdo shartnomasi, ot-aravali qatnovlar. O'yinchi karvonlarni qaroqchilardan himoya qiladi.
+* **Diplomatik Harakatlar:**
+  * **O'lpon (Tribute):** Hujumni to'xtatish yoki hurmat qozonish uchun har mavsum to'lov.
+  * **Ittifoq (Alliance):** Umumiy dushmanga qarshi birlashish, qamalda yordam chaqirish.
+  * **Josuslik (Espionage):** Raqib qasri omboriga o't qo'yish yoki tungi qamalda darvozani ichkaridan ochish.
+
+## 22.3. Chegara To'qnashuvlari va Urush Mexanikasi
+* **Voxel Qamallari (Destructible Voxel Sieges):** AI va o'yinchi trebuchetlar, katapultalar va taranlar (Battering Ram) yordamida tosh devorlarni jismonan buzib kiradi.
+* **Hududni Bosib Olish:** Raqib Asosiy Zali (Great Hall) egallansa va AI Lord yengilsa, o'sha yer barcha infratuzilmasi bilan tobelikka o'tadi.
+* **Asirlar Tizimi:** Mag'lub lordlar zindonga tashlanadi — katta tovon puli talab qilish, qatl etish yoki vassalga aylantirish mumkin.
+
+## 22.4. Multiplayer va Co-op Rejimi (Steam P2P 2–4 O'yinchi)
+* **Yagona Taxt (Shared Kingdom / Co-op):** Do'stlar bitta shahar-davlatni birgalikda boshqaradi:
+  * *1-O'yinchi (Hukmdor):* Iqtisodiyot, binolar loyihasi, soliqlar va diplomatiya.
+  * *2-O'yinchi (Bosh Qomondon):* Kazarma, qo'shin tayyorlash va jangovar yurishlar.
+  * *3-O'yinchi (Bosh Usta):* Konchilik tarmog'i, chuqur shaxtalar va metallurgiya zanjiri.
+* **Feodal Tarqoqlik (Rival Kingdoms / PvPvE):** O'yinchilar bitta katta xaritaning turli burchaklarida o'z qasrlarini quradi — ittifoq tuzishi yoki konlar uchun o'zaro qamal urushlari olib borishi mumkin.
+* **Texnik Yechim:** Host-Authoritative Client-Server arxitekturasi. Dunyo simulyatsiyasi va NPC AIsi Hostda hisoblanadi, boshqa o'yinchilarga holat paketlari uzatiladi.
+
+---
+
+# 23. MAHORAT TIZIMI (SKILL SYSTEM)
+
+Har bir kasbda 0–100 daraja:
+`Novice (Yangi) → Apprentice (Shogird) → Journeyman (Usta yordamchisi) → Expert (Mutaxassis) → Master (Buyuk Usta)`.
+Master ustalar yangi avlod shogirdlarini o'qitish huquqiga ega.
+
+---
+
+# 24. FEODAL MAQOMLAR (FEUDAL RANKS)
+
+- **Sargardon:** Aholi 1–2 kishi.
+- **Oqsoqol:** Aholi 3–10 kishi.
+- **Baron:** Aholi 10–35 kishi.
+- **Graf / Gersog:** Aholi 35–100 kishi.
+- **Qirol:** Aholi 100+ kishi.
+
+---
+
+# 25. TEXNOLOGIYA BOSQICHLARI (TECH TIERS)
+
+- **Tier I — Refugee Camp:** Boshlang'ich omon qolish va yog'och kulbalar.
+- **Tier II — Craft Village:** Hunarmandchilik dastgohlari, asosiy iqtisodiyot.
+- **Tier III — Feudal Town:** Tosh me'morchiligi, soqchilar, soliq tizimi, elchixona.
+- **Tier IV — Kingdom:** Monumental inshootlar, ilg'or metallurgiya, milliy tizimlar.
+
+---
+
+# 26. QIROLLIKKA 3 YO‘L
+
+1. **Qilich Yo'li:** Mintaqadagi barcha yovuz kuchlar va qaroqchilar boshliqlarini tor-mor etish.
+2. **Oltin Yo'li:** Xazinada 10,000 Oltin to'plash, strategik savdo yo'llarini monopoliyaga olish.
+3. **Xalq Mehri:** Obro' (Prestige) va xalq roziligi 95%+, Buyuk Sobor va Ajdodlar Toji.
+
+---
+
+# 27. DUNYO GENERATSIYASI VA 6 ASOSIY BIOM
+
+1. **Unumdor Tekislik:** Dehqonchilik unumi +50%, minerallar kam.
+2. **Qalin O‘rmon:** Mo'l yog'och va yovvoyi hayvonlar, yirtqichlar xavfi.
+3. **Tog‘lik:** Boy minerallar va tosh zaxirasi, qiyin relyef.
+4. **Botqoqlik:** Torf, noyob dorivor giyohlar, zax va kasallik xavfi.
+5. **Tundra:** Doimiy sovuq, ekinlar o'smaydi, go'sht muzlab aynimaydi, geotermal issiqxonalar zarur.
+6. **Dasht (Arid Steppe):** Yaylovlar, tosh tuzi, suv manbalari tanqis.
+
+---
+
+# 28. VOXEL WORLD TEXNIK PARAMETRLARI
+
+- **Masshtab:** 1 voxel = 1 metr³.
+- **Chunk:** 32 × 32 × 32 voxel bloklari.
+- **Chunk Streaming:** O'yinchi atrofida asinxron yuklanadi.
+
+---
+
+# 29. VOXEL LOD (LEVEL OF DETAIL)
+
+- Yaqin chunklar: To'liq voxel kolliziya va greedy meshing.
+- O'rta masofa: Soddalashtirilgan yuzalar.
+- Uzoq masofa: Relyef balandlik xaritasi (Terrain LOD).
+
+---
+
+# 30. YER QATLAMLARI VA STRATALAR
+
+- **0 → -30m:** Tuproq va loy qatlami (Soil & Clay).
+- **-30 → -100m:** Ko'mir, Mis va Qalay qatlami.
+- **-100 → -200m:** Temir, Kumush va Oltingugurt qatlami.
+- **-200 → -350m:** Oltin, Qimmatbaho javohirlar (Ruby, Diamond).
+- **-350m+:** Magma, Obsidian va Tub Qoya (Bedrock).
+
+---
+
+# 31. SHAXTALAR VA KONCHILIK MEXANIZMLARI
+
+Shaxta xavfsizligi va logistikasi:
+- Yog'och tirgaklar (Support Beams);
+- Shamollatish shaxtalari (Ventilation Shafts);
+- Ruda aravachalari (Mine Carts & Rails);
+- Chuqur liftlar (Hoists & Winches);
+- Konchilar chiroqlari (Lanterns).
+
+---
+
+# 32. SHAXTA O‘PIRILISHI (CAVE-IN)
+
+Tirgaklar o'rnatilmasa, shiftning mustahkamlik koeffitsiyenti (Ceiling Stability) pasayadi va voxel qulashi ro'y beradi. Konchilar jarohatlanadi, tunnellar yopilib qoladi.
+
+---
+
+# 33. METAN GAZI VA PORTLASH (UNDERGROUND GAS)
+
+Chuqur qatlamlarda zaharli gaz cho'ntaklari paydo bo'ladi. Shamollatish quvurlari bo'lmasa, gaz zaharlanishi yoki mash'ala olovidan portlash yuz beradi.
+
+---
+
+# 34. 20+ GEOLOGIK MINERALLAR
+
+Stone, Clay, Limestone, Marble, Granite, Basalt, Coal, Peat, Salt (Halite), Sulfur, Saltpeter, Copper, Tin, Lead, Zinc, Nickel, Iron, Silver, Gold, Platinum, Ruby, Emerald, Sapphire, Diamond.
+
+---
+
+# 35. METALLURGIYA ZANJIRI
+
+`Ruda qazish → Rudani maydalash → Domna pechida eritish → Quymalar (Ingots) → Qotishmalar (Bronza, Po'lat) → Temirchilik bosqoni → Tayyor qurol/asbob`.
+
+---
+
+# 36. DEHQONCHILIK VA EKINLAR
+
+Urug' → Yumshoq tuproq → Namlik → Harorat → O'sish davri → Begona o'tlar/kasalliklar → Hosilni yig'ish.
+
+---
+
+# 37. TUPROQ UNUMDORLIGI VA ALMASHINLAB EKISH
+
+Tuproq unumdorligi (Fertility) har hosildan keyin pasayadi. Bir maydonga doimiy bir xil ekin ekish man etiladi. Almashlab ekish (Bug'doy → Mosh/Dukkakli → Bedapoya) va chirindi o'g'it unumdorlikni tiklaydi.
+
+---
+
+# 38. SUG‘ORISH TIZIMI (IRRIGATION)
+
+Daryo yoki buloq → Ariqlar va kanallar → Sug'oriladigan polizlar. Sug'orish hosildorlikni +40% ga oshiradi.
+
+---
+
+# 39. CHORVACHILIK (LIVESTOCK)
+
+Chicken (Tuxum, Pat), Sheep (Jun, Go'sht), Cow (Sut, Teri), Pig (Go'sht, Yog'), Horse (Minish, Arava tortish).
+
+---
+
+# 40. OZIQ-OVQAT AYNISH MUDDATLARI
+
+- Xom go‘sht/baliq: 2–3 kun;
+- Sut: 1–2 kun;
+- Sabzavot va mevalar: 5–7 kun;
+- Non: 6–8 kun;
+- Don va bug'doy: 1–2 yil.
+
+---
+
+# 41. SAQLASH USULLARI (FOOD PRESERVATION)
+
+1. **Tuzlash (Salting):** Halite tuzi yordamida 1 yilgacha saqlash.
+2. **Dudlash (Smoking):** Dudxonada dudlangan qazi va baliqlar (20–30 kun, baxt +15%).
+3. **Quritish (Drying):** Qoqi mevalar va quritilgan qo'ziqorinlar.
+4. **Muzxona / Podval (Cold Cellar):** Qishki muz bloklari bilan sovitiladigan ombor.
+
+---
+
+# 42. OMBORXONALAR VA MAXSUS FILTRLAR
+
+- Granary: Don va un;
+- Cold Cellar: Oziq-ovqatlar;
+- Armory: Qurol-yarog' va sovutlar;
+- Warehouse: Qurilish materiallari va xomashyo.
+
+---
+
+# 43. YUK TASHISH LOGISTIKASI (HAULING & RESERVATION)
+
+Bir ashyoni ikki fuqaro bir vaqtda talashmasligi uchun Item Reservation tizimi ishlaydi. Ustuvorlik asosida aravalar yuk tashiydi.
+
+---
+
+# 44. YO‘LLAR VA TRANSPORT SAMARADORLIGI
+
+- **Tuproq yo'l:** Harakat tezligi +15%.
+- **Tosh yotqizilgan ko'cha:** Tezlik +35%.
+- **Qirollik shoh ko'chasi:** Tezlik +60%, aravalar maksimal tezlikda harakatlanadi.
+
+---
+
+# 45. IQTISODIYOT ASOSI
+
+`Xomashyo ishlab chiqarish → Qayta ishlash → Tayyor mahsulot → Iste'mol / Ichki bozor / Eksport`.
+
+---
+
+# 46. BUG‘DOY VA NON ZANJIRI
+
+`Bug‘doy ekish → O'roq bilan o'rish → Shamol/Suv tegirmoni (Un) → Nonvoyxona (Non) → Aholi ta'minoti`.
+
+---
+
+# 47. TEMIR VA QUROL ZANJIRI
+
+`Temir rudasi + Ko'mir → Eritish pechi → Temir quyma → Temirchilik ustaxonasi → Bolg'a, o'roq, qilich, nayzalar`.
+
+---
+
+# 48. VALYUTA TIZIMI
+
+100 Kumush Tanga (Silver) = 1 Oltin Tanga (Gold).
+Kundalik ichki savdo va xizmatlar kumushda, yirik davlat xaridlari, soliqlar va xalqaro savdo oltinda yuritiladi.
+
+---
+
+# 49. BOZOR MEXANIKASI VA DINAMIK NARXLAR
+
+Narx = `BaseValue × Supply (Taklif) × Demand (Talab) × Reputation (Obro')`. Ortiqcha mahsulot arzonlashadi, taqchil resurs qimmatlashadi.
+
+---
+
+# 50. SAVDO KARVONLARI
+
+Karvonlar shaharga oziq-ovqat, ekzotik matolar, qurol-aslahalar va noyob minerallar olib keladi va mahalliy ortiqcha mollarni sotib oladi.
+
+---
+
+# 51. SOLIQ QONUNCHILIGI (TAX SYSTEM)
+
+Hukmdor soliqlarni 0% dan 40% gacha belgilaydi:
+- Past soliq (<10%): Fuqarolar juda xursand, ammo xazina sekin to'ladi.
+- O'rtacha soliq (10–20%): Muvozanatli holat.
+- Yuqori soliq (>25%): Xazina tez to'ladi, biroq xalq ruhiyati tushadi, jinoyat va qochishlar (emigratsiya) ortadi.
+
+---
+
+# 52. FUQAROLAR RUHIYATI (MORALE)
+
+Ko'rsatkich: 0–100.
+Faktorlar: Taom xilma-xilligi, issiq uy, xavfsizlik, dam olish maskanlari, adolatli soliqlar, o'lim va kasalliklar yo'qligi, bayramlar.
+
+---
+
+# 53. JANG TIZIMI (COMBAT MECHANICS)
+
+Light Attack, Heavy Attack, Block, Parry (Qaytarish), Dodge (Chetlanish), Stamina, Armor, Stagger (Muvozanatni yo'qotish).
+
+---
+
+# 54. ZARAR HISOBLASH FORMULASI (DAMAGE)
+
+`FinalDamage = (BaseDamage × SkillModifier × WeaponQuality × HitModifier) - ArmorProtection`.
+
+---
+
+# 55. SOVUTLAR VA ZARAR TURLARI
+
+Sovutlar: Matoli kiyim, Qalin charm, Zanjir sovut, To'liq temir zirh (Plate Armor).
+Zarar turlari: Kesuvchi (Slash), Sanchuvchi (Pierce), Maydalovchi (Blunt).
+
+---
+
+# 56. MASOFADAN JANG (RANGED COMBAT)
+
+Oddiy va kompozit kamonlar, og'ir arbaletlar (Crossbows). Fizik gravitatsiya va shamol ta'siri.
+
+---
+
+# 57. HARBIY FAZILATLAR (WARRIOR TRAITS)
+
+Jasorat (Bravery), Kuch (Strength), Chaqqonlik (Agility), Ko'rish o'tkirligi (Vision), Intizom (Discipline).
+
+---
+
+# 58. ASKARLARNI O‘QITISH VA RUTBALAR
+
+`Ko'ngilli Yangi Askar → Xalq Lashkari (Militia) → Professional Piyoda → Tajribali Veteran → Elita Ritsar`.
+
+---
+
+# 59. HARBIY SAFLAR VA BUYRUQLAR (FORMATIONS)
+
+Buyruqlar: Ortidan ergashish (Follow), O'rnida turish (Hold), Himoyalanish (Defend), Hujum (Attack), Chekinish (Retreat).
+Saflar: Saf (Line), Qalqon Devori (Shield Wall), Kolonna (Column), Otliqlar Hujumi (Cavalry Charge).
+
+---
+
+# 60. JANGOVAR RUH (MILITARY MORALE)
+
+Komandir o'lsa saf buziladi va askarlar qochadi. G'alaba qozonilsa jangovar ruh va tajriba keskin oshadi.
+
+---
+
+# 61. QAMAL TEXNIKASI (SIEGE ENGINES)
+
+Devor yoruvchi taran (Battering Ram), qamal narvonlari, tosh otuvchi katapultalar va og'ir trebuchetlar. Voxel devorlar to'g'ridan-to'g'ri parchalanadi.
+
+---
+
+# 62. QURILISHNING IKKI XIL REJIMI
+
+1. **Manual Voxel Mode:** Har bir blokni shaxsan o'rnatish (birinchi shaxs nigohida).
+2. **Blueprint Mode:** Bino chizmasini joylashtirish — g'isht teruvchi fuqarolar avtomatik material tashib quradi.
+
+---
+
+# 63. LOYIHALASH KAMERASI (PLANNING CAMERA)
+
+Katta qal'alar va shahar tumanlarini rejalashtirishda erkin ko'rinish beruvchi taktik kamera.
+
+---
+
+# 64. BINO O‘LCHAMLARI
+
+- Kichik: 3×3 – 5×5 (Kulbalar, soqchilar xonasi).
+- O'rta: 7×7 – 10×10 (Ustaxonalar, omborlar).
+- Katta: 15×15 – 20×20 (Kazarmaxona, bozor maydoni).
+- Monumental: 30×30 – 100×100 (Shohona Qasr, Buyuk Sobor).
+
+---
+
+# 65. BINO MUSTAHKAMLIGI VA FIZIKA (STRUCTURAL STABILITY)
+
+Og'irlik, mustahkamlik va tayanch masofasi (Support Distance). Tayanchsiz qoldirilgan og'ir tosh tomlar o'z og'irligi ostida qulab tushadi.
+
+---
+
+# 66. YONG‘IN XAVFI VA O‘CHIRISH (FIRE HAZARD)
+
+Yog'och va somon tomlar chaqmoq yoki olovdan tez alangalanadi. Fuqarolar darhol chelaklar bilan suv tashib yong'inni o'chiradi.
+
+---
+
+# 67. DINAMIK OB-HAVO
+
+Bahorgi jala va sellar, yozgi jazirama va qurg'oqchilik, kuzgi tumanlar, qishki qor bo'roni va sovuq.
+
+---
+
+# 68. TANA HARORATI VA GIPOTERMIYA
+
+Har bir personajda BodyTemperature mavjud. Qattiq sovuqda issiq kiyimsiz va pechkali uysiz yurgan fuqaro muzlab halok bo'ladi.
+
+---
+
+# 69. TABIIY VA YIRTQICH DUSHMANLAR
+
+Bo'rilar to'dasi, ayiqlar, qaroqchilar, g'or kalamushlari, gigant zaharli o'rgimchaklar.
+
+---
+
+# 70. QONLI OY REYDLARI (BLOOD MOON)
+
+Har 15–20 kunda yuz beruvchi keng ko'lamli qaroqchilar va maxluqlar hujumi. Kuch o'yinchi shahrining boyligi va aholisiga qarab mutanosib oshib boradi.
+
+---
+
+# 71. DUNYONING 5 AFSONAVIY BOSSI (CANONICAL 5 BOSSES)
+
+1. **Qonli Tirnoq (Alpha Bear):** O'rmon xo'jayini (Tier II).
+2. **Temir Soqol Valdemar (Warlord):** Qaroqchilar sarkardasi (Tier III).
+3. **Zulmat Onasi (Broodmother):** Chuqur g'orlar malikasi (Tier III–IV).
+4. **Qoya Kolossi (Crag Colossus):** Tog'li hududlar giganti (Tier IV).
+5. **Muz Qanoti (Frost Wyvern):** Shimoliy tundraning afsonaviy vishali (Late Tier IV).
+
+---
+
+# 72. BOSS PROGRESSIYASI
+
+Har bir boss o'z bosqichida ochiladi va mag'lub etilganda noyob mukofotlar va unvonlar keltiradi.
+
+---
+
+# 73. JAROHAT VA SALOMATLIK STATUSLARI
+
+Health, Qon ketishi (Bleeding), Og'riq (Pain), Suyak sinishi (Fracture), Yuqumli yiringlash (Infection).
+
+---
+
+# 74. TABOBAT VA GOSPITAL TIZIMI
+
+Bog'lov materiallari (Bandage), dorivor damlamalar, Tabib (Doctor), Gospital va Alkimyoviy malhamlar.
+
+---
+
+# 75. YUQUMLI KASALLIKLAR MEXANIKASI
+
+Yuqish zanjiri: `Kontakt → Inkubatsiya → Belgilar → Tuzalish / O'lim`. Tarqalish sabablari: iflos suv, buzilgan taom, ko'milmagan jasadlar, kalamushlar.
+
+---
+
+# 76. SHAHAR SANITARIYASI
+
+Chiqindi chuqurlari, toza ichimlik suvi ta'minoti, jasadlarni o'z vaqtida yig'ish, kalamushlarga qarshi mushuklar va itlar boqish.
+
+---
+
+# 77. QORA O‘LAT VA KARANTIN (THE BLACK PLAGUE)
+
+Epidemiya boshlanganda:
+Karantin e'lon qilish, O'lat Tabibi (Plague Doctor) jalb qilish, kasalxona izolatsiyasi, vabo gulxanida kiyimlarni yoqish.
+
+---
+
+# 78. JINOYATCHILIK SABABLARI
+
+Ochlik, haddan tashqari yuqori soliqlar, ishsizlik, spirtli ichimliklar ta'siri, tushkunlik va shahardagi soqchilar yetishmasligi.
+
+---
+
+# 79. JINOYATNI TERGOV QILISH VA HIBSI
+
+`Jinoyat sodir bo'lishi → Guvohlar va ashyoviy dalillar → Soqchilar tergovi → Gumondorni hibsga olish → Sud jarayoni`.
+
+---
+
+# 80. HUKMDOR SUDI VA JAZO CHORALARI (ROYAL COURT)
+
+Hukmlar: Afv etish (Pardon), Jarima solish (Fine), Jazo ustuniga kishanlash (Stocks), Qasr zindoni (Dungeon), Majburiy og'ir mehnat (Shaxta), Surgun qilish (Exile), Qatl (Execution).
+
+---
+
+# 81. QONUNLAR TIZIMI (CODEX OF LAWS)
+
+Soliq qonuni, Oziq-ovqat me'yori, Harbiy majburiyat, Tungi komendantlik soati, Savdo boji, O'rmondan foydalanish qoidalari.
+
+---
+
+# 82. FAVQULODDA FARMONLAR (ROYAL EDICTS)
+
+Vaqtinchalik shoshilinch choralar (Masalan: Shoshilinch hosil yig'ish — mehnat unumi +30%, fuqarolar kayfiyati -10%).
+
+---
+
+# 83. TASHQI MUNOSABATLAR VA STATUSTLAR
+
+Dushman (Hostile), Sovuq (Unfriendly), Neytral (Neutral), Do'stona (Friendly), Ittifoqchi (Allied), Vassal (Qaram tobe).
+
+---
+
+# 84. DIPLOMATIK SHARTNOMALAR
+
+Savdo bitimi, Hujum qilmaslik pakti, Mudofaa ittifoqi, Nikoh diplimatiyasi, O'lpon to'lash, Sulh yoki Urush e'lon qilish.
+
+---
+
+# 85. HUDUD CHEGARALARI (TERRITORY CONTROL)
+
+Qorovul minoralari (Watchtowers) qurish orqali hududni o'z mulkiga qo'shib olish. Kengayish uchun yetarli aholi va ma'muriy boshqaruv kuchi talab qilinadi.
+
+---
+
+# 86. MADANIYAT VA MA’NAVIYAT (CULTURE SYSTEM)
+
+Madaniyat manbalari: Bardlar kuylari, Taverna suhbatlari, Buyuk Bayramlar, Marmar haykallar, Maktablar, Sobor ibodatlari, Ritsarlar turniri.
+
+---
+
+# 87. SHOHONA BAYRAMLAR (FESTIVALS)
+
+Kuzgi Hosil Bayrami, Qishki Yule tantanalari. Fuqarolar baxti 100% ga chiqadi, nikohlar va yangi tug'ilishlar keskin ortadi.
+
+---
+
+# 88. RITSARLAR TURNIRI (ROYAL TOURNAMENT)
+
+Kamonchilar otishuvi, qilichbozlik duellari, ot ustidagi nayza jangi (Jousting). G'olib ritsarlar qirollik shon-shuhratini yuksaltiradi.
+
+---
+
+# 89. TA’LIM VA SHAHAR MAKTABI
+
+Tier III'da ochiladi. Shahar bolalari savod chiqaradi va usta hunarmandlik asoslarini tezroq o'rganadi.
+
+---
+
+# 90. USTA VA SHOGIRD AN’ANASI
+
+Har bir Master usta o'zining noyob retseptlari va mahoratini yosh shogirdiga meros qilib qoldiradi.
+
+---
+
+# 91. DINIY VA MA’NAVIY INSHOOTLAR
+
+Kichik ibodatxona (Chapel), Shahar cherkovi (Church), Buyuk Sobor (Great Cathedral).
+
+---
+
+# 92. FUQAROLARNING TABIIY VA NOTABIIY O‘LIMI
+
+O'lim sabablari: Keksalik (Old Age), Jang maydoni, Kasallik, Ochlik, Qahraton sovuq, Shaxtadagi baxtsiz hodisa.
+
+---
+
+# 93. KO‘CHADA QOLGAN JASADLARNING FOJIASI
+
+Jasad ko'milmay qolsa, shahar sanitariyasi yemirilib, fuqarolar chuqur ruhiy tushkunlikka tushadi va vabo xavfi kuchayadi.
+
+---
+
+# 94. G‘ASSOL VA DAFN LOGISTIKASI (GRAVEDIGGER)
+
+O'liklar aravasi (Morgue Cart) bilan jasadlarni yig'ib, tobut yoki kafanda qabristonga yetkazuvchi maxsus xizmatchi.
+
+---
+
+# 95. MUQADDAS QABRISTON VA EPITAFLAR
+
+Har bir qabr toshida fuqaroning ismi, kasbi, umr yillari va qilgan buyuk xizmatlari bitiladi.
+
+---
+
+# 96. MEROSXO‘RLIK (INHERITANCE)
+
+Vafot etgan fuqaroning shaxsiy jamg'armasi va qurollari uning farzandlari yoki oilasiga o'tadi.
+
+---
+
+# 97. AJDODLAR MEROSI VA XOTIRA (ANCESTRAL LEGACY)
+
+Obod tutilgan qabriston butun shaharga "Ajdodlar Duosi" xotirjamligini beradi. Qirollik o'z qahramonlarini unutmaydi.
+
+---
+
+# 98. DUNYONI TADQIQ ETISH (EXPLORATION)
+
+Katta Dunyo Xaritasi tuman (Fog of War) bilan qoplangan bo'ladi. Hukmdor yoki otliq josuslar yangi hududlarni asta-sekin kashf qiladi.
+
+---
+
+# 99. DUNYO XARITASI (WORLD MAP)
+
+Relyef, qishloqlar, qasirlar, yo'llar, ma'lum konlar, qo'shni fraktsiyalar chegaralari va xavfli hududlar ko'rsatiladi.
+
+---
+
+# 100. TOPSHIRIQLAR TIZIMI (QUESTS)
+
+Asosiy qirollik topshiriqlari, shahar rivoji vazifalari, fuqarolarning shaxsiy iltimoslari, diplomatik topshiriqlar va boss ovlari.
+
+---
+
+# 101. DINAMIK VOQEALAR (DYNAMIC EVENTS)
+
+Qochoqlar to'lqini, kutilmagan savdogarlar, qaroqchilar pistirmasi, shaxtada suv toshishi, saroyga oliyjanob mehmon kelishi.
+
+---
+
+# 102. HUKMDOR DAFTARI (ROYAL LEDGER — `TAB` TIZIMI)
+
+Barcha davlat boshqaruvi: Aholi, Kasblar, Uylar, Oziq-ovqat, Ishlab chiqarish, Tashqi savdo, Armiya, Salomatlik, Qonunlar, Soliqlar, Chegaralar, Madaniyat.
+
+---
+
+# 103. SHOSHILINCH OGOHLANTIRISHLAR (ALERT SYSTEM)
+
+`Info → Warning → Critical`.
+Oziq-ovqat tanqisligi, Och fuqaro, Kasallik tarqalishi, Dushman bosqini, Yong'in, Kon gazining oshishi.
+
+---
+
+# 104. FOYDALANUVCHI INTERFEYSI (MINIMAL IMMERSIVE HUD)
+
+Salomatlik, Chidamlilik, Tana harorati, Hotbar (8 slot), O'zaro ta'sir ko'rsatuvchi markerlar. Ekran ortiqcha raqamlar bilan to'ldirilmaydi.
+
+---
+
+# 105. BIRINCHI KUN VA O‘RGATISH (ONBOARDING)
+
+1-qadam: Sovuqda omon qolish.  
+2-qadam: Birinchi boshpana qurish.  
+3-qadam: Xaloskor Gulxan yoqish.  
+4-qadam: Birinchi sarson qochqinni qabul qilish.  
+5-qadam: Unga ish berish.  
+6-qadam: Birinchi qishloq tamalini qo'yish.
+
+---
+
+# 106. QIYINLIK DARAJASI (DIFFICULTY PRESETS)
+
+- Hikoya (Story)
+- Standart Feodal (Normal)
+- Og'ir Kurash (Hard)
+- Qora Qismat (Feudal Nightmare)
+Maxsus sozlamalar: Reyd kuchi, vabo tarqalishi, qishki sovuq darajasi, resurslar mo'lligi.
+
+---
+
+# 107. QULAYLIK SOZLAMALARI (ACCESSIBILITY)
+
+Tugmalarni erkin sozlash, UI masshtabi, Ko'rish burchagi (FOV), Subtitrlar, Kamerani tebranishini o'chirish, Rang ajratish rejimlari.
+
+---
+
+# 108. AUDIO VA MUSIQIY MUHIT
+
+Biomlar shovqini, ob-havo tovushlari, ish shovqinlari (bolg'a urilishi, daraxt yiqilishi), jang musiqalari, bayram ohanglari, taverna liralari.
+
+---
+
+# 109. SAN’AT VA GRAFIKA YO‘NALISHI (ART DIRECTION)
+
+Stylized Realistic Voxel Medieval. Blokli dunyo go'zalligi realistik yorug'lik, volumetric tuman, atmosferali ob-havo va silliq animatsiyalar bilan uyg'unlashadi.
+
+---
+
+# 110. KUN VA TUN SIKLI (DAY/NIGHT CYCLE)
+
+Kunduzi faol mehnat. Tunda ko'rish masofasi qisqaradi, harorat tushadi, yirtqichlar va maxluqlar faollashadi.
+
+---
+
+# 111. O‘YINNI SAQLASH TIZIMI (SAVE SYSTEM)
+
+Manual Save, Quick Save (`F5`), Kunlik tonggi avtomatik saqlash (Autosave).
+
+---
+
+# 112. SAVE FAYLI TARKIBI VA OPTIMALLASHTIRISH
+
+Faqat o'zgargan voxel bloklari delta-formatida saqlanadi. Fuqarolar, bino chizmalari, iqtisodiy holat va qonunlar siqilgan JSON/Binary ko'rinishida yoziladi.
+
+---
+
+# 113. SAVE VERSIYALARI VA MIGRATSIYA
+
+Har bir save fayl o'z versiyasiga ega bo'lib, o'yin yangilanishlari chiqqanda dunyo ma'lumotlarini buzmasdan yangi versiyaga o'tkazadi.
+
+---
+
+# 114. GODOT 4 DASTURIY ARXITEKTURASI
+
+- **Core:** `GameManager`, `TimeManager`, `EventBus`, `SaveManager`.
+- **World:** `WorldManager`, `ChunkManager`, `VoxelGenerator`, `WeatherManager`.
+- **Entities:** `Citizen`, `Player`, `Animal`, `Enemy`, `Boss`.
+- **AI:** `TaskManager`, `JobManager`, `CitizenBrain`, `FactionAI`.
+- **Economy:** `ItemDatabase`, `InventorySystem`, `ProductionManager`, `TradeManager`.
+- **Settlement:** `BuildingManager`, `HousingManager`, `TerritoryManager`, `CultureManager`.
+- **Combat:** `CombatManager`, `ProjectileSystem`, `SiegeSystem`.
+- **UI:** `HUD`, `RoyalLedger`, `WorldMap`, `DialogueManager`.
+
+---
+
+# 115. SCRIPT VAZIFALARI (GDSCRIPT & C#)
+
+- **GDScript:** O'yin mantig'i, kvestlar, personajlar muloqoti, UI boshqaruvi.
+- **C# / GDExtension:** Yuqori unumdorlik talab qiluvchi Voxel Meshing, Greedy algoritmlari, ko'p sonli aholining yo'l topish hisob-kitoblari.
+
+---
+
+# 116. VOXEL RENDERLASH SAMARADORLIGI
+
+Face Culling, Greedy Meshing, Fon oqimlarida (Background Threads) chunk yaratish. Asosiy render oqimi (Main Thread) hech qachon qotib qolmasligi shart.
+
+---
+
+# 117. O‘ZGARUVCHAN DUNYODA YO‘L TOPISH (NAVIGATION)
+
+Statik NavMesh ishlamaydi. Har bir chunk o'zining dinamik NavigationRegion3D qismiga ega bo'ladi. Voxel buzilganda yoki qo'yilganda faqat shu mintaqa yangilanadi.
+
+---
+
+# 118. AHOLI SUN’IY INTELLEKTI LOD TIZIMI (AI LOD)
+
+- Yaqin fuqarolar: To'liq 3D animatsiya va individual fizik hisob-kitob.
+- O'rta masofa: Soddalashtirilgan yo'l topish.
+- Uzoq masofa: Statistik simulyatsiya (Fermer dalada matematik ishlaydi, kadrma-kadr render qilinmaydi).
+
+---
+
+# 119. UNUMDORLIK NISHONLARI (PERFORMANCE TARGETS)
+
+- Ekran: 1080p / 1440p.
+- FPS: Minimal 60 FPS, Ideal 120 FPS.
+- Sinov me'yori: 100–150 ta faol fuqaro, yirik tosh qal'a, qor bo'roni va faol ishlab chiqarish paytida.
+
+---
+
+# 120. DUNYO XARITASINI YUKLASH CHEGARALARI
+
+1000×1000 masshtabdagi dunyo bir paytda to'liq chizilmaydi — qat'iy asinxron Chunk Streaming tizimi ishlaydi.
+
+---
+
+# 121. SIMULYATOR SINOVLARI (SIMULATION TESTING)
+
+`prototype_sim.py` vositasi orqali: 30 kunlik balans, 100 kunlik qishki omon qolish, aholi o'sishi, vabo epidemiyasi va soliq bosimi matematik tekshiriladi.
+
+---
+
+# 122. MA’LUMOTLAR BILAN BOSHQARILUVCHI DIZAYN (DATA-DRIVEN)
+
+Barcha qurollar, binolar, retseptlar, ekinlar va qonunlar qattiq kodlanmasdan, JSON va Godot Custom Resource fayllarida saqlanadi.
+
+---
+
+# 123. MARKAZIY BALANS BAZASI (BALANCE CONFIG)
+
+Hosil ko'paytiruvchilari, soliq narxlari, askarlar oyligi va fuqarolarning non iste'moli yagona balans faylida boshqariladi.
+
+---
+
+# 124. QIROL BO‘LISH VA YAKUNIY G‘ALABA FARQI
+
+Qirol bo'lish — o'yin o'rtasidagi yirik siyosiy bosqichdir. Yakuniy g'alaba (Victory) esa butun mintaqada abadiy meros qoldirish maqsadidir.
+
+---
+
+# 125. ENDGAME — 3 XIL BUYUK G‘ALABA YO‘LI
+
+1. **Wonder of the Realm (Me'moriy Mo'jiza):** 10,000 o'yma tosh, 2,000 marmar, 500 oltin bezak va 150 vitraj oynadan iborat Asrlar Saroyi yoki Sobori.
+2. **Realm Unification (Qit'ani Birlashtirish):** 6 ta biomda mustahkam poytaxtlar qurish, 5 ta Afsonaviy Bossni yengish va barcha raqib fraktsiyalarni birlashtirish.
+3. **The Sovereign Guild (Iqtisodiy Monopoliya):** 100,000 Oltin Tanga xazinasi, Yirik Xalqaro Port va barcha savdo gildiyalarini iqtisodiy qaram qilish.
+
+---
+
+# 126. CHEKSIZ REJIM (ENDLESS REALM)
+
+Buyuk g'alabadan keyin ham saltanat to'xtamaydi: o'yinchi o'z poytaxtini kengaytirishda, avlodlarni tarbiyalashda va ulkan feodal imperiyani boshqarishda davom etadi.
+
+---
+
+# 127. PLAYABLE MVP BOSQICHI
+
+1 ta biom, bazaviy voxel mexanikasi, rudalar, qurilish, asbob yasash, 5–10 ta fuqaro, oddiy kasblar, non pishirish, bitta kichik qaroqchilar qarorgohi.
+
+---
+
+# 128. EARLY ACCESS 0.1 BOSQICHI
+
+3 ta biom, 30 ta fuqaro, dehqonchilik, metallurgiya, bino chizmalari, qaroqchilar reydi, fasllar va bazaviy iqtisodiyot.
+
+---
+
+# 129. EARLY ACCESS 0.5 BOSQICHI
+
+6 ta biom, 100 ta fuqaro, muntazam armiya, qamal mashinalari, vabo va sanitariya, qozixona, savdo karvonlari, dastlabki 3 ta boss.
+
+---
+
+# 130. RELEASE 1.0 (TO‘LIQ TALQIN)
+
+Sulola va vorislik tizimi, barcha 5 ta afsonaviy boss, Ritsarlar turniri, tashqi diplomatiya, Buyuk Sobor me'moriy mo'jizasi, Steam P2P Co-op Multiplayer va yutuqlar (Achievements).
+
+---
+
+# 131. ASOSIY DIZAYN QOIDASI (KEY DESIGN RULE)
+
+Har bir yangi funksiya quyidagi savolga ijobiy javob berishi shart:
+> *“Bu mexanika o‘yinchining oddiy sarson-sargardondan buyuk qudratli feodal hukmdorgacha ko‘tarilish hissini kuchaytiradimi?”*
+
+---
+
+# 132. AMALIY ISHLAB CHIQISH NAVBATI (DEVELOPMENT PRIORITY)
+
+* **P0 — Asos:** Voxel World, Character Controller, Inventar, Buyumlar, Save/Load.
+* **P1 — Omon Qolish:** Crafting, Boshpana, Oziq-ovqat, Ob-havo.
+* **P2 — Koloniya:** Citizen AI, Kasblar, Uylar, Logistika, Ishlab chiqarish.
+* **P3 — Iqtisodiyot:** Tashqi savdo, Soliqlar, Resurs zanjirlari.
+* **P4 — Harbiy:** Jang mexanikasi, Armiya, Reydlar, Voxel qamallari.
+* **P5 — Jamiyat:** Oilalar, Sud va jazo, Sanitariya, Ta'lim, Madaniyat.
+* **P6 — Qirollik:** Diplomatiya, Sulola, Qirollik qonunlari, Chegaralar.
+* **P7 — Endgame & Co-op:** 5 ta Boss, Mo'jizalar, Steam P2P Multiplayer, G'alaba shartlari.
+
+---
+
+# YAKUNIY O‘YIN FORMULASI
+
+**Survival → Settlement → Automation → Economy → Military → Politics → Kingdom → Dynasty → Legacy**
+
+---
+
+# VOXEL LORD: FEUDAL REALM
+
+O‘yinning asosiy ruhiyati:
+> Birinchi kuni o‘yinchi sovuq o‘rmonda yolg‘iz holda bitta daraxtni bolta bilan kesadi.
+> Bir necha yil o‘tgach esa aynan shu joyda yuzlab odam yashaydigan ulkan tosh poytaxt qad ko'taradi.
+> Uzoqda dalalar to'lqinlanadi.
+> Konlardan aravalar ruda olib chiqadi.
+> Temirchilar qilich yasaydi.
+> Savdogarlar darvozadan kiradi.
+> Bolalar maktabga boradi.
+> Ritsarlar qal’a devorlarini qo‘riqlaydi.
+> Sobor qo‘ng‘iroqlari yangraydi.
+> Qabristonda o‘yinning dastlabki kunlarida o'yinchi bilan birga yashagan birinchi fuqarolarning qabr toshlari turadi.
+
+Va o‘yinchi tushunadi:  
+**bu qirollik unga tayyor berilmagan.**  
+**Uning har bir g‘ishti, har bir oilasi va har bir tarixi o‘yin davomida o'z mehnati bilan paydo bo‘lgan.**
