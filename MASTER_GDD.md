@@ -488,7 +488,50 @@ func get_quality_value_multiplier() -> float:
 		QualityTier.ROYAL: return 8.00
 		QualityTier.LEGENDARY: return 20.00
 	return 1.00
-```
+### 10.4. Shohona Artefaktlar, Uzuklar, Tumorlar va Qobiliyat Kitoblari (Sovereign Artifacts, Rings, Talismans & Tomes)
+
+Ushbu relikviyalar **qurollarni kuchaytirish uchun emas**, balki bevosita **O‘yinchining (Hukmdorning) o‘z shaxsiyatiga, biologik barqarorligiga, aurasiga va buyuk feodal boshqaruv qudratiga** ta'sir o'tkazish uchun mo'ljallangan oliy darajadagi noyob buyumlardir. Ular oddiy do'konda sotilmaydi va oddiy ustaxonada yasalmaydi.
+
+#### 10.4.1. Shohona Uzuklar Tizimi (`SLOT_RING_1` & `SLOT_RING_2`)
+O'yinchi bir vaqtning o'zida ikkita qo'liga ikkita muqaddas uzuk taqishi mumkin. Ushbu uzuklar hukmdorning jismoniy va siyosiy quvvatini kengaytiradi:
+
+| Uzuk Nomi | Uzuk ID | Qayerdan Topiladi | Hukmdorga Beradigan Doimiy Passiv Quvvati |
+|---|---|---|---|
+| **Hukmdorlik Uzugi** | `RING_SOVEREIGN_AUTHORITY` | Qadimiy Qirollik Qabri (-250m) | 50m radiusdagi fuqarolarga $+15$ Baxt, qo'rquv va isyon xavfi $0\%$, barcha ishchilar mahsuldorligi $+20\%$. |
+| **Yerosti Konchi Uzugi**| `RING_EARTHWARDEN` | Qoya Kolossi bossi xazinasi | Qorong'u g'orlarda 15m ko'k nur taratadi, metan gazi zaharini $85\%$ to'sadi, shaxta o'pirilishini (cave-in) 5 soniya oldin ogohlantiradi. |
+| **Bedorlik Uzugi** | `RING_ETERNAL_VIGIL` | Zulmat Onasi (Broodmother) xazinasi | Charchoq (Fatigue) to'planishini to'xtatadi. Hukmdor tun-u kun uxlamasdan mehnat qilishi va qo'shin boshqarishi mumkin. |
+| **Titan Qadam Uzugi** | `RING_TITAN_STRIDE` | Tog'liklar afsonaviy xazinasi | Yuk ko'tarish chegarasini $2.0\times$ oshiradi; og'ir yuk ostida ham tez yugurish (Sprint) taqiqlanmaydi. |
+| **Qonli Qasos Uzugi** | `RING_WARLORDS_WRATH` | Qaroqchilar sarkardasi Valdemar | Hukmdorning barcha zarbalariga $+25\%$ jismoniy kuch qo'shadi va zarba tekkan har dushmandan $5\%$ qon so'rib HP tiklaydi. |
+
+#### 10.4.2. Muqaddas Tumorlar va Tilsimlar (`SLOT_NECK`)
+Bo'yinga taqiladigan muqaddas tumorlar hukmdorni o'limdan asrovchi va butun shaharga ta'sir o'tkazuvchi hayotiy ashyolardir:
+
+| Tumor Nomi | Tumor ID | Kamyoblik Darajasi | Hukmdorga Beradigan Xususiyati |
+|---|---|---|---|
+| **Qaqnus Yuragi Tumori** | `AMULET_PHOENIX_CREST` | Mythic (Afsonaviy) | Hukmdor jangda halokatli zarba olib HP $0$ ga tushganda, uni bir zumda $50\%$ HP bilan qayta tiriltiradi va dushmanlarni olov bilan suradi (Cooldown: 1 o'yin kuni). |
+| **Qahraton To'sig'i Tumori**| `TALISMAN_FROSTWARD` | Epic (Noyob) | Tana haroratini doimiy $37.0^\circ\text{C}$ darajada saqlaydi. Tundrada va sovuq bo'ronlarda gipotermiya xavfi mutlaqo $0\%$. |
+| **Serob Tuproq Tumori** | `AMULET_FERTILE_EARTH` | Epic (Noyob) | Hukmdor qishloq bo'ylab yurganda 30m radiusdagi barcha ekinlar $2.5\times$ tez o'sadi va chorva hayvonlari $35\%$ tezroq bolalaydi. |
+| **Temir Qalqon Tumori** | `TALISMAN_IRON_AEGIS` | Rare (Nodir) | Hukmdorning tabiiy tana himoyasiga $+20\text{ Armor}$ qo'shadi, chuqur yaralarda qon ketishini (bleeding) bir zumda to'xtatadi. |
+
+#### 10.4.3. Qadimiy Qobiliyat Kitoblari (Ancient Sovereign Tomes & Grimoires)
+Qobiliyat kitoblari qurol yoki asbob emas — hukmdor ushbu qadimiy qo'lyozmalarni bir marta mutolaa qiladi (`Read & Inscribe into Soul`) va kitob yo'qolib, o'rniga hukmdor shaxsiga **doimiy faol (Active) yoki passiv (Passive) qobiliyat** beriladi:
+
+1. **"Imperiya Hukmronligi Kodeksi" (`TOME_ROYAL_RALLY`):**
+   - *Turi:* Faol Qobiliyat — **Hukmdor Xitobi (Royal Rally - `V` tugmasi)**.
+   - *Effekti:* 60 metr radiusdagi barcha fuqaro va askarlarga 60 soniya davomida cheksiz chidamlilik (Stamina), $+40\%$ harakat tezligi va qo'rquvga qarshi mutlaq immunitet beradi.
+   - *Qayta tiklanish (Cooldown):* 12 real daqiqa.
+2. **"Qadimiy Me'morlar Qo'lyozmasi" (`TOME_ANCIENT_ARCHITECT`):**
+   - *Turi:* Doimiy Passiv Qobiliyat.
+   - *Effekti:* Hukmdor bino loyihalarini (blueprint) shaxsan o'rnatishda yoki qurishda qatnashganda qurilish tezligi $4.0\times$ tezlashadi va sarflanadigan tosh hamda yog'och resurslari $25\%$ tejaladi.
+3. **"Oltin Zanjir Ta'limoti" (`TOME_MIDAS_TREASURY`):**
+   - *Turi:* Doimiy Passiv Qobiliyat.
+   - *Effekti:* Tashqi savdo karvonlari bilan har qanday savdoda $20\%$ chegirma taqdim etadi va shahar aholisidan olinadigan barcha soliqlardan qo'shimcha $+15\%$ sof oltin daromad hosil qiladi.
+4. **"Yovvoyi Tabiat Pinhonlari" (`TOME_BEAST_SOVEREIGN`):**
+   - *Turi:* Doimiy Passiv Qobiliyat.
+   - *Effekti:* O'rmon yirtqichlari (bo'rilar, ayiqlar) hukmdorga birinchi bo'lib hujum qilmaydi; o'rmonlar orqali piyoda yurish tezligi $+30\%$ oshadi.
+5. **"Po'lat Iroda Kitobi" (`TOME_IMMORTAL_WILL`):**
+   - *Turi:* Doimiy Passiv Qobiliyat.
+   - *Effekti:* Qora o'lat, zaharlanish va kasalliklarga $100\%$ immunitet beradi; jangda yiqilsa, gospitalda davolanish vaqti 3 kundan 8 soatga tushadi.
 
 ---
 
@@ -2399,7 +2442,31 @@ Har bir omborxona konteyneri va joyi foydalanuvchi interfeysida (UI) bitmask fil
   1. `Urgent Buffer (O'ta Muhim Zaxira)`: Bo'shagan zahoti boshqa omborlardan bu yerga yuk tashuvchilar yuk olib keladi.
   2. `Preferred (Afzal Ko'rilgan)`
   3. `Standard (Standart Qabul Qilish)`
-  4. `Overflow Dump (Ortiqcha Mollarni Tashlash)`: Barcha asosiy omborlar to'lganda ishlatiladi.
+### 42.4. Alohida Sandiqlar va Konteyner Turlari (Interactive Chests, Lock Tiers & Quick Stack UI)
+
+Shahar omborlaridan tashqari, o'yinchi va fuqarolar o'z turar joylarida va ustaxonalarda jismoniy joylashtiriladigan individual interaktiv sandiq va konteynerlardan foydalanadi.
+
+#### 42.4.1. 5 Asosiy Sandiq Turlari Balans Jadvali
+
+| Sandiq Turi | Sandiq ID | Sig'imi (Slots) | Maksimal Yuk (kg) | Retsepti / Yasalish Talabi | Maxsus Vazifasi va Joylashuvi |
+|---|---|---|---|---|---|
+| **Kichik Yog'och Sandiq** | `CHEST_WOOD_SMALL` | 16 katak ($4\times4$) | $80.0\text{ kg}$ | 8 ta taxta + 4 ta temir mix | Ilk boshpana va kulbalarda shaxsiy buyumlar saqlash |
+| **Katta Temir Gardishli Sandiq** | `CHEST_IRON_BANDED` | 36 katak ($6\times6$) | $250.0\text{ kg}$| 16 ta eman taxta + 4 temir quyma | Kazarmalar va ustaxonalarda ommaviy xomashyo saqlash |
+| **Shohona Xazina Sandig'i** | `CHEST_ROYAL_VAULT` | 48 katak ($8\times6$) | $600.0\text{ kg}$| 8 ta po'lat quyma + 4 oltin bezak | Oltin tangalar, zargarlik buyumlari va toj xazinasi |
+| **Muzlatgich Qutisi (Icebox)** | `CHEST_COLD_ICEBOX` | 12 katak ($4\times3$) | $100.0\text{ kg}$| 12 taxta + qo'rg'oshin qoplamasi | Daryo muzi solinsa, oziq-ovqatlar 30 kun aynimaydi |
+| **Asboblar Javoni (Tool Rack)**| `RACK_WORKSHOP_TOOLS`| 8 ta asbob sloti | $50.0\text{ kg}$ | 6 taxta + 2 temir mix | Ustaxonada fuqarolar asboblarni umumiy ishlatishga qo'yadi |
+
+#### 42.4.2. Sandiq Boshqaruv Interfeysi (Dual-Grid UI & Hotkeys)
+Sandiq ochilganda ekranning chap qismida Hukmdorning inventari, o'ng qismida esa sandiqning to'liq kataklari ochiladi:
+* **`Shift + Chap Klik` (Instant Transfer):** Ashyoni inventardan sandiqqa (yoki aksincha) bir zumda bo'sh katakka o'tkazish.
+* **`Ctrl + Chap Klik` (Split Stack):** Ashyo to'plamini teng ikkiga bo'lib ajratish.
+* **`Quick Stack (Bitta Tugma)`:** Hukmdor inventaridagi sandiqda allaqachon mavjud bo'lgan resurslarni bitta bosishda sandiqqa to'kib tashlash (vaqtni va joyni tejash).
+* **`Sort (Kategoriya Saralash)`:** Sandiqdagi ashyolarni turi, sifati yoki og'irligi bo'yicha tartiblash.
+
+#### 42.4.3. Ruxsatnomalar va Qulf Tizimi (Access Control & Ownership)
+Har bir sandiq interfeysida uning huquqiy maqomi belgilanadi:
+1. **Shaxsiy Hukmdor Qulfi (`LOCK_PRIVATE`):** Faqat o'yinchi ochishi mumkin. Fuqarolar bu yerdan resurslarni ololmaydi (o'g'irlik xavfi $0\%$).
+2. **Jamoat / Koloniya Sandig'i (`LOCK_PUBLIC`):** Ishchi fuqarolar va hunarmandlar ustaxonada ishlash uchun kerakli xomashyo va asboblarni bu yerdan erkin olib, tayyor mahsulotni qaytarib qo'yishi mumkin.
 
 ---
 
