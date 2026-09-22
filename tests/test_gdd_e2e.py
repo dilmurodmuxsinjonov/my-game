@@ -77,6 +77,30 @@ class TestGDD_Tier1_FeatureCoverage(unittest.TestCase):
             f"Sections with no body content detected: {empty_sections}",
         )
 
+    def test_section_minimum_word_count(self):
+        """Verify that every section (0 to 132) has at least 35 words of body content, proving full specification."""
+        sections = re.split(r"\n(?=#\s+[0-9]+\.)", self.content)
+        short_sections = []
+        for sec in sections:
+            stripped = sec.strip()
+            if not stripped:
+                continue
+            header_match = re.match(r"^#\s+([0-9]+)\.\s*(.*)", stripped)
+            if not header_match:
+                continue
+            sec_num = int(header_match.group(1))
+            lines = stripped.splitlines()
+            body = " ".join(lines[1:])
+            words = re.findall(r"\b\w+\b", body)
+            if len(words) < 35:
+                short_sections.append((sec_num, len(words), header_match.group(2)))
+
+        self.assertEqual(
+            len(short_sections),
+            0,
+            f"Sections with fewer than 35 words detected: {short_sections}",
+        )
+
     def test_zero_placeholders_tbd(self):
         """Verify that zero 'TBD' placeholders exist in MASTER_GDD.md."""
         matches = re.findall(r"\bTBD\b", self.content, re.IGNORECASE)
@@ -475,35 +499,46 @@ class TestGDD_Tier4_Simulations(unittest.TestCase):
 
     def test_dynamic_market_pricing_clamp_simulation(self):
         """
-        Formula:
-        Price = clamp(P_base * (Demand / Supply)^gamma * ReputationMultiplier, 0.2 * P_base, 5.0 * P_base)
-        With gamma = 1.25.
-        Verify equilibrium, market collapse clamp at 0.2x, famine price cap at 5.0x, and strict monotonicity.
+        Formula (Section 49.1):
+        P_buy(item) = clamp(BasePrice * max(0.01, 1.0 + k_d * (Stock_target - Stock_current) / Stock_target)^gamma * M_season * M_rep,
+                            0.20 * BasePrice, 5.00 * BasePrice)
+        With k_d = 0.85, gamma = 1.25.
+        Validates:
+        1. Market equilibrium: Stock_current = Stock_target, M_season=1.0, M_rep=1.0 -> Price = BasePrice.
+        2. Severe famine (Stock_current = 0, compounding crisis M_season=2.20, bad rep M_rep=1.25) -> Clamps to 5.00x BasePrice.
+        3. Superabundance / hyper-supply (Stock_current = 2000, Stock_target = 100):
+           Inner term without clamp would be 1 + 0.85 * (-19) = -15.15 -> (-15.15)^1.25 would fail with NaN/ValueError.
+           With max(0.01, ...), safe inner base yields clean minimum clamp at 0.20x BasePrice.
+        4. Strict monotonicity across increasing stock (price non-increasing).
         """
-        p_base = 10.0  # 10 silver
+        base_price = 10.0  # 10 silver
+        k_d = 0.85
         gamma = 1.25
 
-        def calc_price(demand, supply, rep=1.0):
-            ratio = demand / max(0.001, supply)
-            raw_p = p_base * (ratio ** gamma) * rep
-            return max(0.2 * p_base, min(5.0 * p_base, raw_p))
+        def calc_buy_price(stock_target, stock_current, m_season=1.0, m_rep=1.0):
+            stock_ratio = (stock_target - stock_current) / max(0.001, stock_target)
+            inner_base = max(0.01, 1.0 + k_d * stock_ratio)
+            raw_p = base_price * (inner_base ** gamma) * m_season * m_rep
+            return max(0.20 * base_price, min(5.00 * base_price, raw_p))
 
-        # 1. Market equilibrium: Demand = 100, Supply = 100, Rep = 1.0 -> Price = P_base
-        p_eq = calc_price(100, 100)
+        # 1. Market equilibrium: Target = 100, Current = 100 -> inner_base = 1.0 -> Price = BasePrice
+        p_eq = calc_buy_price(100.0, 100.0)
         self.assertAlmostEqual(p_eq, 10.0, places=3)
 
-        # 2. Severe famine: Demand = 500, Supply = 10 -> Raw ratio = 50^1.25 = 133.3 -> Clamped to 5.0x P_base = 50.0
-        p_famine = calc_price(500, 10)
+        # 2. Severe famine with winter crisis & bad reputation: Target = 100, Current = 0, M_season = 2.20, M_rep = 1.25:
+        # Raw = 10.0 * (1.85^1.25) * 2.20 * 1.25 = 10.0 * 2.1576 * 2.75 = 59.33 -> Clamped to 5.0x BasePrice = 50.0
+        p_famine = calc_buy_price(100.0, 0.0, m_season=2.20, m_rep=1.25)
         self.assertEqual(p_famine, 50.0)
 
-        # 3. Superabundance (Market glut): Demand = 10, Supply = 1000 -> Clamped to 0.2x P_base = 2.0
-        p_glut = calc_price(10, 1000)
+        # 3. Superabundance / hyper-supply: Target = 100, Current = 2000:
+        # Inner base would be -15.15 without protection; max(0.01, ...) keeps it safe and clamps to 0.20x BasePrice = 2.0
+        p_glut = calc_buy_price(100.0, 2000.0)
         self.assertEqual(p_glut, 2.0)
 
-        # 4. Strict monotonicity across increasing demand
-        prices = [calc_price(d, 100) for d in range(20, 300, 20)]
+        # 4. Strict monotonicity across increasing stock (price non-increasing)
+        prices = [calc_buy_price(100.0, s) for s in range(0, 300, 10)]
         for i in range(len(prices) - 1):
-            self.assertLessEqual(prices[i], prices[i + 1])
+            self.assertGreaterEqual(prices[i], prices[i + 1])
 
     def test_combat_damage_mitigation_simulation(self):
         """

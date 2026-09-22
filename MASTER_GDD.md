@@ -2600,7 +2600,7 @@ Bozordagi tovarlar narxi doimiy o'zgarmas emas. Narxlar talab va taklif qonuni, 
 
 Xaridor (o'yinchi yoki fuqaro) bozordan tovar sotib olayotgandagi narx ($P_{buy}$) quyidagi formula bo'yicha hisoblanadi:
 
-$$P_{buy}(item) = \text{clamp}\left( BasePrice \times \left(1.0 + k_d \cdot \frac{Stock_{target} - Stock_{current}}{Stock_{target}}\right)^\gamma \times M_{season} \times M_{rep}, \; 0.20 \cdot BasePrice, \; 5.00 \cdot BasePrice \right)$$
+$$P_{buy}(item) = \text{clamp}\left( BasePrice \times \max\left(0.01, \; 1.0 + k_d \cdot \frac{Stock_{target} - Stock_{current}}{Stock_{target}}\right)^\gamma \times M_{season} \times M_{rep}, \; 0.20 \cdot BasePrice, \; 5.00 \cdot BasePrice \right)$$
 
 O'yinchi o'z tovarini bozorga sotgandagi qabul qilinadigan narx ($P_{sell}$):
 
@@ -2610,6 +2610,7 @@ $$P_{sell}(item) = P_{buy}(item) \times \left(1.0 - Tariff_{guild}\right) \times
 - $BasePrice$: Ashyoning kumush tangadagi fundamental boshlang'ich qiymati.
 - $k_d = 0.85$: Talab sezgirligi koeffitsiyenti.
 - $\gamma = 1.25$: Narx elastikligi darajasi (Eksponensial egri chiziq keskin taqchillikda narxni tez ko'taradi).
+- $\max\left(0.01, \; 1.0 + k_d \cdot \frac{Stock_{target} - Stock_{current}}{Stock_{target}}\right)$: Ichki matematik himoya chegarasi (inner clamp). Agar omborlarda tovar keskin ko'payib ketib, ombordagi zaxira xavfsiz me'yordan $2.176\times$ martadan oshib ketsa ($Stock_{current} > \left(1 + \frac{1}{k_d}\right) \cdot Stock_{target}$), qavs ichidagi chiziqli qiymat manfiy songa aylanadi. Manfiy sonni kasr darajaga ($\gamma = 1.25$) ko'tarish GDScript, C# va Python hisob-kitoblarida `NaN` (Not-a-Number) yoki kompleks son xatosini keltirib chiqarib, o'yin tizimini qulatadi. $\max(0.01, \dots)$ qavati hisoblash asosini har doim qat'iy musbat saqlab, giper-to'kinlik sharoitida narxning xavfsiz ravishda minimal $0.20 \cdot BasePrice$ poliga tushishini kafolatlaydi.
 - $Stock_{target}$: Shahar aholisining 14 kunlik xavfsiz ehtiyoj zaxirasi:
   $$Stock_{target} = Population \times DailyConsumption \times 14$$
 - $Stock_{current}$: Ayni paytda shahar omborlarida mavjud bo'lgan amaldagi zaxira.
@@ -3630,9 +3631,67 @@ func get_crop_yield_multiplier(internal_temp: float) -> float:
 
 ---
 
-# 69. TABIIY VA YIRTQICH DUSHMANLAR
+# 69. TABIIY VA YIRTQICH DUSHMANLAR (WILDLIFE, PREDATORS & REGIONAL THREATS)
 
-Bo'rilar to'dasi, ayiqlar, qaroqchilar, g'or kalamushlari, gigant zaharli o'rgimchaklar.
+Voxel Lord: Feudal Realm olamidagi tabiiy ekotizim va faunaning yovvoyi vakillari shunchaki dekorativ element emas, balki shahar-davlatning xavfsizligi, logistika yo'llari, chorva mollarining saqlanishi va konchilik shaxtalarining barqaror faoliyati uchun jiddiy tahdid hisoblanadi. O'rmonlar, tog' daralari, chuqur karst g'orlari va tashlandiq qabristonlar turli xavf darajasidagi yirtqich maxluqlar va qaroqchilar to'dalariga makon bo'lib xizmat qiladi.
+
+### 69.1. Yirtqich va Dushmanlarning Asosiy Balans Jadvali (Table 23: Regional Fauna & Threats Master Balance Table)
+
+Quyidagi jadvalda o'yin olamidagi 5 ta asosiy dushman arxetipining to'liq jangovar ko'rsatkichlari, biologik xususiyatlari, xatti-harakat modellari va o'lja taqsimoti keltirilgan:
+
+| Maxluq / Dushman Archetype | HP (Salomatlik) | Bazaviy Zarar (Base Damage) | Harakat Tezligi (Speed m/s) | Zirh / Himoya (Armor Rating) | Agressiya Radiusi (Aggro m) | Asosiy Biom / Yashash Muhiti | Birlamchi Xatti-harakat (Primary Behavior) | To'liq O'lja Jadvali (Full Drop Table) |
+|---|---|---|---|---|---|---|---|---|
+| O'rmon Bo'rilari To'dasi (Wolf Pack) | 85 (Alfa: 140) | 18 (Tishlash - Pierce/Slash) | 6.8 m/s (Sprint: 9.0 m/s) | 8 (Qalin teri) | 28 m (Hid orqali: 60 m) | Mo''tadil O'rmon, Qalin Taiga, Daraxtzorlar | To'da bo'lib qanotdan aylanib hujum (Pack flank), sarosima solish | 3-5x Bo'ri Go'shti, 1-2x Qalin Bo'ri Terisi, 2-4x Suyak, 1x Yirtqich Tishi |
+| Tog' Qo'ng'ir Ayig'i (Brown Bear) | 320 | 45 (Panja zarbasi - Blunt/Slash) | 5.2 m/s (Shiddat: 7.5 m/s) | 25 (Qalin teri va yog', o'qqa 30% chidam) | 18 m (Iniga yaqinlashilsa: 35 m) | Tog' etaklari, Qalin ignabargli o'rmon, G'or og'izlari | Hududiy shiddatli hujum (Territorial charge), zarba bilan qulatish | 8-12x Ayiq Go'shti, 1x Oliy Navli Ayiq Terisi, 4-6x Hayvon Yog'i, 2x Ayiq Panjasi |
+| Qaroqchilar To'dasi (Forest Bandit Outlaws) | 110-240 (Sardor: 240) | 22-35 (Kamon / Qilich / Bolta) | 4.8 m/s (Ta'qib: 6.0 m/s) | 18-35 (Charm va zanjirli sovut) | 32 m (Ko'rish burchagi: 110°) | Barcha quruqlik biomlari, karvon yo'llari, xarobalar | Pistirma (Ambush), yo'l to'sish, masofadan o'qqa tutish | 8-25x Kumush tangalar, 1x Charm Sovut, 1x Kamon yoki Temir Xanjar, 2-3x Qotgan Non |
+| G'or Kalamushlari (Cave Rats / Vermin) | 30 | 8 (Kemirish - Pierce + 15% infeksiya) | 5.5 m/s | 3 (Mo'rt teri) | 14 m (Qorong'uda: 22 m) | Chuqur shaxtalar (0 dan -250m), tashlandiq yerto'lalar | To'da bo'lib yopirilish (Swarming), son jihatdan ezish | 1-2x Kalamush Go'shti, 1x Kalamush Terisi, 1x O'tkir Tish |
+| Gigant Zaharli O'rgimchak (Giant Brood Spider) | 190 | 24 (Sanchish) + 6 HP/sek Zahar (8 sek) | 6.2 m/s (Shift va devorda: 5.0 m/s) | 15 (Xitin qobig'i) | 20 m (To'r titrashi: 45 m) | Chuqur karst g'orlari (-100m dan past), qorong'i jarliklar | To'r tuzog'i (Web trap - 70% sekinlashtirish), shift va devordan sakrash | 2-4x Ipak Tolasi, 2x Konsentrlangan Zahar Bezi, 3-5x Xitin Plastinasi |
+
+### 69.2. Yirtqichlar Sun'iy Intellekti Holat Mashinasi (Beast AI Behavior State Machine)
+
+Yovvoyi hayvonlar va maxluqlarning harakati klassik FSM (Finite State Machine) arxitekturasiga asoslanadi. Har bir yirtqich atrofdagi tovush tebranishlari, hid zarrachalari va ko'rish maydoni orqali nishonni qidiradi va 5 ta ketma-ket holat bo'yicha harakatlanadi:
+
+$$\text{Idle / Graze} \longrightarrow \text{Alert} \longrightarrow \text{Stalk} \longrightarrow \text{Charge / Flank} \longrightarrow \text{Retreat}$$
+
+| Holat (State) | Kirish Sharti (Entry Condition) | Harakat Mantig'i (Behavior Logic) | Chiqish va Keyingi Holat (Transitions) | Sensor va Harakat Parametrlari |
+|---|---|---|---|---|
+| Idle / Graze | Tahdid mavjud emas; xavfsiz muhit | O't-o'lan kemirish, suv ichish, in atrofida sekin aylanib yurish | Agar 60m radiusda hid sezilsa yoki 28m da nishon ko'rinsa -> Alert | Tezlik: 1.2 m/s; Ko'rish: 90°; Tovush sezish: 15m |
+| Alert | Kutilmagan qadam tovushi, begona hid | Boshni ko'tarib quloq tutish, havoni hidlash, past ovozda irillash | Nishon yaqinlashsa -> Stalk; xavf yo'qolsa (8 sek) -> Idle | Tezlik: 0.0 m/s (Qotib turish); Sensor: 180° ko'rish |
+| Stalk | Nishon ko'rindi; shamol esish yo'nalishi qulay | O'tlar orasida egilib, shovqinsiz nishonning orqa tomoniga aylanib o'tish | Masofa < 15m bo'lsa -> Charge/Flank; nishon qochsa -> Charge | Tezlik: 3.2 m/s (Yashirinib yurish); Shovqin: -80% |
+| Charge / Flank | Nishon hujum masofasida yoki to'da to'liq joylashdi | To'da sardori frontal shiddatli zarba beradi, qolganlar qanotdan aylanib yo'lni to'sadi | Agar dushman o'lsa -> Graze/Eat; Agar maxluq HP < 25% -> Retreat | Tezlik: 7.5 - 9.0 m/s (Sprint); Hujum intervali: 1.2 sek |
+| Retreat | Maxluqning joriy salomatligi $HP < 0.25 \cdot HP_{max}$ | Panikaga tushish, dushmandan teskari yo'nalishda eng yaqin pana joyga yoki iniga qochish | Dushmandan 65m uzoqlashsa va qon to'xtasa -> Idle / Graze | Tezlik: 8.5 m/s; Qochish yo'nalishi: A* NavMesh qochish vektori |
+
+### 69.3. Populyatsiya Zichligi va Tungi Xatti-Harakatlar Matematikasi (Spawn Density & Nocturnal Mechanics)
+
+Dunyo bo'ylab yirtqich maxluqlar va xavflarning paydo bo'lish zichligi relyef biomi, koloniyadan uzoqlik masofasi hamda kun/tun sikliga bog'liq.
+
+#### Populyatsiya Zichligi Formulasi:
+$$D_{spawn}(x, z) = D_{base}(Biome) \times \left(1.0 + k_{wild} \cdot \frac{\min(d_{colony}, \; R_{max})}{R_{safe}}\right) \times M_{nocturnal} \times M_{season}$$
+
+Bunda:
+- $D_{base}(Biome)$: Biomning bazaviy maxluq zichligi (O'rmon: 0.08 maxluq/$100\text{ m}^2$, Tog': 0.05, Sahro: 0.03, Taiga/Tundra: 0.06).
+- $k_{wild} = 1.40$: Shahardan uzoqlashgan sari tabiatning yovvoyilashish koeffitsiyenti.
+- $R_{safe} = 120.0\text{ m}$: Koloniya markazi (Lords Keep) atrofidagi fuqarolar tomonidan tozalangan va patrullik qilinadigan xavfsiz zona.
+- $R_{max} = 1200.0\text{ m}$: Zichlik ko'payishining maksimal hisoblash radiusi.
+- $d_{colony}$: O'yinchi qal'asi markazigacha bo'lgan Evklid masofasi ($d_{colony} = \sqrt{(x - x_0)^2 + (z - z_0)^2}$).
+- $M_{season}$: Fasliy ozuqa tanqisligi modifikatori (Qishda qahraton ochlik tufayli bo'rilar va ayiqlar ko'proq chiqadi: $M_{season}^{winter} = 1.45$, Yozda: $M_{season}^{summer} = 1.00$).
+
+#### Tungi Ko'paytiruvchi ($M_{nocturnal}$):
+Kechasi yirtqichlar ancha faol va xavfli bo'ladi. Ushbu koeffitsiyent 24 soatlik astronomik vaqtga ($t_{hour} \in [0.0, 24.0)$) qarab kosinus to'lqini orqali silliq o'zgaradi:
+
+$$M_{nocturnal} = 1.0 + A_{night} \times \max\left(0.0, \; \cos\left(\frac{2\pi \cdot t_{hour}}{24.0} - \pi\right)\right)$$
+
+Amplituda parametri $A_{night} = 1.80$ bo'lganda:
+- Kunduzi tush payti ($t_{hour} = 12.0$): $\cos(0 - \pi) = -1.0 \le 0 \implies M_{nocturnal} = 1.00\times$.
+- Yarim tunda ($t_{hour} = 0.0$ yoki $24.0$): $\cos(-\pi) = 1.0 \implies M_{nocturnal} = 1.0 + 1.80 \times 1.0 = 2.80\times$.
+
+Tungi paytda (21:00 dan 05:00 gacha) barcha yirtqichlarning sensor va jangovar qobiliyatlari kuchayadi:
+$$R_{aggro}^{night} = R_{aggro} \times 1.35, \quad V_{speed}^{night} = V_{speed} \times 1.15$$
+
+#### To'da Hamkorligi va Sarosima Dinamikasi:
+Bo'rilar va qaroqchilar to'dasi Alfa boshliqqa ega bo'ladi. Agar Alfa maxluq o'ldirilsa, to'daning qolgan a'zolari uchun darhol iroda sinovi hisoblanadi:
+$$P_{panic} = 0.60 \times \left(1.0 - \frac{N_{survivors}}{N_{initial}}\right)$$
+Iroda sinovidan o'ta olmagan barcha dushmanlar darhol `Retreat` holatiga o'tib, jang maydonidan qochadi.
 
 ---
 
@@ -4794,7 +4853,12 @@ O'yin dizayni "Toza Ekran" (Diegetic Minimal HUD) falsafasiga amal qiladi. O'yin
   - 8 ta yog'och ramkali slot. Har bir qurol yoki asbobning ostida uning chidamliligini ko'rsatuvchi ingichka tasmacha joylashadi.
 - **O'ng Yuqori Burchak (Vaqt va Fasl):**
   - Quyosh va Oyning osmondagi harakatini ko'rsatuvchi quyosh soati kompas diskasi;
-  - Hozirgi fasl belgisi (Masalan: Oltin boshoq — Kuz, Muz parchalari — Qish).
+  - Hozirgi fasl belgisi — barcha 4 fasl diegetik piktogrammalar bilan to'liq ifodalanadi:
+    - *Bahor (Spring):* Yashil novda va uyg'onayotgan nihol nishoni;
+    - *Yoz (Summer):* To'liq porlagan oftob va oltin quyosh gardishi;
+    - *Kuz (Autumn):* Oltin boshoq va qizg'ish chinor bargi nishoni;
+    - *Qish (Winter):* Qor uchquni va muzlagan kristall parchalari;
+    - HUD indikatori joriy fasl (Bahor / Yoz / Kuz / Qish) va faslning nechanchi kuni (1..7) ekanligini real vaqtda ko'rsatadi.
 - **Diegetik 3D O'zaro Aloqa (Contextual Look-at Prompts):**
   - Har qanday obyektga (eshik, pech, fuqaro, ruda bloki) qaralganda nishon markazida nozik oq matn paydo bo'ladi (Masalan: `[E] Suhbatlashish - Temirchi Valter`).
 
@@ -5340,6 +5404,34 @@ func process_tribute_response(faction_id: int, accepted: bool) -> void:
 		f["relation"] = maxi(-100, f["relation"] - 35)
 		if f["aggression"] >= 100:
 			emit_signal("war_declared", faction_id, "Tribute Default")
+```
+
+### 115.6. Dinamik Bozor va Savdo Narxlari Menejeri (`res://scripts/economy/dynamic_market_system.gd`)
+
+```gdscript
+class_name DynamicMarketSystem
+extends Node
+
+## Dinamik narxlar, talab-taklif elastikligi va bozor tranzaksiyalarini hisoblovchi avtoritar server tizimi.
+
+@export var k_d: float = 0.85
+@export var gamma: float = 1.25
+@export var guild_tariff: float = 0.15
+
+func calculate_buy_price(base_price: float, stock_target: float, stock_current: float, m_season: float = 1.0, m_rep: float = 1.0) -> float:
+	var safe_target: float = maxf(1.0, stock_target)
+	var stock_ratio: float = (safe_target - stock_current) / safe_target
+	var raw_base: float = 1.0 + (k_d * stock_ratio)
+	# CRITICAL ENGINE DEFENSE: maxf(0.01, raw_base) prevents negative base NaN under hyper-supply (>2.176x target)
+	var safe_base: float = maxf(0.01, raw_base)
+	var elastic_factor: float = pow(safe_base, gamma)
+	var raw_price: float = base_price * elastic_factor * m_season * m_rep
+	return clampf(raw_price, 0.20 * base_price, 5.00 * base_price)
+
+func calculate_sell_price(buy_price: float, merchant_skill: float = 50.0) -> float:
+	var skill_discount: float = 0.20 * (1.0 - (clampf(merchant_skill, 0.0, 100.0) / 100.0))
+	var raw_sell: float = buy_price * (1.0 - guild_tariff) * (1.0 - skill_discount)
+	return maxf(0.05, raw_sell)
 ```
 
 ---
