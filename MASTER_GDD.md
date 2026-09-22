@@ -1,7 +1,7 @@
 # MASTER GAME DESIGN DOCUMENT (GDD)
 # "Voxel Lord: Feudal Realm" 👑
 
-> **Hujjat Maqomi:** To'liq Texnik Loyiha (Specification 1.2 — Fasllar va Sanitariya Qo'shildi)  
+> **Hujjat Maqomi:** To'liq Texnik Loyiha (Specification 1.3 — Jinoyatchilik va Sud Qo'shildi)  
 > **Janr:** Birinchi Shaxs / Voxel Sandbox / O'rta Asrlar Koloniya Simulyatori (Colony Sim & Strategy)  
 > **Dvigatel:** Godot Engine 4.3+ (Forward+ / GDScript & C#)  
 > **Platforma:** PC (Steam / Windows, Linux)  
@@ -26,7 +26,8 @@
 14. [Qurilish Tizimi, Kattalik Darajalari va Masshtab](#14-qurilish-tizimi-kattalik-darajalari-va-masshtab)
 15. [4 Fasl (Mavsumlar) va Dinamik Ob-havo Tizimi](#15-4-fasl-mavsumlar-va-dinamik-ob-havo-tizimi)
 16. [Oziq-ovqat Aynishi, Saqlash Usullari, Sanitariya va Vabo](#16-oziq-ovqat-aynishi-saqlash-usullari-sanitariya-va-vabo)
-17. [Godot 4 Texnik Arxitekturasi va Dasturiy Modullar](#17-godot-4-texnik-arxitekturasi-va-dasturiy-modullar)
+17. [Jinoyatchilik, Sud, Qonunlar va Zindon Tizimi](#17-jinoyatchilik-sud-qonunlar-va-zindon-tizimi)
+18. [Godot 4 Texnik Arxitekturasi va Dasturiy Modullar](#18-godot-4-texnik-arxitekturasi-va-dasturiy-modullar)
 
 ---
 
@@ -237,44 +238,57 @@
 
 * **1 O'yin Yili = 28 Kun (Har bir fasl 7 kun):**
   * **🌸 Bahor (1–7 kunlar):** Qor erishi, daryo toshqinlari, serob yumshoq tuproq, ekin ekish unumi +30%, chorva bolalashi.
-  * **☀️ Yoz (8–14 kunlar):** Oltin quyosh, qurilish uchun eng quruq fasl (g'ishtlar tez quriydi), qurg'oqchilik xavfi (sug'orilmasa hosil quriydi), quruq o'tlar yong'ini.
-  * **🍂 Kuz (15–21 kunlar):** Hosilni o'rib g'amlash, o'tin yig'ish poygasi, tuzlash va dudlash, jun kiyimlar tikish, 20-kunda Hosildorlik Bayrami.
-  * **❄️ Qish (22–28 kunlar):** Abadiy qor, muzlagan daryolar, ochiq dalalarda dehqonchilik 0%, pechlarda o'tin sarfi 2x, uylar sovusa muzlab o'lish, och bo'rilar qishloq qo'ralariga hujumi.
-* **Dinamik Ofatlar:** Qalin Tuman (kamonchilar ko'rolmaydi), Momaqaldiroq & Yashin (Yashinqaytargich kerak), Qor Bo'roni (harakat -70%), Do'l (ochiq ekinlarni sindiradi).
+  * **☀️ Yoz (8–14 kunlar):** Oltin quyosh, qurilish uchun eng quruq fasl, qurg'oqchilik xavfi, quruq o'tlar yong'ini.
+  * **🍂 Kuz (15–21 kunlar):** Hosilni o'rib g'amlash, o'tin yig'ish poygasi, tuzlash va dudlash, 20-kunda Hosildorlik Bayrami.
+  * **❄️ Qish (22–28 kunlar):** Abadiy qor, muzlagan daryolar, dehqonchilik 0%, pechlarda o'tin sarfi 2x, uylar sovusa muzlab o'lish, och bo'rilar hujumi.
+* **Dinamik Ofatlar:** Qalin Tuman, Momaqaldiroq & Yashin (Yashinqaytargich), Qor Bo'roni (harakat -70%), Do'l.
 
 ---
 
 ## 16. OZIQ-OVQAT AYNISHI, SAQLASH USULLARI, SANITARIYA VA VABO
 
 ### 16.1. Oziq-ovqat Aynish Muddatlari
-* Xom go'sht/baliq: 2–3 kun.
-* Yangi sut: 1–2 kun.
-* Meva/sabzavot: 5–7 kun.
-* Pishirilgan non: 6–8 kun.
-* Quruq don (Bug'doy/Arpa): 1–2 yil (buzilmaydi).
-* *Buzilgan oziq-ovqat:* Qurtlaydi, sassiq hid tarqatadi, kalamushlarni jalb qiladi. Ochlikdan yeyilsa og'ir kasallik va o'lim keladi.
+* Xom go'sht/baliq: 2–3 kun | Yangi sut: 1–2 kun | Meva/sabzavot: 5–7 kun | Non: 6–8 kun | Bug'doy/Arpa: 1–2 yil.
+* Buzilgan oziq-ovqat yeyilsa og'ir kasallik va o'lim keladi.
 
 ### 16.2. Saqlashning 4 Xil Usuli:
 1. **Tuzlash (Salting):** `Go'sht/Baliq + Tosh Tuzi (Halite)` = 1 yil saqlanadi.
-2. **Dudlash (Smokehouse):** O'tin tutunida 20–30 kun saqlanadi, xushbo'y ta'm (baxt +15%).
-3. **Muzxona / Podval (Cold Cellar):** Qishda daryo muzidan katta bloklar keltirib taxlanadi (0°C, sabzavotlar 3x uzoq turadi).
-4. **Quritish (Sun Drying):** Meva, qo'ziqorin va baliqlarni oftobda quritish.
+2. **Dudlash (Smokehouse):** 20–30 kun saqlanadi, xushbo'y ta'm (baxt +15%).
+3. **Muzxona / Podval (Cold Cellar):** Qishki muz bloklari bilan sovitiladi (0°C).
+4. **Quritish (Sun Drying):** Meva va qo'ziqorinlarni oftobda quritish.
 
 ### 16.3. Sanitariya va Vabo (The Black Plague)
-* **Axlat Chuquri (Compost Pit):** Chiqindilar shahar tashqarisiga chiqariladi (o'g'it bo'ladi).
-* **Kalamushlar Bosqini:** Ko'chalarda axlat to'plansa kalamushlar ko'payadi, quduqlarni zaharlaydi. *Yechim:* Mushuklar va Qorovul Itlar.
-* **Qora O'lat Epidemiyasi:** Tozalik 30% dan tushsa vabo boshlanadi. Odamdan odamga yuqadi.
-* **Hukmdor Favqulodda Qarorlari:**
-  * Qattiq karantin (aholi uylarga qamaladi).
-  * O'lat Tabibi (Plague Doctor) chaqiriladi.
-  * Kasallangan to'shaklar va uylar olov bilan tozalanadi.
+* **Axlat Chuquri:** Chiqindilar shahar tashqarisiga chiqariladi.
+* **Kalamushlar Bosqini:** Ko'chalarda axlat to'plansa kalamushlar ko'payadi. *Yechim:* Mushuklar va Qorovul Itlar.
+* **Qora O'lat Epidemiyasi:** Karantin e'lon qilish, O'lat Tabibi (Plague Doctor) chaqirish, kasallangan to'shaklarni yoqish.
 
 ---
 
-## 17. GODOT 4 TEXNIK ARXITEKTURASI VA DASTURIY MODULLAR
+## 17. JINOYATCHILIK, SUD, QONUNLAR VA ZINDON TIZIMI
 
-* **Face Culling & Greedy Meshing:** `scripts/core/voxel_chunk.gd` — ko'rinmaydigan blok yuzalarini birlashtirib 120+ FPS ta'minlash.
-* **Aholi FSM & Yo'l topish:** `scripts/entities/citizen.gd` — NavigationAgent3D yordamida dinamik yo'l topish.
+### 17.1. Jinoyat Sabablari:
+* Ochlik (fuqaro 2 kun och qolsa ombordan o'g'irlaydi).
+* Haddan tashqari yuqori soliqlar (> 30%).
+* Taverna pivo mushtlashuvlari.
+* Qaroqchilar josusi (Infiltrator) — tunda darvozani ochishga urinadi.
+
+### 17.2. Huquq-Tartibot va Jazo Binolari:
+1. **Shahar Soqchilari (Constables):** Ko'chalarda patrul qilib jinoyatchini hibsga oladi.
+2. **Jazo Ustuni (Stocks & Pillory):** Kichik o'g'rilarni 3 kun taxtaga qisib qo'yish (xalq loy otadi, obro'si tushadi).
+3. **Qasr Zindoni (The Dungeon):** Og'ir jinoyatchilar va ushlangan qaroqchilar temir panjara ortida saqlanadi.
+4. **Qatl Maydoni (Gallows):** Xiyonatchilar va josuslar uchun dor.
+
+### 17.3. Hukmdor Sudi (The Royal Trials):
+* Og'ir jinoyat sodir bo'lganda Hukmdor shaxsan hukm chiqaradi:
+  * *Beva ayol (ochlikdan non o'g'irlagan):* Kechirish (Xalq mehri +20%) yoki Qonun ustuvorligi (+10% intizom).
+  * *Josus (qaroqchi agenti):* Dorga osish yoki Shaxtada umrbod og'ir mehnatga hukm qilish (Penal Labor).
+
+---
+
+## 18. GODOT 4 TEXNIK ARXITEKTURASI VA DASTURIY MODULLAR
+
+* **Face Culling & Greedy Meshing:** `scripts/core/voxel_chunk.gd` — 120+ FPS ta'minlash.
+* **Aholi FSM & Yo'l topish:** `scripts/entities/citizen.gd` — NavigationAgent3D.
 * **Iqtisodiyot va Ta'minot:** `scripts/economy/supply_chain.gd` — resurslar sarfi va kundalik hisob-kitob.
 * **Boshqaruv UI:** `scripts/ui/royal_ledger.gd` — Hukmdor daftari interfeysi.
 * **Simulyator:** `prototype_sim.py` — 30 kunlik avtomatlashtirilgan iqtisodiy sinov vositasi.
