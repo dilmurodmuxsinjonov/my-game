@@ -1038,6 +1038,117 @@ O'yindagi barcha ashyolar, tabiiy qazilmalar, ekinlar, tayyor taomlar, harbiy as
 
 ---
 
+### 13.5. Eng Kichigidan Eng Kattasigacha Yasalish va Qurilish Ierarxiyasi (Tier 0 dan Tier 8 gacha)
+
+O'yindagi barcha yasaladigan ashyolar, qurollar, mashinalar va monumental inshootlar o'zining murakkabligi, xomashyo talabi, ishlab chiqarish uslubi va ko'lamiga ko'ra 9 ta bosqichli progressiv ierarxiyaga tizimlashtirilgan:
+
+#### 13.5.1. 0-Daraja: Eng Mayda Cho'ntak Ashyolari (Handcrafting)
+
+| Buyum Nomi va ID | Yasalish Uslubi | Sarflanadigan Xomashyo | Ish Vaqti | Qanday Ishlatilishi va Mexanikasi |
+|---|---|---|---|---|
+| **Chaqmoqtosh va Qov** (`ITEM_UTIL_FLINT_TINDER`) | Qo'lda ishqalash | 1 dona Dala chaqmoqtoshi + 1 dona Quruq qov | $3\text{ sek}$ | Gulxan, pechka va mash'alalarni yoqish uchun chaqmoq uchquni chiqaradi. 50 marta ishlatiladi. |
+| **Tosh Ov Pichog'i** (`ITEM_TOOL_STONE_KNIFE`) | Qo'lda bog'lash | 1 dona O'tkir chaqmoqtosh + 1 dona Yog'och tayoq | $6\text{ sek}$ | O'ldirilgan hayvonlar terisini shilish, o'rmondan dorivor o'tlar va qov terish uchun boshlang'ich pichoq. |
+| **Kanop Bog'ichi** (`ITEM_UTIL_BANDAGE`) | Qo'lda o'rash | 1 dona Toza zig'ir mato | $5\text{ sek}$ | Qon ketish travmasini darhol to'xtatadi, salomatlikni $+15\text{ HP}$ tiklaydi va infeksiyadan asraydi. |
+| **Qalin Kanop Arqon** (`ITEM_UTIL_ROPE`) | Qo'lda to'qish | 4 dona Zig'ir tolasi | $8\text{ sek}$ | Shaxta quduqlariga xavfsiz tushish, qurilish to'sinlarini bog'lash va dushman asirlarini tushovlash. |
+| **Yog'och Mash'ala** (`ITEM_UTIL_TORCH`) | Qo'lda qatronlash | 1 dona Yog'och tayoq + 1 dona Daraxt smolasi (yoki Ko'mir) | $4\text{ sek}$ | 12 metr radiusdagi qorong'ulikni yoritadi, tana haroratini $+3^\circ\text{C}$ isitadi. Yondirilgach 45 daqiqa yonadi. |
+| **Ibtidoiy Tosh Cho'kich** (`ITEM_TOOL_PICKAXE_STONE`) | Qo'lda biriktirish | 2 dona Dala toshi + 1 dona Tayoq + 1 dona Arqon | $10\text{ sek}$ | Yer yuzasidagi tosh, loy va ko'mir tomirlarini sekin sur'atda ($1.0\times$) qazish uchun ilk vosita. |
+
+#### 13.5.2. 1-Daraja: Oshxona, Yengil To'quv va Tibbiyot
+
+| Buyum Nomi va ID | Yasalish Uslubi | Sarflanadigan Xomashyo | Ish Vaqti | Qanday Ishlatilishi va Mexanikasi |
+|---|---|---|---|---|
+| **Issiq Dala Noni** (`ITEM_FOOD_BREAD`) | Tosh pechda pishirish | 1 qop Un + 1 ko'za Suv + 1 Xamirturush | $15\text{ sek}$ | Shahar aholisining asosiy taomi. Ochlikni $-35$ tushiradi, $+25\text{ HP}$ va $+35\text{ Stamina}$ buff beradi. |
+| **Qovurilgan Qobon Go'shti** (`FOOD_ROAST_BOAR`) | O'choqda qovurish | 1 bo'lak Xom go'sht + 1 dona O'tin | $12\text{ sek}$ | Kuchli oqsil taomi. 20 daqiqa davomida $+40\text{ HP}$, $+15\text{ Stamina}$ va $+1.5\text{ HP/s}$ regen beradi. |
+| **To'yimli Feodal Dimlama** (`FOOD_HEARTY_STEW`) | Qozonda qaynatish | 1 Go'sht + 1 Kartoshka + 1 Sabzi + 1 Suv | $25\text{ sek}$ | Elita ozuqa. 30 daqiqa davomida $+55\text{ HP}$, $+30\text{ Stamina}$ va tanani sovuqdan $+20^\circ\text{C}$ isitadi. |
+| **Dudlangan Daryo Balig'i** (`ITEM_FOOD_SMOKED_FISH`) | Dudxona tutunida | 2 dona Xom baliq + 1 dona Tuz + Qayin qipig'i | $45\text{ sek}$ | Sovuq havoda 45 o'yin kuni aynimaydigan uzoq safar zaxirasi. Ochlikni $-45$ ga qondiradi. |
+| **Qishloq Arpa Eli** (`ITEM_DRINK_ALE`) | Xumda achitish | 2 dona Arpa solodi + 1 ko'za Suv + 1 Xmel | $40\text{ sek}$ | Chanqoqni bosadi, fuqaro ruhiyatini $+15$ Morale ko'taradi, jismoniy charchoq to'planishini sekinlashtiradi. |
+| **Shifobaxsh Asal Malhami** (`ITEM_UTIL_HEALING_SALVE`) | Hovonchada ezish | 1 dona Dalachoy + 1 idish Asal + 1 Hayvon yog'i | $18\text{ sek}$ | Og'ir jarohatlar, singan suyaklar va qon ketishini tezda davolab, har soniyada $+5\text{ HP}$ tiklaydi. |
+| **Zig'ir Ishchi Ko'ylagi** (`ITEM_ARMOR_CLOTH_TUNIC`) | To'quv dastgohi | 3 dona Zig'ir mato + 1 dona Ip | $20\text{ sek}$ | Fuqarolarning kundalik kiyimi. Tana haroratini $+4^\circ\text{C}$ saqlaydi, axloqiy norozilikni yo'qotadi. |
+| **Paxtali Qalin Jilet** (`ITEM_ARMOR_GAMBESON`) | Qavish uslubida | 4 dona Jun mato + 2 dona Zig'ir ip | $35\text{ sek}$ | Zanjir sovut tagidan kiyiladi. To'mtoq ezuvchi zarbalarni (Blunt) $15\%$ ga yumshatadi. |
+| **Qalin Charm Botinka** (`ITEM_ARMOR_LEATHER_BOOTS`) | Charm tikuv stoli | 2 dona Oshlangan charm + 2 dona Temir mix | $25\text{ sek}$ | Fuqaroning loy, qor va botqoqda harakat tezligini $+15\%$ ga oshiradi, sovuq qotishdan asraydi. |
+
+#### 13.5.3. 2-Daraja: Qurilish Bloklari va Maishiy Jihozlar
+
+| Buyum Nomi va ID | Yasalish Uslubi | Sarflanadigan Xomashyo | Ish Vaqti | Qanday Ishlatilishi va Mexanikasi |
+|---|---|---|---|---|
+| **Ishlangan Yog'och Taxta** (`ITEM_WOOD_PLANK`) | Duradgor arrasi | 1 dona Qarag'ay yoki eman xodasi | $10\text{ sek}$ | Bitta xodadan 4 ta taxta chiqadi. Uylar poli, tomi, eshiklar, mebellar va aravachalar asosi. |
+| **Yuk Ko'taruvchi Yog'och Brus** (`ITEM_WOOD_BEAM`) | Sawmill dastgohi | 1 dona Qattiq eman xodasi + 2 dona Temir mix | $15\text{ sek}$ | Binolar oraliq shiftlari va shaxta shiftini mustahkamlovchi tirgovich (vertikal $450\text{ kg/m}$ yuk ko'taradi). |
+| **Standart Tosh G'isht** (`ITEM_STONE_BRICK`) | Qalamcha bilan yo'nish | 2 dona Dag'al tosh bo'lagi ($15\text{kg}$) + 1 Ohak | $15\text{ sek}$ | $20\text{ kg}$ lik silliq g'isht. Qal'a devorlari, minoralar va pishiq tosh uylarni terish uchun asosiy blok. |
+| **Pishirilgan Qizil G'isht** (`ITEM_CLAY_BRICK`) | Xumdonda kuydirish | 2 dona Xom loy + 1 dona Daryo qumi | $30\text{ sek}$ | Olovga chidamli keramik blok. Nonvoyxona pechlari, xonadon kaminlari va mo'rilar qurishda ishlatiladi. |
+| **Qurilish Ohak Qorishmasi** (`ITEM_MORTAR`) | Qorg'onda qorish | 1 dona Kuydirilgan ohaktosh + 1 Qum + 1 Suv | $10\text{ sek}$ | Tosh va g'ishtlarni bir-biriga yaxlit yopishtiruvchi tsement qorishmasi. Bino mustahkamligini $+50\%$ oshiradi. |
+| **Qalin Shisha Oyna Paneli** (`ITEM_GLASS_PANE`) | Shisha xumdonida | 2 dona Kvars qumi + 1 dona O'tin kuli | $25\text{ sek}$ | $1200^\circ\text{C}$ da quyiladi. Turar-joylarga yorug'lik kiritadi, issiqlikni saqlab qishki uy reytingini $+15$ ballga oshiradi. |
+| **Kichik Yog'och Sandiq** (`CHEST_WOOD_SMALL`) | Duradgor stolida | 8 dona Taxta + 4 dona Temir mix | $20\text{ sek}$ | Xonadonlarda 16 katakli shaxsiy ombor vazifasini o'taydi. Fuqarolar 3 kunlik ovqatini saqlaydi. |
+| **Temir Gardishli Sandiq** (`CHEST_IRON_BANDED`) | Sandiqqa temir qoplash | 16 dona Eman taxta + 4 dona Temir quyma | $40\text{ sek}$ | Ustaxonalar va kazarmalarda 36 katakli ommaviy resurslar ombori. O'g'rilik xavfi $0\%$. |
+| **Muzlatgich Kiler Qutisi** (`CHEST_COLD_ICEBOX`) | Qo'rg'oshin qoplamasi | 12 taxta + 2 qo'rg'oshin plastina + 1 daryo muzi | $35\text{ sek}$ | Go'sht, sut va mevalarning chirish jarayonini $10\times$ barobarga sekinlashtiradi. |
+
+#### 13.5.4. 3-Daraja: Metallurgiya, Qurol va Aslahalar
+
+| Buyum Nomi va ID | Yasalish Uslubi | Sarflanadigan Xomashyo | Ish Vaqti | Qanday Ishlatilishi va Mexanikasi |
+|---|---|---|---|---|
+| **Tozalangan Temir Quyma** (`ITEM_INGOT_IRON`) | Bloomery xumdonida | 2 dona Temir rudasi + 2 dona Yog'och ko'miri | $30\text{ sek}$ | $1100^\circ\text{C}$ da eritiladi. Barcha standart qurollar, mehnat cho'kichlari, mixlar va taqalarning asosi. |
+| **Zich Po'lat Quyma** (`ITEM_INGOT_STEEL`) | Domna pechida toblash | 2 Temir quyma + 1 Toshko'mir + Havo bosqoni | $45\text{ sek}$ | $1400^\circ\text{C}$ da uglerod bilan toblanadi. Ritsarlik uzun qilichlari, to'liq zirhlar va og'ir arbaletlar asosi. |
+| **Qatlamli Damashq Po'lati** (`ITEM_INGOT_DAMASCUS`)| Tigel xumdonida buklash| 2 Po'lat quyma + 1 Nikel kukuni + Maxsus flyus | $90\text{ sek}$ | 120 qatlam qilib buklab bolg'alanadi. Sinmas, zanglamas afsonaviy qurollar materiali. |
+| **Temir Konchi Cho'kichi** (`ITEM_TOOL_PICKAXE_IRON`) | Sandonda bolg'alash | 3 dona Temir quyma + 2 dona Yog'och dasta | $30\text{ sek}$ | Qattiq granit, temir va kumush tomirlarini tez qazish ($Speed = 2.2\times$, Durability: 450 zarba). |
+| **O'rmonchi Po'lat Boltasi** (`ITEM_TOOL_AXE_STEEL`) | Sandonda charxlash | 2 dona Po'lat quyma + 1 dona Eman dasta | $35\text{ sek}$ | Yo'g'on ko'p yillik emanlarni tez yiqitadi ($Speed = 2.8\times$), o'tin hosildorligini $+25\%$ oshiradi. |
+| **Ritsarlik Uzun Qilichi** (`ITEM_WEAPON_LONG_SWORD`) | Sandonda toblash | 3 dona Po'lat quyma + 1 dona Charm tasma | $50\text{ sek}$ | Bir yoki ikki qo'lda ishlatiladi. 35 baza kesuvchi zararga ega, ochiq maydonda keng qulochli zarbalar beradi. |
+| **Safdorlar Uzun Nayzasi** (`ITEM_WEAPON_PIKE`) | Dastaga o'rnatish | 1 dona Temir nayza uchi + 3 metrli Eman xoda | $25\text{ sek}$ | Dushman otliqlarini to'xtatuvchi nayzadorlar mudofaa devori (Shield Wall ortidan sanchiladi). |
+| **Temir Mexanik Arbalet** (`ITEM_WEAPON_CROSSBOW`) | Qismlarni yig'ish | 2 Po'lat plastina + 1 Eman qo'ndoq + 1 Prujina | $60\text{ sek}$ | 60 metr masofadan to'g'ri chiziqli po'lat bolt otadi. Dushmanning zanjirli zirhlarini teshib o'tadi. |
+| **Zanjirli Temir Ko'ylak** (`ITEM_ARMOR_CHAINMAIL_HAUBERK`)| 8,000 halqani to'qish| 8 dona Tozalangan temir quyma + Charm tasma | $120\text{ sek}$ | Kesuvchi qilich zararlarini $45\%$ ga, sanchuvchi o'qlarni $20\%$ ga qaytaruvchi mustahkam korpus zirhi. |
+| **To'liq Po'lat Ko'krak Zirhi** (`ITEM_ARMOR_PLATE_CUIRASS`)| Qolipda bolg'alash | 6 dona Zich po'lat quyma + 4 dona Qalin charm | $150\text{ sek}$ | Kamon o'qlari va nayza zarbalarini 100% sirpantirib qaytaradi (Slash $-70\%$, Pierce $-60\%$). |
+
+#### 13.5.5. 4-Daraja: Runalar, Sehr va Alkimyo
+
+| Buyum Nomi va ID | Yasalish Uslubi | Sarflanadigan Xomashyo | Ish Vaqti | Qanday Ishlatilishi va Mexanikasi |
+|---|---|---|---|---|
+| **Bo'sh Tosh Runa Plitasi** (`ITEM_RUNE_BLANK_SLATE`)| Tosh yo'nuvchi arralashi| 1 dona Silliq marmar yoki Kvars plitasi | $15\text{ sek}$ | Barcha darajali runalarni o'yib yozish uchun zarur bo'lgan bo'sh poydevor plitasi. |
+| **Vibratsion Qazish Runasi** (`RUNE_SEISMIC_STRIKE` I-III)| Sehrgarlar stolida o'yish| 1 Bo'sh plita + 4 Lapislazuli + 2 Kalamush tirnog'i| $60\text{ sek}$ | Cho'kichga o'rnatiladi. Qazish tezligini $+45\%$ oshiradi, shaxta shifti o'pirilish xavfini $-35\%$ pasaytiradi. |
+| **Olmos Damli Tig' Runasi** (`RUNE_RAZOR_EDGE` I-III) | Runik matrisada qotirish| 1 Bo'sh plita + 1 Olmos + 2 Bo'ri jag' suyagi | $75\text{ sek}$ | Qilich yoki xanjarga o'rnatiladi. Dushman temir sovutining $45\%$ himoyasini inobatga olmay teshadi. |
+| **Po'lat Qobiq Sovut Runasi** (`RUNE_IMPENETRABLE_WARD`)| Mineral bog'lash | 1 Bo'sh plita + 1 Toshbaqa kosasi + 4 Lapis | $70\text{ sek}$ | Ko'krak sovutiga o'rnatiladi. Barcha jismoniy (Slash, Pierce, Blunt) zararlarni $40\%$ ga kamaytiradi. |
+| **Shamol Yirtuvchi Runasi** (`RUNE_WINDPIERCER` I-III)| Qush paridan yo'nish | 1 Bo'sh plita + 4 Qarg'a pati + 2 Lapis | $50\text{ sek}$ | Kamon yoki arbaletga o'rnatiladi. O'q parvozidagi gravitatsiya va shamol og'ishini butunlay yo'qotadi. |
+| **Yonuvchi Qoramoy Xumi** (`ITEM_AMMO_PITCH_POT`) | Alkimyo qozonida qorishtirish| 1 Sopol xum + 2 Qora neft + 1 Oltingugurt + Smola | $30\text{ sek}$ | Katapulta yoki qo'lda devordan tashlanadi. Urilgan yerda 8 metr radiusda 30 soniya o'chmas alanga hosil qiladi. |
+
+#### 13.5.6. 5-Daraja: Logistika Vositalari va Ko'tarish Mexanizmlari
+
+| Buyum Nomi va ID | Yasalish Uslubi | Sarflanadigan Xomashyo | Ish Vaqti | Qanday Ishlatilishi va Mexanikasi |
+|---|---|---|---|---|
+| **Yog'och Qo'l Aravacha** (`Wheelbarrow`) | Duradgor stolida | 4 taxta + 1 yog'och g'ildirak + 2 mix | $30\text{ sek}$ | Ishchining yuk sig'imini $25\text{ kg}$ dan $120\text{ kg}$ ga oshiradi. Tuproq yo'lda tezlik $1.15\times$. |
+| **Ikki G'ildirakli Katta Arava** (`Handcart`) | G'ildirak o'qini sozlash | 8 taxta + 2 temir gardishli g'ildirak + 1 o'q | $50\text{ sek}$ | Bir vaqtda $250\text{ kg}$ yuk ko'taradi. Tosh ko'chalarda harakat tezligi $1.25\times$. |
+| **Ot Qo'shilgan Katta Furgon** (`Horse Wagon`) | Katta transport montaji | 16 eman taxta + 4 temir g'ildirak + 2 Ot jabdug'i | $120\text{ sek}$ | $800-1,500\text{ kg}$ yuk tashiydi. Uzoq forpostlardan markaziy omborga ruda va g'allani soatbay yetkazadi. |
+| **Shaxta Relsli Vagonetkasi** (`Minecart`) | Temirxonada quyish | 4 temir plastina + 4 quyma g'ildirak + 6 taxta | $60\text{ sek}$ | Yog'och va temir relslar ustida $1,000\text{ kg}$ rudani konchilar yoki eshak orqali tortib chiqadi. |
+| **Shaxta Chig'irli Kran Ko'targichi** (`Headframe Hoist`)| Vertikal stvol montaji | 8 xoda + 4 arqon + 2 tishli g'ildirak + savat | $90\text{ sek}$ | Vertikal chuqur shaxtalardan ($-150\text{m}$) ruda qutilarini va yarador konchilarni soniyalarda ko'taradi. |
+
+#### 13.5.7. 6-Daraja: Harbiy Qamal Mashinalari va Mustahkam To'siqlar
+
+| Buyum Nomi va ID | Yasalish Uslubi | Sarflanadigan Xomashyo | Ish Vaqti | Qanday Ishlatilishi va Mexanikasi |
+|---|---|---|---|---|
+| **Devor Buzuvchi Taran** (`BATTERING_RAM`) | Dala brigada montaji | 4 eman xodasi + 1 quyma temir bosh + 8 arqon + soyabon | $180\text{ sek}$ | 4 nafar askar tomonidan suriladi. Qal'a yog'och va tosh darvozalariga har zarbada $1,500\text{ HP}$ maydalovchi zarar beradi. |
+| **Qamal Stankali Balistasi** (`SIEGE_BALLISTA`)| Mexanik prujina yig'ish | 6 qattiq brus + 2 po'lat prujina + 1 tishli richag | $150\text{ sek}$ | $120\text{ metr}$ masofadan og'ir po'lat nayza otadi. Dushman otliqlarini bir zarbada uloqtiradi va minorani buzadi. |
+| **Qarama-Qarshi Kuchli Trebuchet** (`TREBUCHET`)| Muhandislik arxitekturasi | 16 eman xodasi + 4 po'lat o'q + 8 arqon + 500kg tosh quti | $300\text{ sek}$ | $250\text{ metr}$ masofaga $100\text{ kg}$ silliq tosh yadrolarini otib qasr devorlari va minoralarini yakson qiladi. |
+| **Ko'tarma Temir Panjara Darvoza** (`PORTCULLIS`)| Qal'a darvozasiga quyish | 12 eman to'sini + 8 temir panjara + richag chig'iri | $200\text{ sek}$ | Qasr bosh darvozasiga o'rnatiladi. $10,000\text{ HP}$ mustahkamlikka ega bo'lib, dushman qo'shinini shahar tashqarisida to'xtatadi. |
+
+#### 13.5.8. 7-Daraja: Fuqarolik va Ishlab Chiqarish Binolari
+
+| Bino Nomi va ID | Qurilish Uslubi | Sarflanadigan Materiallar | Qurilish Vaqti | Qanday Ishlatilishi va Vazifasi |
+|---|---|---|---|---|
+| **Tosh Yarim-Karkas Turar-joy** (`Stone Cottage`)| Voxel blok terish | 30 Tosh g'isht + 20 Taxta + 6 Oyna + 1 Pech | $120\text{ sek}$ | 6 nafar fuqaroning uyi. Tungi salomatlik tiklanishi $+25\text{ HP}$, kunlik Morale $+15$ (Tier 2 qulaylik). |
+| **Orqa Hovli Tovuqxonasi** (`ITEM_BACKYARD_CHICKEN`)| Hovli extension montaji| 10 dona Taxta + 4 dona Somon to'plami | $20\text{ sek}$ | Uy orqasidagi $3\times3$ yerda passiv har kuni 2 ta yangi tuxum beradi. Aholi oqsil taqchilligini butkul yopadi. |
+| **Orqa Hovli Sabzavot Polizi** (`ITEM_BACKYARD_GARDEN`)| Shudgorlab to'siq tortish| 4 dona O'tin + 1 dona Temir belkurak | $25\text{ sek}$ | Uy orqasidagi $4\times4$ yerda har fasl oxirida 20 ta yangi sabzi va karam yetishtirib xonadonga beradi. |
+| **Shamol Tegirmoni** (`Windmill Gristmill`) | Minora karkasi terish | 60 Tosh g'isht + 30 Taxta + 4 Mato qanot + 2 Tegirmontosh| $180\text{ sek}$ | Shamol kuchi bilan kuniga 16 qop oliy navli un yanchadi. Ishlab chiqarish samaradorligi $2.50\times$. |
+| **Gidravlik Sawmill** (`Water-Powered Sawmill`)| Daryo bo'yida charxpalak| 50 Tosh g'isht + 40 Taxta + 4 Temir arra + Gidro-turbina| $200\text{ sek}$ | Daryo oqimi kuchi bilan xodalarni avtomatik tiladi. Xomashyo yo'qotilmaydi, tezlik $2.20\times$. |
+| **Domna Metallurgiya Pechi** (`Blast Furnace Complex`)| Olovbardosh konstruksiya | 80 Olovbardosh g'isht + 30 Tosh + 2 Temir havo bosqoni | $240\text{ sek}$ | $1400^\circ\text{C}$ issiqlikda to'xtovsiz po'lat quyish va qurollar uchun metall tayyorlash sehi. |
+| **Tabiiy Yerosti Sovuq Podvali** (`Cold Cellar`) | Chuqur qazib tosh terish | 40 Tosh g'isht + $\ge 4\text{m}$ Chuqurlik | $150\text{ sek}$ | Geotermal izolyatsiya tufayli $+4^\circ\text{C} – +8^\circ\text{C}$ salqinlikni ushlab, taomlarni $4\times$ uzoq saqlaydi. |
+
+#### 13.5.9. 8-Daraja: Eng Ulkan Monumentlar va Qal'alar (Mega Structures)
+
+| Monumental Bino Nomi | Qurilish Uslubi | Sarflanadigan Materiallar | Ishchi Kuchi | Qanday Ishlatilishi va Strategik Ahamiyati |
+|---|---|---|---|---|
+| **Qasr Qo'rg'oni va Bunker** (`Citadel Keep & Bunker`) | Monolit poydevorli ko'p qavatli arkalar | 500 Tosh g'isht + 200 Eman to'sini + 50 Mix + 1 Signal qo'ng'irog'i | 8 ishchi (600 sek) | **Qal'aning yuragi.** Qamal trevogasi chalinganda barcha fuqarolar ichkariga berkinadi, zulfinlanadi va qurollantiriladi. Ichida qirollik taxt zali, xazina seyfi va boshqaruv daftari (`Royal Ledger`) joylashadi. |
+| **Machicolation Mudofaa Minoralari** (`Defensive Bastion`)| Tik minora va osma ambrazuralar | 120 Tosh g'isht + 40 Ohak + 12 Yog'och to'sin + Tom koshini | 4 ishchi (300 sek) | Minora devori ostiga bostirib kelgan taran va dushman ustiga qaynagan smola va tosh tashlash ambrazuralari. Kamonchilar uchun $360^\circ$ xavfsiz otish burchagi. |
+| **Qal'a Tosh Mudofaa Devori** (Har 10 metr qism uchun) | Qalin ikki qavatli monolit terish | 80 Tosh g'isht + 30 Ohak qorishmasi + 8 Tosh merlon | 4 ishchi (180 sek) | Piyodalar va otliqlarni to'xtatuvchi $8\text{m}$ balandlikdagi devor. Ustida soqchilar yurish yo'lagi (Battlement Walkway) mavjud. |
+| **Buyuk Tosh Sobor** (`Grand Cathedral`) | Gotik arkali gumbazlar va vitrajlar | 1,200 Marmar g'isht + 400 Tom koshini + 80 Shisha vitraj + 12 Marmar ustun | 12 ishchi (1200 sek) | **Oliy davlat monumenti.** Shahar nufuzini (`Prestige`) eng yuqori 100 ballga yetkazadi. Barcha shahar fuqarolari ruhiyatiga doimiy $+35$ Morale baxt beradi, qo'shni feodallarni itoatga majbur qiladi. |
+
+---
+
 # 14. AHOLINING PAYDO BO‘LISHI (POPULATION GENERATION & LIFECYCLE)
 
 Voxel Lord: Feudal Realm o'yinida aholi sun'iy ravishda havodan yoki resurs sarflamasdan o'z-o'zidan paydo bo'lmaydi. Har bir fuqaro dunyo simulyatsiyasida aniq biologik, ijtimoiy va logistik sabab-oqibat zanjiri orqali dunyoga keladi yoki shaharga qo'shiladi.
