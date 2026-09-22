@@ -606,38 +606,66 @@ Agar fuqaro o'z kasbiga oid asbobsiz ishlasa (masalan, konchi qo'li bilan tosh q
 - Qattiqligi $H \ge 2$ bo'lgan barcha voxellar qazib olinmaydi ("Asbob kerak" xatosi chiqadi).
 - Ishchining charchoqlik (Fatigue) to'planishi $2.5\times$ ga tezlashadi va jarohat olish (qon ketish, qo'l lat yeyishi) ehtimoli $+15\%$ ga oshadi.
 
-### 12.4. Qurol va Asboblarga Runik Sehrlar Tizimi (Runic Enchanting & Infusion Mechanics)
+### 12.4. Qurol, Asbob va Sovutlarga Runik Sehrlar Tizimi (Tiered Enchanting & Mythic Infusions)
 
-Minecraft sehrlash tizimidan ilhomlangan, biroq feodal realizm, fizik qonuniyatlar va konchilik mexanikasiga moslashtirilgan takomillashtirilgan tizim. O'yinda sehr havoda tasodifiy o'yin (kazino) orqali berilmaydi, balki **Runik Altar va Temirchilik Bosqoni (`Runic Anvil & Altar`)**da qadimiy yerosti gliflari va alkimyoviy essensiyalarni metall vujudiga o'yib yozish orqali amalga oshiriladi.
+Minecraft sehrlash tizimidan ilhomlangan, biroq feodal realizm, fizik qonuniyatlar va konchilik mexanikasiga moslashtirilgan ko'p pog'onali tizim. O'yinda sehr havoda tasodifiy o'yin (kazino) orqali berilmaydi, balki **Runik Altar va Temirchilik Bosqoni (`Runic Anvil & Altar`)**da qadimiy yerosti gliflari va alkimyoviy essensiyalarni metall vujudiga o'yib yozish orqali amalga oshiriladi.
 
-#### 12.4.1. Runa Uyalari Sig'imi (Rune Socket Capacity)
-Har bir qurol va asbob o'zining yasalish sifat darajasiga (Quality Tier) ko'ra quyidagi miqdorda runa uyalariga ega bo'ladi:
-- `Poor` va `Common` daraja: 0 ta uya (sehr kirmaydi);
-- `Fine` daraja: 1 ta runa uyasi;
-- `Masterwork` daraja: 2 ta runa uyasi;
-- `Royal` va `Legendary` daraja: 3 ta runa uyasi (barcha kuchli sehrlarni o'zaro bog'lash mumkin).
+#### 12.4.1. Runa Uyalari va 3 Bosqichli Darajalar Tizimi (Tiers I–III Progression)
+1. **Runa Uyalari Sig'imi:**
+   - `Poor` va `Common` daraja: 0 ta uya (sehr kirmaydi);
+   - `Fine` daraja: 1 ta runa uyasi;
+   - `Masterwork` daraja: 2 ta runa uyasi;
+   - `Royal` va `Legendary` daraja: 3 ta runa uyasi.
+2. **Sehr Darajalari (Levels I–III):**
+   - **Daraja I (Kichik Runa - Lesser):** Boshlang'ich effekt ($+15\% - +25\%$).
+   - **Daraja II (Katta Runa - Greater):** O'rta kuchaytirilgan effekt ($+35\% - +55\%$).
+   - **Daraja III (Oliy Runa - Superior):** Eng yuqori usta effekti ($+65\% - +90\%$).
+   - *Runa Birlashtirish Qoidasi:* Runik Anvilda 2 ta bir xil Daraja I runa + Lapislazuli oqimi = 1 ta Daraja II runa hosil qiladi.
 
-#### 12.4.2. Asboblarga Qo'shiladigan Takomillashtirilgan Sehrlar (Tool Enchantments)
+#### 12.4.2. Asboblarning Darajali Sehirlari Balans Jadvali (Tool Enchantments I–III)
 
-| Sehr Nomi | Runa ID | Qo'llanadigan Asbob | Minecraft Ilhomi | Takomillashtirilgan Feodal Mexanikasi |
+| Sehr Nomi | Runa ID | Qo'llanadigan Asbob | I / II / III Darajadagi Aniq Ko'rsatkichlari | Feodal Simulyatsiya Mexanikasi |
 |---|---|---|---|---|
-| **Vibratsion Qazish** | `RUNE_SEISMIC_STRIKE` | Cho'kich / Pickaxe | Efficiency | Qazish tezligini $2.5\times$ oshiradi va toshlarni tebranish to'lqini bilan maydalaydi; eng muhimi — shaxta shiftiga tushadigan seysmik zo'riqishni $45\%$ kamaytirib, **o'pirilish (cave-in) xavfini keskin pasaytiradi**. |
-| **Geologik Soflik** | `RUNE_VEIN_PURITY` | Cho'kich / Pickaxe | Fortune | Xomashyoni maydalaganda tosh chiqindisini (slag) yo'qotib, sof metall miqdorini $+50\%$ ga oshiradi va yondosh nodir javohirlarning (olmos, yoqut) butun sinmasdan ajralish ehtimolini $+30\%$ qiladi. |
-| **Monolit Blok Kesish**| `RUNE_PRECISION_QUARRY`| Cho'kich / Pickaxe | Silk Touch | Tosh, granit va marmarni mayda shag'alga aylantirmasdan, $100\%$ silliq me'moriy monolit blok holatida ajratib oladi (Buyuk Sobor va Qasr qurilishida zarur). |
-| **Yashovchan Metall** | `RUNE_LIVING_TEMPER` | Barcha Asboblar | Unbreaking + Mending | Buyumning eskirish ehtimolini $80\%$ ga pasaytiradi; asbob dam olish vaqtida qurol javonida yoki inventarda turganda har soatda $+5\%$ mustahkamligini o'zi tiklaydi. |
-| **O'rmon Qulashi** | `RUNE_TIMBER_FALL` | Bolta / Wood Axe | Treecapitator | Daraxtning pastki g'o'lasini kesganda butun daraxt bir maromda pastga qulaydi va shox-shabbalar avtomatik tarzda bog'langan o'tin to'plamlariga aylanadi. |
-| **Dehqon Barakoti** | `RUNE_REAPERS_HARVEST` | O'roq / Scythe | Fortune (Farming) | Bir zarbada $3\times3$ poliz maydonidagi bug'doyni to'liq o'rib oladi va ekin urug'larini darhol yumshatilgan yerga qaytadan ekib ketadi. |
+| **Vibratsion Qazish** | `RUNE_SEISMIC_STRIKE` | Cho'kich (Pickaxe) | Tezlik: $+60\% / +140\% / +250\%$ | Toshlarni tebranish to'lqini bilan maydalaydi; shaxta shiftiga seysmik zo'riqishni $-20\% / -35\% / -50\%$ kamaytirib, **o'pirilish (cave-in) xavfini keskin pasaytiradi**. |
+| **Geologik Soflik** | `RUNE_VEIN_PURITY` | Cho'kich (Pickaxe) | Sof metall: $+20\% / +35\% / +50\%$ | Chiqindi tosh shlakini yo'qotadi; yonma-yon joylashgan olmos va yoqutlarning **butun sinmasdan ajralish ehtimoli $+15\% / +25\% / +40\%$** oshadi. |
+| **Monolit Blok Kesish**| `RUNE_PRECISION_QUARRY`| Cho'kich (Pickaxe) | Butunlik: $50\% / 80\% / 100\%$ | Tosh, granit va marmarni mayda shag'alga aylantirmasdan, silliq me'moriy monolit blok holatida ajratib oladi (Buyuk Sobor qurilishida zarur). |
+| **Yashovchan Metall** | `RUNE_LIVING_TEMPER` | Barcha Asboblar | Eskirish pasayishi: $-40\% / -65\% / -85\%$ | Asbob dam olish vaqtida qurol javonida yoki inventarda turganda har soatda $+2\% / +4\% / +7\%$ mustahkamligini avtomatik tiklaydi. |
+| **O'rmon Qulashi** | `RUNE_TIMBER_FALL` | Bolta (Wood Axe) | Qulash radiusi: 4m / 8m / 14m | Daraxtning pastki g'o'lasini kesganda butun daraxt bir maromda pastga qulaydi va shoxlari bog'langan o'tin to'plamlariga aylanadi. |
+| **Dehqon Barakoti** | `RUNE_REAPERS_HARVEST` | O'roq (Scythe) | Qamrov maydoni: $2\times2$ / $3\times3$ / $4\times4$ | Bir zarbada belgilangan polizdagi barcha hosilni o'rib oladi va urug'larni avtomatik ravishda yumshatilgan yerga qayta ekib ketadi. |
 
-#### 12.4.3. Qurollarga Qo'shiladigan Takomillashtirilgan Sehrlar (Weapon Enchantments)
+#### 12.4.3. Qurollarning Darajali Sehirlari Balans Jadvali (Weapon Enchantments I–III)
 
-| Sehr Nomi | Runa ID | Qo'llanadigan Qurol | Minecraft Ilhomi | Takomillashtirilgan Feodal Mexanikasi |
+| Sehr Nomi | Runa ID | Qo'llanadigan Qurol | I / II / III Darajadagi Aniq Ko'rsatkichlari | Feodal Simulyatsiya Mexanikasi |
 |---|---|---|---|---|
-| **Olmos Damli Tig'** | `RUNE_RAZOR_EDGE` | Qilich, Nayza, Bolta | Sharpness | Shunchaki tekis zarar oshishi emas: dushmanning og'ir temir zirhini (Plate Armor) $40\%$ teshish (Armor Penetration) qobiliyatini beradi. |
-| **Magma Alangi** | `RUNE_SMOLDERING_PYRE` | Qilich, Nayza | Fire Aspect | Dushmanga 8 soniya yonish statusi beradi; shamol esganda olov dushman safidagi boshqa askarlarga va yog'och qal'a devorlariga ham tarqaladi. |
-| **Titratuvchi Zarb** | `RUNE_STAGGER_CONCUSSION`| Bolg'a, Qilich, Bolta | Knockback | Dushmanni shunchaki surib yubormaydi: dushmanning muvozanatini (Stagger Meter) $100\%$ ga to'ldirib, uni 3 soniyaga qurolsizlantiradi va tiz cho'ktiradi. |
-| **Urush Tovoni** | `RUNE_PLUNDER_SPOILS` | Qilich, Bolta | Looting | Yengilgan dushman ritsarlari va qaroqchilaridan qimmatbaho sovutlar, uzuklar va qurollarning butun, yaroqli holda tushish ehtimolini $+45\%$ ga oshiradi. |
-| **Shamol Yirtuvchi** | `RUNE_WINDPIERCER` | Kamon, Arbalet | Power + Infinity | O'qlar parvozida shamol qarshiligi va gravitatsiyani butunlay e'tiborsiz qoldirib, 140 metrgacha to'g'ri chiziqda nishonga uriladi. |
-| **Yoruvchi Ballistika** | `RUNE_BALLISTIC_PIERCE`| Arbalet, Og'ir Kamon | Piercing | O'q dushmanning yog'och qalqonini parchalab, uning ortidagi yana bitta dushmanga to'liq zarba beradi. |
+| **Olmos Damli Tig'** | `RUNE_RAZOR_EDGE` | Qilich, Nayza, Bolta | Zirh teshish: $+15\% / +30\% / +45\%$ | Dushmanning og'ir temir zirhini (Plate Armor) parchalab, suyak va mushaklariga to'g'ridan-to'g'ri kritik zarar yetkazadi. |
+| **Magma Alangi** | `RUNE_SMOLDERING_PYRE` | Qilich, Nayza | Olov: 4 soniya / 7 soniya / 10 soniya | Dushmanga kuchli yonish statusi beradi; shamol esganda olov dushman safidagi qo'shnilarga va yog'och istehkomlarga ham tarqaladi. |
+| **Titratuvchi Zarb** | `RUNE_STAGGER_CONCUSSION`| Bolg'a, Qilich, Bolta | Muvozanat buzilishi: $+40\% / +70\% / +100\%$ | Dushmanni shunchaki surib yubormaydi: dushmanning muvozanatini (Stagger) buzib, uni 3 soniyaga qurolsizlantiradi va tiz cho'ktiradi. |
+| **Urush Tovoni** | `RUNE_PLUNDER_SPOILS` | Qilich, Bolta | Sovut tushishi: $+20\% / +35\% / +50\%$ | Yengilgan dushman ritsarlaridan qimmatbaho sovutlar, oltin tangalar va qurollarning butun, yaroqli holda tushish ehtimolini oshiradi. |
+| **Shamol Yirtuvchi** | `RUNE_WINDPIERCER` | Kamon, Arbalet | Masofa: 70m / 115m / 160m | O'qlar parvozida shamol qarshiligi va gravitatsiya og'ishini butunlay e'tiborsiz qoldirib, to'g'ri chiziqda nishonga uriladi. |
+| **Yoruvchi Ballistika** | `RUNE_BALLISTIC_PIERCE`| Arbalet, Og'ir Kamon | Qalqon teshish: $35\% / 65\% / 100\%$ | O'q dushmanning yog'och qalqonini parchalab, uning ortidagi yana 1 ta (III darajada 2 ta) dushmanga to'liq zarba beradi. |
+
+#### 12.4.4. Sovutlar va Qalqonlarning Darajali Sehirlari (Armor & Shield Enchantments I–III)
+
+| Sehr Nomi | Runa ID | Qo'llanadigan Sovut | I / II / III Darajadagi Aniq Ko'rsatkichlari | Feodal Simulyatsiya Mexanikasi |
+|---|---|---|---|---|
+| **Po'lat Qobig'i** | `RUNE_IMPENETRABLE_WARD`| Barcha Sovutlar | Umumiy Zirh: $+12\% / +25\% / +40\%$ | Barcha kesuvchi, sanchuvchi va maydalovchi jismoniy zararlardan olinadigan zararni sindiradi. |
+| **Ajdaho Qalqoni** | `RUNE_DRAGON_WARD` | Ko'krak Sovuti, Qalqon | Portlash/Olov himoyasi: $-25\% / -50\% / -75\%$ | Qamal katapultalari toshlari, yonuvchi neft va olovli o'qlardan olinadigan zararni keskin kamaytiradi. |
+| **Qush Pati Qadami**| `RUNE_FEATHER_STRIDE` | Botinka (Boots) | Yiqilish zarari: $-35\% / -70\% / -95\%$ | Qal'a devorlari yoki tog' qoyalaridan sakraganda yiqilish zarari va oyoq sinishi (fracture) xavfini $0\%$ ga tushiradi. |
+| **G'avvos Nafasi** | `RUNE_ABYSSAL_LUNG` | Dubulg'a (Helmet) | Suv osti nafasi: $+100\% / +250\% / +500\%$ | Daryolar va chuqur ko'llarda suv ostida suzganda nafas yetishmovchiligini to'xtatadi; suv tubida erkin jang qilish imkonini beradi. |
+| **Qasos Tikanlari** | `RUNE_BARBED_THORNS` | Ko'krak Sovuti, Qalqon | Qaytuvchi zarar: $20\% / 35\% / 55\%$ | Dushman yaqindan zarba berganda, uning yetkazgan zararasining yarmini maydalovchi zarba sifatida dushmanning o'ziga qaytaradi. |
+| **Muz Yurar Qadam** | `RUNE_FROST_TREAD` | Botinka (Boots) | Muzda sirpanmaslik: $100\%$ kafolat | Qahraton qishda muz ustida toyib ketishni yo'qotadi; qalin qor bo'ronlarida harakat tezligini $100\%$ saqlaydi. |
+
+#### 12.4.5. Qadimiy va Taqiqlangan Afsonaviy Sehrlar (Ancient & Forbidden Legendary Runes)
+Ushbu sehrlar darajali emas — ular qit'ada sanoqli bo'lib, faqat dunyoning 5 ta afsonaviy bosslari va eng chuqur daxmalaridan olinadigan, o'yin qoidalarini o'zgartiruvchi noyob sehrlardir:
+
+| Afsonaviy Runa Nomi | Runa ID | Qayerdan Topiladi | O'rnatiladigan Buyum | Noyob Feodal Qobiliyati |
+|---|---|---|---|---|
+| **Arvoh Zirhi** | `RUNE_SPECTRAL_PHANTOM` | Zulmat Onasi (Deep Cave Boss) | Ko'krak Sovuti | Hukmdor HP $20\%$ dan pastga tushganda, 4 soniyaga shaffof arvohga aylanadi (barcha jismoniy zarbalar uning vujudidan zararsiz o'tib ketadi va dushmanlar qurshovidan erkin chiqadi). |
+| **Momaqaldiroq Qahri** | `RUNE_THUNDER_WRATH` | Qoya Kolossi (Mountain Boss) | Qilich, Nayza | Yomg'ir yoki momaqaldiroq paytida har 4-chi og'ir zarbada osmondan haqiqiy chaqmoq tushirib, 8m radiusdagi dushman to'dasini yoqib kul qiladi. |
+| **Qora Shaxta Ko'zi** | `RUNE_VOID_VISION` | Qadimiy Katakomba (-300m) | Dubulg'a | -100m dan chuqur shaxtalarda devorlar ortidagi qimmatbaho oltin va olmos tomirlarini (veins) 12m masofadan qorong'ulikda yarqirab ko'rsatib turadi. |
+| **Vassallar Qalqoni** | `RUNE_AEGIS_VANGUARD` | Valdemar Qasri Xazinasi | Shohona Qalqon | Qalqon bilan blok qo'yilganda, Hukmdorning orqasidagi 10 ta askarni ham dushman o'qlaridan himoyalovchi ko'rinmas gumbaz hosil qiladi. |
+| **Zulmat Eruvchisi** | `RUNE_SMELT_STRIKE` | Magmatik Bedrock Xarobalari | Cho'kich (Pickaxe) | Har qanday rudani qazib olgan zahoti to'g'ridan-to'g'ri eritilgan metall quymasiga aylantiradi (domna pechida eritish bosqichini chetlab o'tadi). |
+| **Jon Rishtasi** | `RUNE_SOUL_TETHER` | Muz Qanoti (Frost Wyvern Boss)| Kamon, Arbalet | Otilgan o'q dushmanga tekkanda uni 5 soniyaga muzlatib yerga zanjirband qiladi va o'sha dushmanning harakat tezligini o'yinchiga qo'shib beradi. |
 
 ---
 
