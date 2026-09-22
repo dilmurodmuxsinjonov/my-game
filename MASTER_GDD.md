@@ -1780,59 +1780,449 @@ $$Morale = \text{clamp}\left(50.0 + \sum_{i=1}^{N} Modifier_i, \; -100.0, \; +10
 
 ---
 
-# 53. JANG TIZIMI (COMBAT MECHANICS)
+# 53. JANG TIZIMI (COMBAT MECHANICS & MELEE TACTICS)
 
-Light Attack, Heavy Attack, Block, Parry (Qaytarish), Dodge (Chetlanish), Stamina, Armor, Stagger (Muvozanatni yo'qotish).
+Voxel Lord: Feudal Realm o'yinida yaqin jang tizimi (Melee Combat Engine) Godot 4 ning fizik hisoblash yadrosiga asoslangan bo'lib, Dark Souls, Mount & Blade hamda Kingdom Come: Deliverance o'yinlarining chuqur mexanikalarini o'zida mujassam etadi. Har bir hujum, mudofaa va manyovr voxel olamidagi fazoviy koordinatalar, real vaqt rejimidagi to'qnashuv hitboxlari (Collision Raycasting) hamda aniq charchoq (Stamina) sarfiga bog'langan.
+
+### 53.1. Asosiy Jangovar Harakatlar Sikli (5-Action Combat Loop)
+
+1. **Hujum (Attack):**
+   - **Yengil Tezkor Hujum (Light Attack):** Kam charchoq sarflaydi, dushmanning mudofaa teshiklariga tezkor zarba berish uchun mo'ljallangan.
+   - **Og'ir Kuchaytirilgan Zarba (Heavy Charged Attack):** Qurolni orqaga tortib quvvatlash orqali dushman mudofaasini yorib o'tish (Guard Break) va yuqori zarba (Stagger) yetkazish.
+   - **Hujumni Soxtalashtirish (Feint Cancel):** Shamollatish (Windup) fazasida zarbani to'xtatib, dushmanni erta blok qo'yishga majbur qilish va qarshi zarba berish.
+2. **Bloklash (Block & Guard):**
+   - Qalqon yoki qurol dastagi bilan dushman zarbasini to'sish. Qalqon bilan bloklash 110 darajali frontal konusni qamrab oladi va kesuvchi hamda sanchuvchi zarbalarni 100% to'sadi. Qurol bilan bloklash 70 darajali burchakda ishlaydi va zararning bir qismini o'tkazib yuboradi.
+3. **Mukammal Qaytarish (Perfect Parry):**
+   - Dushman zarbasi tegishiga 9-18 freym (0.15-0.30 soniya) qolganda amalga oshiriladigan faol mudofaa harakati. Muvaffaqiyatli parry dushmanning muvozanatini (Poise) butunlay buzadi, uni 1.2 soniyaga karaxt qiladi va o'yinchiga kafolatlangan kritik qarshi zarba (Riposte) berish imkonini yaratadi.
+4. **Chetlanish va Sakrash (Dodge & Evade):**
+   - Qadam tashlab chetlanish (Sidestep) va yerda dumalash (Combat Roll). Dumalash harakati 60 FPS chastotada 12 ta daxlsizlik freymiga (Invulnerability Frames / i-frames) ega. Sovut og'irligi oshgan sari dumalash tezligi va masofasi qisqaradi.
+5. **Muvozanatni Yo'qotish va Yiqitish (Stagger & Poise):**
+   - Har bir jangchida 0 dan 100 gacha bo'lgan Poise (Muvozanat zaxirasi) mavjud. Og'ir gurzi va bolta zarbalari muvozanatni tezda 0 ga tushiradi. Poise tugaganda personaj 1.5 soniyaga himoyasiz qoladi (Guard Broken) yoki yerga yiqiladi (Knockdown).
+
+### 53.2. Charchoq (Stamina) Sarfi Formulalari
+
+Jangdagi har bir jismoniy harakat qat'iy matematik qonuniyatlar asosida charchoq sarflaydi:
+
+$$\Delta Stamina_{attack} = BaseStaminaCost(Weapon) \times \left(1.0 + \frac{Weight_{weapon}}{10.0}\right) \times \left(1.0 - 0.25 \times \frac{Agility}{100.0}\right)$$
+
+$$\Delta Stamina_{block} = RawDamage \times (1.0 - ShieldBlockEfficiency) \times \left(1.0 - 0.30 \times \frac{Strength}{100.0}\right)$$
+
+$$\Delta Stamina_{dodge} = 22.0 \times \left(1.0 + 0.02 \times ArmorWeight_{kg}\right)$$
+
+Agar jangchining Stamina miqdori 0 ga tushib qolsa (Stamina Exhaustion):
+- Harakatlanish tezligi -50% ga sekinlashadi.
+- Blok va parry harakatlarini amalga oshirish imkonsiz bo'ladi.
+- Qabul qilingan har qanday kuchli zarba avtomatik ravishda to'liq yiqilishga (Knockdown) sabab bo'ladi.
+
+### 53.3. Hujum Freym Ma'lumotlari (Attack Frame Data at 60 FPS)
+
+| Qurol Turi | Shamollatish (Windup) | Faol Hitbox (Active) | Qaytarish (Recovery) | Feint Oynasi (Cancel) | Stamina Sarfi |
+|---|---|---|---|---|---|
+| Xanjir (Dagger) | 8 freym (0.13s) | 6 freym (0.10s) | 12 freym (0.20s) | 1-6 freym | 8 ball |
+| Qisqa Qilich (Shortsword) | 14 freym (0.23s) | 8 freym (0.13s) | 16 freym (0.26s) | 1-10 freym | 12 ball |
+| Ritsar Qilichi (Arming Sword) | 18 freym (0.30s) | 10 freym (0.16s) | 22 freym (0.36s) | 1-14 freym | 16 ball |
+| Uzun Qilich (Longsword) | 24 freym (0.40s) | 12 freym (0.20s) | 28 freym (0.46s) | 1-18 freym | 22 ball |
+| Ikki Qo'lli Qilich (Greatsword) | 36 freym (0.60s) | 16 freym (0.26s) | 42 freym (0.70s) | 1-26 freym | 36 ball |
+| Jangovar Bolta (Battleaxe) | 22 freym (0.36s) | 10 freym (0.16s) | 26 freym (0.43s) | 1-16 freym | 20 ball |
+| Ikki Qo'lli Bolta (Greataxe) | 38 freym (0.63s) | 14 freym (0.23s) | 46 freym (0.76s) | 1-28 freym | 40 ball |
+| Jangovar Gurzi (Mace) | 20 freym (0.33s) | 8 freym (0.13s) | 24 freym (0.40s) | 1-15 freym | 18 ball |
+| Jangovar Cho'kich (Warhammer) | 26 freym (0.43s) | 10 freym (0.16s) | 32 freym (0.53s) | 1-20 freym | 25 ball |
+| Piyoda Nayzasi (Spear) | 16 freym (0.26s) | 12 freym (0.20s) | 24 freym (0.40s) | 1-12 freym | 15 ball |
+| Gevis / Alabarda (Halberd) | 32 freym (0.53s) | 14 freym (0.23s) | 38 freym (0.63s) | 1-24 freym | 32 ball |
+| Ritsar Oyboltasi (Poleaxe) | 30 freym (0.50s) | 12 freym (0.20s) | 36 freym (0.60s) | 1-22 freym | 30 ball |
+
+### 53.4. Qurol Uzunligi va Fazoviy Voxel Qamrovi (Weapon Reach & Hitboxes)
+
+Voxel Lord olamida har bir qurol fazoda real 3D qamrov radiusiga ega (1 Voxel = 1.0 Metr):
+
+| Qurol Nomi | Reach (Voxel Metr) | Hitbox Radiusi ($R_{sweep}$) | Optimal Masofa (Sweetspot) | Hujum Traektoriyasi Burchagi |
+|---|---|---|---|---|
+| Xanjir (Dagger) | 0.85 m | 0.15 m | 0.50 m - 0.80 m | 45 daraja qiya sanchish |
+| Qisqa Qilich (Shortsword) | 1.20 m | 0.25 m | 0.80 m - 1.15 m | 90 daraja gorizontal kesish |
+| Ritsar Qilichi (Arming Sword) | 1.45 m | 0.30 m | 0.90 m - 1.40 m | 120 daraja yarim aylana kesish |
+| Uzun Qilich (Longsword) | 1.75 m | 0.35 m | 1.10 m - 1.70 m | 140 daraja keng aylanma |
+| Ikki Qo'lli Qilich (Greatsword) | 2.15 m | 0.45 m | 1.40 m - 2.10 m | 180 daraja yalpi tozalovchi zarba |
+| Jangovar Bolta (Battleaxe) | 1.30 m | 0.30 m | 0.90 m - 1.25 m | 100 daraja vertikal chopish |
+| Jangovar Gurzi (Mace) | 1.15 m | 0.25 m | 0.70 m - 1.10 m | 80 daraja diagonal ezish |
+| Jangovar Cho'kich (Warhammer) | 1.25 m | 0.25 m | 0.80 m - 1.20 m | 90 daraja tepadan zarba |
+| Piyoda Nayzasi (Spear) | 2.85 m | 0.18 m | 2.00 m - 2.80 m | 25 daraja to'g'ri chiziqli sanchish |
+| Gevis / Alabarda (Halberd) | 2.60 m | 0.40 m | 1.80 m - 2.55 m | 130 daraja diagonal qirqish |
+| Ritsar Oyboltasi (Poleaxe) | 2.25 m | 0.35 m | 1.50 m - 2.20 m | 110 daraja gibrid zarba |
+
+### 53.5. Jangovar Kombinatsiyalar (Combo Chains)
+
+- **Qilich va Qalqon Taktikasi (Sword & Board):** Shield Bash (Dushmanni 0.8 soniya stagger qiladi) -> Quick Thrust (Qalqon ortidan himoyalangan sanchish) -> Low Slash (Oyoqqa kesuvchi zarba).
+- **Uzun Qilich Zanjiri (Longsword Mastery):** Left Diagonal Slash -> Right Diagonal Slash -> Overhead Heavy Chop (Zanjirning yakuniy zarbasi blokni yorib o'tish imkoniyatini +65% ga oshiradi).
+- **Nayzadorlar Saflanishi (Spear Thrust & Step):** Thrust -> Backstep (Orqaga qadam) -> Lunge Thrust (Uzaytirilgan zarba, otliq dushmanlarga qarshi 3.0x zarar).
+- **Gurzi va Cho'kich Zanjiri (Bone-Cracker Combo):** Pommel Strike (Miya chayqalishi travmasi) -> Downward Skull-Crusher (Sovutni hisobga olmagan holda ichki organlarni maydalash).
 
 ---
 
 # 54. ZARAR HISOBLASH FORMULASI (DAMAGE)
 
-`FinalDamage = (BaseDamage × SkillModifier × WeaponQuality × HitModifier) - ArmorProtection`.
+O'yinda barcha yaqin va uzoq masofali hujumlar uchun quyidagi universal fizika-mexanik hisoblash tenglamasi qo'llaniladi:
+
+$$RawDamage = BaseDamage(Weapon) \times \left(1.0 + \frac{SkillLevel}{100.0} \times 0.75\right) \times QualityMult \times AttackTypeMult \times HitZoneMult$$
+
+### 54.1. Formula O'zgaruvchilari va Chegaralari
+
+1. **$BaseDamage(Weapon)$:** Qurolning metall tarkibi va geometriyasi tomonidan belgilanadigan fundamental boshlang'ich zarar miqdori.
+2. **$SkillLevel$ (0-100):** Jangchining ushbu qurol toifasidagi shaxsiy mahorati. 100-darajada qurol zarari +75% ga oshadi.
+3. **$QualityMult$:** Qurolchilik ustaxonasida yasalgan buyumning temirchilik sifati:
+   - Xomaki / Sinish arafasidagi (Poor): 0.80x
+   - Oddiy standart (Common): 1.00x
+   - Sifatli po'lat (Fine): 1.25x
+   - Usta ishi (Masterwork): 1.60x
+   - Shohona saroy quroli (Royal): 2.00x
+   - Afsonaviy qadimiy po'lat (Legendary): 2.50x
+4. **$AttackTypeMult$:**
+   - Yengil zarba (Light Attack): 0.75x
+   - Standart hujum (Normal Strike): 1.00x
+   - Kuchaytirilgan og'ir hujum (Heavy Charged): 1.75x
+   - Ot ustidagi tezkor hujum (Mounted Charge): $1.00 + 0.18 \times Velocity_{horse}$ (Maksimal 3.20x ga yetadi).
+5. **$HitZoneMult$:** Tana a'zosiga yetkazilgan zarba koeffitsienti:
+   - Bosh va Bo'yin (Head & Neck): 2.20x (Kritik jarohat, miya chayqalishi xavfi).
+   - Yuqori Gavda va Ko'krak (Chest & Upper Torso): 1.00x (Standart tayanch hudud).
+   - Yelka va Qo'llar (Shoulders & Arms): 0.70x (Qurolni qo'ldan tushirish ehtimoli 15%).
+   - Qorin va Chov sohasi (Abdomen & Groin): 0.85x (Kuchli og'riq va qon ketish).
+   - Boldir va Oyoq panjalari (Legs & Feet): 0.65x (Harakat tezligini -50% ga tushiradi).
+
+### 54.2. 12 ta Qurol Toifasi Bo'yicha Bosh Balans Jadvali
+
+| Qurol Turi | Qurol Nomi | Bazaviy Zarar | Asosiy Zarar Turi | Ikkilamchi Zarar Turi | Hujum Tezligi | Guard Break Koeffitsienti | Kritik Multiplikator | Talab Qilingan Kuch/Chaqqonlik |
+|---|---|---|---|---|---|---|---|---|
+| Xanjir | Po'lat Xanjir | 14 HP | Sanchuvchi (Pierce) | Kesuvchi (Slash) | 2.2 zarba/s | 0.25x | 2.50x | Kuch 5 / Chaqqonlik 14 |
+| Qisqa Qilich | Qadimiy Gladius | 20 HP | Kesuvchi (Slash) | Sanchuvchi (Pierce) | 1.6 zarba/s | 0.50x | 1.80x | Kuch 8 / Chaqqonlik 10 |
+| Ritsar Qilichi | Bir Qo'lli Arming Sword | 28 HP | Kesuvchi (Slash) | Sanchuvchi (Pierce) | 1.3 zarba/s | 0.75x | 1.75x | Kuch 10 / Chaqqonlik 8 |
+| Uzun Qilich | Feodal Bastard Sword | 38 HP | Kesuvchi (Slash) | Sanchuvchi (Pierce) | 1.0 zarba/s | 1.10x | 1.85x | Kuch 14 / Chaqqonlik 10 |
+| Buyuk Qilich | Ikki Qo'lli Zweihander | 55 HP | Kesuvchi (Slash) | Maydalovchi (Blunt) | 0.7 zarba/s | 1.80x | 1.60x | Kuch 18 / Chaqqonlik 8 |
+| Jangovar Bolta | Skandinav Boltasi | 34 HP | Kesuvchi (Slash) | Maydalovchi (Blunt) | 1.1 zarba/s | 1.25x | 1.50x | Kuch 12 / Chaqqonlik 6 |
+| Ikki Qo'lli Bolta | Og'ir Qamal Boltasi | 58 HP | Kesuvchi (Slash) | Maydalovchi (Blunt) | 0.65 zarba/s | 2.10x | 1.55x | Kuch 20 / Chaqqonlik 6 |
+| Jangovar Gurzi | Qirrali Cho'qmor (Flanged Mace) | 30 HP | Maydalovchi (Blunt) | Sanchuvchi (Pierce) | 1.2 zarba/s | 1.40x | 1.35x | Kuch 12 / Chaqqonlik 6 |
+| Jangovar Cho'kich | Ritsar Klevetsi (Warhammer) | 32 HP | Maydalovchi (Blunt) | Sanchuvchi (Pierce) | 1.0 zarba/s | 1.60x | 1.65x | Kuch 14 / Chaqqonlik 8 |
+| Piyoda Nayzasi | Po'lat Uchli Nayza | 26 HP | Sanchuvchi (Pierce) | Maydalovchi (Blunt) | 1.4 zarba/s | 0.60x | 2.00x | Kuch 8 / Chaqqonlik 12 |
+| Gevis / Alabarda | Feodal Halberd | 46 HP | Kesuvchi (Slash) | Sanchuvchi (Pierce) | 0.8 zarba/s | 1.65x | 1.75x | Kuch 16 / Chaqqonlik 8 |
+| Ritsar Oyboltasi | Og'ir Poleaxe | 48 HP | Maydalovchi (Blunt) | Kesuvchi (Slash) | 0.75 zarba/s | 1.85x | 1.70x | Kuch 17 / Chaqqonlik 7 |
 
 ---
 
 # 55. SOVUTLAR VA ZARAR TURLARI
 
-Sovutlar: Matoli kiyim, Qalin charm, Zanjir sovut, To'liq temir zirh (Plate Armor).
-Zarar turlari: Kesuvchi (Slash), Sanchuvchi (Pierce), Maydalovchi (Blunt).
+Voxel Lord feodal olamida har bir sovut ikki bosqichli haqiqiy mudofaa tenglamasi (Two-Stage Defense Equation) asosida zararni qaytaradi:
+
+$$Damage_{absorbed} = \max\left(0.0, \; (RawDamage - D_{flat}) \times (1.0 - A_{\%})\right)$$
+
+### 55.1. Ikki Bosqichli Mudofaa Mexanikasi
+
+1. **Birinchi Bosqich — Statik Qaytish ($D_{flat}$ / Flat Deflection):**
+   - Sovutning tashqi po'lat yoki charm qobig'i zarba kinetik energiyasini qaytarish qobiliyati.
+   - Agar $RawDamage \le D_{flat}$ bo'lsa, tig' sovutdan sirg'alib uchqun sochib ketadi (Glancing Blow) va jangchiga faqat 1.0 ballik yuzaki tirnalish shikasti yetadi.
+2. **Ikkinchi Bosqich — Foizli Yutish ($A_{\%}$ / Percentage Absorption):**
+   - Sovut tagidagi paxtali gambezon, kigiz va ichki to'qimalarning kinetik energiyani o'ziga yutib yoyib yuborish koeffitsienti.
+   - Sovut orqali o'tgan qoldiq zarar $1.0 - A_{\%}$ nisbatida kamaytiriladi.
+
+### 55.2. Sovut Toifalari Bo'yicha Asosiy Matritsa (Master Armor Mitigation Matrix)
+
+Quyidagi jadval 6 ta sovut toifasining kesuvchi (Slash), sanchuvchi (Pierce) va maydalovchi (Blunt) hujumlarga nisbatan statik qaytarish (Flat Deflection) va foizli yutish (Percentage Absorption) parametrlarini belgilaydi:
+
+| Sovut Toifasi | Og'irlik (kg) | Slash Deflection / Absorption | Pierce Deflection / Absorption | Blunt Deflection / Absorption | Chidamlilik (Durability) | Harakatlanish Jarimasi |
+|---|---|---|---|---|---|---|
+| Zig'ir Tolali Kiyim (Linen Clothes) | 1.5 kg | 0 Flat / 5% Absorption | 0 Flat / 0% Absorption | 0 Flat / 0% Absorption | 60 HP | 0% |
+| Paxtali Gambezon (Padded Gambeson) | 4.0 kg | 3 Flat / 30% Absorption | 1 Flat / 15% Absorption | 4 Flat / 35% Absorption | 180 HP | -2% |
+| Qattiq Charm Sovut (Hardened Leather) | 7.5 kg | 6 Flat / 45% Absorption | 4 Flat / 30% Absorption | 3 Flat / 25% Absorption | 250 HP | -5% |
+| Zanjir Sovut (Chainmail Hauberk) | 14.0 kg | 14 Flat / 80% Absorption | 6 Flat / 45% Absorption | 3 Flat / 20% Absorption | 500 HP | -10% |
+| Plastinkali Sovut (Scale / Brigandine) | 18.0 kg | 16 Flat / 75% Absorption | 10 Flat / 65% Absorption | 6 Flat / 40% Absorption | 650 HP | -14% |
+| To'liq Po'lat Zirh (Full Steel Plate) | 26.0 kg | 26 Flat / 92% Absorption | 18 Flat / 78% Absorption | 8 Flat / 50% Absorption | 1,200 HP | -20% |
+
+### 55.3. Zarar Turlari va Sovut O'rtasidagi O'zaro Ta'sir Taktikasi
+
+1. **Kesuvchi Zarar (Slash - Qilichlar, Boltalar):**
+   - Paxtali kiyim va yupqa charmga qarshi dahshatli halokatli kuchga ega (+35% qon ketish effekti).
+   - Temir zanjir sovut va to'liq po'lat zirhga qarshi deyarli samarasiz: $D_{flat}$ ko'rsatkichi tufayli po'lat plastinkadan sirg'alib ketadi va o'tkir tig' to'g'ridan-to'g'ri to'xtatiladi.
+2. **Sanchuvchi Zarar (Pierce - Nayzalar, Bodkin O'qlari, Rapiyerlar):**
+   - Tor maydonga yuqori bosim beradi. Zanjir sovutning halqalarini uzib kirib ketadi (Chainmail penetration).
+   - To'liq po'lat zirhning bo'g'imlariga (qo'ltiq osti, tomoq, son chovlari) tushganda himoyani chetlab o'tish imkoniyatiga ega.
+3. **Maydalovchi Zarar (Blunt - Gurzilar, Jangovar Cho'kichlar):**
+   - Po'lat plastinkani teshish talab etilmaydi. Kinetik zarba to'lqini zirh orqali to'g'ridan-to'g'ri ichki skeletga o'tadi.
+   - Kam $D_{flat}$ tufayli og'ir zirh kiygan ritsarlarni karaxt qilish (Stagger), qovurg'a va qo'l suyaklarini sindirish hamda ichki qon ketish keltirib chiqarishda yagona eng samarali quroldir.
+
+### 55.4. Sovutning Yeyilishi va Ta'mirlanishi
+
+Har bir qabul qilingan zarbada sovut chidamliligi pasayadi:
+
+$$\Delta Durability = 0.05 \times Damage_{absorbed}$$
+
+Agar sovut chidamliligi 0 ga tushsa, uning himoya koeffitsientlari 75% ga zaiflashadi va po'lat parchalanib tushadi. Sovutni temirchilik ustaxonasida (Blacksmith Anvil) temir quyma va charm tasmalar evaziga qayta tiklash talab etiladi.
 
 ---
 
 # 56. MASOFADAN JANG (RANGED COMBAT)
 
-Oddiy va kompozit kamonlar, og'ir arbaletlar (Crossbows). Fizik gravitatsiya va shamol ta'siri.
+Voxel Lord feodal simulyatorida barcha o'q-yoy va arbalet snaryadlari real vaqt rejimida 3D fazoda differentsial tenglamalar asosida harakatlanadi. O'qlar to'g'ri chiziq bo'ylab emas, balki tortishish kuchi, havo qarshiligi va shamol siljishi ta'sirida trayektoriya chizadi.
+
+### 56.1. 3D Ballistik Harakat Tenglamalari
+
+Godot 4 fizika siklida ($\Delta t = 1/60 \text{ soniya}$) har bir snaryadning tezlanishi va koordinatalari quyidagi tenglamalar bo'yicha hisoblanadi:
+
+$$\vec{a}_t = \vec{g} - \frac{1}{2m} \rho C_d A |\vec{v}_{rel}| \vec{v}_{rel}$$
+
+$$\vec{v}_{rel} = \vec{v}_{projectile} - \vec{v}_{wind}$$
+
+$$\vec{v}_{t+\Delta t} = \vec{v}_t + \vec{a}_t \Delta t$$
+
+$$\vec{x}_{t+\Delta t} = \vec{x}_t + \vec{v}_t \Delta t$$
+
+- $\vec{g} = (0, -9.81, 0) \text{ m/s}^2$ — erkin tushish tezlanishi.
+- $\rho = 1.225 \text{ kg/m}^3$ — dengiz sathidagi havoning zichligi.
+- $C_d = 0.045$ — patli o'qning aerodinamik qarshilik koeffitsienti.
+- $A = 0.00012 \text{ m}^2$ — o'qning ko'ndalang kesim yuzasi.
+- $m$ — o'qning massasi (kilogrammda).
+- $\vec{v}_{wind}$ — dinamik ob-havo tizimi tomonidan taqdim etiladigan shamol tezligi vektori.
+
+### 56.2. Yoy Ipini Tortish va Boshlang'ich Tezlik Formulasi
+
+Kamonchining o'q uzish kuchi uning ipni qancha vaqt tortib turganiga (Hold Duration) bog'liq:
+
+$$V_0 = V_{max} \times \min\left(1.0, \; \frac{HoldDuration}{FullDrawTime}\right)^{1.4}$$
+
+Agar o'yinchi ipni oxirigacha tortmasdan qo'yib yuborsa ($HoldDuration < FullDrawTime$), o'q 1.4 darajali eksponent bo'yicha kinetik kuchini yo'qotadi, yaqin masofada yerga qulaydi va aniqlik tebranishi (Accuracy Spread) 4.0x ga kengayadi. Ipni 4.0 soniyadan ortiq ushlab turish esa kamonchining qo'llarini titratadi va charchoqni har soniyada -15 Stamina ga yo'qotadi.
+
+### 56.3. Masofaviy Qurollar Bosh Balans Jadvali
+
+| Qurol Nomi | Tortish/O'qlash Vaqti | Maksimal Tezlik $V_{max}$ | O'q Massasi | Samarali Masofa | Maksimal Masofa | Kinetik Energiya | Zirhni Teshish Koeffitsienti |
+|---|---|---|---|---|---|---|---|
+| Qisqa Ov Kamoni (Shortbow) | 0.8 s | 42 m/s | 0.025 kg | 40 m | 95 m | 22.0 J | 0.85x |
+| Qayrilma Kompozit Kamon (Recurve) | 1.3 s | 60 m/s | 0.032 kg | 75 m | 180 m | 57.6 J | 1.15x |
+| Katta Ingliz Kamoni (War Longbow) | 1.8 s | 72 m/s | 0.045 kg | 120 m | 260 m | 116.6 J | 1.50x |
+| Yengil Ov Arbaleti (Light Crossbow) | 2.5 s | 75 m/s | 0.035 kg | 60 m | 140 m | 98.4 J | 1.30x |
+| Og'ir Vorotli Arbalet (Arbalest) | 5.0 s | 98 m/s | 0.065 kg | 140 m | 320 m | 312.1 J | 2.35x |
+
+### 56.4. O'q-Dori Turlari va Taktik Qo'llanilishi
+
+1. **Bodkin O'qlari (Piercing Bodkin Arrows):**
+   - Ignasimon qotirilgan po'lat uchi tufayli zanjir sovut halqalarini parchalaydi. Zirhni teshish bonusi +50%.
+2. **Keng Tig'li Ov O'qlari (Broadhead Arrows):**
+   - Zirhsiz nishonlar va hayvonlarga qarshi kesuvchi jarohat yetkazadi. Kuchli qon ketish (Severe Bleeding) chaqiradi, ammo temir sovutlarga qarshi $D_{flat}$ ga urilib sinadi.
+3. **Olovli Qamal O'qlari (Fire Incendiary Arrows):**
+   - Qatron shimdirilgan uchli o'qlar. Parvoz tezligi -15% ga sekinroq, ammo tushgan yog'och yoki somon voxel blokini 85% ehtimollik bilan yondiradi.
 
 ---
 
 # 57. HARBIY FAZILATLAR (WARRIOR TRAITS)
 
-Jasorat (Bravery), Kuch (Strength), Chaqqonlik (Agility), Ko'rish o'tkirligi (Vision), Intizom (Discipline).
+Har bir fuqaro tug'ma yoki jang maydonida qozongan qonli tajribasi evaziga noyob jangovar xislatlarga (Warrior Combat Traits) ega bo'lishi mumkin. Ushbu xususiyatlar shaxsiy jang uslubini, safdagi o'rnini va favqulodda vaziyatlardagi xatti-harakatlarini belgilaydi.
+
+### 57.1. Jangovar Fazilatlar Katalogi
+
+1. **Berserker (Qonxo'r Qasoskor):**
+   - **Tavsif:** Og'riqni his qilmaydigan, qon hididan mast bo'luvchi quturgan jangchi.
+   - **Ijobiy Bonus:** Sog'liq 30% dan pastga tushganda yaqin jang zarari +40% ga, harakat tezligi +20% ga oshadi; zarba karaxtligi (Stagger Duration) -50% ga qisqaradi.
+   - **Cheklov / Salbiy Ta'sir:** Qalqon ishlata olmaydi, bloklash harakatlari bloklanadi, mudofaa buyruqlariga bo'ysunmaydi.
+2. **Qalqon Saflari Faxriysi (Shield Wall Veteran):**
+   - **Tavsif:** Saf intizomini mukammal o'zlashtirgan, qalqonini tanasining bir bo'lagiga aylantirgan askar.
+   - **Ijobiy Bonus:** Qalqon bilan bloklash samaradorligi +35%, blok paytida charchoq sarfi -50%, yonidagi safdoshlariga +15 Morale ruhiy quvvat beradi.
+   - **Cheklov / Salbiy Ta'sir:** Yakka tartibda jang qilganda harakatlanish tezligi -15%.
+3. **Merganko'z (Deadshot):**
+   - **Tavsif:** Masofani, shamol yo'nalishini va nishon harakatini benuqson his etuvchi kamonchi.
+   - **Ijobiy Bonus:** Kamon ipini to'liq tortganda kamerani kattalashtirish (Zoom Focus) +50%, qo'llar qaltirashi (Bow Sway) -70%, boshga tekkanda kritik ko'paytiruvchi +40%.
+   - **Cheklov / Salbiy Ta'sir:** Yaqin masofali pichoqbozlikda hujum kuchi -25%.
+4. **Temir Iroda (Iron Will):**
+   - **Tavsif:** O'limdan qo'rqmaydigan, hatto butun qo'shin qochganda ham o'z postini tark etmaydigan matonat timsoli.
+   - **Ijobiy Bonus:** Komandir vafot etgandagi shok to'lqiniga to'liq immunitet (0 Morale yo'qotish), og'riq chegarasi +20%, qochish (Flee) holatiga hech qachon kirmaydi.
+   - **Cheklov / Salbiy Ta'sir:** Taktik chekinish buyrug'ini qabul qilganda orqaga qaytishga ikkilanadi.
+5. **Bahaybat Qotili (Giant Slayer):**
+   - **Tavsif:** Trollar, vishallar, qamal mashinalari va bahaybat maxluqlarga qarshi kurashish bo'yicha mutaxassis.
+   - **Ijobiy Bonus:** Katta va gigant nishonlarga qarshi yetkaziladigan barcha zararlar +60%, ularning zarbalaridan chetlanish (Dodge) daxlsizlik freymlari +25%.
+   - **Cheklov / Salbiy Ta'sir:** Odam toifasidagi mayda tezkor dushmanlarga qarshi aniqlik ko'rsatkichi -10%.
+6. **Nayzadorlar Saflanish Ustasi (Phalanx Drillmaster):**
+   - **Tavsif:** Pike va uzun nayzalarni to'g'ri burchak ostida ushlab, dushman otliqlarini kutib olish bo'yicha harbiy murabbiy.
+   - **Ijobiy Bonus:** Nayzaning sanchish tezligi +30%, dushman otliqlarining hujumini kutib olganda dushman tezligiga mutanosib ravishda 3.0x qaytarma zarba beradi.
+   - **Cheklov / Salbiy Ta'sir:** Tor xonalar va g'orlar ichida jang qilish qobiliyati -40%.
+7. **Chaqqon Shamshirboz (Swiftblade):**
+   - **Tavsif:** O'z tanasining yengilligi va chaqqonligiga tayanuvchi qilichboz.
+   - **Ijobiy Bonus:** Yengil yoki o'rta sovutda harakat va hujum tezligi +20%, dumalash va chetlanish charchog'i -30%.
+   - **Cheklov / Salbiy Ta'sir:** Og'ir plastinkali sovut kiyganda barcha bonuslar yo'qoladi va charchoq 2.0x tez tugaydi.
+8. **Qal'a Devori Posboni (Stalwart Defender):**
+   - **Tavsif:** Qal'a devorlari, minoralar va tor darvozalarni himoya qilishga ixtisoslashgan posbon.
+   - **Ijobiy Bonus:** Balandlikda turib jang qilganda statik mudofaa (Deflection) +25%, tosh parapet orqasida turganda o'qlardan himoyalanish +40%.
+   - **Cheklov / Salbiy Ta'sir:** Ochiq tekislikda yugurish tezligi -10%.
 
 ---
 
 # 58. ASKARLARNI O‘QITISH VA RUTBALAR
 
-`Ko'ngilli Yangi Askar → Xalq Lashkari (Militia) → Professional Piyoda → Tajribali Veteran → Elita Ritsar`.
+Feodal jamiyatda tinch fuqarolarni professional qo'shinga aylantirish mustahkam harbiy infratuzilma, doimiy o'quv mashg'ulotlari hamda yuqori sifatli moddiy ta'minotni talab qiladi.
+
+### 58.1. Harbiy Rutbalar va Bosqichlar (5 Military Tiers)
+
+1. **Xalq Lashkari (Militia / Peasant Levies - Tier 1):**
+   - Oddiy dehqonlar va hunarmandlardan yig'ilgan majburiy qo'shin. Yog'och nayza, o'roq, chopqi va oddiy kamon bilan qurollangan. Sovutlari — oddiy matoli kiyim yoki yupqa charm. Jangovar ruhi juda beqaror.
+2. **Piyoda Askari (Man-at-Arms / Town Guard - Tier 2):**
+   - Kazarmada professional harbiy xizmatni o'tayotgan shahar soqchilari. Temir qilich, qisqa nayza, doiraviy yog'och qalqon va paxtali gambezon yoki zanjir jilet bilan ta'minlangan.
+3. **Tajribali Harbiy (Veteran Soldier - Tier 3):**
+   - Ko'plab janglarda toblangan elita askarlar. Uzun ikki qo'lli qilichlar, og'ir alabardalar, krossbovlar va mustahkam temir halqali zanjir sovut (Chainmail Hauberk) kiyishadi. Saf intizomi va taktik buyruqlarga so'zsiz bo'ysunadi.
+4. **Elita Ritsar (Feudal Knight / Heavy Cavalry - Tier 4):**
+   - Shohona zodagonlar toifasidan chiqqan og'ir zirhli ritsarlar. To'liq po'lat zirh (Full Steel Plate), jangovar destrie tulporlari, uzun nayza (Lance) va Damashq po'latidan yasalgan qilichlar bilan qurollangan. Quruqlikdagi yorib o'tuvchi asosiy zarba kuchi.
+5. **Shoh Chempioni (Paladin / Champion of the Realm - Tier 5):**
+   - Butun qirollik bo'ylab sanoqli, afsonaviy qudratga ega yengilmas bahodirlar. Qadimiy ritsarlik qasamini ichgan, eng oliy sifatli saroy po'lati bilan qurollangan, jangga kirganda atrofdagi barcha askarlarning ruhiyatini eng yuqori darajaga ko'taradi.
+
+### 58.2. Mashg'ulot Maydonlari va Tajriba To'plash (XP Rates)
+
+Kazarma hududida o'rnatilgan harbiy inshootlar orqali askarlar harakat qiladi:
+- **Somon Qopli Mashg'ulot Qo'g'irchog'i (Straw Training Dummy):** Boshlang'ich qurollanish mashg'ulotlari. Tajriba: +12 XP/soat.
+- **Harbiy O'q Otish Tiri (Archery Targets):** Kamon va arbalet nishonlari. Tajriba: +18 XP/soat.
+- **Jangovar Qilichbozlik Maydoni (Sparring Arena with Drillmaster):** Murabbiy bilan haqiqiy jang amaliyoti. Tajriba: +35 XP/soat.
+- **Otliqlar Maydoni (Jousting Yard):** Ritsarlarning ot ustida manyovr qilish maydoni. Tajriba: +45 XP/soat.
+
+### 58.3. Rutba Ko'tarilish Bosqichlari va Ta'minot Xarajatlari
+
+| Harbiy Tieri | Rutba Nomi | Talab Qilingan XP | Kunlik Maosh (Kumush) | Ta'minot Rasioni | Haftalik Qurol Ta'miri | Bazaviy Jangovar Ruh |
+|---|---|---|---|---|---|---|
+| Tier 1 | Xalq Lashkari | 0 XP | 0.5 Kumush | Oddiy Non va Suv | 1.0 Kumush | 35 ball |
+| Tier 2 | Piyoda Askari | 500 XP | 2.5 Kumush | Qovurilgan Go'sht va Non | 3.0 Kumush | 55 ball |
+| Tier 3 | Tajribali Harbiy | 1,800 XP | 6.0 Kumush | Go'sht, Pishloq va El Pivosi | 8.0 Kumush | 70 ball |
+| Tier 4 | Elita Ritsar | 5,000 XP | 18.0 Kumush | Dabdabali Go'shtli Taom va Sharob | 25.0 Kumush | 85 ball |
+| Tier 5 | Shoh Chempioni | 12,000 XP | 45.0 Kumush | Shohona Ziyofat Ratsioni | 60.0 Kumush | 98 ball |
 
 ---
 
 # 59. HARBIY SAFLAR VA BUYRUQLAR (FORMATIONS)
 
-Buyruqlar: Ortidan ergashish (Follow), O'rnida turish (Hold), Himoyalanish (Defend), Hujum (Attack), Chekinish (Retreat).
-Saflar: Saf (Line), Qalqon Devori (Shield Wall), Kolonna (Column), Otliqlar Hujumi (Cavalry Charge).
+Jang maydonidagi g'alaba faqatgina alohida jangchilarning mahoratiga emas, balki guruh bo'lib saflanish va komandirning taktik signallariga bog'liq.
+
+### 59.1. 5 ta Taktik Saf (Formations)
+
+1. **Chiziqli Saf (Line Formation):**
+   - **Tuzilishi:** Askarlar 2 yoki 3 qator bo'lib yonma-yon tiziladi.
+   - **Xususiyati:** Eng keng hujum jabhasi yaratadi, kamonchilar va arbaletchilar uchun bir vaqtda yalpi o't ochish imkoniyatini beradi.
+   - **Parametrlari:** Harakat tezligi 1.00x, frontal zarba quvvati +15%, qanotlardan oson aylanib o'tilishi mumkin.
+2. **Ponasimon Saf (Wedge Formation / Boar's Snout):**
+   - **Tuzilishi:** Uchburchak shaklidagi pona, markazda eng kuchli zirhli ritsarlar turadi.
+   - **Xususiyati:** Dushmanning zich saflarini ikkiga yorib o'tish va markaziy komandirni o'rab olish uchun otliqlar tomonidan qo'llaniladi.
+   - **Parametrlari:** Yugurish tezligi +20%, frontal yorib o'tish zarari +45%, ammo orqa qanotlar himoyasiz qoladi.
+3. **Qalqon Devori (Shield Wall):**
+   - **Tuzilishi:** Old qatordagi askarlar katta qalqonlarini bir-birining ustiga mindirib yaxlit devor hosil qiladi, orqa qatordagilar nayzalarini oldinga cho'zadi.
+   - **Xususiyati:** Frontal o'q-yoylardan 80% himoya, yaqin jang zarbalarini qaytarish +50%.
+   - **Parametrlari:** Harakat tezligi -60% ga tushadi, faqat oldinga qadam tashlash mumkin.
+4. **Kare / Qal'a Saflari (Square Formation):**
+   - **Tuzilishi:** To'rtburchak shaklidagi yopiq saf, nayzalar barcha 360 daraja yo'nalishlarga qaratiladi.
+   - **Xususiyati:** Qanotdan yoki orqadan aylanib o'tish xavfini butunlay yo'qotadi. Dushman otliqlarining hujumlarini yo'qqa chiqarish uchun eng optimal mudofaa usuli.
+   - **Parametrlari:** Harakatlanish mumkin emas (statik mudofaa), otliqlar zarbasiga to'liq daxlsizlik.
+5. **Tarqoq Saf (Skirmish Spread):**
+   - **Tuzilishi:** Askarlar orasida 3-4 metr bo'sh joy qoldiriladi.
+   - **Xususiyati:** Dushman katapultalari, trebuchetlari va kamonchilarining ommaviy zarbalaridan minimal talofat ko'rish uchun qo'llaniladi.
+   - **Parametrlari:** Hududiy snaryad zararlaridan -70% talofat kamayishi, ammo dushman otliqlari kelsa osongina yakson qilinadi.
+
+### 59.2. Saf Parametrlari Balans Jadvali
+
+| Saf Nomi | Harakat Tezligi | Oldingi Mudofaa Bonusi | Yon/Orqa Mudofaa | Optimal Qo'shin Turi |
+|---|---|---|---|---|
+| Chiziqli Saf (Line) | 1.00x | +15% Hujum kengligi | 0% (Standart) | Kamonchilar va Qilichbozlar |
+| Ponasimon Saf (Wedge) | 1.20x | +45% Yorib o'tish zarari | -25% Qanot zaifligi | Og'ir Otliq Ritsarlar |
+| Qalqon Devori (Shield Wall) | 0.40x | +80% O'qlardan, +50% Yaqin jang | -30% Orqa zaiflik | Qalqonli Nayzadorlar |
+| Kare Saflari (Square) | 0.00x (Harakatsiz) | +40% Barcha yo'nalishlarda | +40% To'liq 360 burchak | Elita Pikechilar |
+| Tarqoq Saf (Skirmish) | 1.15x | -15% Yaqin jang mudofaasi | -15% Alohida jang | Yengil Razvedkachilar |
+
+### 59.3. Qo'mondonlik Gorn Signallari (Tactical Horn Commands)
+
+O'yinchi yoki otryad komandiri jang maydonida gorn chalaroq 120 voxel radiusdagi barcha ittifoqchilarga zumda buyruq berishi mumkin:
+1. **"Saf Tort!" (Form Up - Bir Uzoq Jarangdor Sado):** Sochilib ketgan yoki tartibsiz jang qilayotgan barcha askarlar komandir bayrog'i atrofida belgilangan safga zudlik bilan tiziladi.
+2. **"Qalqon Ko'tar!" (Raise Shields - Ikki Qisqa Past Sado):** Askarlar zumda mudofaa holatiga o'tadi, qalqonlarini bosh va ko'krak ustiga ko'taradi.
+3. **"Oldinga Hujum!" (Charge - Ko'tariluvchi Shiddatli Sado):** Butun saf dushman nishoniga qarab maksimal tezlikda sprint bilan bostirib boradi (+20% harakat tezligi, +30% dastlabki zarba quvvati).
+4. **"Mergonlar Yalpi O't Ochsin!" (Volley Fire - Uchta Qisqa Baland Sado):** Kamonchilar va arbaletchilar belgilangan hududga koordinatali bir paytda yuzlab o'q uzadi.
+5. **"Orqaga Saf bilan Chekin!" (Tactical Withdrawal - Cho'ziq Past Sado):** Askarlar yuzlarini dushmanga qaratgan holda, qalqonlarini tushirmasdan tartibli ravishda qal'a darvozasi tomon chekinadi (Ruhiyat sinmaydi).
 
 ---
 
 # 60. JANGOVAR RUH (MILITARY MORALE)
 
-Komandir o'lsa saf buziladi va askarlar qochadi. G'alaba qozonilsa jangovar ruh va tajriba keskin oshadi.
+Urush taqdirini nafaqat qurollar, balki askarlarning yuragidagi jangovar ruh va ishonch hal qiladi. Qo'rqinch va ruhiy tushkunlik eng kuchli qo'shinni ham parokanda qilib yuborishi mumkin.
+
+### 60.1. Harbiy Ruhiyat Formulasi
+
+Har bir harbiy bo'linma va alohida jangchining ruhiyati (0-100) quyidagi dinamik tenglama bo'yicha har soniyada hisoblanadi:
+
+$$Morale_{unit} = BaseMorale + \Delta M_{casualties} + \Delta M_{officer} + \Delta M_{flank} + \Delta M_{formation} + \Delta M_{terror}$$
+
+### 60.2. Ruhiyat Bosqichlari va Xatti-Harakatlar (Behavioral Thresholds)
+
+- **75-100 Ball — Matonatli (Steadfast):**
+  - Askarlar qat'iy ishonch bilan kurashadi. Hujum tezligi +10%, yengil vahima va qon ko'rishga to'liq immunitet. Saf tartibini qat'iy ushlab turadi.
+- **40-74 Ball — Intizomli (Disciplined):**
+  - Standart jangovar rejim. Berilgan buyruqlarni benuqson bajaradi, pozitsiyasini saqlaydi.
+- **20-39 Ball — Ikkilanayotgan (Wavering):**
+  - Qo'rquv va sarosima paydo bo'ladi. Saf jipsligi buziladi, askarlarning harakat tezligi -30% ga sekinlashadi, ba'zilar orqaga chekinishga harakat qiladi.
+- **0-19 Ball — Vahima va Qochish (Routed / Panic):**
+  - Askarlar qalqon va og'ir qurollarini yerga tashlab, shartsiz FLEE holatiga o'tadi. Eng yaqin qal'a darvozasiga yoki xaritadan tashqariga qarab qochadi.
+
+### 60.3. Dinamik Ruhiyat Modifikatorlari
+
+| Vaziyat / Voqea | Modifikator ($\Delta M$) | Davomiyligi / Shart |
+|---|---|---|
+| Otryad Talafoti (Casualties) | $-1.2 \times \text{Talafot Foizi}$ | Masalan, 40% o'lim bo'lsa -48 ball |
+| Komandir Halok Bo'lishi (Officer Slain) | -35 ball | 35 metr radiusdagi barcha ittifoqchilarga zudlik bilan shok to'lqini |
+| Orqadan Qanot Qilinishi (Flanked / Rear Attack) | -25 ball | Orqadan zarba berilayotgan vaqtda |
+| Dushmanning Son Jihatdan Ustunligi | $-15 \times \log_2\left(\frac{EnemyCount}{FriendlyCount}\right)$ | Dushman 2x ko'p bo'lsa -15, 4x ko'p bo'lsa -30 |
+| Qalqon Devori Saqlanib Turishi | +20 ball | Saf buzilmagan paytda |
+| Ittifoqchi Trebuchet Toshining Dushmanga Tushishi | +15 ball | Muvaffaqiyatli qamal zarbasidan so'ng 30 soniya |
+| Dushman Katapultasi O'ti Ostida Qolish | -20 ball | Snaryad portlashi atrofida bo'lganda |
+| Qahramonona Qarshilik (O'yinchining Elita Qotilligi) | +25 ball | Dushman boshlig'i yiqitilganda |
+
+### 60.4. Vahimadagi Qo'shinni Qayta Jamlash (Rallying Mechanics)
+
+Qochayotgan askarlarni to'xtatish uchun quyidagi choralardan foydalaniladi:
+1. **Qo'mondon Gorn Sadosi:** Qochayotgan askarlar komandir gornini eshitsa, 50% ehtimollik bilan to'xtab, +20 ruhiyat bilan qayta saflanadi.
+2. **Ruhoniy Duosi va Muqaddas Relikviya:** Ruhoniy o'zining muqaddas ramzini ko'targanda 15 metr radiusdagi qo'rquvni bosadi va ruhiyatni +25 ga tiklaydi.
+3. **Mustahkam Qal'a Devorlari Panohi:** Qochayotgan askarlar mudofaa qilingan darvozadan ichkariga kirsa, vahima to'xtaydi.
 
 ---
 
 # 61. QAMAL TEXNIKASI (SIEGE ENGINES)
 
-Devor yoruvchi taran (Battering Ram), qamal narvonlari, tosh otuvchi katapultalar va og'ir trebuchetlar. Voxel devorlar to'g'ridan-to'g'ri parchalanadi.
+Voxel Lord: Feudal Realm o'yinining eng hayratlanarli xususiyatlaridan biri — butun qal'a devorlari, darvozalari, tomlari va ko'priklarining qamal qurollari zarbasi ostida dinamik parchalanuvchi fizik bloklarga aylanishidir.
+
+### 61.1. Qamal Mashinalarining Bosh Mexanik Balans Jadvali
+
+Quyidagi jadval barcha 4 ta asosiy qamal mashinasining texnik parametrlarini to'liq ochib beradi:
+
+| Qamal Mashinasi | Ekipaj Soni | Yig'ish Materiallari | Qayta O'qlash Vaqti | Snaryad Massasi | Boshlang'ich Tezlik | Kinetik Energiya | Portlash Radiusi | Qamal Shikasti |
+|---|---|---|---|---|---|---|---|---|
+| Devor Yoruvchi Taran (Battering Ram) | 6 nafar askar | 45 Xoda, 12 Temir, 6 G'ildirak | 4.0 s (Har bir tebranish) | 900 kg po'lat bosh | 5.5 m/s | 13.6 kJ | To'g'ridan-to'g'ri (1 voxel) | 550 HP Qamal Zarari |
+| Yengil Mangonel (Mangonel) | 2 nafar askar | 30 Taxta, 8 Arqon, 6 Temir | 12.0 s | 40 kg tosh yadro | 38.0 m/s | 28.8 kJ | 1.5 metr radius | 750 HP Qamal Zarari |
+| Og'ir Trebuchet (Trebuchet) | 4 nafar askar | 90 Yog'och, 25 Arqon, 30 Temir, 150 Tosh yuk | 30.0 s | 130 kg yo'nilgan tosh | 52.0 m/s | 175.7 kJ | 3.5 metr sferik krater | 3,200 HP Qamal Zarari |
+| Mudofaa Ballistasi (Ballista) | 2 nafar askar | 20 Taxta, 6 Po'lat, 6 Arqon | 8.0 s | 8 kg po'lat nayza | 75.0 m/s | 22.5 kJ | To'g'ri chiziqli teshish | 450 HP Sanchuvchi Zarar |
+
+### 61.2. Voxel Materiallarining Qattiqligi va Chidamlilik Jadvali
+
+Har bir voxel bloki zarbani qaytarish darajasi (Hardness Tier) va umumiy chidamlilikka (HP) ega:
+
+| Voxel Materiali | Material Sinf | Voxel HP ($HP_{max}$) | Qattiqlik Tieri ($H$) | Yong'in Xavfi (Flammability) | Qamal Bardoshlilik Koeffitsienti |
+|---|---|---|---|---|---|
+| Yumshoq Tuproq va Loy (Dirt / Clay) | Tuproq | 80 HP | 1 | 0% | 0.50x |
+| Yog'och Taxta va Xodalar (Timber Planks) | Yog'och | 200 HP | 2 | 85% | 0.80x |
+| Qora Boshbosh Tosh (Cobblestone) | Tosh | 600 HP | 4 | 0% | 1.20x |
+| Yo'nilgan Qal'a G'ishti (Chiseled Stone Brick)| Og'ir Tosh | 1,200 HP | 6 | 0% | 1.60x |
+| Mustahkamlangan Tosh Devor (Reinforced Stone)| Fortifikatsiya | 2,500 HP | 8 | 0% | 2.20x |
+| Quyma Temir Panjara va Darvoza (Iron Portcullis)| Metall | 3,500 HP | 9 | 0% | 3.00x |
+
+### 61.3. Portlash Shikastini Tarqatish Formulasi (Voxel Blast Dispersion)
+
+Trebuchet yoki mangonel snaryadi $\vec{P}_{impact}$ nuqtasiga urilganda, portlash to'lqini atrofidagi har bir $\vec{X}$ koordinatadagi voxel blokiga quyidagi formula asosida tarqaladi:
+
+$$Damage_{voxel}(\vec{X}) = \frac{ImpactDamage}{1.0 + |\vec{X} - \vec{P}_{impact}|^2} \times \left(1.0 - \frac{HardnessTier}{10.0}\right)$$
+
+Agar voxel blokining qabul qilgan jami zarari uning $HP_{max}$ ko'rsatkichidan oshib ketsa:
+1. Blok VoxelChunk ma'lumotlar massividan o'chiriladi va uning o'rni bo'shliq deb e'lon qilinadi.
+2. Godot 4 ning NavigationRegion3D navmesh tizimi real vaqtda yangilanadi va dushman piyodalari uchun devorda yangi yo'l ochiladi.
+3. Yo'q qilingan har bir blok o'rnida massasi $m = 85 \text{ kg}$ bo'lgan 3 dan 6 tagacha RigidBody3D fizik tosh bo'laklari (Rubble) vujudga keladi.
+
+### 61.4. Qulagan Toshlar Fizikasi va Bosib Qolish Shikasti
+
+Qulab tushayotgan tosh bo'laklari yerga tushgunga qadar erkin tushish tezlanishida harakatlanadi. Har qanday pastda turgan askar yoki fuqaroga tosh tekkanida uning kinetik energiyasiga mutanosib maydalovchi zarba beriladi:
+
+$$Damage_{crushing} = \frac{1}{2} m v^2 \times 0.05$$
+
+10 metr balandlikdan qulagan tosh blok (tezligi taxminan 14 m/s) piyoda askarga 416 HP zarar yetkazib, uni bir zumda ezib tashlaydi. Qulagan vayronalar yo'llarni to'sib qo'yadi va ularni tozalash uchun ishchilar tosh qoldiqlarini (res_stone_rubble) yig'ib olishi talab etiladi.
 
 ---
 
@@ -1860,13 +2250,99 @@ Katta qal'alar va shahar tumanlarini rejalashtirishda erkin ko'rinish beruvchi t
 
 # 65. BINO MUSTAHKAMLIGI VA FIZIKA (STRUCTURAL STABILITY)
 
-Og'irlik, mustahkamlik va tayanch masofasi (Support Distance). Tayanchsiz qoldirilgan og'ir tosh tomlar o'z og'irligi ostida qulab tushadi.
+Voxel Lord: Feudal Realm arxitekturasi shunchaki vizual bloklar terish emas, balki real statik yuk taqsimoti, bosim qarshiligi va tortishish kuchiga asoslangan qurilish muhandisligi simulyatsiyasidir. Havoda muallaq turuvchi imkonsiz konstruksiyalar yoki tayanchsiz qoldirilgan og'ir tosh tomlar o'z og'irligi ostida halokatli tarzda qulab tushadi.
+
+### 65.1. Strukturaviy Barqarorlik Indeksi ($S_{struct}$)
+
+Har bir voxel bloki o'zining tayanch nuqtasiga (poydevor, ustun yoki yuk ko'taruvchi devor) nisbatan barqarorlik indeksini hisoblab boradi:
+
+$$S_{struct} = K_{material} \times \frac{R_{support}}{Span_{unsupported}}$$
+
+- **$K_{material}$:** Materialning ichki molekulyar bog'lanish va siqilishga chidamlilik koeffitsienti.
+- **$R_{support}$:** Eng yaqin vertikal yuk ko'taruvchi ustun yoki poydevorning effektiv tayanch radiusi.
+- **$Span_{unsupported}$:** Blokning eng yaqin mustahkam vertikal tayanchdan gorizontal uzoqlashish masofasi (Voxel metr hisobida).
+
+**Barqarorlik Holatlari:**
+- $S_{struct} \ge 1.0$: To'liq barqaror va xavfsiz konstruksiya. Bino har qanday tashqi tebranishlarga bardosh beradi.
+- $0.75 \le S_{struct} < 1.0$: Zo'riqish holatidagi konstruksiya (Structural Strain). To'sinlar qirsillaydi, tosh oralaridan qum va ohak to'kiladi, qo'shimcha yuk tushsa qulaydi.
+- $S_{struct} < 0.75$: Kritik buzilish chegarasi. Bog'lamlar uziladi va bloklar darhol kaskadli qulash (Cascading Cave-in) fizik rejimiga o'tadi.
+
+### 65.2. Gorizontal Tayanchsiz Masofa Chegaralari Jadvali
+
+Quyidagi jadval 4 ta asosiy qurilish materiali uchun ruxsat etilgan maksimal gorizontal tayanchsiz masofa (Overhang Span) va mexanik ko'rsatkichlarni belgilaydi:
+
+| Material Nomi | Maksimal Tayanchsiz Masofa | Material Koeffitsienti ($K_{material}$) | Maksimal Vertikal Yuk | Tavsiya Qilingan Ustun Oralig'i |
+|---|---|---|---|---|
+| Yog'och Taxta va Xodalar (Wood) | 5 voxel metr | 1.00 | 450 kg/m | Har 4 voxelda bitta yog'och ustun |
+| Qora Boshbosh Tosh (Cobble) | 3 voxel metr | 0.85 | 1,200 kg/m | Har 2-3 voxelda tosh tayanch |
+| Yo'nilgan Arkasimon Tosh (Chiseled Arch) | 8 voxel metr | 1.45 | 3,800 kg/m | Har 7 voxelda arkali poydevor |
+| Mustahkamlangan Po'lat To'sin (Iron-Beam) | 14 voxel metr | 2.20 | 9,500 kg/m | Har 12 voxelda karkasli quyma ustun |
+
+### 65.3. Yuk Ko'taruvchi Ustunlar va Poydevor Talablari
+
+1. **Vertikal Bosim Zanjiri (Vertical Load Transfer):**
+   - Bino tomi va yuqori qavatlarining massasi to'g'ridan-to'g'ri vertikal ustunlar (Pillars) orqali pastga — ona zaminga uzatilishi shart.
+   - Bo'shliq yoki oddiy yog'och pol ustiga qurilgan og'ir tosh devorlar pastki polni sindirib pastga tushadi.
+2. **Poydevor Bloklari (Foundation Blocks):**
+   - Poydevor qatlami faqat qattiq tabiiy tosh (Granit, Ohaktosh) yoki mustahkamlangan yo'nilgan tosh poydevordan iborat bo'lishi kerak.
+   - Yumshoq tuproq, loy yoki qum ustiga qurilgan og'ir devorlar poydevor cho'kishi (Foundation Sinking) natijasida bino darz ketishiga va qulashiga sabab bo'ladi.
+
+### 65.4. Kaskadli Qulash Algoritmi (Cascading Cave-In Engine)
+
+Agar dushman qamal trebucheti zarbasi, shaxtadagi portlash yoki yong'in bitta yuk ko'taruvchi markaziy ustunni yo'q qilsa, Godot 4 dvigateli zudlik bilan kenglik bo'yicha qidiruv (Breadth-First Search / BFS) algoritmini ishga tushiradi:
+1. Yo'q qilingan blok atrofidagi barcha qo'shni 6 ta voxel tekshiriladi.
+2. Har bir voxel uchun ona zamin bilan to'g'ridan-to'g'ri bog'langan yuk ko'tarish yo'li mavjudligi aniqlanadi.
+3. Agar bino tomi yoki shiftining biror qismi zamin bilan barqaror bog'lanishini yo'qotsa ($S_{struct} < 0.75$), ushbu voxel guruhi VoxelChunk statik to'ridan ajratib olinadi.
+4. Ajratilgan barcha bloklar avtomatik ravishda fizik xususiyatga ega RigidBody3D obyektlariga aylanadi va tortishish kuchi ta'sirida pastki qavatlarga qulaydi.
+5. Qulagan bloklar pastki konstruksiyalarga dinamik urilish zarbasi berib, butun ko'p qavatli binoni zanjirli kaskad shaklida to'liq vayron qiladi.
 
 ---
 
 # 66. YONG‘IN XAVFI VA O‘CHIRISH (FIRE HAZARD)
 
-Yog'och va somon tomlar chaqmoq yoki olovdan tez alangalanadi. Fuqarolar darhol chelaklar bilan suv tashib yong'inni o'chiradi.
+O't va alangalar feodal shaharchaning eng dahshatli ofatlaridan biridir. Chaqmoq urishi, qamal paytidagi olovli o'qlar yoki beparvo fuqaroning pechkadan sochgan cho'g'i butun yog'och mavzelarni sanoqli daqiqalarda kulga aylantirishi mumkin.
+
+### 66.1. Issiqlik Alangalanish Chegaralari (Thermal Ignition Thresholds)
+
+Har bir material o'zining termodinamik xususiyatlariga ko'ra o'z-o'zidan yonish haroratiga ($T_{ignite}$) ega:
+- **Somon Tom va Pichanpoya (Thatch & Straw):** 220 daraja C (Juda tez alangalanadi).
+- **Yog'och To'sinlar va Plitalar (Timber Planks):** 300 daraja C (Sekin tutab yonadi, kuchli issiqlik chiqaradi).
+- **Quruq Torf va Ko'mir Ombri (Peat & Coal):** 180 daraja C (Tutunsiz ichki yonish, o'chirish juda qiyin).
+- **Qora Tosh va Ohaktosh G'ishti (Stone & Brick):** Yonmaydi ($T_{ignite} = \infty$).
+- **Temir Panjara va Po'lat Zirhlar (Iron & Steel):** Yonmaydi ($T_{ignite} = \infty$).
+
+### 66.2. Materiallarning Yonuvchanlik Matritsasi
+
+| Material Nomi | Yonuvchanlik Darajasi | Yonish Davomiyligi | Chiqaradigan Issiqlik | Tutun Zaharliyligi |
+|---|---|---|---|---|
+| Somon Tom (Thatch) | 95% | 45 soniya | 350 kW/m2 | O'rtacha bo'g'uvchi |
+| Qoraqarag'ay Yog'ochi (Pine Timber) | 85% | 120 soniya | 620 kW/m2 | Yuqori quyuq tutun |
+| Eman Yog'ochi (Hardwood Oak) | 65% | 240 soniya | 850 kW/m2 | Qizigan ko'mir qoldig'i |
+| Jun va Gazlama Mato (Wool / Cloth) | 75% | 60 soniya | 280 kW/m2 | Bo'g'uvchi zaharli gaz |
+| Tosh va Pishiq G'isht (Stone Masonry) | 0% | 0 soniya | 0 kW/m2 | Tutun chiqarmaydi |
+
+### 66.3. Shamol Tezligi Asosida Olovning Tarqalish Ehtimoli Formulasi
+
+Yonayotgan voxel blokidan qo'shni voxel bloklariga olov sakrash ehtimoli shamol vektori va havo namligiga qat'iy bog'liq:
+
+$$P_{spread} = BaseSpreadRate \times \left(1.0 + k_w \cdot (\vec{v}_{wind} \cdot \vec{d}_{voxel})\right) \times (1.0 - Humidity)$$
+
+- **$BaseSpreadRate$:** Somon uchun $0.15 \text{ s}^{-1}$, yog'och uchun $0.05 \text{ s}^{-1}$.
+- **$k_w = 0.25$:** Shamol yo'nalishining olov uchqunlarini (Embers) uchirish koeffitsienti.
+- **$\vec{v}_{wind} \cdot \vec{d}_{voxel}$:** Shamol yo'nalishi va maqsadli qo'shni voxel vektori orasidagi skalyar ko'paytma. Shamol esayotgan tomondagi binolar 4.0x tezroq yonadi va uchqunlar 12 voxel masofagacha uchib borishi mumkin.
+- **$Humidity$:** Havo namligi. Bahorgi jala va yomg'ir paytida ($Humidity \ge 0.85$) olov tarqalishi deyarli butunlay to'xtaydi.
+
+### 66.4. O't O'chirish Tizimi va Chelaklar Zanjiri AI Protokoli (Bucket Brigade)
+
+Shahar hududida olov chiqqanda fuqarolik AI tizimi darhol 0-darajali Favqulodda Holat (Emergency Priority 1,000) rejimiga o'tadi:
+1. **O't O'chiruvchilar Safarbarligi:**
+   - 45 metr radiusdagi barcha mehnatga layoqatli fuqarolar zudlik bilan kundalik ishini to'xtatadi.
+   - Fuqarolar shahar qudug'i (Village Well), daryo yoki suv ombori tomon yugurib, yog'och chelaklar (item_bucket_wood) oladi.
+2. **Chelaklar Zanjiri Taktikasi (Bucket Brigade):**
+   - Agar quduqdan olovgacha masofa uzoq bo'lsa, fuqarolar yo'l bo'ylab bir qatorga tizilib, to'la chelaklarni qo'ldan-qo'lga uzatish zanjirini hosil qiladi. Bu harakat tezligini 3.5x ga oshiradi.
+   - Bitta chelak suv yonayotgan voxel blokiga sepilganda blok harorati -250 daraja C ga sovutiladi va ochiq alanga 80% ehtimol bilan o'chiriladi.
+3. **Nazorat Ostida Bino Buzish (Firebreak Demolition):**
+   - Agar yong'in qamrovi 5 tadan ortiq binoni qamrab olsa va shamol kuchi haddan tashqari yuqori bo'lsa, soqchilar va o'rmonchilar olov yo'lidagi qo'shni yog'och binolarni boltalar bilan shoshilinch buzib tashlaydi (Firebreak). Ushbu to'siq olovning boshqa mavzelarga o'tishini oldini oladi.
 
 ---
 
@@ -1890,23 +2366,166 @@ Bo'rilar to'dasi, ayiqlar, qaroqchilar, g'or kalamushlari, gigant zaharli o'rgim
 
 # 70. QONLI OY REYDLARI (BLOOD MOON)
 
-Har 15–20 kunda yuz beruvchi keng ko'lamli qaroqchilar va maxluqlar hujumi. Kuch o'yinchi shahrining boyligi va aholisiga qarab mutanosib oshib boradi.
+Voxel Lord: Feudal Realm olamida har 28 kunda (to'liq feodal yil / 4 fasl almashinuvi yakunida) osmonda dahshatli astronomik hodisa — Qonli Oy (Blood Moon) yuz beradi. Ushbu tun davomida qizil tuman yer bag'irlaydi, yovvoyi maxluqlar aqldan ozadi va atrofdagi barcha qaroqchilar hamda qamal otryadlari o'yinchining qal'asini yo'q qilish uchun ommaviy yurish boshlaydi.
+
+### 70.1. Xavf Darajasi Hisoblash Formulasi (Threat Scaling Formula)
+
+Qonli Oy bosqinining soni, elita qo'shinlar tarkibi va qamal mashinalari hajmi o'yinchi shahrining iqtisodiy va demografik qudratiga qarab quyidagi formula orqali hisoblanadi:
+
+$$ThreatScore = (Population \times 1.2) + (TreasurySilver \times 0.05) + (ActiveWorkstations \times 4.0)$$
+
+**Xavf Bosqichlari va Dushman Armiyasi Tarkibi:**
+- **Tier I — Boshlang'ich Bosqin ($ThreatScore < 150$):**
+  - 15-20 nafar qurollangan qaroqchilar (Bandit Marauders), o'roq va yog'och dubinalar, qatronli mash'alalar. Yog'och eshik va devorlarni yoqishga harakat qiladi.
+- **Tier II — Uyushgan Qamal Qo'shini ($150 \le ThreatScore < 400$):**
+  - 35-50 nafar tajribali askarlar, temir qilichlar va arbaletlar, 1 ta Devor Yoruvchi Taran (Battering Ram), katta yog'och paviza qalqonlari ortidagi o'qchilar.
+- **Tier III — Professional Yollanma Armiya ($400 \le ThreatScore < 900$):**
+  - 70-90 nafar og'ir zirhli yollanma askarlar, 2 ta Mangonel katapultasi, muhandis laqimchilar (Sappers) va zaharli olov otuvchi maxsus o'qchilar.
+- **Tier IV — Qonli Sarkarda O'rdasi ($ThreatScore \ge 900$):**
+  - 120 dan ortiq elita qotillar, to'liq temir zirhli ritsarlar, 2 ta Og'ir Trebuchet, laqimchilar tunneli, quturgan urush trollari va qora sehrgarlar.
+
+### 70.2. Elita Qamal Qaroqchilari va Muhandis Laqimchilar (Sapper Tunnelers)
+
+Oddiy o'g'rilardan farqli ravishda, Qonli Oy reydi yuqori taktik intizom bilan harakat qiladi:
+1. **Muhandis Laqimchilar (Sapper Tunnelers):**
+   - Agar shahar baland tosh devor va chuqur xandaq bilan o'ralgan bo'lsa, 4-6 nafardan iborat laqimchilar guruhi kirka va belkuraklar bilan devor poydevori ostidan yerosti yo'li (Tunnel) qazishga kirishadi.
+   - Ular devor ostidagi poydevor bloklarini yo'q qilib, devorning kaskadli qulashiga sabab bo'ladi yoki to'g'ridan-to'g'ri shahar omborxonasi ichidan chiqib keladi.
+2. **Katta Paviza Qalqonchilari (Pavise Shieldbearers):**
+   - 2 metrli qalin yog'och qalqonlarni yerga qadab, orqadagi o'qchilar uchun ko'chma mudofaa istehkomi yaratadi. Qal'a kamonchilarining o'qlarini 90% qaytaradi.
+3. **O't Qo'yuvchi Diversantlar (Arsonist Saboteurs):**
+   - Devordan oshib o'tish uchun qamal narvonlarini qo'yadi, shahar ichkarisidagi don ombori, ferma va uylarga moy ko'zalari uloqtirib yong'in chiqaradi.
+
+### 70.3. Qonli Tunning Atmosferaviy va Ruhiy Ta'sirlari
+
+- **Qizil Tuman va Osmon Vizuali:** Godot 4 ning WorldEnvironment tizimi orqali osmon to'q qizil rangga kiradi, tuman ko'rish masofasini 25 voxel metrgacha cheklaydi.
+- **Fuqarolik Ruhiyati Shoki:** Tinch aholi vahimaga tushadi (Morale -15 ball), hamma o'z uyiga berkinadi va ibodat qiladi.
+- **Yovvoyi Hayvonlar G'alayoni:** Shahar atrofdagi bo'rilar va yirtqichlar g'azablanib (+50% tajovuzkorlik, ko'zlari qizil yonadi), har qanday tirik jonga tashlanadi.
 
 ---
 
 # 71. DUNYONING 5 AFSONAVIY BOSSI (CANONICAL 5 BOSSES)
 
-1. **Qonli Tirnoq (Alpha Bear):** O'rmon xo'jayini (Tier II).
-2. **Temir Soqol Valdemar (Warlord):** Qaroqchilar sarkardasi (Tier III).
-3. **Zulmat Onasi (Broodmother):** Chuqur g'orlar malikasi (Tier III–IV).
-4. **Qoya Kolossi (Crag Colossus):** Tog'li hududlar giganti (Tier IV).
-5. **Muz Qanoti (Frost Wyvern):** Shimoliy tundraning afsonaviy vishali (Late Tier IV).
+Voxel Lord: Feudal Realm olamida qirollik taqdirini hal qiluvchi 5 ta afsonaviy bosh maxluq (World Bosses) mavjud. Ushbu gigantlar o'zlarining shaxsiy arenalarida yashaydi, minglab salomatlikka (HP), ko'p bosqichli fazalarga, telegraf qilingan halokatli hujumlarga hamda atrofdagi butun voxel relyefni yakson qilish qobiliyatiga ega.
+
+### 71.1. Tog'lar Hukmdori — Grok'Gar (Mountain Troll King)
+- **Tieri va Salomatligi:** Tier II Boss | 4,500 HP | Qattiq Teri ($D_{flat} = 12$).
+- **Aronasi:** Qadimgi Baland Qoyatosh G'ori (Granite Crag Hollow).
+- **Jang Bosqichlari (Phases):**
+  - **Faza 1 (100% - 50% HP):**
+    - *Qarag'ay Daraxti Zarbasi (Tree Trunk Sweep):* 4 metr radiusdagi barcha o'yinchilarni uchirib yuboruvchi aylanma zarba (120 HP zarba).
+    - *Qoyatosh Uloqtirish (Boulder Toss):* Uzoq masofaga 300 kg tosh otadi, tushgan joydagi 3x3 tosh devorlarni parchalaydi.
+    - *Yer Tepish (Ground Stomp):* 6 metr radiusda seysmik to'lqin tarqatib, barchani yerga yiqitadi (Knockdown).
+  - **Faza 2 (50% - 0% HP — Enraged Berserk):**
+    - Quturish holati: Harakat va hujum tezligi +40% ga oshadi.
+    - *Shiddatli Hujum (Rampage Charge):* To'g'ri chiziq bo'ylab yugurib, yo'lidagi barcha yog'och va tosh binolarni bir zumda ezib o'tadi.
+- **Voxel Vayronkorligi:** Har bir og'ir zarbasi 4x4 voxel maydondagi tosh va yog'och bloklarni bir zumda parchalab fizik tosh uyumiga aylantiradi.
+- **Tushadigan Noyob O'ljalar (Masterwork Drop Table):**
+  - *Troll Qirolining Yuragi (Heart of Grok'Gar):* Qayta tiklanish eliksiri tayyorlash uchun afsonaviy modda (+5 HP/soniya doimiy regeneratsiya).
+  - *Qora Granit Cho'qmor (Club of Granite Might):* 65 Blunt bazaviy zararga ega gigant qurol.
+  - *Qoyatosh Toji (Crown of Crags):* Barcha shaxtyorlarning tosh qazish tezligini +25% ga oshiruvchi qirollik toji.
+
+### 71.2. Mal'un Baron Mordred (Cursed Necromancer Baron)
+- **Tieri va Salomatligi:** Tier III Boss | 6,500 HP | Qora Sehr Qalqoni ($D_{flat} = 16$).
+- **Aronasi:** Qadimgi Shohona Mozoat Kriptasi (Crypt of the Fallen Sovereign).
+- **Jang Bosqichlari (Phases):**
+  - **Faza 1 (100% - 60% HP):**
+    - *Zulmat Sharilari (Necrotic Shadow Orbs):* O'yinchini ta'qib qiluvchi 3 ta qora shar (Har biri 45 HP sehrli zarar).
+    - *Suyak Nayzasi (Bone Spear Pierce):* Yerdan otilib chiquvchi o'tkir suyaklar.
+    - *O'liklarni Tiriltirish (Raise Skeletons):* G'or polidagi qabrlardan 6 nafar zirhli skelet jangchilarni chaqiradi.
+  - **Faza 2 (60% - 25% HP):**
+    - *Jasadlar Portlashi (Corpse Explosion):* Yiqilgan barcha skelet jasadlarini detanatsiya qilib, 5 metr radiusda zaharli blast tarqatadi.
+    - *Soya Teleportatsiyasi:* O'yinchining orqasiga yashirin o'tib, bo'yinga sanchuvchi xanjar zarbasi beradi.
+  - **Faza 3 (25% - 0% HP — Lich Formasi):**
+    - *O'lmaslik Qobig'i (Phylactery Ward):* Baron to'liq daxlsiz bo'lib qoladi. O'yinchi kriptaning 4 burchagidagi qurbongoh suyak filakteriyalarini buzib tashlashi shart.
+- **Voxel Vayronkorligi:** Qora sehr unumdor tuproqni chirindi zaharga aylantiradi, yog'och ustunlarni chirigan qora kukun qilib qulatadi.
+- **Tushadigan Noyob O'ljalar (Masterwork Drop Table):**
+  - *Qon So'ruvchi Rapiyer (Baron's Cursed Rapier):* Har bir sanchuvchi zarbada yetkazilgan zararning 25% qismini o'yinchi salomatligiga qo'shadi.
+  - *Qora Sehr Filakteriyasi (Grim Phylactery):* Shaharda halok bo'lgan 1 nafar elita fuqaroni qayta tiriltirish imkonini beruvchi artefakt.
+  - *Zulmat Xalati (Robes of Shadow Veil):* Dushman kamonchilari aniqligini -40% ga tushiruvchi qadimiy kiyim.
+
+### 71.3. Botqoqlik Vivernasi — Vessaria (Swamp Wyvern Matriarch)
+- **Tieri va Salomatligi:** Tier III-IV Boss | 9,000 HP | Qalin Qora Tangachalar ($D_{flat} = 20$).
+- **Aronasi:** Zaharli Botqoqlik Ko'rfazi (Venomous Mire Lagoon).
+- **Jang Bosqichlari (Phases):**
+  - **Faza 1 (100% - 70% HP — Havodagi Hujum):**
+    - *Kislotali Qusish (Acid Spit Vomit):* Havodan turib botqoq kislotasi purkaydi. Tushgan joydagi sovutlarning chidamliligini 5.0x tezlikda eritadi.
+    - *Shiddatli Sho'ng'ish (Swoop Attack):* O'yinchilarni panjalari bilan changallab balandlikdan pastga uloqtiradi.
+  - **Faza 2 (70% - 30% HP — Quruqlikdagi Bo'ron):**
+    - Viverna yerga qo'nadi. Qanotlari bilan kuchli shamol to'lqini hosil qilib (Wing Buffet), o'yinchilarni botqoq suviga uloqtiradi.
+    - *Zaharli Dum Qamchisi (Tail Whip):* Orqadagi barcha jangchilarga 180 HP zarar va kuchli zahar statusi beradi.
+  - **Faza 3 (30% - 0% HP — Ona Qasosi):**
+    - G'azab faryodi: Botqoq inlaridan 12 ta yosh viverna bolalarini (Broodlings) yordamga chaqiradi.
+- **Voxel Vayronkorligi:** Kislota oqimi yog'och ko'priklar, to'siqlar va qayiqlarni butunlay eritib yo'q qiladi; qanot zarbasi tomlardagi somon va koshinlarni uchirib yuboradi.
+- **Tushadigan Noyob O'ljalar (Masterwork Drop Table):**
+  - *Viverna Kislota Xaltasi (Wyvern Acid Sac):* Qamal katapultalari uchun 10 ta o'ta halokatli devor erituvchi snaryad tayyorlash manbai.
+  - *Zaharli Qilich (Venomfang Greatsword):* Zarba berilganda dushmanga 15 soniya davomida sekundiga 12 HP zahar yetkazadi.
+  - *Ajdaho Terisi Sovuti (Dragonhide Scale Cuirass):* Zahar va kislotaga 75% immunitet beruvchi yengil elita sovut.
+
+### 71.4. Qor Devlari Sardori — Thrym (Frost Jotun Chieftain)
+- **Tieri va Salomatligi:** Tier IV Boss | 12,000 HP | Muzlagan Po'lat Tan ($D_{flat} = 24$).
+- **Aronasi:** Abadiy Muzlik Cho'qqisi (Glacial Pinnacle Spire).
+- **Jang Bosqichlari (Phases):**
+  - **Faza 1 (100% - 65% HP):**
+    - *Muzli Cho'kich Zarbasi (Glacial Cleave):* 8 metr uzunlikdagi muz to'lqini yo'lidagi barcha tirik mavjudotlarni muzlatib qotirib qo'yadi.
+    - *Qor Bo'roni Qichqirig'i (Blizzard Howl):* Hududdagi haroratni bir zumda -35 daraja C ga tushiradi (Gipotermiya xavfi 3.0x oshadi).
+  - **Faza 2 (65% - 30% HP):**
+    - *Muz Ustunlari Chaqiruvi (Frost Pillars):* Yerdan 5 voxel balandlikdagi 6 ta ulkan muz ustunlarini otilib chiqaradi.
+    - *Muz Qoyalari Qulashi (Avalanche Slam):* Shiftga zarba berib, tepadan o'yinchilar boshiga tonnalik muz qoyalarini yog'diradi.
+  - **Faza 3 (30% - 0% HP — Absolyut Muzlash):**
+    - *Ustunlarni Portlatish (Pillar Shatter):* Barcha muz ustunlarini parchalab, butun arena bo'ylab millionlab muz parchalarini o'qdek sochadi.
+- **Voxel Vayronkorligi:** Oqar daryolar va suv manbalarini qattiq muz bloklariga aylantiradi, tosh devorlarni sovuqdan qirsillatib yorib parchalaydi.
+- **Tushadigan Noyob O'ljalar (Masterwork Drop Table):**
+  - *Dev Qor Cho'kichi (Jotun's Glacial Greathammer):* 72 Blunt zararga ega; har bir zarbada dushmanni 2 soniyaga muzlatadi.
+  - *Abadiy Muzlik Runasi (Rune of Permafrost):* Shahar yerto'lasiga o'rnatilganda barcha oziq-ovqatlarning aynishini umrbod 0 ga tushiradi.
+  - *Qor Devi Po'stini (Frost Giant Pelt Cloak):* O'yinchiga +35 daraja C doimiy tana issiqligi beradi (Qishki sovuqqa mutlaq daxlsizlik).
+
+### 71.5. Tubanlik Golemi — Tartaros (Corrupted Abyssal Golem)
+- **Tieri va Salomatligi:** Tier IV+ Yakuniy Dunyo Bossi | 15,000 HP | Qora Magma Graniti ($D_{flat} = 28$).
+- **Aronasi:** Yer Tubidagi Magma O'chog'i (Magma Crucible of the Deep Abyss).
+- **Jang Bosqichlari (Phases):**
+  - **Faza 1 (100% - 75% HP):**
+    - *Magma Mushti Zarbasi (Magma Fist Slam):* Yerga urilganda to'lqin shaklida oqib keluvchi olovli lava xandaqlarini ochadi.
+    - *Yadro Nuri (Molten Core Beam):* Ko'kragidan uzluksiz lazer shaklidagi issiqlik nuri otadi (Soniyasiga 140 HP yondiruvchi zarar).
+  - **Faza 2 (75% - 40% HP — Obsidiyan Qalqon):**
+    - Golem sovib qotgan obsidiyan qobig'iga o'ranadi (Barcha fizik zararlarga 100% immunitet). O'yinchi uning bo'g'imlariga suv va qor bloklarini tashlab, issiq bug' portlashi orqali qobiqni yorishi lozim.
+  - **Faza 3 (40% - 15% HP):**
+    - *Qizigan Reaktor (Overheating Core):* Arena harorati +60 daraja C ga ko'tariladi, o'yinchilar har soniyada issiqlik zarbasi oladi.
+    - *Voxel Zilzilasi:* Butun g'or polidagi bloklar silkinib, pastki lava qa'riga qulashni boshlaydi.
+  - **Faza 4 (15% - 0% HP — O'z-o'zini Yo'q Qilish Sanog'i):**
+    - Golem yadrosi kritik rejimga o'tadi. O'yinchida 90 soniya vaqt bor. Agar shu vaqt ichida golem o'ldirilmasa, termoyadroviy portlash butun g'orni va yaqin atrofdagi shahar hududini yo'q qiladi.
+- **Voxel Vayronkorligi:** Tosh g'ishtlarni erigan suyuq lavaga aylantiradi, metall konstruktsiyalarni bir necha soniyada bug'lantirib yuboradi.
+- **Tushadigan Noyob O'ljalar (Masterwork Drop Table):**
+  - *Tartaros Yadrosi (Heart of Tartaros):* Shahar metallurgiya pechlari uchun cheksiz issiqlik manbai (Ko'mir sarfisiz uzluksiz po'lat eritish).
+  - *Tubanlik Katta Qalqoni (Abyssal Core Greatshield):* Frontal olov va zarbalarni 100% yutuvchi eng qudratli ritsar qalqoni.
+  - *Afsonaviy Damashq Po'lati Chizmasi (Blueprint: Mythic Crucible):* Qirollikdagi eng oliy darajali afsonaviy qurol-aslahalarni yasash imkoniyati.
 
 ---
 
 # 72. BOSS PROGRESSIYASI
 
-Har bir boss o'z bosqichida ochiladi va mag'lub etilganda noyob mukofotlar va unvonlar keltiradi.
+Dunyoning 5 ta afsonaviy bossi shunchaki xaritada aylanib yurmaydi. Ularning har biri qadimiy qurbongohlar (Summoning Altars) orqali chaqiriladi va ularni mag'lub etish butun feodal shohlik miqyosida doimiy global farmonlar (Realm-Wide Edicts) hamda passiv iqtisodiy-harbiy bonuslarni ochib beradi.
+
+### 72.1. Bosslarni Chaqirish Qurbongohlari va Talab Qilinadigan Yutuqlar
+
+| Boss Nomi | Qurbongoh Joylashuvi | Talab Qilinadigan Shohlik Yutug'i | Qurbongoh Qurbonligi (Ritual Offering) |
+|---|---|---|---|
+| 1. Grok'Gar (Troll King) | Qadimiy Tosh Mozoat (Ancient Barrow) | Shahar Aholisi 35+ kishi, Tier II Qal'a | 10 ta Yovvoyi Qobon Oziqi + 5 Bochka Asal Sharobi |
+| 2. Baron Mordred (Necromancer) | Mal'un Kripta Darvozasi (Mausoleum) | 5 nafar Elita Veteran Askari, Shahar Ibodatxonasi | Halok bo'lgan Bahodir Bosh Suyagi + 3 Kumush Kosa |
+| 3. Vessaria (Swamp Wyvern) | Botqoqlik Uyasi (Festering Mire Altar) | To'liq Zanjir Sovutli Qo'shin, Katta Don Ombri | Oltin Ajdaho Tuxumi + 20 Halit Tuz Qopchasi |
+| 4. Thrym (Frost Jotun) | Abadiy Muzlik Qurbongohi (Glacial Spire) | Qishki Issiqlik Tizimi, Tier IV Shahar Kengashi | 5 ta Moviy Yoqut (Sapphire) + Qor Bo'risi Yuragi |
+| 5. Tartaros (Abyssal Golem) | Magma O'chog'i Qurbongohi (Crucible Altar) | Avvalgi 4 ta Bossni Mag'lub Etish Yutug'i | 4 ta Boss Trofeyining Birlashtirilgan Qotishmasi |
+
+### 72.2. Mag'lubiyatdan So'ng Ochiladigan Doimiy Shohona Farmonlar (Realm Edicts)
+
+Har bir afsonaviy dushman mag'lub etilganda qirol taxt zalida butun shohlik hududida umrbod amal qiluvchi maxsus farmon (Edict) e'lon qiladi:
+
+| Mag'lub Etilgan Boss | Shohona Farmon (Realm Edict) | Butun Shohlikka Doimiy Ta'siri | Yangi Ochiladigan Texnologiya |
+|---|---|---|---|
+| Grok'Gar (Troll King) | Farmon: Qoya O'ymakorligi (Edict of Stonecrafters) | Konda tosh qazish tezligi +25%, barcha binolar mustahkamligi +20% | Gigant Tosh Blokli Qal'a Devorlari |
+| Baron Mordred (Necromancer) | Farmon: Muqaddas Zamin (Edict of Sanctified Soil) | Tungi o'liklar hujumi to'xtaydi, dorivor giyohlar hosili +30% | Gospitalda Jarrohlik va Antiseptika |
+| Vessaria (Swamp Wyvern) | Farmon: Buyuk Savdo Karvoni (Edict of Trade Guilds) | Savdogarlar boji -50% ga arzonlashadi, soliqqa toqatlilik +15% | Kislotaga Chidamli Zirh Qoplamalari |
+| Thrym (Frost Jotun) | Farmon: Qishki Matonat (Edict of Frost Mastery) | Qishda o'tin sarfi -35% ga kamayadi, fuqarolar muzlab qolmaydi | Yerto'lada Doimiy Muzxona Sovutgichi |
+| Tartaros (Abyssal Golem) | Farmon: Buyuk Feodal Shohlik Toji (Imperial Coronation) | O'yinning bosh g'alabasi, barcha qo'shni feodallar vassal bo'ladi | Afsonaviy Damashq Po'lati Domna Pechi |
 
 ---
 
