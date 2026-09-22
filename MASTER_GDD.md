@@ -1037,75 +1037,570 @@ $$\Delta XP = BaseActionXP \times \left(1.0 + 0.5 \times Tier_{station}\right) \
 
 ---
 
-# 27. DUNYO GENERATSIYASI VA 6 ASOSIY BIOM
+# 27. DUNYO GENERATSIYASI VA 6 ASOSIY BIOM (WORLD GENERATION & 6 CORE BIOMES)
 
-1. **Unumdor Tekislik:** Dehqonchilik unumi +50%, minerallar kam.
-2. **Qalin O‘rmon:** Mo'l yog'och va yovvoyi hayvonlar, yirtqichlar xavfi.
-3. **Tog‘lik:** Boy minerallar va tosh zaxirasi, qiyin relyef.
-4. **Botqoqlik:** Torf, noyob dorivor giyohlar, zax va kasallik xavfi.
-5. **Tundra:** Doimiy sovuq, ekinlar o'smaydi, go'sht muzlab aynimaydi, geotermal issiqxonalar zarur.
-6. **Dasht (Arid Steppe):** Yaylovlar, tosh tuzi, suv manbalari tanqis.
+Voxel Lord: Feudal Realm dunyo generatsiyasi to'liq protsedural, deterministik urug' (world seed) asosida ishlaydigan ko'p qatlamli 3D OpenSimplex / FastNoiseLite tizimiga tayanadi. Dunyo balandlik xaritasi, harorat, namlik va eroziya shovqinlari integratsiyasi orqali shakllanadi va 6 ta asosiy ekologik biomga ajratiladi.
 
----
+### 27.1. Protsedural Dunyo Xaritasi va Noise Qatlamlari (Procedural Generation & Noise Stacks)
 
-# 28. VOXEL WORLD TEXNIK PARAMETRLARI
+Yer yuzasi va g'orlar tizimini generatsiya qilishda 5 ta mustaqil shovqin qatlami (noise octaves) qo'llaniladi:
+1. **Continentalness ($N_{cont}$):** Katta masshtabli quruqlik va okeanlar chegarasini belgilaydi (Chastota $f = 0.0015$).
+2. **Erosion ($N_{eros}$):** Tog'li tizmalar yemirilishi va yassi tekisliklarni shakllantiradi ($f = 0.004$).
+3. **Peaks & Valleys ($N_{pv}$):** Mahalliy qoyatoshlar, daralar va kanyonlarni o'yadi ($f = 0.012$).
+4. **Temperature ($N_{temp}$):** Global kenglik va balandlikka bog'liq harorat maydoni ($f = 0.002$).
+5. **Humidity / Moisture ($N_{moist}$):** Yog'ingarchilik va yerosti suvlari to'yinishi ($f = 0.003$).
 
-- **Masshtab:** 1 voxel = 1 metr³.
-- **Chunk:** 32 × 32 × 32 voxel bloklari.
-- **Chunk Streaming:** O'yinchi atrofida asinxron yuklanadi.
+Har bir 3D koordinatadagi voxel zichligi quyidagi universal formula bo'yicha hisoblanadi:
 
----
+$$D(x, y, z) = -y + N_{cont}(x, z) \cdot W_{cont} + N_{detail}(x, y, z) \cdot W_{detail} - S_{cave}(x, y, z)$$
 
-# 29. VOXEL LOD (LEVEL OF DETAIL)
+Bu yerda:
+- $y$ — dengiz sathidan balandlik (metrlarda, dengiz sathi $y = 0$).
+- $W_{cont} = 120.0$, $W_{detail} = 35.0$ — relef og'irlik koeffitsiyentlari.
+- $S_{cave}(x, y, z)$ — 3D Shveysariya pishlog'i (Swiss cheese) va qurt yo'llari (Worm caves) g'orlar shovqini. Agar $D(x, y, z) > 0$ bo'lsa, qattiq jins hosil bo'ladi, $D(x, y, z) \le 0$ bo'lsa, havo yoki suv bilan to'ldiriladi.
+- Biom tanlovi Uittaker (Whittaker) iqlim diagrammasiga binoan mahalliy harorat $T(x, z) \in [-30^\circ\text{C}, +45^\circ\text{C}]$ va namlik $W(x, z) \in [0\%, 100\%]$ ko'rsatkichlari kesishmasida aniqlanadi.
 
-- Yaqin chunklar: To'liq voxel kolliziya va greedy meshing.
-- O'rta masofa: Soddalashtirilgan yuzalar.
-- Uzoq masofa: Relyef balandlik xaritasi (Terrain LOD).
+### 27.2. Oltita Asosiy Biomning Katta Ekologik Matritsasi (6 Core Biomes Master Ecological Matrix)
 
----
+Quyidagi jadvalda Voxel Lord: Feudal Realm olamidagi 6 ta asosiy biomning to'liq termodinamik, qishloq xo'jaligi, biologik va qurilish parametrlari keltirilgan:
 
-# 30. YER QATLAMLARI VA STRATALAR
+| Biom Nomi (Biome) | O'rtacha Harorat ($T_{mean}$) | Fasllar Diapazoni ($\Delta T$) | Yillik Yog'ingarchilik (mm) | Tuproq Unumdorlik Indeksi | Flora O'sish Multiplikatori | Fauna Ekotizimi | Kasallik Xavfi (Virulence) | Grunt Ko'tarish Qobiliyati (Bearing Capacity kPa) | O'ziga Xos Ekologik Perk |
+|---|---|---|---|---|---|---|---|---|---|
+| **1. Unumdor Tekislik (Fertile Plains)** | $+14^\circ\text{C}$ | Bahor: $12^\circ\text{C}$, Yoz: $24^\circ\text{C}$, Kuz: $10^\circ\text{C}$, Qish: $-2^\circ\text{C}$ | $850\text{ mm}$ | $100\%$ ($1.00\times$) | $1.25\times$ | Qoramol, Qo'y, Yovvoyi Quyon, Ot | Asosiy me'yor ($1.00\times$) | $250\text{ kPa}$ (Standart zamin) | Don va sabzavotlar hosildorligi $+50\%$ |
+| **2. Qalin O'rmon (Dense Forest)** | $+11^\circ\text{C}$ | Bahor: $9^\circ\text{C}$, Yoz: $20^\circ\text{C}$, Kuz: $8^\circ\text{C}$, Qish: $-6^\circ\text{C}$ | $1200\text{ mm}$ | $70\%$ ($0.70\times$) | $1.50\times$ (Daraxtlar) | Bug'u, Yovvoyi To'ng'iz, Bo'ri, Qo'ng'ir Ayiq | Past-O'rta ($1.10\times$) | $200\text{ kPa}$ (O'rmon chirindisi) | Cheksiz yog'och va qatron manbai |
+| **3. Tik Qoyali Tog'lar (Craggy Mountains)** | $+4^\circ\text{C}$ | Bahor: $3^\circ\text{C}$, Yoz: $12^\circ\text{C}$, Kuz: $1^\circ\text{C}$, Qish: $-18^\circ\text{C}$ | $950\text{ mm}$ (Qor ko'p) | $20\%$ ($0.20\times$) | $0.40\times$ | Tog' Echkisi, Burgut, Qor Qoploni | Juda past ($0.50\times$) | $800\text{ kPa}$ (Mustahkam qoya) | Oliy toifadagi metall rudalari va granit |
+| **4. Qorong'u Botqoqlik (Murky Swamp)** | $+16^\circ\text{C}$ | Bahor: $15^\circ\text{C}$, Yoz: $26^\circ\text{C}$, Kuz: $14^\circ\text{C}$, Qish: $+2^\circ\text{C}$ | $1800\text{ mm}$ | $45\%$ ($0.45\times$) | $1.10\times$ (Qamish/Mox) | Zuluk, Baqa, Botqoq Timsohi, Ilon | O'ta xavfli ($2.20\times$, Bezgak/Vabo) | $60\text{ kPa}$ (Qoziqli poydevor zarur) | Torf yoqilg'isi, botqoq temiri va dorivor giyohlar |
+| **5. Muzlagan Tundra (Frozen Tundra)** | $-12^\circ\text{C}$ | Bahor: $-8^\circ\text{C}$, Yoz: $+3^\circ\text{C}$, Kuz: $-10^\circ\text{C}$, Qish: $-35^\circ\text{C}$ | $220\text{ mm}$ (Bo'ronlar) | $5\%$ (Abadiy muzlik) | $0.05\times$ (Ochiq tuproqda) | Qutb Bukasi, Oq Tulki, Oq Ayiq, Muz Yashiri | Sterillangan ($0.30\times$) | $500\text{ kPa}$ (Muzlagan grunt) | Oziq-ovqat va go'sht chirimasligi ($0\times$ aynish) |
+| **6. Qurg'oqchil Dasht (Arid Steppe)** | $+22^\circ\text{C}$ | Bahor: $18^\circ\text{C}$, Yoz: $38^\circ\text{C}$, Kuz: $15^\circ\text{C}$, Qish: $-4^\circ\text{C}$ | $180\text{ mm}$ (Qurg'oqchilik) | $30\%$ ($0.30\times$) | $0.50\times$ (Quruq butalar) | Yovvoyi Ot, Jayron, Shoqol, Chayon | Past ($0.80\times$, Suv orqali) | $300\text{ kPa}$ (Zichlashgan gilli qatlam) | Zotdor jangovar otlar yetishtirish markazi |
 
-- **0 → -30m:** Tuproq va loy qatlami (Soil & Clay).
-- **-30 → -100m:** Ko'mir, Mis va Qalay qatlami.
-- **-100 → -200m:** Temir, Kumush va Oltingugurt qatlami.
-- **-200 → -350m:** Oltin, Qimmatbaho javohirlar (Ruby, Diamond).
-- **-350m+:** Magma, Obsidian va Tub Qoya (Bedrock).
+### 27.3. Biomlar Oralig'idagi O'tish Zonasi va Blend Mexanikasi (Biome Blending & Voronoi Jitter)
 
----
+Biom chegaralari keskin to'siq bo'lib qolmasligi uchun Voronoi diagrammasi asosida 48 voxel ($1.5$ chunk) kengligidagi o'tish zonasi (Transition Buffer) hisoblanadi. Ikki yoki undan ortiq biom tutashgan nuqtada iqlim ko'rsatkichlari og'irlikli teskari masofa formulasi (Inverse Distance Weighting) orqali tekislanadi:
 
-# 31. SHAXTALAR VA KONCHILIK MEXANIZMLARI
+$$T_{local}(x, z) = \sum_{k=1}^K w_k(x, z) \cdot T_{biome, k}, \quad w_k(x, z) = \frac{\frac{1}{d_k^2 + 0.01}}{\sum_{j=1}^K \frac{1}{d_j^2 + 0.01}}$$
 
-Shaxta xavfsizligi va logistikasi:
-- Yog'och tirgaklar (Support Beams);
-- Shamollatish shaxtalari (Ventilation Shafts);
-- Ruda aravachalari (Mine Carts & Rails);
-- Chuqur liftlar (Hoists & Winches);
-- Konchilar chiroqlari (Lanterns).
+Bu yerda:
+- $d_k$ — ko'rib chiqilayotgan $(x, z)$ ustunidan $k$-biom markazigacha bo'lgan masofa.
+- $w_k$ — normallashgan og'irlik koeffitsiyenti ($\sum w_k = 1.0$).
+- Grunt bloklari chegarada aralashadi: masalan, O'rmon va Dasht chegarasida chimli tuproq (Grass Block) asta-sekin quruq qumloq tuproqqa (Coarse Dirt) aylanadi.
 
----
+### 27.4. Flora va Yovvoyi Tabiatning Biomlar Bo'yicha Taqsimoti (Flora & Fauna Ecosystem)
 
-# 32. SHAXTA O‘PIRILISHI (CAVE-IN)
-
-Tirgaklar o'rnatilmasa, shiftning mustahkamlik koeffitsiyenti (Ceiling Stability) pasayadi va voxel qulashi ro'y beradi. Konchilar jarohatlanadi, tunnellar yopilib qoladi.
-
----
-
-# 33. METAN GAZI VA PORTLASH (UNDERGROUND GAS)
-
-Chuqur qatlamlarda zaharli gaz cho'ntaklari paydo bo'ladi. Shamollatish quvurlari bo'lmasa, gaz zaharlanishi yoki mash'ala olovidan portlash yuz beradi.
-
----
-
-# 34. 20+ GEOLOGIK MINERALLAR
-
-Stone, Clay, Limestone, Marble, Granite, Basalt, Coal, Peat, Salt (Halite), Sulfur, Saltpeter, Copper, Tin, Lead, Zinc, Nickel, Iron, Silver, Gold, Platinum, Ruby, Emerald, Sapphire, Diamond.
+1. **Daraxt Turlari:**
+   - *Eman (Oak):* Unumdor Tekislik va Qalin O'rmon biomida o'sadi, yuqori zichlikdagi qurilish yog'ochi beradi.
+   - *Qarag'ay (Pine):* Tik Qoyali Tog'lar va Tundra yonbag'rida uchraydi, qatron va yengil taxta manbai.
+   - *Qayin (Birch):* O'rmon chetlari va tekisliklarda tarqalgan, o'ymakorlik va mebelchilik uchun xomashyo.
+   - *Majnuntol (Willow):* Qorong'u Botqoqlik qirg'oqlarida o'sadi, egiluvchan savatlar va tirgaklar uchun qo'llaniladi.
+   - *Qora Archa (Yew):* Tog' etaklarida kamyob o'sadi, eng kuchli jangovar uzun kamonlar (Longbow) uchun zarur.
+   - *Akatsiya (Acacia):* Qurg'oqchil Dasht kanyonlarida o'sadi, qattiq va issiqqa chidamli yog'och.
+2. **Yovvoyi Hayvonlar Populyatsiyasi va Ko'payishi:**
+   - Har bir chunk ustunida maksimal o'txo'rlar va yirtqichlar sig'imi (Carrying Capacity) cheklangan: $K_{fauna} = A_{chunk} \cdot B_{density}$.
+   - O'rmonlarda bug'ular va yovvoyi to'ng'izlar ozuqa izlab podada yuradi; qishda oziq-ovqat kamayganda bo'rilar aholi punktlariga yaqinlashib xavf tug'diradi.
 
 ---
 
-# 35. METALLURGIYA ZANJIRI
+# 28. VOXEL WORLD TEXNIK PARAMETRLARI (VOXEL WORLD TECHNICAL PARAMETERS)
 
-`Ruda qazish → Rudani maydalash → Domna pechida eritish → Quymalar (Ingots) → Qotishmalar (Bronza, Po'lat) → Temirchilik bosqoni → Tayyor qurol/asbob`.
+Voxel Lord: Feudal Realm o'yin dunyosi Godot Engine 4.3 platformasida ishlab chiqilgan yuqori unumdorlikka ega, to'liq o'zgaruvchan (fully destructible) voxel texnologiyasiga tayanadi.
+
+### 28.1. Standartlashtirilgan Chunk Strukturasi ($32 \times 32 \times 32$)
+
+1. **Fizik O'lcham:**
+   - 1 Voxel bloki = $1.0\text{ m} \times 1.0\text{ m} \times 1.0\text{ m}$ kub shaklidagi fazoviy hajm.
+   - 1 Chunk = $32 \times 32 \times 32$ voxel = $32,768$ ta blokdan iborat to'liq kubik segment.
+   - Dunyoning fazoviy masshtabi inson modeli ($1.8\text{ m}$ balandlik) bilan $1:1$ aniqlikda muvofiqlashtirilgan.
+2. **Fazoviy Indekslash (Spatial Indexing):**
+   - Chunk ichidagi har bir lokal voxel $(x, y, z)$ yagona 1D chiziqli massivga tekislanadi:
+
+$$\text{Index}(x, y, z) = x + (z \times 32) + (y \times 32 \times 32) = x + 32z + 1024y$$
+
+Bu yerda $x, y, z \in [0, 31]$. Ushbu tartib kesh lokalizatsiyasini (cache locality) ta'minlaydi va xotiradan ma'lumot o'qish tezligini oshiradi.
+
+### 28.2. Chunk Xotira Bayt Formati (Chunk Byte Layout & Bit-Packing)
+
+Har bir voxel bloki xotirada qat'iy 32-bit (4 bayt) butun son shaklida saqlanadi:
+
+```
+[Bit 0-11: Block ID] [Bit 12-15: Meta/Damage] [Bit 16-19: Sunlight] [Bit 20-23: BlockLight] [Bit 24-31: MicroBiome]
+|--- 12 bit --------|--- 4 bit -------------|--- 4 bit ---------|--- 4 bit ------------|--- 8 bit ---------|
+```
+
+- **Bits 0–11 (12 bit):** Blok Turi identifikatori (`BlockID` $0 - 4095$ gacha turli minerallar, yog'ochlar, tuproqlar).
+- **Bits 12–15 (4 bit):** Blok Holati va Buzilish Darajasi (`Metadata / Damage Stage`, $0 - 15$ darajali darz ketish animatsiyasi).
+- **Bits 16–19 (4 bit):** Quyosh nuri intensivligi (`Sunlight`, $0 - 15$ daraja, osmondan tushuvchi dinamik nurlar).
+- **Bits 20–23 (4 bit):** Sun'iy yorug'lik intensivligi (`BlockLight`, $0 - 15$ daraja, mash'ala, kamin, lava nurlari).
+- **Bits 24–31 (8 bit):** Namlik va mahalliy mikro-harorat indeksi ($0 - 255$).
+
+Quyidagi jadvalda chunklarning xotiradagi byudjeti keltirilgan:
+
+| Chunk Turi | Voxel Soni | Xotira Hajmi (Uncompressed) | Siqish Usuli (Compression) | Siqilgan Hajm (Compressed) | Keshdagi Xotira Sig'imi (1024 chunk) |
+|---|---|---|---|---|---|
+| **Bo'sh Havo Chunki (Air Chunk)** | 32,768 | $128\text{ KB}$ | Yagona konstant ID (Flagged) | $16\text{ Bayt}$ | $16\text{ KB}$ |
+| **Yaxlit Qoya Chunki (Solid Stone)** | 32,768 | $128\text{ KB}$ | RLE (Run-Length Encoding) | $64\text{ Bayt}$ | $64\text{ KB}$ |
+| **Aralash Yerusti Chunki (Surface)** | 32,768 | $128\text{ KB}$ | Palette Compression (16 rang) | $18.4\text{ KB}$ | $18.8\text{ MB}$ |
+| **Murakkab Shaxta Chunki (Mine/Caves)**| 32,768 | $128\text{ KB}$ | Deflate / Zlib oqimi | $32.6\text{ KB}$ | $33.4\text{ MB}$ |
+
+### 28.3. Dunyo Chegaralari va Koordinata Konversiya Formulalari (World Boundaries & Coordinate Transforms)
+
+1. **Dunyo Chegarasi:**
+   - Gorizontal maydon: $X \in [-2048\text{ m}, +2048\text{ m}]$, $Z \in [-2048\text{ m}, +2048\text{ m}]$ (Umumiy maydon $16.78\text{ km}^2$, $128 \times 128$ chunk ustunlari).
+   - Vertikal koordinatalar: $Y \in [-512\text{ m}, +256\text{ m}]$ (Jami balandlik $768\text{ m}$, 24 ta chunk qatlami).
+2. **Koordinata Transformatsiyasi Formulalari:**
+   Global dunyo koordinatasi $(X, Y, Z)$ dan Chunk koordinatasi $(CX, CY, CZ)$ va lokal voxel indeksi $(vx, vy, vz)$ ni hisoblash:
+
+$$CX = \lfloor X / 32 \rfloor, \quad CY = \lfloor Y / 32 \rfloor, \quad CZ = \lfloor Z / 32 \rfloor$$
+
+$$vx = X - (CX \times 32) = X \ \& \ 31$$
+
+$$vy = Y - (CY \times 32) = Y \ \& \ 31$$
+
+$$vz = Z - (CZ \times 32) = Z \ \& \ 31$$
+
+Teskari konversiya (Lokal voxeldan global dunyo koordinatasiga):
+
+$$X = CX \times 32 + vx, \quad Y = CY \times 32 + vy, \quad Z = CZ \times 32 + vz$$
+
+---
+
+# 29. VOXEL LOD (LEVEL OF DETAIL SYSTEM)
+
+Katta hajmdagi voxel olamida yuqori kadrlar chastotasini (60–144 FPS) ta'minlash maqsadida 4 pog'onali iyerarxik Level of Detail (LOD) tizimi qo'llaniladi.
+
+### 29.1. 4 Pog'onali LOD Iyerarxiyasi (4-Tier LOD Architecture)
+
+1. **LOD 0 — Yaqin Masofa ($0 - 64\text{ m}$, 2 chunk radiusi):**
+   - *Render:* To'liq Greedy Meshing algoritmi. Bir xil turdagi va bir tekislikda joylashgan qo'shni yuzalar bitta to'rtburchak polagonga birlashtiriladi. Natijada poligonlar soni 60% dan 85% gacha qisqaradi.
+   - *Fizika:* To'liq `ConcavePolygonShape3D` statik to'qnashuv to'ri (collision mesh). Har bir voxel individual sindirilishi va kovlanishi mumkin.
+   - *Yoritish:* Bloklararo dinamik Ambient Occlusion va yumshoq yorug'lik silliqlash.
+2. **LOD 1 — O'rta Masofa ($64 - 160\text{ m}$, 2–5 chunk radiusi):**
+   - *Render:* Okto-daraxt (Octree) asosidagi soddalashtirilgan Dual Contouring / Surface Decimation. $2 \times 2 \times 2$ voxel guruhlari bitta makro-katakka birlashtiriladi. Poligonlar soni LOD 0 ga nisbatan 75% kamayadi.
+   - *Fizika:* Faqat personaj harakati uchun soddalashtirilgan qo'pol balandlik kolliziyasi; mayda g'or ichi kolliziyalari o'chiriladi.
+3. **LOD 2 — Uzoq Masofa ($160 - 384\text{ m}$, 5–12 chunk radiusi):**
+   - *Render:* Balandlik maydoni relied to'ri (Heightfield Terrain Mesh). Yer osti g'orlari va shaxtalar meshdan to'liq chiqarib tashlanadi (Occlusion culling). Faqat eng yuqori quyosh ko'radigan sirt $4 \times 4$ qadamda triyangulyatsiya qilinadi.
+   - *Fizika:* Kolliziya to'liq o'chiriladi; uzoq masofadagi o'qlar va AI marshrutlari analitik balandlik tekshiruvi orqali yo'naltiriladi.
+4. **LOD 3 — Ufq Chizig'i ($384 - 1024\text{ m}+$, ufq chegarasi):**
+   - *Render:* Distant Horizon Impostors / Normal-mapped Billboard Mesh. Uzoqdagi tog' tizmalari va relef past poligonli siluet sifatida chiziladi va volumetrik tuman (Volumetric Fog) orqali silliq yashiriladi.
+
+### 29.2. O'tish Histerezisi (LOD Transition Hysteresis)
+
+Kamera LOD chegaralarida tebranganda poligon to'rlarining to'xtovsiz qayta generatsiya bo'lishi (LOD thrashing va stuttering) ning oldini olish uchun $\Delta_{hysteresis} = 8.0\text{ metr}$ o'lchamdagi histerezis buferi kiritiladi:
+
+$$D_{upgrade} = D_{boundary} - \Delta_{hysteresis}, \quad D_{downgrade} = D_{boundary} + \Delta_{hysteresis}$$
+
+Masalan, LOD 0 dan LOD 1 ga o'tish masofasi $64\text{ m}$ bo'lsa, kamera uzoqlashayotganda chunk $72\text{ m}$ ga yetgandagina LOD 1 ga o'tadi, yaqinlashayotganda esa $56\text{ m}$ ga yetgandagina LOD 0 ga qaytadi.
+
+### 29.3. Ko'p Oqimli Mesh Generatsiyasi (Mesh Generation Threading Pipeline)
+
+Mesh generatsiyasi asosiy o'yin oqimini (Main Thread) muzlatib qo'ymasligi uchun Godot 4 ning `WorkerThreadPool` tizimi asosida asinxron bajariladi:
+1. **Prioritet Navbati (Priority Queue):** O'yinchining ko'rish konusidagi (Frustum) va eng yaqin masofadagi o'zgargan (dirty) chunklar eng yuqori ustuvorlikka ega bo'ladi:
+
+$$\text{Priority} = \max(0, 1000 - \lfloor d_{camera} \rfloor) + (\text{InFrustum} \times 500)$$
+
+2. **Xomashyo Buferi (Staging Buffer):** Fon oqimida vertex, normal, UV va indeks massivlari hisoblab chiqiladi.
+3. **Asosiy Oqimga Yuklash:** Faqatgina tayyor `ArrayMesh` va `Shape3D` resurslari asosiy oqimga uzatiladi va GPU xotirasiga $1.5\text{ ms}$ vaqt chegarasida (Frame Budget) yuklanadi.
+
+---
+
+# 30. YER QATLAMLARI VA STRATALAR (SUBTERRANEAN STRATA LAYERS)
+
+Voxel Lord: Feudal Realm ostidagi geologiya oddiy tasodifiy tosh emas, balki Yer qobig'ining qonuniy geologik evolyutsiyasini aks ettiruvchi vertikal qatlamlardan iborat.
+
+### 30.1. Vertikal Geologik Qatlamlar Tuzilishi (0 to -350m+)
+
+Subterranean muhit 6 ta alohida litosfera qatlamiga (strata) bo'linadi:
+
+1. **1-Qatlam: Gumus va Cho'kindi Qatlam ($0 \to -15\text{ m}$):**
+   - Organik qora tuproq, qum, daryo shag'ali va loy (Clay) qatlami.
+   - Dehqonchilik, g'isht pishirish va kulolchilik uchun birlamchi qatlam. O'simlik ildizlari va grunt suvlari to'yinadi.
+2. **2-Qatlam: Yumshoq Cho'kindi Tog' Jinslari ($-15 \to -60\text{ m}$):**
+   - Qumtosh (Sandstone), Ohaktosh (Limestone) va dastlabki qalin Toshko'mir qatlamlari.
+   - Qadimgi dengiz qoldiqlari bo'lgan Tosh tuzi (Halite) va mis oksidlarining yuqori shoxchalari uchraydi.
+3. **3-Qatlam: O'tish Qatlami va Asosiy Metallar ($-60 \to -160\text{ m}$):**
+   - Qattiq ohaktosh, kvarsit va slaneslar.
+   - Temir rudasi (Gematit), Qalay (Kassiterit), Qo'rg'oshin (Galenit), Rux (Sfalerit) va Oltingugurt qatlamlari. Bronza va po'lat asrining poydevori.
+4. **4-Qatlam: Magmatik Jinslar va Asil Metallar ($-160 \to -280\text{ m}$):**
+   - Oq Marmar va ulkan Granit qoyalari.
+   - Kumush rudasi (Akantit), Nikel (Pentlandit), Oltin tomirlari va yashil Zumrad kristallari. Shaxta o'pirilish xavfi va tog' bosimi keskin ortadi.
+5. **5-Qatlam: Abissal Qatlam va Qimmatbaho Javohirlar ($-280 \to -350\text{ m}$):**
+   - O'ta qattiq vulkanik Bazalt va qora diabazlar.
+   - Oliy sof Oltin uyumlari, Platina, qizil Yoqut (Ruby) va Olmos (Diamond) kristallari. Yuqori harorat, metan va vodorod sulfid gazlari to'planadi.
+6. **6-Qatlam: Magmatik Tub Qoya ($-350\text{ m}+$):**
+   - Qazib bo'lmas Tub Qoya (Bedrock), erigan lava daryolari va obsidian plitalari. O'yin dunyosining mutlaq pastki chegarasi.
+
+### 30.2. Gauss Taqsimoti Ehtimollik Zichligi (Gaussian Depth Probability Function)
+
+Har bir mineral va rudaning qatlamlar bo'ylab uchrash ehtimoli Gaussning normal taqsimot qonuniyatiga bo'ysunadi. Bu orqali har bir ruda o'zining cho'qqi chuqurligi ($y_{peak}$) da eng ko'p, undan uzoqlashgan sari kamayib boruvchi tabiiy taqsimot hosil qiladi:
+
+$$P_{ore}(y) = P_{peak} \cdot \exp\left(-\frac{(y - y_{peak})^2}{2\sigma_y^2}\right)$$
+
+Bu yerda:
+- $y \le 0$ — chuqurlik (metrlarda).
+- $y_{peak}$ — rudaning eng ko'p to'plangan optimal chuqurligi.
+- $\sigma_y$ — qatlam qalinligining standart og'ishi (tarqalish radiusi).
+- $P_{peak}$ — cho'qqi chuqurlikdagi maksimal hosil bo'lish ehtimoli ($0.0 - 1.0$).
+
+Dunyo generatsiyasi paytida voxel koordinatasi bo'yicha 3D tomir shovqini $N_{vein}(x, y, z) \in [0.0, 1.0]$ olinadi:
+
+$$\text{Agar } N_{vein}(x, y, z) < P_{ore}(y) \implies \text{Voxel Bloki } = \text{OreBlockID}$$
+
+### 30.3. 3D OpenSimplex / FastNoiseLite Shovqin Parametrlari
+
+Qatlamlarning egilishi, tekis bo'lmagan to'lqinsimon chegaralari va ruda tomirlarining fazoviy klasterlanishi quyidagi FastNoiseLite parametrlari orqali boshqariladi:
+
+| Shovqin Tizimi | Noise Turi | Chastota ($f$) | Oktavalar Soni | Lacunarity | Gain | Izoh va Geologik Vazifasi |
+|---|---|---|---|---|---|---|
+| **Strata Wave Noise** | Simplex Smooth | $0.008$ | 3 | $2.0$ | $0.5$ | Geologik qatlamlarning vertikal to'lqinlanishi va siljishini hosil qiladi |
+| **Cellular Vein Noise** | Cellular (Worley)| $0.035$ | 2 | $2.0$ | $0.45$| Ruda tomirlarining ingichka, tarvaqaylagan linzalarini generatsiya qiladi |
+| **Cave Density Noise** | Perlin 3D | $0.020$ | 4 | $2.2$ | $0.55$| Tabiiy karst g'orlari, karst bo'shliqlari va yerosti zallarini o'yadi |
+| **Domain Warp Noise** | Simplex Domain Warp| $0.015$ | 2 | $2.0$ | $0.6$ | Qatlamlar va tomirlarni tektonik burmalanishdek qiyshaytiradi |
+
+---
+
+# 31. SHAXTALAR VA KONCHILIK MEXANIZMLARI (MINING MECHANICS & INFRASTRUCTURE)
+
+Voxel Lord: Feudal Realm shaxta ishlari oddiy blok urish emas, balki real muhandislik, xavfsizlik va chuqur transport logistikasini talab qiluvchi sanoat tizimidir.
+
+### 31.1. Kon Qazish Mexanikasi va Asbob Tiersi (Mining Mechanics & Pickaxe Progression)
+
+Har bir qattiq blok o'zining mustahkamlik darajasiga (Hardness) ega. Agar o'yinchi yoki konchi fuqaroning qo'lidagi cho'kich (Pickaxe) tieri blok talabidan past bo'lsa, zarba berilganda asbob uchqun chiqarib orqaga qaytadi (Deflection), mineral buzilmaydi va asbob mustahkamligi $3\times$ tezroq yo'qoladi.
+
+Blokni qazib olish uchun talab qilinadigan sof vaqt ($T_{mine}$) quyidagi formula bo'yicha hisoblanadi:
+
+$$T_{mine} = \frac{\text{Hardness} \times 1.5}{\text{ToolSpeedMultiplier} \times \text{SkillMultiplier} \times \text{StaminaFactor}}$$
+
+Bu yerda:
+- $\text{Hardness}$ — mineralning jadvaldagi qattiqlik darajasi ($1 - 20$).
+- $\text{ToolSpeedMultiplier}$ — cho'kich tezligi (Yog'och: $0.5\times$, Tosh: $1.0\times$, Bronza: $1.6\times$, Temir: $2.4\times$, Po'lat: $3.5\times$, Damashq po'lati: $5.0\times$).
+- $\text{SkillMultiplier}$ — fuqaroning konchilik mahorati ($1.0 + 0.05 \times \text{Level}$).
+- $\text{StaminaFactor}$ — konchining charchoq koeffitsiyenti ($1.0$ dan $0.4$ gacha pasayadi).
+
+### 31.2. Shaxtani Yog'ochlash va Vertikal Ustunlar (Shaft Timbering & Shoring)
+
+Chuqur yerosti shaxtalari ikki xil asosiy muhandislik yo'nalishida quriladi:
+1. **Vertikal Shaxta Stvoli (Vertical Shaft):**
+   - $3 \times 3$ yoki $4 \times 4$ voxel o'lchamida vertikal pastga qaziladi.
+   - Yog'och qoplama (Shaft Lining) va to'rtburchak ramkalar (Square Sets) bilan qoplanishi shart.
+   - Tepada yog'och chig'ir va ko'targich kran (Headframe & Winch Hoist) o'rnatiladi. U chuqurlikdan ruda qutilarini va konchilarni ko'tarib tushiradi.
+2. **Gorizontal Shtolnya va Tunnellar (Horizontal Drift & Adit):**
+   - Qiya yoki to'g'ri gorizontal kovlanadi.
+   - Har 3–5 metrda yog'och tirgak ramkalari (Timber Sets: Cap, Post, Sill) o'rnatilishi shart.
+   - Yumshoq qum va loy qatlamlarida to'kilishning oldini olish uchun yupqa taxtali qalqonlar (Spiling boards) qoqiladi.
+
+### 31.3. Drenaj va Suv Qatlamlari (Mine Drainage, Aquifers & Sumps)
+
+Chuqurligi $-60\text{ m}$ dan oshgan shaxtalarda grunt suvlari qatlami (Aquifer) ni teshib qo'yish xavfi mavjud.
+- Agar konchi suvli qumtoshni teshib qo'ysa, shaxtaga minutiga $Q_{in} = 0.5 - 2.5\text{ m}^3$ tezlikda suv oqib kira boshlaydi.
+- Drenaj choralari ko'rilmasa, shaxta to'lib, ish to'xtaydi va ichkaridagi konchilar cho'kib halok bo'ladi.
+- **Suvni Bartaraf Etish Texnologiyalari:**
+  1. *Drenaj Chuquri (Drainage Sump):* Shaxtaning eng chuqur burchagida qazilgan maxsus $3 \times 3 \times 3$ o'lchamli suv to'plagich.
+  2. *Chelakli Charxpalak Ko'targich (Bucket Elevator):* Ot yoki suv charxpalagi kuchi bilan aylanuvchi uzluksiz charm chelaklar tizimi.
+  3. *Arximed Vinti (Archimedes Screw):* Qiya o'rnatilgan yog'och vint suvni yuqori gorizontga haydaydi.
+  4. *Yog'och Quvurli Drenaj Shtolnyasi (Gravity Adit):* Tog' etagiga chiqarilgan nishab ariq orqali suv o'z oqimi bilan tashqariga oqiziladi.
+
+### 31.4. Ruda Transport Logistikasi (Subterranean Haulage & Mine Carts)
+
+Chuqurlikdan rudani qo'lda ko'tarib chiqish konchilar unumdorligini 80% ga tushirib yuboradi. Shu sababli shaxta logistika tizimlari quriladi:
+- **Yog'och va Temir Relslar:** Tunnellar poliga yotqiziladi. Harakat qarshiligini $4\times$ kamaytiradi.
+- **Vagonetkalar (Mine Carts):** Sig'imi $600\text{ kg}$ dan $1500\text{ kg}$ gacha bo'lgan g'ildirakli temir/yog'och aravachalar. Konchilar yoki eshak/otlar orqali tortiladi.
+- **Qiya Tortgichlar (Incline Gravity Tramway):** To'la yukli vagonetka pastga tushayotganda arqon orqali bo'sh vagonetkani yuqoriga tortib chiqaradi.
+
+---
+
+# 32. SHAXTA O‘PIRILISHI (CAVE-IN & STRUCTURAL STABILITY)
+
+Har qanday yerosti kovlash ishlari tabiiy tosh massivida kuchlar muvozanatini buzadi. Katta bo'shliqlar hosil qilinganda tog' bosimi shiftga og'irlik qiladi va halokatli kaskadli o'pirilishlar (cave-in) yuzaga keladi.
+
+### 32.1. Shift Mustahkamligi Indeksi ($S_c$) ning Matematik Modeli
+
+Har bir ochiq bo'shliq ustidagi shift blokida $(x, y, z)$ Shift Mustahkamlik Indeksi ($S_c$) uzluksiz baholanadi:
+
+$$S_c = \frac{K_{rock} \cdot \max\left(1.0, \sum_{i \in \text{Supports}} \frac{R_{sup, i}^2}{d_i^2 + 0.1}\right)}{1.0 + \alpha_{span} \cdot \left( \frac{L_{span}}{2} \right)^2 \cdot \left( 1.0 + \beta_{depth} \cdot \frac{|y|}{100} \right)}$$
+
+Shu bilan birga, yagona tayanch va to'g'ridan-to'g'ri ochiq oraliq uchun chiziqli me'yoriy formula quyidagicha ifodalanadi:
+
+$$S_c = K_{rock} \cdot \left(\frac{R_{sup}}{L_{span}}\right)$$
+
+Bu formulalarda:
+- $K_{rock}$ — tog' jinsining valent mustahkamlik koeffitsiyenti (Rock Tensile Strength Factor).
+- $R_{sup, i}$ — $i$-raqamli tirgakning samarali qo'llab-quvvatlash radiusi (metrlarda).
+- $d_i$ — shift blokidan $i$-tirgakkacha bo'lgan Evklid masofasi.
+- $L_{span}$ — qarama-qarshi turgan yaxlit qoya devorlari orasidagi eng qisqa masofa (tayanchsiz oraliq, metrlarda).
+- $\alpha_{span} = 0.08$ — oraliq kengayishi kuchlanishining ko'rsatkich koeffitsiyenti.
+- $\beta_{depth} = 0.35$ — har 100 metr chuqurlikdagi ustki qatlam bosimi ortish koeffitsiyenti.
+- $y \le 0$ — chuqurlik koordinatasi.
+
+**Xavfsizlik Mezonlari:**
+- $S_c \ge 1.0$: Shift mutlaq barqaror va xavfsiz.
+- $0.75 \le S_c < 1.0$: Kritik holat. Yog'och tirgaklar qisirlaydi, shiftdan mayda tosh va chang to'kiladi, konchilar vahimaga tushadi.
+- $S_c < 0.75$: Beqarorlik chegarasi. Har 2.0 sekundda qulash ehtimoli $P_{collapse} = 1.0 - S_c$ bo'yicha tekshiriladi va o'pirilish boshlanadi.
+
+### 32.2. Jinslar Mustahkamlik Koeffitsiyenti ($K_{rock}$) va Tirgak Radiusi ($R_{sup}$)
+
+Quyidagi jadvalda tog' jinslarining tabiiy mustahkamlik koeffitsiyentlari keltirilgan:
+
+| Jins Turi (Rock Type) | Geologik Klassifikatsiya | Mustahkamlik Koeffitsiyenti ($K_{rock}$) | Maksimal Tayanchsiz Oraliq ($L_{max}$ m) | O'pirilish Xarakteri |
+|---|---|---|---|---|
+| **Tuproq / Qum / Loy (Soil/Clay)** | Bo'shashgan cho'kindi | $0.20$ | $1.5\text{ m}$ | Darhol to'kiluvchi qum va gilli ko'chki |
+| **Qumtosh / Ohaktosh (Sandstone/Limestone)**| Cho'kindi qatlamli | $0.55$ | $4.5\text{ m}$ | Qatlam bo'ylab yorilib, yirik plitalar tushishi |
+| **Marmar / Granit (Marble/Granite)** | Metamorfik / Magmatik | $0.90$ | $9.0\text{ m}$ | Sekin darz ketuvchi, ulkan monolit bloklar |
+| **Granit Monolit (Monolithic Granite)** | Magmatik intruziya | $1.40$ | $12.0\text{ m}$ | O'ta qattiq mustahkam tabiiy gumbaz |
+| **Bazalt / Tub Qoya (Basalt/Bedrock)**| Vulkanik tub jins | $1.00$ | $10.0\text{ m}$ | Yuqori bosimga chidamli, yoriqsiz qattiq massiv |
+
+Shaxtada quriladigan sun'iy tirgaklarning samaradorlik ko'rsatkichlari:
+
+| Tirgak Turi (Support Type) | Material Tarkibi | Himoya Radiusi ($R_{sup}$ m) | Samarali Himoya Maydoni ($m^2$) | Yuklama Bardoshligi (kPa) |
+|---|---|---|---|---|
+| **Yumshoq Yog'och Tirgak (Softwood Timber)** | Qarag'ay / Qayin xodalari | $3.0\text{ m}$ | $28.3\text{ m}^2$ | $150\text{ kPa}$ |
+| **Qattiq Yog'och Ramka (Hardwood Frame)** | Qalin eman (Oak) to'sinlari | $5.0\text{ m}$ | $78.5\text{ m}^2$ | $450\text{ kPa}$ |
+| **Eman Tayanch Ustun (Reinforced Oak Post)** | Zich eman monolit ustun | $6.0\text{ m}$ | $113.1\text{ m}^2$ | $600\text{ kPa}$ |
+| **Tarashlangan Tosh Ustun (Cut Stone Pillar)** | Ohaktosh / Granit bloklar | $7.5\text{ m}$ | $176.7\text{ m}^2$ | $1200\text{ kPa}$ |
+| **Temir Qoplamali Kamar (Iron-Reinforced Arch)**| Temir armatura va tosh ark | $11.0\text{ m}$ | $380.1\text{ m}^2$ | $3500\text{ kPa}$ |
+
+### 32.3. Tog' Bosimi Formulasi (Overburden Pressure)
+
+Chuqurlik ortishi bilan qazuv maydoni ustidagi millionlab tonna tog' jinsining gidrostatik litostatik bosimi ortib boradi:
+
+$$P_{overburden} = \rho_{rock} \cdot g \cdot |y| \quad (\text{kPa})$$
+
+Bu yerda:
+- $\rho_{rock} \approx 2600\text{ kg/m}^3$ — tog' jinslarining o'rtacha zichligi.
+- $g = 9.81\text{ m/s}^2$ — erkin tushish tezlanishi.
+- $|y|$ — chuqurlik (metrlarda). Masalan, $-100\text{ m}$ chuqurlikda litostatik bosim $P = 2600 \times 9.81 \times 100 = 2,550,600\text{ Pa} \approx 2550\text{ kPa}$ ($25.5\text{ bar}$) ga yetadi.
+
+### 32.4. Kaskadli O'pirilish BFS Algoritmi (Cascading Cave-in Algorithm)
+
+Bitta blok qulaganda qo'shni shift bloklaridagi kuchlanish keskin ortadi va zanjirli kaskadli reaksiya yuz beradi. Tizim Breadth-First Search (BFS) algoritmi bo'yicha ishlaydi:
+
+```gdscript
+func process_cave_in_cascade(start_pos: Vector3i, chunk_manager: ChunkManager) -> void:
+	var queue: Array[Vector3i] = [start_pos]
+	var visited: Dictionary = {start_pos: true}
+	var collapsed_blocks: Array[Vector3i] = []
+
+	while not queue.is_empty():
+		var current_pos: Vector3i = queue.pop_front()
+		var rock_type: int = chunk_manager.get_block(current_pos)
+		if rock_type == 0:
+			continue
+
+		var stability: float = evaluate_ceiling_stability(current_pos, rock_type)
+		if stability < 0.75:
+			collapsed_blocks.append(current_pos)
+			# Qo'shni shift bloklarini tekshirish (6 tomonlama bog'lanish)
+			for offset in [Vector3i(1,0,0), Vector3i(-1,0,0), Vector3i(0,0,1), Vector3i(0,0,-1), Vector3i(0,1,0)]:
+				var neighbor: Vector3i = current_pos + offset
+				if not visited.has(neighbor) and chunk_manager.get_block(neighbor) != 0:
+					visited[neighbor] = true
+					queue.push_back(neighbor)
+
+	# Barcha beqaror bloklarni fizik qulovchi ob'ektlarga aylantirish
+	for pos in collapsed_blocks:
+		spawn_falling_debris_block(pos, chunk_manager.get_block(pos))
+		chunk_manager.set_block(pos, 0) # Havoga aylantirish
+```
+
+### 32.5. Qulovchi Bloklar Fizikasi va Miner Jarohati
+
+1. **Jarohat Hisoblash Formulasi:**
+   Qulagan har bir $1.0\text{ m}^3$ tosh blokining massasi $m_{block} \approx 2600\text{ kg}$. Tushish balandligi $h_{fall}$ ga qarab kinetik energiya orqali konchiga yetkaziladigan ezuvchi zarba (Blunt Damage):
+
+$$\text{Damage}_{miner} = m_{block} \cdot v_{impact} \cdot 0.25 = 2600 \cdot \sqrt{2 \cdot g \cdot h_{fall}} \cdot 0.25$$
+
+$3\text{ metr}$ balandlikdan tushgan kichik parcha ham $50\text{ HP}$ dan ortiq maydalovchi zarba beradi. Maxsus temir dubulg'asiz konchilar joyida halok bo'ladi.
+2. **Tunnel To'silib Qolishi:** Tushgan toshlar polga to'kilib, tunnelni $100\%$ germetik to'sib qo'yadi. Orqada qolgan konchilar havo va oziq-ovqatsiz qolib ketadi; qutqaruv otryadlari qazib ochguncha nafas qisilishidan o'lish xavfi yuzaga keladi.
+
+---
+
+# 33. METAN GAZI VA PORTLASH (SUBTERRANEAN GAS ACCUMULATION & VENTILATION)
+
+Yer qa'ridagi organik chirish va termokimyoviy jarayonlar natijasida chuqur shaxtalarda o'ta xavfli, ko'zga ko'rinmas gaz cho'ntaklari paydo bo'ladi.
+
+### 33.1. To'rtta Asosiy Kon Gazi Kimyosi va Xususiyatlari
+
+Subterranean tizimda 4 ta tarixiy va fizik kon gazi simulyatsiya qilinadi:
+
+| Gaz Nomi (Gas Name) | Kimyoviy Formula | Zichlik ($\rho_{air}=1.0$) | Shaxtadagi Xatti-harakati | Portlash Diapazoni (% hajmiy) | Toksik / Halokatli Chegara | Aniqlash Usuli (Detection) |
+|---|---|---|---|---|---|---|
+| **Firedamp (Metan)** | $CH_4$ | $0.55$ (Yengil) | Shift bo'shliqlari va cho'ntaklariga ko'tariladi | $5.0\% - 15.0\%$ (Cho'qqi portlash $9.5\%$) | Zaharli emas, lekin kislorodni siqib chiqaradi ($>50\%$) | Davy chirog'ida moviy alanga gardishi |
+| **Blackdamp (Bo'g'uvchi gaz)**| $CO_2 + N_2$ | $1.52$ (Og'ir) | Shaxta tubi, quduqlar va drenaj sumplariga cho'kadi | Yonmaydi (Alangani o'chiradi) | $O_2 < 12\%$ (3 daqiqada behushlik, asfiksiya) | Sham va mash'ala alangasining so'nishi |
+| **Stinkdamp (Vodorod Sulfid)**| $H_2S$ | $1.19$ (Og'irroq) | Suvli qatlamlar va sulfid rudalari bo'ylab polga yoyiladi| $4.3\% - 46.0\%$ | $>500\text{ ppm}$ ($0.05\%$, asab falaji va tezkor o'lim) | Chirigan tuxum hidi, qafasdagi kanareyka |
+| **Afterdamp (Is gazi)** | $CO$ | $0.97$ (Teng) | Yong'in va portlashdan keyin butun shaxta bo'ylab diffuziyalanadi | $12.5\% - 74.0\%$ | $>1200\text{ ppm}$ ($0.12\%$, 10 daqiqada o'lim) | Qafasdagi kanareyka hushidan ketishi |
+
+### 33.2. Gaz Sizib Chiqishi va Shamollatish Differensial Tenglamasi
+
+Shaxta kamerasidagi gaz konsentratsiyasi $C_{gas}(t)$ (% hajmiy ulush) vaqt o'tishi bilan ochiq ruda yuzasidan gaz sizib chiqishi va ventilyatsiya tizimi chiqindisi balansiga tayanadi:
+
+$$\frac{dC_{gas}}{dt} = \frac{G_{seep}(y) \cdot A_{wall}}{V_{cavity}} - \frac{Q_{vent}}{V_{cavity}} \cdot C_{gas}(t)$$
+
+Bu yerda:
+- $V_{cavity}$ — shaxta xonasining umumiy hajmi ($m^3$).
+- $A_{wall}$ — ochiq turgan ko'mir yoki sulfid qatlamining devor sathi maydoni ($m^2$).
+- $G_{seep}(y) = G_0 \cdot (1.0 + 0.005 \cdot |y|)$ — chuqurlikka bog'liq gaz sizish tezligi ($m^3 / (m^2 \cdot \text{soat})$). Ko'mir uchun $G_0 = 0.08$, oltingugurt uchun $G_0 = 0.15$.
+- $Q_{vent}$ — ventilyatsiya orqali chiqarilayotgan havo hajmi ($m^3 / \text{soat}$).
+
+Ushbu differensial tenglamaning analitik aniq yechimi:
+
+$$C_{gas}(t) = \frac{G_{seep} \cdot A_{wall}}{Q_{vent}} + \left( C_0 - \frac{G_{seep} \cdot A_{wall}}{Q_{vent}} \right) e^{-\frac{Q_{vent}}{V_{cavity}} \cdot t}$$
+
+**Ventilyatsiya Quvvati ($Q_{vent}$):**
+- Tabiiy konveksiya quvuri: $Q_{vent} = 15.0 \cdot \sqrt{\Delta h_{shaft}}\text{ m}^3/\text{soat}$.
+- Qo'lda aylanuvchi charm bosqon (Bellows): $Q_{vent} = 120.0\text{ m}^3/\text{soat}$.
+- Suv charxpalagi yoki shamol tegirmoniga ulangan markazdan qochma ventilyator: $Q_{vent} = 850.0\text{ m}^3/\text{soat}$.
+
+### 33.3. Gaz Qidirish va Aniqlash Metodlari (Davy Lamp & Canary)
+
+1. **Devi Xavfsiz Shaxta Chirog'i (Davy Safety Lamp):**
+   - Sir Devid Devi ixtirosi bo'lgan zich sim to'rli mis chiroq. Olov alangasini sim to'r sovutadi va tashqaridagi metanni chaqnatmaydi.
+   - O'yinchi chiroqqa qaraganda metan darajasi aniqlanadi: agar havoda metan $2\%$ dan oshsa, olov tepasida moviy qalpog'cha (blue halo cap) paydo bo'ladi. Qalpog'cha balandligi metan foiziga to'g'ri proporsionaldir.
+2. **Qafasdagi Konchi Kanareykasi (Canary Bird):**
+   - Kanareykalarning metabolizmi va kislorod sarfi odamnikidan 15 barobar tez.
+   - Havoda is gazi ($CO$) yoki vodorod sulfid ($H_2S$) paydo bo'lganda, kanareyka bezovtalanadi, sayrashdan to'xtaydi va 2 daqiqa ichida qafas poliga ag'dariladi. Bu konchilar uchun shoshilinch evakuatsiya signali hisoblanadi.
+
+### 33.4. Portlash Mexanikasi va Portlash Radiusi Formulasi
+
+Agar metan konsentratsiyasi portlash chegarasida ($5.0\% \le C_{CH4} \le 15.0\%$) bo'lsa va kameraga ochiq olov (mash'ala, oddiy sham yoki chaqmoqtosh uchquni) kiritilsa, bir lahzali deflagratsion portlash ro'y beradi.
+
+Portlashda ajralib chiqadigan umumiy kinetik energiya:
+
+$$E_{blast} = V_{pocket} \cdot \left(\frac{C_{CH4}}{100}\right) \cdot \Delta H_{combustion} \quad (\Delta H = 35.8\text{ MJ/m}^3)$$
+
+Hosil bo'lgan zarba to'lqinining to'liq vayron qilish radiusi ($R_{destruct}$):
+
+$$R_{destruct} = 0.28 \cdot \sqrt[3]{E_{blast}\text{ (in kJ)}}$$
+
+**Portlash Oqibatlari:**
+- $R_{destruct}$ ichidagi barcha yog'och tirgaklar parchalanib ketadi.
+- Darhol ulkan ikkilamchi kaskadli o'pirilish (Secondary Cave-in) boshlanadi.
+- Radiusdagi barcha jonli mavjudotlar $100 - 300\text{ HP}$ olovli va zarbali portlash zarari oladi.
+- Kislorod bir zumda yonib tugab, o'rnida o'ldiruvchi Afterdamp ($CO$) gazi hosil bo'ladi.
+
+---
+
+# 34. 20+ GEOLOGIK MINERALLAR (24 GEOLOGICAL MINERALS & GEMS MASTER BALANCE TABLE)
+
+Voxel Lord: Feudal Realm geologik katalogi feodal davr konchilik, metallurgiya, zargarlik, kimyo va qurilish ehtiyojlarini to'liq qamrab oluvchi 24 ta tabiiy mineral, tosh va qimmatbaho javohirlardan iborat.
+
+### 34.1. 24 ta Mineral va Qimmatbaho Javohirlar Balans Jadvali
+
+Quyidagi jadvalda dunyodagi barcha 24 ta mineralning qatlam chuqurligi taqsimoti, Gauss parametrlari, qattiqligi, asbob talablari va iqtisodiy qiymati to'liq belgilangan:
+
+| # | Mineral / Javohir Nomi | Toifa (Category) | Qatlam Chuqurligi (Depth Strata m) | $y_{peak}$ (m) | $\sigma_y$ (m) | $P_{peak}$ (%) | Tomir O'lchami (Vein voxels) | Talab Qilinadigan Asbob Tieri | Qattiqlik (Hardness Hits) | Bazaviy Qiymat (Kumush) | Birlamchi Chiqish / Qayta Ishlash |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| 1 | **O'simlik Tuprog'i (Topsoil / Loam)** | Tuproq | $0 \to -15\text{ m}$ | $-2\text{ m}$ | $5.0$ | $100.0\%$ | Yaxlit qatlam | Qo'l / Yog'och Belkurak | 1 | 0.05 | Haydalgan ekin maydoni / Kompost |
+| 2 | **Kulolchilik Loyi (Clay)** | Cho'kindi | $0 \to -35\text{ m}$ | $-10\text{ m}$ | $8.0$ | $45.0\%$ | $12 - 36$ | Yog'och Belkurak | 2 | 0.20 | Kulolchilik xumdoni $\to$ Pishgan g'isht va idishlar |
+| 3 | **Yoqilg'i Torfi (Peat)** | Yonuvchi organika | $0 \to -25\text{ m}$ | $-8\text{ m}$ | $6.0$ | $35.0\%$ | $16 - 48$ | Yog'och Belkurak | 2 | 0.30 | Quritilgan briket $\to$ O'choq yoqilg'isi ($1.2\times$ yog'och) |
+| 4 | **Qumtosh (Sandstone)** | Cho'kindi jins | $-5 \to -60\text{ m}$ | $-25\text{ m}$ | $15.0$ | $60.0\%$ | Yaxlit qatlam | Tosh Cho'kich | 3 | 0.40 | Tosh yo'nuvchi $\to$ 1-Tier devor bloklari |
+| 5 | **Ohaktosh (Limestone)** | Cho'kindi karbonat| $-15 \to -90\text{ m}$ | $-45\text{ m}$ | $20.0$ | $50.0\%$ | $24 - 64$ | Tosh Cho'kich | 4 | 0.60 | So'ndirilgan ohak (qurilish qorishmasi) / Metallurgiya flyusi |
+| 6 | **Tosh Tuzi (Halite / Rock Salt)** | Cho'kindi mineral | $-20 \to -120\text{ m}$ | $-60\text{ m}$ | $25.0$ | $30.0\%$ | $18 - 40$ | Tosh Cho'kich | 3 | 2.50 | Tuzlash $\to$ Go'sht va baliqni uzoq saqlash |
+| 7 | **Toshko'mir (Coal)** | Qazilma yoqilg'i | $-15 \to -180\text{ m}$ | $-75\text{ m}$ | $35.0$ | $55.0\%$ | $20 - 50$ | Tosh Cho'kich | 4 | 1.00 | Koks / Domna pechi yoqilg'isi ($3.0\times$ yog'och) |
+| 8 | **Mis Rudasi (Copper / Chalcopyrite)**| Birlamchi metall | $-10 \to -110\text{ m}$ | $-50\text{ m}$ | $22.0$ | $40.0\%$ | $14 - 32$ | Tosh Cho'kich | 5 | 1.80 | Eritish pechi $\to$ Sof Mis quyma (Copper Ingot) |
+| 9 | **Qalay Rudasi (Tin / Cassiterite)** | Rangli metall | $-25 \to -130\text{ m}$ | $-70\text{ m}$ | $24.0$ | $32.0\%$ | $10 - 24$ | Mis Cho'kich | 5 | 2.20 | Eritish: Mis bilan qo'shilib Bronza quymasi olinadi |
+| 10 | **Oltingugurt (Sulfur)** | Vulkanik / Cho'kindi| $-40 \to -220\text{ m}$ | $-120\text{ m}$ | $30.0$ | $25.0\%$ | $8 - 20$ | Mis Cho'kich | 4 | 3.00 | Porox tayyorlash / Alkimyo / Teri oshlash |
+| 11 | **Selitra (Saltpeter / Niter)** | Kimyoviy mineral | $-30 \to -160\text{ m}$ | $-90\text{ m}$ | $28.0$ | $22.0\%$ | $8 - 18$ | Mis Cho'kich | 3 | 3.50 | Qora porox komponenti / Mineral o'g'it ($+30\%$ hosil) |
+| 12 | **Temir Rudasi (Iron / Hematite)** | Qora metall | $-45 \to -240\text{ m}$ | $-130\text{ m}$ | $40.0$ | $45.0\%$ | $16 - 42$ | Bronza Cho'kich | 7 | 4.00 | Domna pechi $\to$ Cho'yan va Temir quymasi (Iron Ingot) |
+| 13 | **Qo'rg'oshin (Lead / Galena)** | Og'ir metall | $-60 \to -210\text{ m}$ | $-140\text{ m}$ | $35.0$ | $28.0\%$ | $12 - 26$ | Bronza Cho'kich | 6 | 3.20 | Qamal toshlari / Tom qoplamasi / Pevter qotishmasi |
+| 14 | **Rux Rudasi (Zinc / Sphalerite)** | Rangli metall | $-70 \to -230\text{ m}$ | $-150\text{ m}$ | $35.0$ | $25.0\%$ | $10 - 22$ | Bronza Cho'kich | 6 | 3.80 | Mis bilan legirlash $\to$ Jez / Latun quymasi (Brass) |
+| 15 | **Nikel (Nickel / Pentlandite)** | Oliy metall | $-90 \to -260\text{ m}$ | $-175\text{ m}$ | $38.0$ | $20.0\%$ | $8 - 18$ | Temir Cho'kich | 8 | 5.50 | Po'lat legirlash $\to$ Mustahkam Damashq po'lati |
+| 16 | **Oq Marmar (Marble)** | Metamorfik tosh | $-50 \to -280\text{ m}$ | $-160\text{ m}$ | $50.0$ | $30.0\%$ | $32 - 96$ | Temir Cho'kich | 8 | 6.00 | Haykaltaroshlik / Sobor ustunlari / Saroy plitalari |
+| 17 | **Kulrang Granit (Granite)** | Magmatik intruziya| $-80 \to -350\text{ m}$ | $-220\text{ m}$ | $65.0$ | $65.0\%$ | Yaxlit qatlam | Temir Cho'kich | 10 | 2.00 | Qal'a poydevori / Qamalga chidamli mustahkam devor |
+| 18 | **Kumush Rudasi (Silver / Acanthite)**| Qimmatbaho metall | $-110 \to -280\text{ m}$| $-195\text{ m}$ | $35.0$ | $18.0\%$ | $8 - 18$ | Temir Cho'kich | 8 | 15.00 | Zarbxona $\to$ Feodal Kumush Tanga (Asosiy valyuta) |
+| 19 | **Oltin Rudasi (Native Gold)** | Qimmatbaho metall | $-160 \to -340\text{ m}$| $-250\text{ m}$ | $40.0$ | $12.0\%$ | $6 - 14$ | Po'lat Cho'kich | 10 | 100.00 | Zarbxona $\to$ Oltin Dinar (1 Oltin = 100 Kumush) |
+| 20 | **Platina Rudasi (Platinum)** | Oliy asil metall | $-220 \to -350\text{ m}+$| $-290\text{ m}$| $30.0$ | $6.0\%$ | $4 - 10$ | Po'lat Cho'kich | 12 | 220.00 | Hukmdor toji / Qirollik regaliyalari va muqaddas idishlar |
+| 21 | **Vulkanik Bazalt (Basalt)** | Magmatik efuziv | $-250 \to -350\text{ m}+$| $-320\text{ m}$| $45.0$ | $50.0\%$ | Yaxlit qatlam | Po'lat Cho'kich | 12 | 3.00 | O'ta issiqqa chidamli domna pechi devorlari |
+| 22 | **Zumrad (Emerald / Beryl)** | Qimmatbaho javohir| $-120 \to -260\text{ m}$| $-190\text{ m}$ | $25.0$ | $4.0\%$ | $2 - 6$ | Po'lat Cho'kich | 14 | 180.00 | Sayqallash ustaxonasi $\to$ Sayqallangan Zumrad (+Axloq) |
+| 23 | **Yoqut (Ruby / Corundum)** | Qimmatbaho javohir| $-180 \to -320\text{ m}$| $-260\text{ m}$ | $30.0$ | $3.0\%$ | $2 - 5$ | Damashq Cho'kich | 16 | 280.00 | Qilich sopi bezagi / Qirollik xazinasi (+Obro') |
+| 24 | **Olmos (Diamond)** | Oliy javohir | $-280 \to -350\text{ m}+$| $-330\text{ m}$| $22.0$ | $1.5\%$ | $1 - 4$ | Damashq/Runik Cho'kich| 20 | 500.00 | Runik kuchaytirish / Olmos parma / Imperator Asosi |
+
+### 34.2. Mineral Guruhlarning Iqtisodiy va Texnologik Vazifalari
+
+1. **Agro va Maishiy Cho'kindilar (1–3):** Koloniyaning dastlabki kunlaridanoq qishloq xo'jaligi, o'choq yoqish va boshpana qurish poydevorini yaratadi.
+2. **Qurilish Toshlari (4, 5, 16, 17, 21):** Feodal qal'a va shaharlar arxitekturasini mustahkamlaydi. Granit va Bazalt dushman trebuchetlarining og'ir zarbalariga eng yuqori qarshilik ko'rsatadi.
+3. **Metallurgiya Rudalari (8, 9, 12, 13, 14, 15):** Asbobsozlik, qurol-yarog' va zirh ishlab chiqarish sanoatining moddiy asosi.
+4. **Kimyo va Poroxsozlik (10, 11):** Xitoy va Sharq alkimyosi orqali qora porox tayyorlash, tog' jinslarini portlatish va mushket o'qlari ishlab chiqarishga imkon beradi.
+5. **Monetar va Qimmatbaho Javohirlar (6, 18, 19, 20, 22, 23, 24):** Savdo-sotiq, tashqi diplomatiya, qirollik soliqlarini to'lash va imperiya xazinasini boyitish vositalari.
+
+---
+
+# 35. METALLURGIYA ZANJIRI (METALLURGICAL CHAIN, SMELTING & FORGING)
+
+Metallurgiya — Voxel Lord: Feudal Realm harbiy qudrati va sanoat taraqqiyotining yuragi hisoblanadi. Xom rudaning tayyor qilich yoki ritsar sovutiga aylanishi ko'p bosqichli fizik-kimyoviy jarayonlardan iborat.
+
+### 35.1. To'liq Metallurgiya Qayta Ishlash Bosqichlari
+
+Xom ruda quyidagi zanjir bo'yicha bosqichma-bosqich qayta ishlanadi:
+
+```
+[Ruda Qazish] 
+      ↓
+[Maydalash va Suvda Yuvish] (Gravitatsion boyitish, +25% unum)
+      ↓
+[Ochiq Qovurish / Roasting] (Oltingugurt va namlikni haydash)
+      ↓
+[Domna / Eritish Pechida Qaynatish] (+ Ohaktosh Flyusi va Ko'mir)
+      ↓
+[Shlakni Ajratish va Cho'yan / Shpon Temir Olish]
+      ↓
+[Tigel / Tigelda Legirlash va Qotishma Hosil Qilish] (Bronza, Po'lat)
+      ↓
+[Temirchilik Bosqoni va Sandonda Zarb Berish] (Plastik deformatsiya)
+      ↓
+[Termik Ishlov: Chiniqtirish va Bo'shatish] (Quenching & Tempering)
+      ↓
+[Tayyor Qurol / Sovut / Ishchi Asbob]
+```
+
+1. **Maydalash va Gravitatsion Yuvish:** Og'ir ruda toshlari yog'och to'qmoqlar bilan maydalanadi va oqar suv novlarida yuviladi. Bo'sh tog' jinsi oqib ketadi, og'ir metall zarrachalari cho'kadi (Boyitish darajasi $+25\%$).
+2. **Qovurish (Roasting):** Sulfidli rudalar (xalkopirit, galenit) ochiq o'tda $500^\circ\text{C}$ da qovurilib, zararli gazlar uchirib yuboriladi.
+
+### 35.2. Flyus Kimyosi va Ohaktoshning Vazifasi (Flux Chemistry)
+
+Domna pechiga temir rudasi bilan birga Ohaktosh ($CaCO_3$) qo'shilishi shart. Harorat $900^\circ\text{C}$ dan oshganda ohaktosh parchalanadi:
+
+$$CaCO_3 \xrightarrow{\Delta} CaO + CO_2\uparrow$$
+
+Hosil bo'lgan so'nmagan ohak ($CaO$) rudaning tarkibidagi kvars va qum qoldiqlari ($SiO_2$) bilan reaksiyaga kirishadi:
+
+$$CaO + SiO_2 \to CaSiO_3 \quad (\text{Suyuq Shlak / Slag})$$
+
+**Texnologik Ahamiyati:**
+- Agar ohaktosh flyusi solinmasa, qovushqoq kremniy shlaki domna pechini tiqib qo'yadi (Furnace Choking) va pech portlab ishdan chiqadi.
+- Suyuq shlak erigan og'ir temir yuzasiga qalqib chiqadi va maxsus tirqishdan oqizib olinadi. Natijada olingan quyma tozaligi $+35\%$ ga oshadi.
+
+### 35.3. Asosiy Qotishmalar Retsepti va Xususiyatlari
+
+Metallurgiya pechlarida turli metallarni aralashtirish orqali yuqori xossali qotishmalar eritiladi:
+
+| Qotishma Nomi (Alloy) | Komponentlar Nisbati | Erish Harorati (°C) | Qattiqlik Koeffitsiyenti | Asosiy Xossalari va Ishlatilish Sohasi |
+|---|---|---|---|---|
+| **Klassik Bronza (Bronze)** | $88\%$ Mis + $12\%$ Qalay | $950^\circ\text{C}$ | 6 | Korroziyaga chidamli, oson quyiladi; dastlabki pishiq asboblar, to'plar va qilichlar |
+| **Jez / Latun (Brass)** | $68\%$ Mis + $32\%$ Rux | $920^\circ\text{C}$ | 5 | Oltinsimon yaltiroq, zanglamaydi; saroy bezaklari, soat mexanizmlari, quvur jo'mraklari |
+| **Pevter (Pewter)** | $88\%$ Qalay + $10\%$ Qo'rg'oshin + $2\%$ Mis | $230^\circ\text{C}$ | 3 | Past erish harorati; zodagonlar idish-tovog'i, shamdonlar va bezak buyumlari |
+| **Uglerodli Po'lat (Carbon Steel)**| $98.5\%$ Temir + $1.5\%$ Ko'mir/Uglerod | $1450^\circ\text{C}$ | 9 | Yuqori elastiklik va mustahkamlik; ritsar qilichlari, plastinka sovutlar, po'lat cho'kichlar |
+| **Damashq Po'lati (Damascus Steel)**| $95\%$ Yuqori uglerodli po'lat + $5\%$ Nikel | $1400^\circ\text{C}$ | 14 | 256 qatlam buklab zarblangan to'lqinsimon po'lat; sinmaydi, o'tmaslashmaydi; afsonaviy qurollar |
+
+### 35.4. Pech Turlari va Harorat Rejimlari
+
+1. **Sirchiq Pech (Primitive Bloomery):**
+   - Loy va toshdan yasalgan quvur pech. Harorat $950^\circ\text{C} - 1150^\circ\text{C}$.
+   - Temir to'liq erimaydi, balki g'ovak shpon temir (Iron Sponge / Bloom) hosil bo'ladi. To'qmoq bilan urib shlakdan tozalanadi.
+2. **Katta Domna Pechi (Blast Furnace):**
+   - Balandligi 6–10 metrli tosh minora. Qo'sh bosqonlar suv charxpalagi orqali uzluksiz havo purkaydi.
+   - Harorat $1350^\circ\text{C} - 1550^\circ\text{C}$. Temir to'liq suyuqlanib cho'yan (Pig Iron) holida ariqchalarga oqadi.
+3. **Tigel Pechi (Crucible Furnace):**
+   - Grafit va o'tga chidamli loy tigellar. Harorat $1400^\circ\text{C} - 1650^\circ\text{C}$.
+   - Oliy sifatli Damashq po'lati va asil metallar (oltin, kumush) eritishda ishlatiladi.
+
+### 35.5. Chiniqtirish Suyuqliklari va Termik Ishlov (Quenching & Tempering)
+
+Temirchi qizdirilgan qurolni sandonda zarb qilgach, po'latning ichki kristall panjarasini qotirish uchun maxsus suyuqliklarda chiniqtiradi:
+1. **Muzdek Suv (Water Quench):**
+   - Eng tez sovitish usuli. Po'lat juda qattiq bo'ladi, lekin mo'rtlik ortib, urilganda sinib ketish xavfi tug'iladi.
+2. **Zig'ir yoki Zaytun Moyi (Oil Quench):**
+   - Sekinroq va bir maromda sovitish. Qattiqlik va elastiklik o'rtasida mukammal muvozanat hosil qiladi. Jangovar qilichlar uchun standart usul.
+3. **Tuzli Sho'rva (Brine Quench):**
+   - $10\%$ li tuzli suv bug' pardasini yorib o'tib agressiv sovitadi. Faqat og'ir zirh plitalari uchun qo'llaniladi.
+4. **Bo'shatish (Tempering):**
+   - Chiniqqan po'lat $250^\circ\text{C} - 350^\circ\text{C}$ gacha past olovda qayta qizdirilib, sekin sovitiladi. Bu ichki kuchlanishlarni yo'qotadi va pichoqning qayrilganda sinmasligini ta'minlaydi.
 
 ---
 
@@ -2346,15 +2841,213 @@ Shahar hududida olov chiqqanda fuqarolik AI tizimi darhol 0-darajali Favqulodda 
 
 ---
 
-# 67. DINAMIK OB-HAVO
+# 67. DINAMIK OB-HAVO (DYNAMIC WEATHER SYSTEM)
 
-Bahorgi jala va sellar, yozgi jazirama va qurg'oqchilik, kuzgi tumanlar, qishki qor bo'roni va sovuq.
+Voxel Lord: Feudal Realm dinamik ob-havo tizimi atmosfera bosimi, fasllar almashinuvi va biomlarning harorat-namlik maydonlari bilan to'liq bog'langan deterministik chekli avtomat (Weather Finite State Machine) orqali boshqariladi.
+
+### 67.1. Ob-havo Chekli Avtomat Holatlari (Weather Finite State Machine)
+
+Ob-havo 7 ta asosiy holatdan iborat bo'lib, har 30 daqiqada (o'yin vaqti bilan) ehtimollik matritsasi bo'yicha yangilanadi:
+
+1. **Musaffo / Quyoshli (Clear / Sunny):**
+   - Quyosh nuri maksimal ($1.0\times$), bug'lanish kuchayadi, ekinlar fotosintezi faol, fuqarolar kayfiyati $+5$.
+2. **Bulutli (Overcast):**
+   - Diffuz yorug'lik ($0.65\times$), harorat $2^\circ\text{C} - 4^\circ\text{C}$ pasayadi, yog'ingarchilikka o'tish ehtimoli yuqori.
+3. **Mayda Yomg'ir va Jala (Light Rain & Downpour):**
+   - Tuproq namligi jadal to'yinadi, ochiq mash'alalar o'chadi, ko'rish masofasi $50\%$ qisqaradi, aravachalar tezligi $-20\%$.
+4. **Momaqaldiroqli Bo'ron (Thunderstorm):**
+   - Kuchli shamol ($18 - 32\text{ m/s}$), chaqmoq urishi xavfi mavjud (baland tosh/yog'och minoralarga chaqmoq urib yong'in chiqarishi mumkin), fuqarolar boshpanaga qochadi.
+5. **Qor Bo'roni (Blizzard):**
+   - Tundra va Qish faslida faollashadi. Harorat $-15^\circ\text{C} \dots -35^\circ\text{C}$ gacha tushadi, ko'rish masofasi $8\text{ metr}$, sovuq urishi (Frostbite) xavfi favqulodda yuqori.
+6. **Jazirama / Qurg'oqchilik (Heatwave):**
+   - Dasht va Yoz oylarida uchraydi. Harorat $+38^\circ\text{C} \dots +45^\circ\text{C}$. Suv havzalari bug'lanadi, tuproq quriydi, yong'in xavfi $+80\%$ ortadi, fuqarolarda chanqoqlik $2.5\times$ tezlashadi.
+7. **Zaharli Smog va Kon Gazi Tumani (Toxic Smog / Gas Mist):**
+   - Botqoqliklarda yoki chuqur shaxta ventilyatsiyasi yer yuzasiga yetarli filtrlanmagan chiqindilarni haydaganda hosil bo'ladi. Nafas qisishi, o'pka kasalliklari va ko'z achishiga sabab bo'ladi.
+
+Quyidagi jadvalda fasllar bo'yicha ob-havo holatlarining o'tish ehtimolliklari keltirilgan:
+
+| Ob-havo Holati | Bahor Ehtimoli | Yoz Ehtimoli | Kuz Ehtimoli | Qish Ehtimoli | Davomiyligi (O'yin soati) |
+|---|---|---|---|---|---|
+| **Musaffo (Clear)** | $35\%$ | $55\%$ | $30\%$ | $20\%$ | $4 - 12\text{ soat}$ |
+| **Bulutli (Overcast)** | $30\%$ | $25\%$ | $35\%$ | $30\%$ | $3 - 8\text{ soat}$ |
+| **Yomg'ir / Jala (Rain)** | $25\%$ | $10\%$ | $25\%$ | $5\%$ (Qorga aylanadi) | $2 - 6\text{ soat}$ |
+| **Bo'ron (Storm)** | $8\%$ | $5\%$ | $7\%$ | $0\%$ | $1 - 3\text{ soat}$ |
+| **Qor Bo'roni (Blizzard)** | $0\%$ | $0\%$ | $2\%$ | $40\%$ | $4 - 10\text{ soat}$ |
+| **Jazirama (Heatwave)** | $2\%$ | $5\%$ | $0\%$ | $0\%$ | $6 - 16\text{ soat}$ |
+| **Zaharli Smog (Smog)** | $0\%$ | $0\%$ | $1\%$ | $5\%$ | $2 - 4\text{ soat}$ |
+
+### 67.2. Yog'ingarchilik va Tuproq Namligi Dinamikasi (Precipitation & Soil Moisture Dynamics)
+
+Yog'ingarchilik tuproqning gidrologik balansiga bevosita ta'sir ko'rsatadi:
+
+$$\frac{dW_{soil}}{dt} = P_{precip} - E_{evap}(T) - D_{drain}$$
+
+Bu yerda:
+- $P_{precip}$ — yog'ingarchilik intensivligi (Musaffo: $0.0$, Mayda yomg'ir: $+0.05\text{ mm/daqiqa}$, Jala: $+0.30\text{ mm/daqiqa}$).
+- $E_{evap}(T)$ — haroratga bog'liq bug'lanish tezligi.
+- $D_{drain}$ — tuproq drenaj o'tkazuvchanligi. Loyli tuproqda $D_{drain} = 0.02$, toshli/shag'alli tuproqda $D_{drain} = 0.15$.
+- **Suv Toshqini va Chirish:** Agar $W_{soil} > 90\%$ bo'lib 12 o'yin soatidan ortiq saqlanib qolsa, ekinlarning ildiz tizimi chiriydi (Waterlogging). O'yinchi ariqlar va tosh kanallar qazishi shart.
+
+### 67.3. Shamol Vektori va Fizik Tizimlarga Ta'siri (Wind Vector Mechanics)
+
+Har bir hududda dinamik shamol vektori mavjud: $\vec{v}_{wind} = (v_x, 0, v_z)\text{ m/s}$.
+
+1. **Ballistika Trayektoriyasi:**
+   Kamon o'qlari, arbalet boltlari va trebuchet toshlarining uchish trayektoriyasi shamol aerodinamik kuchi bilan og'adi:
+
+$$\vec{a}_{wind} = \frac{1}{2 m} C_d \rho A |\vec{v}_{wind} - \vec{v}_{proj}| (\vec{v}_{wind} - \vec{v}_{proj})$$
+
+Kuchli bo'ronda uzoq masofali merganlik aniqligi $40\%$ ga pasayadi; jangchilar shamol yo'nalishini hisobga olib oldindan nishonga olishi talab etiladi.
+2. **Yong'in Tarqalish Tezligi:**
+   Shamol yo'nalishi bo'ylab olov uchqunlari $2.5\times$ tezroq uchadi va yong'inning qo'shni binolarga sakrash ehtimolini keskin oshiradi.
+3. **Shamol Tegirmoni Quvvati:**
+   Un tegirmonlari va ventilyatsiya fanlarining aylanish momenti shamol tezligining kubiga to'g'ri proporsional ($P_{mill} \propto |\vec{v}_{wind}|^3$); shamolsiz paytda un tortish to'xtaydi.
 
 ---
 
-# 68. TANA HARORATI VA GIPOTERMIYA
+# 68. TANA HARORATI VA GIPOTERMIYA (THERMOREGULATION, HYPOTHERMIA & GEOTHERMAL GREENHOUSES)
 
-Har bir personajda BodyTemperature mavjud. Qattiq sovuqda issiq kiyimsiz va pechkali uysiz yurgan fuqaro muzlab halok bo'ladi.
+Voxel Lord: Feudal Realm tirik qolish realizmining muhim qismi — personajlarning issiqlik almashinuvi va atrof-muhit harorati bilan termodinamik muvozanatidir.
+
+### 68.1. Inson Tana Harorati Balansi Differensial Tenglamasi (Thermoregulation Equation)
+
+Har bir inson (o'yinchi va fuqarolar) tanasining harorati $T_{body}$ ($^\circ\text{C}$) quyidagi differensial issiqlik balansi orqali boshqariladi:
+
+$$C_{body} \frac{dT_{body}}{dt} = M_{metabolic} + \dot{Q}_{radiation} - \frac{A_{skin}}{R_{clothing} + R_{air}} (T_{body} - T_{ambient}) - \dot{Q}_{evap}$$
+
+Bu yerda:
+- $C_{body} \approx 3.5\text{ kJ}/(\text{kg}\cdot\text{K}) \times 75\text{ kg} = 262.5\text{ kJ/K}$ — inson tanasining issiqlik sig'imi.
+- $M_{metabolic}$ — metabolik issiqlik ishlab chiqarish quvvati:
+  - Tinch uxlayotganda: $80\text{ W}$
+  - Oddiy yurishda: $140\text{ W}$
+  - Og'ir konchilik va jangda: $280\text{ W}$
+- $\dot{Q}_{radiation}$ — yaqin olov, kamin yoki quyosh nurlaridan yutilgan issiqlik oqimi ($0 - 450\text{ W}$).
+- $A_{skin} \approx 1.8\text{ m}^2$ — inson tanasining teri sathi maydoni.
+- $R_{clothing}$ — kiyimning termal qarshiligi ($m^2\cdot\text{K/W}$ yoki Clo birliklari).
+- $R_{air}$ — teri ustidagi chegara havo qatlami qarshiligi (shamol kuchiga qarab kamayadi).
+- $\dot{Q}_{evap}$ — terlash orqali yo'qotiladigan issiqlik (jaziramada sovutish mexanizmi).
+
+### 68.2. Kiyim Izolyatsiyasi Bosqichlari (Clothing Insulation Tiers)
+
+Fuqarolarning kiyimi ularni sovuqdan asrovchi asosiy himoya vositasidir:
+
+| Kiyim Turi (Clothing Type) | Izolyatsiya (Clo) | Termal Qarshilik ($R_{clothing}$) | Shamolga Chidamlilik | Xavfsiz Harorat Diapazoni | Kerakli Xomashyo |
+|---|---|---|---|---|---|
+| **Yirtiq Mato (Ragged Linen)** | $0.3\text{ Clo}$ | $0.046\text{ m}^2\text{K/W}$ | Juda past ($10\%$) | $+15^\circ\text{C} \dots +30^\circ\text{C}$ | Birlamchi latta-puttalar |
+| **Jun Ko'ylak va Shim (Woolen Garments)**| $1.0\text{ Clo}$ | $0.155\text{ m}^2\text{K/W}$ | O'rtacha ($45\%$) | $+5^\circ\text{C} \dots +20^\circ\text{C}$ | Qo'y juni, to'qimachilik dastgohi |
+| **Mo'ynali Nimcha va Etik (Fur-lined Leather)**| $2.2\text{ Clo}$ | $0.341\text{ m}^2\text{K/W}$ | Yuqori ($75\%$) | $-10^\circ\text{C} \dots +10^\circ\text{C}$ | Bo'ri/Tulkining oshlangan terisi |
+| **Og'ir Ayiq Po'stini (Heavy Bear Hide Coat)**| $3.8\text{ Clo}$ | $0.589\text{ m}^2\text{K/W}$ | Mukammal ($95\%$) | $-35^\circ\text{C} \dots 0^\circ\text{C}$ | Oq ayiq terisi, qalin charmlar |
+
+### 68.3. Gipotermiya va Gipertermiya Bosqichlari
+
+Inson tanasi harorati me'yori $36.6^\circ\text{C} - 37.0^\circ\text{C}$ hisoblanadi. Undan og'ish fuqaro holatiga quyidagicha ta'sir qiladi:
+
+1. **Yengil Gipotermiya ($35.0^\circ\text{C} \le T_{body} < 36.5^\circ\text{C}$):**
+   - Kuchli qaltirash (shivering), qo'llar uvishishi. Ish tezligi va yurish tezligi $-20\%$ ga pasayadi.
+2. **O'rta Gipotermiya ($32.0^\circ\text{C} \le T_{body} < 35.0^\circ\text{C}$):**
+   - Qaltirash to'xtaydi, harakat koordinatsiyasi buziladi, qurol va asboblar qo'ldan tushib ketadi, ong xiralashadi, baxt darajasi $-40$ ga qulaydi.
+3. **Og'ir Gipotermiya ($T_{body} < 32.0^\circ\text{C}$):**
+   - Fuqaro qorga yiqilib behush bo'ladi. Har 10 sekundda $15\text{ HP}$ sovuq shikastlanishi oladi. Agar zudlik bilan issiq kamin yoniga keltirilmasa, muqarrar o'lim yuz beradi.
+4. **Gipertermiya ($T_{body} > 39.5^\circ\text{C}$):**
+   - Jazirama va issiq quyosh ostida suvsiz qolganda ro'y beradi. Qon quyulishi, ko'ngil aynishi, hushdan ketish va quyosh urishi.
+
+### 68.4. Tundra Geotermal Issiqxonasi Termodinamikasi (Geothermal Greenhouse Thermodynamics)
+
+Muzlagan Tundra biomida ochiq havoda harorat $-12^\circ\text{C} \dots -35^\circ\text{C}$ bo'lib, ochiq tuproqda qishloq xo'jaligi mutlaqo imkonsizdir ($Yield = 0\%$). Aholini boqishning yagona yo'li — yerosti vulkanik issiq bug' teshiklari (Geothermal Steam Vents) ustida maxsus izolyatsiyalangan **Geotermal Issiqxona (Geothermal Greenhouse)** qurishdir.
+
+#### 1. Issiqlik Balansi Differensial Tenglamasi
+
+Yopiq issiqxona havo harorati $T_{in}(t)$ ning vaqt bo'yicha evolyutsiyasi quyidagi termodinamik muvozanatga tayanadi:
+
+$$C_{air} \cdot \rho_{air} \cdot V \cdot \frac{dT_{in}}{dt} = \dot{Q}_{geothermal} + \dot{Q}_{solar} - \dot{Q}_{conduction} - \dot{Q}_{infiltration}$$
+
+Bu yerda:
+- $V$ — issiqxonaning umumiy ichki hajmi ($m^3$).
+- $\rho_{air} \approx 1.2\text{ kg/m}^3$ — havo zichligi, $C_{air} \approx 1005\text{ J}/(\text{kg}\cdot\text{K})$ — solishtirma issiqlik sig'imi.
+- $\dot{Q}_{geothermal}$ — vulkanik teshikdan kiruvchi issiqlik quvvati (Vattda):
+
+$$\dot{Q}_{geothermal} = \dot{m}_{steam} \cdot c_{p,steam} \cdot (T_{vent} - T_{exhaust}) + \sum_{pipes} U_{pipe} \cdot A_{pipe} \cdot (T_{fluid} - T_{in})$$
+
+Ochiq bug' manbai quvvati: $\dot{Q}_{geothermal} = 8.4\text{ kW} - 180\text{ kW}$ ($8400\text{ W} - 180,000\text{ W}$).
+- $\dot{Q}_{solar}$ — kvars/shisha tom orqali tushuvchi quyosh nuri issiqligi:
+
+$$\dot{Q}_{solar} = \tau_{glass} \cdot I_{solar} \cdot A_{skylight} \cdot \cos(\theta_{sun})$$
+
+Bu yerda $\tau_{glass} = 0.75$ (shaffoflik koeffitsiyenti), $I_{solar} \approx 350 - 400\text{ W/m}^2$.
+- $\dot{Q}_{conduction}$ — devor va tom orqali tashqi muhitga yo'qotiladigan konduktiv issiqlik:
+
+$$\dot{Q}_{conduction} = \sum_{material} \frac{A_i}{R_i} \cdot (T_{in} - T_{out}) = \sum (U_i A_i) \cdot (T_{in} - T_{out})$$
+
+Qurilish materiallarining termal qarshiligi $R_i$ ($m^2\cdot\text{K/W}$) va issiqlik o'tkazuvchanligi $U_i$ ($W/(m^2\cdot K)$):
+- Yagona qavatli oddiy shisha (Single-pane Glass): $R = 0.18\text{ m}^2\text{K/W}$ ($U = 5.55\text{ W/m}^2\text{K}$, yuqori issiqlik yo'qotish).
+- Ikki qavatli kvars oyna (Double-glazed Quartz): $R = 0.55\text{ m}^2\text{K/W}$ ($U = 1.82\text{ W/m}^2\text{K}$).
+- Tosh devor (1 metrli tosh blok): $R = 0.80\text{ m}^2\text{K/W}$ ($U = 1.25\text{ W/m}^2\text{K}$).
+- Izolyatsiyalangan qo'sh yog'och devor (Insulated Timber): $R = 1.60\text{ m}^2\text{K/W}$ ($U = 0.625\text{ W/m}^2\text{K}$).
+- Qalin chim va tuproqli marza devor (Turf / Earth-berm Sod): $R = 2.40\text{ m}^2\text{K/W}$ ($U = 0.417\text{ W/m}^2\text{K}$, eng yuqori izolyatsiya).
+
+#### 2. Barqaror Holatdagi Muvozanat Harorati (Steady-State Equilibrium)
+
+Tizim barqarorlashganda ($\frac{dT_{in}}{dt} = 0$) ichki muvozanat harorati $T_{eq}$ quyidagi formula bilan hisoblanadi:
+
+$$T_{eq} = T_{amb} + \frac{\dot{Q}_{geothermal} + \dot{Q}_{solar}}{\sum (U_i A_i) + \dot{m}_{inf} c_p}$$
+
+**Aniq Matematik Simulyatsiya Misoli (Auditor Benchmark):**
+- Tundra qishki tashqi harorati: $T_{amb} = -15.0^\circ\text{C}$.
+- Issiqxona to'liq sirt maydoni: $Area = 120.0\text{ m}^2$.
+- O'rtacha devor/tom izolyatsiyasi: $U = 2.0\text{ W}/(\text{m}^2\cdot\text{K})$.
+- Geotermal bug' kiritish quvvati: $\dot{Q}_{geothermal} = 8400.0\text{ W}$ ($8.4\text{ kW}$).
+- Harorat farqi hisobi:
+
+$$\Delta T = \frac{\dot{Q}_{geothermal}}{U \cdot Area} = \frac{8400.0}{2.0 \times 120.0} = \frac{8400.0}{240.0} = 35.0^\circ\text{C}$$
+
+$$T_{eq} = T_{amb} + \Delta T = -15.0^\circ\text{C} + 35.0^\circ\text{C} = +20.0^\circ\text{C}$$
+
+Natijada ichki harorat $+20.0^\circ\text{C}$ ga yetadi va tashqarida $-15^\circ\text{C}$ bo'ron bo'lishiga qaramay, issiqxonada bug'doy, sabzavotlar va mevalar gurkirab o'sadi.
+
+#### 3. Ichki Haroratning Hosil Unumdorligiga Ta'siri (Crop Yield Multipliers)
+
+Issiqxonada ekilgan ekinlarning hosildorligi $T_{eq}$ ga to'g'ridan-to'g'ri bog'langan:
+- $T_{eq} < 0^\circ\text{C}$: Muzlab nobud bo'lish ($Yield = 0\%$, barcha ko'chatlar o'ladi).
+- $0^\circ\text{C} \le T_{eq} < 10^\circ\text{C}$: Qattiq sovuq urishi ($Yield = 25\%$, o'sish deyarli to'xtaydi).
+- $10^\circ\text{C} \le T_{eq} < 18^\circ\text{C}$: Sub-optimal oraliq ($Yield = 65\%$, sekin o'sadi).
+- $18^\circ\text{C} \le T_{eq} \le 28^\circ\text{C}$: **Optimal Issiqxona Hosildorligi** ($Yield = 100\%$, eng yuqori unum).
+- $T_{eq} > 35^\circ\text{C}$: Haddan tashqari qizish / Qurib qolish ($Yield = 30\%$, shamollatish darchalari ochilishi shart).
+
+#### 4. Godot 4 GDScript Arxitekturasi (`GreenhouseThermalSystem`)
+
+```gdscript
+class_name GreenhouseThermalSystem
+extends Node
+
+## Muzlagan Tundrada geotermal issiqxonalar termodinamik muvozanatini hisoblovchi tizim.
+
+@export var ambient_temperature: float = -15.0 # Tundra qishi
+@export var solar_irradiance: float = 350.0   # W/m2
+
+func calculate_greenhouse_temp(volume_m3: float, glass_area: float, insulated_wall_area: float, geothermal_vent_kw: float) -> float:
+	var u_glass: float = 1.0 / 0.18 # 5.55 W/m2*K
+	var u_wall: float = 1.0 / 1.60  # 0.625 W/m2*K
+	var total_conductance: float = (glass_area * u_glass) + (insulated_wall_area * u_wall)
+
+	var q_solar_watts: float = glass_area * solar_irradiance * 0.75
+	var q_geo_watts: float = geothermal_vent_kw * 1000.0
+	var total_heat_in: float = q_solar_watts + q_geo_watts
+
+	var delta_t: float = total_heat_in / max(1.0, total_conductance)
+	return ambient_temperature + delta_t
+
+func get_crop_yield_multiplier(internal_temp: float) -> float:
+	if internal_temp < 0.0:
+		return 0.0
+	elif internal_temp < 10.0:
+		return 0.25
+	elif internal_temp < 18.0:
+		return 0.65
+	elif internal_temp <= 28.0:
+		return 1.00
+	else:
+		return 0.30
+```
 
 ---
 
