@@ -606,6 +606,39 @@ Agar fuqaro o'z kasbiga oid asbobsiz ishlasa (masalan, konchi qo'li bilan tosh q
 - Qattiqligi $H \ge 2$ bo'lgan barcha voxellar qazib olinmaydi ("Asbob kerak" xatosi chiqadi).
 - Ishchining charchoqlik (Fatigue) to'planishi $2.5\times$ ga tezlashadi va jarohat olish (qon ketish, qo'l lat yeyishi) ehtimoli $+15\%$ ga oshadi.
 
+### 12.4. Qurol va Asboblarga Runik Sehrlar Tizimi (Runic Enchanting & Infusion Mechanics)
+
+Minecraft sehrlash tizimidan ilhomlangan, biroq feodal realizm, fizik qonuniyatlar va konchilik mexanikasiga moslashtirilgan takomillashtirilgan tizim. O'yinda sehr havoda tasodifiy o'yin (kazino) orqali berilmaydi, balki **Runik Altar va Temirchilik Bosqoni (`Runic Anvil & Altar`)**da qadimiy yerosti gliflari va alkimyoviy essensiyalarni metall vujudiga o'yib yozish orqali amalga oshiriladi.
+
+#### 12.4.1. Runa Uyalari Sig'imi (Rune Socket Capacity)
+Har bir qurol va asbob o'zining yasalish sifat darajasiga (Quality Tier) ko'ra quyidagi miqdorda runa uyalariga ega bo'ladi:
+- `Poor` va `Common` daraja: 0 ta uya (sehr kirmaydi);
+- `Fine` daraja: 1 ta runa uyasi;
+- `Masterwork` daraja: 2 ta runa uyasi;
+- `Royal` va `Legendary` daraja: 3 ta runa uyasi (barcha kuchli sehrlarni o'zaro bog'lash mumkin).
+
+#### 12.4.2. Asboblarga Qo'shiladigan Takomillashtirilgan Sehrlar (Tool Enchantments)
+
+| Sehr Nomi | Runa ID | Qo'llanadigan Asbob | Minecraft Ilhomi | Takomillashtirilgan Feodal Mexanikasi |
+|---|---|---|---|---|
+| **Vibratsion Qazish** | `RUNE_SEISMIC_STRIKE` | Cho'kich / Pickaxe | Efficiency | Qazish tezligini $2.5\times$ oshiradi va toshlarni tebranish to'lqini bilan maydalaydi; eng muhimi — shaxta shiftiga tushadigan seysmik zo'riqishni $45\%$ kamaytirib, **o'pirilish (cave-in) xavfini keskin pasaytiradi**. |
+| **Geologik Soflik** | `RUNE_VEIN_PURITY` | Cho'kich / Pickaxe | Fortune | Xomashyoni maydalaganda tosh chiqindisini (slag) yo'qotib, sof metall miqdorini $+50\%$ ga oshiradi va yondosh nodir javohirlarning (olmos, yoqut) butun sinmasdan ajralish ehtimolini $+30\%$ qiladi. |
+| **Monolit Blok Kesish**| `RUNE_PRECISION_QUARRY`| Cho'kich / Pickaxe | Silk Touch | Tosh, granit va marmarni mayda shag'alga aylantirmasdan, $100\%$ silliq me'moriy monolit blok holatida ajratib oladi (Buyuk Sobor va Qasr qurilishida zarur). |
+| **Yashovchan Metall** | `RUNE_LIVING_TEMPER` | Barcha Asboblar | Unbreaking + Mending | Buyumning eskirish ehtimolini $80\%$ ga pasaytiradi; asbob dam olish vaqtida qurol javonida yoki inventarda turganda har soatda $+5\%$ mustahkamligini o'zi tiklaydi. |
+| **O'rmon Qulashi** | `RUNE_TIMBER_FALL` | Bolta / Wood Axe | Treecapitator | Daraxtning pastki g'o'lasini kesganda butun daraxt bir maromda pastga qulaydi va shox-shabbalar avtomatik tarzda bog'langan o'tin to'plamlariga aylanadi. |
+| **Dehqon Barakoti** | `RUNE_REAPERS_HARVEST` | O'roq / Scythe | Fortune (Farming) | Bir zarbada $3\times3$ poliz maydonidagi bug'doyni to'liq o'rib oladi va ekin urug'larini darhol yumshatilgan yerga qaytadan ekib ketadi. |
+
+#### 12.4.3. Qurollarga Qo'shiladigan Takomillashtirilgan Sehrlar (Weapon Enchantments)
+
+| Sehr Nomi | Runa ID | Qo'llanadigan Qurol | Minecraft Ilhomi | Takomillashtirilgan Feodal Mexanikasi |
+|---|---|---|---|---|
+| **Olmos Damli Tig'** | `RUNE_RAZOR_EDGE` | Qilich, Nayza, Bolta | Sharpness | Shunchaki tekis zarar oshishi emas: dushmanning og'ir temir zirhini (Plate Armor) $40\%$ teshish (Armor Penetration) qobiliyatini beradi. |
+| **Magma Alangi** | `RUNE_SMOLDERING_PYRE` | Qilich, Nayza | Fire Aspect | Dushmanga 8 soniya yonish statusi beradi; shamol esganda olov dushman safidagi boshqa askarlarga va yog'och qal'a devorlariga ham tarqaladi. |
+| **Titratuvchi Zarb** | `RUNE_STAGGER_CONCUSSION`| Bolg'a, Qilich, Bolta | Knockback | Dushmanni shunchaki surib yubormaydi: dushmanning muvozanatini (Stagger Meter) $100\%$ ga to'ldirib, uni 3 soniyaga qurolsizlantiradi va tiz cho'ktiradi. |
+| **Urush Tovoni** | `RUNE_PLUNDER_SPOILS` | Qilich, Bolta | Looting | Yengilgan dushman ritsarlari va qaroqchilaridan qimmatbaho sovutlar, uzuklar va qurollarning butun, yaroqli holda tushish ehtimolini $+45\%$ ga oshiradi. |
+| **Shamol Yirtuvchi** | `RUNE_WINDPIERCER` | Kamon, Arbalet | Power + Infinity | O'qlar parvozida shamol qarshiligi va gravitatsiyani butunlay e'tiborsiz qoldirib, 140 metrgacha to'g'ri chiziqda nishonga uriladi. |
+| **Yoruvchi Ballistika** | `RUNE_BALLISTIC_PIERCE`| Arbalet, Og'ir Kamon | Piercing | O'q dushmanning yog'och qalqonini parchalab, uning ortidagi yana bitta dushmanga to'liq zarba beradi. |
+
 ---
 
 # 13. CRAFTING (YASASH) TIZIMI VA DASTGOHLAR ARXITEKTURASI
