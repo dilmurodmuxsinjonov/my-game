@@ -300,7 +300,59 @@ Madaniyat va quvonch bo'lmasa fuqarolar tushkunlikka tushadi (ish unumi -30%, ni
 
 ---
 
-## 19. GODOT 4 TEXNIK ARXITEKTURASI VA DASTURIY MODULLAR
+## 19. FUQAROLAR QARISHI, OʻLIM, QABRISTON VA AJDODLAR MEROSI
+
+### 19.1. Umr Davrlari va Qarish Dinamikasi
+* **1 Yil = 28 Kun.** Har bir inson to'liq hayot siklini bosib o'tadi:
+  * **Chaqaloqlik va Bolalik (0–15 yosh / 0–15 kun):** Ota-ona qaramog'ida, o'ynaydi va maktabda ta'lim oladi. 10 yoshdan yengil ishlarda yordam beradi.
+  * **Kuch-quvvat Davri (16–45 yosh):** Mehnat samaradorligi va harakat tezligi maksimal (+20%). Harbiy xizmat va og'ir konchilik uchun oltin davr.
+  * **Oqsoqollik va Donolik (46–70 yosh):** Jismoniy kuch va yuk ko'tarish -25% pasayadi, ammo "Donolik" (Wisdom) va "Mahorat" (Mastery) eng cho'qqisiga chiqadi. Qariyalar shahar maktablarida eng zo'r ustoz, kutubxonachi, qozixona maslahatchisi va alkimyogar bo'lishadi.
+  * **Tabiiy Keksayish va O'lim (60–75 yosh oralig'ida):** Har bir oqsoqol o'z uyida to'shagida qarindoshlari davrasida tinch jon taslim qiladi.
+
+### 19.2. O'lim Sabablari va Shahar Ruhiyatiga Ta'siri
+* **Tabiiy O'lim:** Oila motam tutadi (3 kun ish unumi -15%), ammo shahar xalqi vahimaga tushmaydi.
+* **Jangovar Qahramonlik O'limi:** Qolgan askarlarga "Qasos Shijoati" buffini beradi (+15% hujum kuchi, shon-sharaf hissi).
+* **Baxtsiz Hodisa va Muzlash:** Aholining xavfsizlik va boshpanaga bo'lgan ishonchini pasaytiradi.
+* **Qora O'lat O'limi:** Jasad o'ta yuqumli hisoblanadi, darhol xavfsiz utilizatsiya qilinishi yoki maxsus dafn qilinishi shart.
+
+### 19.3. Dafn Logistikasi va Jasadlarni Yig'ish
+* **Ko'chada Qolgan Jasad Xavfi:** 1 kundan keyin badbo'y hid tarqaladi. Jasadni ko'rgan har qanday fuqaroning ruhiyati (Sanity/Morale) -30% ga qulaydi ("Dafn etilmagan qardosh" fojiasi). Kalamushlar to'planib, vabo 5 barobar tez tarqaladi.
+* **G'assol / Qabr Qazuvchi (Gravedigger & Mortician):**
+  * Maxsus **O'liklar Aravasi (Morgue Cart)** bilan shahar bo'ylab jasadlarni yig'adi.
+  * Jasadni Kanop Kafan (Linen Shroud) yoki Yog'och Tobut (Wooden Coffin) ga joylab qabristonga olib boradi.
+  * Favqulodda vabo paytida: Jasadlarni maxsus gulxanda kuydirish (Plague Pyre).
+
+### 19.4. Muqaddas Qabriston, Qabr Toshlari va Daxmalar
+* **Muqaddas Qabriston (The Graveyard):** Sobor yoki cherkov yonidagi panjara bilan o'ralgan, sarv daraxtlari ekilgan sokin ziyoratgoh.
+* **Shaxsiy Qabr Toshlari:** Har bir qabr toshida fuqaroning ismi, kasbi va qilgan xizmatlari bitiladi (masalan: *"Temirchi Eldor — Qirollikning 500 ta qilichini yasagan buyuk usta, 68 yoshida vafot etdi"*).
+* **Qirollik Daxmasi (Royal Crypt & Sarcophagus):** Qasr ostidagi tosh daxma — shohlar va afsonaviy ritsarlar uchun marmar sarkofaglar.
+
+### 19.5. Ajdodlar Duosi va Meros Tizimi
+* **Meros (Inheritance):** O'lgan fuqaroning jamg'argan oltin va asboblari uning farzandlariga yoki eng yaqin shogirdiga meros qoladi.
+* **Ajdodlar Duosi (Ancestral Blessing):** Agar qabristonga gullar ekilsa, shamlar yoqilib obod saqlansa, butun shaharga "Ajdodlar Duosi" aurasi tarqaladi (Baxt +10%, shahar ruhi mustahkam bo'ladi).
+* **Qarovsizlik Oqibati:** Qabriston vayron qilinsa yoki qarovsiz qolsa, tunda Tinchliksiz Arvohlar (Restless Wraiths) chiqib aholini vahimaga soladi.
+
+---
+
+## 20. BUYUK GʻALABA SHARTLARI VA CHEKSIZ QUMDON REJIMI (ENDGAME & VICTORY)
+
+### 20.1. Uch Xil Tarixiy G'alaba Yo'li:
+1. **Me'moriy Mo'jiza — Buyuk Imperatorlik Qasri va Sobori (Wonder of the Realm):**
+   * 100x100x80 blokli mahobatli Oq Marmar Sobor yoki Imperator Saroyi.
+   * Resurslar talabi: 10,000 O'yma Tosh, 2,000 Oq Marmar, 500 Zargarlik Oltin Qoplamasi, 150 Rangli Vitraj Shisha.
+   * Qurib bitkazilganda "Asrlar Me'mori" unvoni beriladi va butun qit'adan ziyoratchilar oqib keladi.
+2. **Qit'ani Birlashtirish — 6 Bioma Hukmronligi (Pax Feudalis / Realm Unification):**
+   * Barcha 6 ta biomda (Tekislik, O'rmon, Tog', Cho'l, Botqoqlik, Tundra) mustahkam forpost va qasrlarni barpo etish.
+   * Xaritadagi 5 ta Afsonaviy Bossni (Ajdaho, Lich, Muz Giganti, O'rmon Devi, Qum Chuvali) batamom mag'lub etib, yerlarni tinchitish.
+3. **Iqtisodiy Gegemonlik — Savdo Monopoliyasi (The Sovereign Guild):**
+   * 100,000 Oltin Tanga jamg'arish, eng hashamatli Savdo Porti va Bank tizimini qurish, qit'adagi barcha qo'shni feodal mulklarni iqtisodiy qaramlikka tushirish.
+
+### 20.2. Cheksiz Hukmronlik Rejimi (Endless Sandbox Reign)
+* G'alaba qozonilgandan keyin ham o'yin to'xtamaydi. O'yinchi istalgan paytda saltanatini avlodlar osha boshqarishda davom etishi, yangi megashaharlar qurishi va o'z sulolasini cheksiz asrlar davomida davom ettirishi mumkin.
+
+---
+
+## 21. GODOT 4 TEXNIK ARXITEKTURASI VA DASTURIY MODULLAR
 
 * **Face Culling & Greedy Meshing:** `scripts/core/voxel_chunk.gd` — 120+ FPS ta'minlash.
 * **Aholi FSM & Yo'l topish:** `scripts/entities/citizen.gd` — NavigationAgent3D.
