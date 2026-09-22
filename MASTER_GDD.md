@@ -1063,56 +1063,37 @@ Voxel Lord: Feudal Realm o'yinida aholi sun'iy ravishda havodan yoki resurs sarf
    - Savdo yo'llari va suv transporti orqali professional yollanma ishchilar, olimlar, me'morlar va tajribali usta-qurollar keladi.
    - Yollash uchun shahar xazinasidan boshlang'ich kumush tanga (Contract Fee: 25–100 Silver) to'lanadi.
 
-5. **Tabiiy Ko'payish (Demographic Generational Birth):**
-   - Shaharda xususiy uyga ega bo'lgan, qonuniy nikohdan o'tgan oilalarda bolalar tug'ilishi orqali shahar aholisining tabiiy o'sishi.
+5. **Reabilitatsiya Qilingan Tutqunlar (Rehabilitated Captives):**
+   - Jangda asir olingan qaroqchilarni qamoqxonada mehnat orqali tarbiyalab, erkin shahar fuqarosi maqomini berish orqali.
 
 ---
 
-### 14.2. Demografik Hayot Sikli va Yosh Egri Chiziqlari (Demographic Lifecycle)
+### 14.2. Fuqarolarning Kasbiy Toifalari va Tajriba Darajalari (Citizen Demographics & Mastery)
 
-Har bir fuqaroning hayoti 6 ta qat'iy biologik va ijtimoiy bosqichdan iborat:
+O'yinda barcha fuqarolar shaharga to'g'ridan-to'g'ri faol mehnatga layoqatli shaxslar sifatida qo'shiladi (500 real soatlik bolalik kutish tizimi bekor qilingan). Ular o'z mahorati va jismoniy salohiyatiga ko'ra 5 ta toifaga bo'linadi:
 
-| Yosh Bosqichi | Davri (Yillar) | Jismoniy Mehnat Salohiyati | Harbiy Xizmat | Oziq-ovqat Iste'moli | Maxsus Imkoniyatlar va Cheklovlar |
+| Malaka Toifasi | Yoshi va Tajribasi | Jismoniy Mehnat Salohiyati | Harbiy Xizmat | Oziq-ovqat Iste'moli | Maxsus Imkoniyatlar va Cheklovlar |
 |---|---|---|---|---|---|
-| **Chaqaloq (Infant)** | 0 – 3 yosh | 0% (Mehnat qilmaydi) | Yo'q | $0.35\times$ (Ona suti/bo'tqa) | Onaning harakatini $-15\%$ ga sekinlashtiradi. Uyda yoki beshikda bo'ladi. |
-| **Bola (Child)** | 4 – 10 yosh | 25% (Yengil yordamchi) | Yo'q | $0.65\times$ | Tuxum yig'ish, qushlarni haydash, o'rmondan qulupnay terish, engil suv tashish. |
-| **Shogird (Apprentice)**| 11 – 15 yosh | 65% (Hunarmand shogirdi) | Yordamchi | $0.90\times$ | Biror usta (Master)ga biriktiriladi. Mahoratini 0 dan 40 gacha rivojlantiradi. |
-| **Voyaga Yetgan (Adult)**| 16 – 45 yosh | 100% (Maksimal unumdorlik)| To'liq chaqiruv | $1.00\times$ (Baza) | Nikoh qurish, og'ir konchilik, qurilish, dehqonchilik va armiyada xizmat qilish. |
-| **Faxriy (Veteran)** | 46 – 60 yosh | 85% (Jismoniy sekinlashuv)| Zaxira soqchi | $0.95\times$ | Ishlab chiqarish sifati $+25\%$, yangi avlodni o'qitish tezligi $+50\%$. |
-| **Oqsoqol (Elder)** | 61 – 75 yosh | 50% (Yengil aqliy mehnat) | Yo'q | $0.80\times$ | Sud maslahatchisi, diniy marosimlar boshqaruvchisi, shahar axloqiy nufuzi $+15\%$. |
+| **Yangi Qochqin (Refugee)** | 18 – 30 yosh (Tajribasiz) | 75% (Zaiflashgan) | Chala qurolli | $0.80\times$ (Kam talabchan) | Qabul qilinganda dastlabki 3 kun jismoniy charchoq yuqori bo'ladi, arzon ishchi kuchi. |
+| **Oddiy Fuqaro (Citizen)** | 20 – 45 yosh (Baza) | 100% (Maksimal unumdorlik)| To'liq chaqiruv | $1.00\times$ (Standart) | Barcha dehqonchilik, qurilish va konchilik ishlarini to'liq sur'atda bajaradi. |
+| **Shogird Hunarmand (Novice)**| 18 – 25 yosh (O'rganuvchi) | 90% (Dastgoh yordamchisi) | Yordamchi soqchi | $0.95\times$ | Dastgohlarda usta yonida ishlab o'z kasbiy mahoratini 2 barobar tezroq oshiradi. |
+| **Usta Hunarmand (Craftsman)**| 28 – 50 yosh (Professional)| 110% (Yuqori unumdorlik) | Gvardiyachi | $1.10\times$ (Yuqori talab)| Ishlab chiqarish vaqtini 35% qisqartiradi, buyum sifatini Masterwork darajaga ko'taradi. |
+| **Faxriy Oqsoqol (Veteran)** | 51 – 70 yosh (Donishmand) | 80% (Aqliy yo'naltiruvchi)| Maslahatchi | $0.90\times$ | Fuqarolar kayfiyatini +15 ga ko'taradi, ma'muriy sud va ta'lim ishlariga boshchilik qiladi. |
 
 ---
 
-### 14.3. Homiladorlik va Tug'ilish Ehtimoli Formulalari (Conception & Gestation)
+### 14.3. Qochqinlar Oqimi va Qutqaruv Ekspeditsiyalari Logistikasi (Immigration & Rescue Operations)
 
-Nikohdagi er-xotin (ayol yoshi 16–48 oralig'ida) shaxsiy xonadonga ega bo'lsa, har bir fasl (7 o'yin kuni) oxirida homilador bo'lish ehtimoli quyidagi formula asosida hisoblanadi:
+Shahar aholisining o'sishi faqatgina real vaqtda faol kechuvchi 4 ta logistik kanal orqali ta'minlanadi:
 
-$$P_{conception} = BaseFecundity(Age) \times \left(\frac{Morale}{100.0}\right)^2 \times ComfortMult \times NutritionMult \times (1.0 - 0.20 \times ExistingChildren)$$
-
-Bunda parametrlar:
-- **Yosh Koeffitsiyenti ($BaseFecundity$):**
-  - 16 – 22 yosh: $0.18$
-  - 23 – 32 yosh: $0.24$ (Maksimal reproduktiv cho'qqi)
-  - 33 – 40 yosh: $0.10$
-  - 41 – 48 yosh: $0.03$
-  - 49+ yosh: $0.00$
-- **Uy Qulayligi Multiplikatori ($ComfortMult$):**
-  $$ComfortMult = 0.50 + 0.50 \times \left(\frac{Score_{house}}{100.0}\right)$$
-  Qulay va issiq xonadon homiladorlik ehtimolini 2 barobarga oshiradi.
-- **Oziqlanish Sifati ($NutritionMult$):**
-  - Faqat non va suv: $0.60\times$
-  - Go'sht va sabzavotlar qo'shilgan turfa ratsion: $1.25\times$
-- **Mavjud Bolalar Cheklovi:** Har bir voyaga yetmagan bola oiladagi yangi homiladorlik ehtimolini $20\%$ ga qisqartiradi (maksimal 4 ta bolagacha).
-
-**Homiladorlik Davri va Onalik Debafflari (Gestation Logistics):**
-- **Davomiyligi:** 3 Fasl = 21 o'yin kuni (504 real daqiqa).
-- **Fiziologik O'zgarishlar:**
-  - Onaning harakatlanish tezligi: $-15\%$ sekinlashadi.
-  - Kaloriya va ochlik sarflanishi: $+25\%$ ga oshadi.
-  - Xavfli ishlardan ozod etish: Homilador ayol avtomatik ravishda harbiy xizmat, shaxtada kon qazish va og'ir tosh ko'tarish ishlaridan chetlatilib, yengil vazifalarga (to'quvchilik, non yopish, oshxona) o'tkaziladi.
-- **Tug'ruq Jarayoni va Xavflar:**
-  - Uyda issiqlik pechkasi va toza suv bo'lsa, ona va bolaning omon qolish ehtimoli $98\%$.
-  - Sovuq, iflos yoki qorong'u kulbada tug'ruq paytida $15\%$ chaqaloq nobud bo'lishi yoki onaning infektsiya (`Sepsis`) olish xavfi mavjud. Tabib (Doctor) mavjudligi bu xavfni butkul bartaraf etadi.
+1. **Xaloskor Gulxan Oqimi (Signal Fire Attraction):**
+   Gulxan 250 metr radiusda tunu-kun yoqib turilganda, har 3 o'yin kunida sargardon oilalar kelish ehtimoli $P_{refugee} = 0.40$ ni tashkil etadi. Gulxanga qora neft yoki koks yoqilsa, tutun baland ko'tarilib ehtimollik $P_{refugee} = 0.75$ ga chiqadi.
+2. **Qaroqchilar Asirlarini Qutqarish (Bandit Camp Captives):**
+   Xaritadagi har bir qaroqchilar lageri mag'lub etilganda, zindondan 2–5 nafar sog'lom asir ozod qilinadi. Ular Hukmdorga nisbatan $+50$ sodiqlik bilan darhol shahar aholisiga qo'shiladi.
+3. **Qasr Qo'ng'irog'i Migratsiyasi (Village Bell Prestige):**
+   Shahar obro'si $Prestige \ge 40$ va aholi ruhiyati $Morale \ge 75$ bo'lganda, har haftada 3–6 nafar professional erkin dehqon va konchilar o'z oilalari bilan ko'chib keladi.
+4. **Savdo Porti va Bozor Yollanmalari:**
+   Xazinadagi kumush tangalar evaziga (25–100 kumush) qo'shni neytral shaharlardan maxsus kasb egalari (me'morlar, tabiblar, temirchilar) yollanadi.
 
 ---
 
@@ -1163,6 +1144,23 @@ $$\Delta Emigrants = \begin{cases}
   - U $45\%$ ehtimol bilan yaqin atrofdagi qaroqchilar to'dasiga qo'shiladi.
   - Sobiq fuqaro qaroqchilar yetakchisiga shahar himoyasining zaif nuqtalarini, oziq-ovqat omborlari joylashuvini va soqchilar sonini aytib beradi.
   - Bu keyingi qonli oydagi reydning aynan o'sha zaif darvozalarga yo'naltirilishiga sabab bo'ladi.
+
+---
+
+### 15.4. Fuqarolarning Ruhiy Sinish Spektri (Mental Breaks Spectrum & Catharsis)
+
+Fuqarolarning ruhiyati pasayganda ular darhol shahardan qochib ketmaydi yoki o'z joniga qasd qilmaydi (*RimWorld* va *Going Medieval* tizimlari asosida). Ruhiy bosim to'planganda 3 ta xavflilik darajasidagi ruhiy sinish holatlari (Mental Breaks) vujudga keladi:
+
+| Ruhiy Sinish Holati | Xavf Darajasi | Morale Chegarasi | Davomiyligi | Xulq-atvori va Oqibati | Davolash / Tinchlantirish Usuli |
+|---|---|---|---|---|---|
+| **Mayxona Xumorligi (Tavern Binge)** | Yengil (Minor) | $Morale \le 30$ | 4–8 o'yin soati | Ish joyini tashlab tavernaga boradi, to'xtovsiz ale ichadi, charchoq va ochlikka qaramay ishlamaydi | Taverna zaxirasida sifatli ichimlik bo'lsa o'zi tinchlanadi, so'ng qattiq uyquga ketadi |
+| **Xonaga Qamalish (Room Seclusion)**| Yengil (Minor) | $Morale \le 25$ | 6–12 o'yin soati | O'z yotog'iga kirib eshikni yopib oladi, hech kim bilan gaplashmaydi, yig'laydi | Boshqa yaqin do'stining suhbati yoki tabibning tinchlantiruvchi giyoh damlamasi |
+| **Maqsadsiz Tentirash (Aimless Daze)** | O'rta (Major) | $Morale \le 18$ | 8–16 o'yin soati | Ko'chalarda va dalalarda es-hushsiz aylanib yuradi, tashqi sovuq va yomg'irga e'tibor bermaydi | Soqchi tomonidan ushlab uyiga yetaklab olib borish (`Arrest & Escort Home`) |
+| **Dastgohni Sindirish (Vandalism)** | O'rta (Major) | $Morale \le 12$ | 2–4 o'yin soati | O'z ustaxonasidagi asbob-uskunalarga yoki xomashyo sandiqlariga zarba berib, qisman zarar yetkazadi | Qorovul tomonidan qurolsizlantirish yoki shahar bailiffi suhbati |
+| **Shahardan Qochish (Defection)** | Og'ir (Extreme) | $Morale \le 5$ | Doimiy (Ketish) | Barcha mol-mulkini tashlab shahardan qochadi, qaroqchilarga qo'shilib dushmanga aylanadi | Shahar darvozasida hibsga olish va qamoqxonada reabilitatsiya qilish |
+| **Qasddan O't Qo'yish (Pyromania)** | Og'ir (Extreme) | $Morale \le 0$ | 1–3 o'yin soati | Ombor yoki somonxonalarga mash'ala bilan o't qo'yishga urinadi, shahar xavfsizligiga taxdid soladi | Darhol hibsga olish (`Subdue`), qurolini tortib olish va zindonga tashlash |
+
+Ruhiy sinish yakunlangach, fuqaro yengillashish (`Catharsis`) holatiga tushadi va keyingi 3 kun davomida $+25$ Morale ruhiy immunitetiga ega bo'ladi.
 
 ---
 
@@ -1262,6 +1260,20 @@ Har bir komponentning hisoblanish qoidalari:
 
 ---
 
+### 17.4. Xonadon Orqa Hovlisi Qo'shimchalari (Manor Lords Burgage Plots & Backyard Extensions)
+
+*Manor Lords* tizimidan andoza olgan holda, har bir xususiy turar-joy binosi orqa tomonida $3\times3$ yoki $4\times4$ o'lchamli yer maydoni qoldirilsa, fuqaro unga o'z xonadoni va shaharcha uchun foyda keltiruvchi qo'shimcha xususiy ishlab chiqarish korxonasini (Backyard Extension) o'rnatishi mumkin:
+
+| Hovli Qo'shimchasi | Extension ID | Talab Qilinadigan Maydon | Qurilish Resursi | Passiv Hosildorlik | Xonadon Bonusi |
+|---|---|---|---|---|---|
+| **Tovuqxona (Chicken Coop)** | `ITEM_BACKYARD_CHICKEN` | $3\times3$ voxel | 10 taxta + 4 somon | Har kuni 2 ta yangi tuxum (`res_egg`) | Oqsil taqchilligi bartaraf etiladi, bolalar va kattalarda HP tiklanishi $+10\%$ |
+| **Sabzavot Polizi (Vegetable Garden)** | `ITEM_BACKYARD_GARDEN` | $4\times4$ shudgor | 4 o'tin + 1 bel | Har fasl oxirida 20 ta sabzi va karam | Xonadon oziq-ovqat xarajatlarini $40\%$ ga qisqartiradi |
+| **Echki Qozig'i (Goat Shed)** | `ITEM_BACKYARD_GOAT` | $3\times4$ voxel | 12 taxta + 2 arqon | Har 2 kunda 1 xom teri va 2 ko'za yangi sut | Xonadon mustaqil ravishda poyabzal va charm kiyim tikishga xomashyo oladi |
+| **Poyabzalchi / Yoysoz (Artisan Shed)**| `ITEM_BACKYARD_WORKSHOP`| $3\times3$ bino | 16 taxta + 4 temir mix | Haftada 3 juft charm etik yoki 2 ta ov yoyi | Bozor rastalariga sotuvga chiqarilib xonadonga sof kumush tangalar olib keladi |
+| **Olmaxona / Mevali Bog' (Orchard)** | `ITEM_BACKYARD_ORCHARD` | $4\times4$ ochiq tuproq| 4 mevali ko'chat | Kuzda 30 ta qizil olma va nok mevalari | Qishda lavsha (Scurvy) kasalligining oldini oladi va Morale $+10$ oshadi |
+
+---
+
 # 18. FUQAROLAR EHTIYOJLARI (CITIZEN PHYSIOLOGICAL NEEDS SIMULATION)
 
 Voxel Lord simulyatsiyasida fuqaroning hayotiyligi va mehnat unumdorligi doimiy ravishda hisoblab boriladigan fiziologik ehtiyojlar tizimiga asoslanadi. Har bir ehtiyoj o'ziga xos dinamik o'zgarish formulasiga ega.
@@ -1340,6 +1352,26 @@ Bunda:
   - Qulay uy to'shagida (`Bed`): daqiqasiga $-0.60$ ball (to'liq tiklanish 2.8 soatda / real vaqtda 2.8 daqiqada amalga oshadi).
   - Somon ustida yoki polda: daqiqasiga $-0.25$ ball.
 - **Charchoq Oqibati:** $Fatigue > 90$ bo'lganda fuqaro har qanday ishni to'xtatadi va eng yaqin xavfsiz yerda to'g'ridan-to'g'ri yerga yiqilib uxlab qoladi (`COLLAPSE_SLEEP`).
+
+---
+
+### 18.5. Valheim Uslubidagi Oziq-ovqat Bufflari va Hayotiylik Tizimi (Valheim-Style Food Buffs)
+
+O'yinda taom iste'mol qilish shunchaki ochlik ko'rsatkichini to'ldirib, ochlikdan o'lishni kechiktiruvchi zerikarli majburiyat emas (*Valheim* ozuqa arxitekturasi asosida takomillashtirilgan). Fuqaro va Hukmdor bir vaqtning o'zida 3 tagacha turli xil sifatli taomlarni iste'mol qilishi mumkin. Har bir taom o'zining tarkibiga qarab maksimal Salomatlik ($HP_{max}$), Chidamlilik ($Stamina_{max}$) va tiklanish sur'atini oshiradi:
+
+$$HP_{total} = HP_{base} + \sum_{i=1}^{3} FoodHP_i, \quad Stamina_{total} = Stamina_{base} + \sum_{i=1}^{3} FoodStamina_i$$
+
+Bunda bazaviy ko'rsatkichlar: $HP_{base} = 25.0$, $Stamina_{base} = 50.0$. Sifatli ovqatlangan fuqaro og'ir jismoniy mehnatda charchamaydi, jangda qattiq zarbalarga bardosh beradi:
+
+| Taom Turi | Taom ID | HP Bonusi | Stamina Bonusi | HP Regen (HP/s) | Davomiyligi (Daqiqa) |
+|---|---|---|---|---|---|
+| **Pishirilgan O'rmon Qo'ziqorini**| `FOOD_COOKED_MUSHROOM` | $+15\text{ HP}$ | $+20\text{ Stamina}$ | $+0.5\text{ HP/s}$ | 15 daqiqa |
+| **Qovurilgan Qobon Go'shti (Roast)**| `FOOD_ROAST_BOAR` | $+40\text{ HP}$ | $+15\text{ Stamina}$ | $+1.5\text{ HP/s}$ | 20 daqiqa |
+| **Bug'doy Non va Pishloq (Bread)** | `FOOD_BREAD_CHEESE` | $+25\text{ HP}$ | $+35\text{ Stamina}$ | $+0.8\text{ HP/s}$ | 25 daqiqa |
+| **To'yimli Feodal Dimlama (Stew)** | `FOOD_HEARTY_STEW` | $+55\text{ HP}$ | $+30\text{ Stamina}$ | $+2.0\text{ HP/s}$ | 30 daqiqa |
+| **Shohona Asal Shirinligi (Honey)** | `FOOD_ROYAL_HONEY` | $+20\text{ HP}$ | $+50\text{ Stamina}$ | $+1.0\text{ HP/s}$ | 25 daqiqa |
+
+Ochlik $Hunger > 90$ ga yetganda o'yinchi bir lahzada halok bo'lmaydi, balki uning maksimal salomatligi bazaviy $25\text{ HP}$ ga tushib qoladi va charchoq tez to'planadi.
 
 ---
 
@@ -1454,6 +1486,14 @@ func check_emergency_interrupts() -> void:
 		return
 ```
 
+### 19.4. Bozor Rastasi Orqali Taqsimot va Granary Tiqilinchini Bartaraf Etish (Market Stall Distribution & Anti-Bottleneck)
+
+Agar barcha 100 nafar fuqaro soat 12:00 tushlik paytida yagona markaziy don ombori (Granary) eshigiga oqib kelsa, o'yin ichida to'qnashuvlar (Pathfinding Jam) va eshik oldida tiqilinch yuzaga keladi. *Manor Lords* tizimidan andoza olingan holda bu muammo **Bozor Rastasi Taqsimoti (Market Stall Logistics)** orqali hal etilgan:
+
+1. **Bozor Furushlari (Peddlers & Stall Keepers):** Maxsus savdogar fuqarolar markaziy omborlardan aravachalar orqali ommaviy taom va o'tinlarni olib, mahalla maydonlaridagi bozor rastalariga (`MARKET_STALL_FOOD`) tashiydi.
+2. **Mahalliy Xarid va Zaxiralash:** Fuqarolar o'z xonadonlariga eng yaqin joylashgan 45 metr radiusdagi bozor rastasidan 3 kunlik oziq-ovqat zahirasini olib, uylaridagi shaxsiy sandiqqa (`CHEST_WOOD_SMALL`) qo'yadi.
+3. **Tiqilinchning Yo'qolishi:** Fuqarolar har kuni omborga emas, o'z uylaridagi sandiqqa borib ovqatlanadi. Bu NavMesh agentlarining ommaviy tiqilishini $95\%$ ga kamaytiradi va CPU hisoblash yukini yengillashtiradi.
+
 ---
 
 # 20. VAZIFALAR USTUVORLIGI (TASK PRIORITY & UTILITY DISPATCHING)
@@ -1494,6 +1534,23 @@ Bir nechta fuqarolarning bitta buyumga yoki cheklangan resursga birdaniga yuguri
 - Fuqaro biror xomashyoni olishga qaror qilganda, u `ItemReservationManager.reserve_item(item_id, citizen_id)` chaqiruvini yuboradi.
 - Agar boshqa fuqaro avvalroq uni band qilgan bo'lsa, dispetcher zudlik bilan ikkinchi eng yaqin mos xomashyoni qidiradi.
 - Agar fuqaro yo'lda dushmanga duch kelib qochsa yoki vafot etsa, uning band qilgan buyumlari 15 sekundlik `timeout` o'tgach yana umumiy havzaga qaytariladi.
+
+---
+
+### 20.4. RimWorld Uslubidagi 1–4 Ish Tablitsasi va Favqulodda Makro Buyruqlar (Work Priority Grid & Town Macros)
+
+Shahar ma'muriyati va mehnat taqsimotini yuksak darajada aniqlik bilan boshqarish uchun *RimWorld* o'yinidagi kabi raqamli matritsa (Work Tab Matrix) joriy etilgan. Har bir fuqaro uchun vazifalar toifalari bo'yicha $1$ dan $4$ gacha ustuvorlik belgilanadi:
+
+- **1 (Top Priority / Shoshilinch):** Fuqaro birinchi navbatda faqat shu vazifani qidiradi va bajaradi.
+- **2 (High Priority / Asosiy Kasb):** 1-darajali vazifalar bo'lmaganda bajariladi.
+- **3 (Normal Priority / Zaxira Ish):** Bo'sh vaqtda qo'shimcha yordam sifatida qilinadi.
+- **4 (Low Priority / Eng Past):** Shaharda hech qanday boshqa ish qolmaganda qilinadi.
+- **0 yoki Bo'sh (Disabled):** Fuqaroga bu ishni qilish qat'iyan taqiqlanadi (masalan, dehqonga qimmatbaho temir quyish taqiqlanadi).
+
+#### Favqulodda Shahar Makro Buyruqlari (Town Emergency Macros):
+1. **"Hosilni Shoshilinch O'rish" (All Hands to Harvest):** Qorasovuq yoki qish kirib kelishi arafasida bitta tugma orqali barcha fuqarolarga dehqonchilik 1-ustuvorlikka ko'tariladi.
+2. **"Qasr Ichiga Yashirinish" (Keep Lockdown):** Dushman armiyasi kelganda barcha fuqarolar zudlik bilan ishni tashlab mustahkam Qasr binosi bunkeriga berkinadi.
+3. **"Umumiy Yong'in Trevogasi" (Firefighting Rally):** Shaharda olov chiqqanda yaqin atrofdagi barcha ishchilar chelaklar bilan yong'inni o'chirishga safarbar etiladi.
 
 ---
 
@@ -1538,6 +1595,24 @@ Voxel Lord feodal iqtisodiyoti chuqur ixtisoslashgan mehnat taqsimotiga tayanadi
 | **Baxshi (Bard)** | Taverna / Shahar Maydoni | Lute (Tanbur), Skripka | Performance | 17:00 – 23:00 | Musiqa chalish, qo'shiq aytish, shaharda Morale $+15$. |
 | **Bailiff (Shahar Boshqaruvchisi)**| Shahar Kengashi Zali | Pat-qalam, Hisob daftari | Stewardship | 08:00 – 17:00 | Soliq yig'ish, jinoyatchilarni sud qilish, hisobotlar. |
 | **Savdogar (Merchant)** | Bozor Rastasi / Karvonsaroy | Tarozu va Tangalar | Commerce | 08:00 – 17:00 | Chet el karvonlari bilan savdo qilish, resurs ayirboshlash. |
+
+---
+
+### 21.3. Bellwright Uslubidagi Cheklangan Ishlab Chiqarish Kvoutalari ("Do Until X" / Target Stock Limits)
+
+Ustaxonalarda fuqarolar xomashyo tugamaguncha to'xtovsiz bitta buyumni (masalan, minglab non yoki ketmonlar) yasab omborlarni to'ldirib tashlamasligi uchun *Bellwright* uslubidagi kvota mexanizmi joriy etilgan. Har bir dastgoh topshiriqlar daftarchasida (Crafting Bills) 3 xil rejim o'rnatiladi:
+
+1. **Uzluksiz Ishlab Chiqarish (`DO_FOREVER`):** Xomashyo bor ekan, to'xtovsiz ishlab chiqaradi (faqat asosiy xomashyolar — o'tin, un, quyma uchun).
+2. **Bir Martalik Buyurtma (`DO_ONCE`):** Belgilangan $N$ dona mahsulot tayyor bo'lgach, topshiriq avtomatik o'chiriladi.
+3. **Zaxirani Saqlash Rejimi (`DO_UNTIL_X / TARGET_STOCK`):** Shahar omborlarida ushbu buyum soni $TargetStock$ ga yetganda dastgoh vaqtincha to'xtaydi. Zaxira $ResumeThreshold$ dan pastga tushganda ish avtomatik qayta boshlanadi.
+
+| Ish Joyi (Station) | Tayyorlanadigan Buyum | Buyruq Rejimi | Target Stock | Resume Threshold | Iqtisodiy Foydasi |
+|---|---|---|---|---|---|
+| **Nonvoyxona Pechi** | Issiq Bug'doy Noni | `TARGET_STOCK` | 50 dona non | 20 dona qolganda | Ortiqcha un isrof bo'lmaydi, nonlar aynib mog'orlamaydi |
+| **Temirchilik Sandoni**| Temir Mehnat Boltasi | `TARGET_STOCK` | 10 dona bolta | 4 dona qolganda | Qimmatbaho temir quymalar qurol va zirhlar uchun tejaladi |
+| **To'quvchilik Dastgohi**| Zig'ir Ishchi Ko'ylagi| `TARGET_STOCK` | 15 dona ko'ylak| 5 dona qolganda | Yangi kelgan qochqinlar uchun doimiy kiyim zaxirasi saqlanadi |
+| **O'qsozlik Dastgohi** | Qayin Yog'och O'qlari | `TARGET_STOCK` | 200 dona o'q | 80 dona qolganda | Mudofaa minoralarida o'q-dori tugab qolish xavfi yo'qoladi |
+| **Dorixona Stoli** | Shifobaxsh Bog'lam | `TARGET_STOCK` | 25 dona bog'ich| 10 dona qolganda | O'lat va urush paytida tibbiy vositalar yetarli bo'ladi |
 
 ---
 
@@ -2315,6 +2390,14 @@ $$\text{Damage}_{miner} = m_{block} \cdot v_{impact} \cdot 0.25 = 2600 \cdot \sq
 $3\text{ metr}$ balandlikdan tushgan kichik parcha ham $50\text{ HP}$ dan ortiq maydalovchi zarba beradi. Maxsus temir dubulg'asiz konchilar joyida halok bo'ladi.
 2. **Tunnel To'silib Qolishi:** Tushgan toshlar polga to'kilib, tunnelni $100\%$ germetik to'sib qo'yadi. Orqada qolgan konchilar havo va oziq-ovqatsiz qolib ketadi; qutqaruv otryadlari qazib ochguncha nafas qisilishidan o'lish xavfi yuzaga keladi.
 
+### 32.6. Qazib Olingan Toshlar Massasini Rebalanslash va Yo'nish (Stone Mass Rebalance & Cut Stone Processing)
+
+Monolit tog' jinsi massivi tabiiy holatda $2600\text{ kg/m}^3$ zichlikka ega bo'lsa-da, fuqaroning yuk ko'tarish chegarasi $25\text{ kg}$ (aravachada $120\text{ kg}$) bo'lganligi sababli, shaxtada venzel qazilganda logistika paradoksi yuzaga kelmasligi uchun quyidagi parchalanish va qayta ishlash qoidasi amal qiladi:
+
+1. **Venzelning Parchalanishi (Fracture Yield):** Bitta $1.0\text{ m}^3$ tosh vokseli qazilganda u bitta yaxlit 2.6 tonnalik tosh bo'lib tushmaydi, balki 4 dona ko'tarishga qulay dag'al tosh bo'lagiga (`ITEM_ROUGH_STONE_CHUNK`, har biri $15\text{ kg}$) parchalanadi. Qolgan qismi mayda shag'al va qum toshini tashkil etadi.
+2. **Qo'lda va Aravada Tashish:** Ishchi o'z xaltasida 1–2 dona tosh bo'lagini ($15–30\text{ kg}$), qo'l aravachasida esa 8 donagacha ($120\text{ kg}$) toshni yer yuzasidagi tosh yo'nish maydoniga olib chiqadi.
+3. **Tosh Yo'nuvchi Dastgohida Ishlov Berish (Masonry Processing):** Tosh yo'nuvchi (Mason) dag'al tosh bo'laklarini tarashlab, standart qurilish g'ishtlariga (`ITEM_STONE_BRICK`, $20\text{ kg}$) aylantiradi. Qal'a devorlari va saroylar aynan mana shu standart g'ishtlardan teriladi.
+
 ---
 
 # 33. METAN GAZI VA PORTLASH (SUBTERRANEAN GAS ACCUMULATION & VENTILATION)
@@ -2785,10 +2868,10 @@ Logistikaning yuragi to'g'ri tashkil etilgan omborlar tarmog'idir. Har qanday ma
    - Maxsus yog'och tirgaklar ustiga ko'tarilgan, pol ostidan shamol aylanadigan shamollatish panjaralariga ega.
    - Faqat quruq donlar, urug'lar, un va xmel qoplarini saqlash uchun mo'ljallangan.
    - Namlikdan saqlanish koeffitsiyenti $98\%$, kemiruvchilar (kalamush) kirishiga to'siq bo'ladi.
-2. **Muzxona / Sovuq Podval (Cold Cellar & Icehouse):**
-   - Yer ostiga 4–8 voxel chuqurlikda qazilgan, devorlari qalin yo'nilgan granit toshdan terilgan bino.
-   - Qishda daryodan arralab olingan muz bloklari (`res_ice_block`) bilan to'ldiriladi. Ichki harorat butun yoz davomida $2^\circ\text{C} – 5^\circ\text{C}$ darajada ushlab turiladi.
-   - Tez ayniydigan oziq-ovqatlar (sut, pishloq, go'sht, sho'rva) saqlanadi.
+2. **Tabiiy Yerosti Sovuq Podvali va Muzxona (Natural Cold Cellar & Icehouse):**
+   - **Tabiiy Izolyatsiya (*Going Medieval* / *Vintage Story* modeli):** Yer ostiga $\ge 4\text{ voxel}$ chuqurlikda qazilgan va devorlari tabiiy tosh (granit, ohaktosh) yoki pishiq tuproq bilan o'ralgan podval tashqi havo haroratidan qat'i nazar tabiiy ravishda $+4^\circ\text{C} – +8^\circ\text{C}$ salqin haroratni saqlaydi. Hech qanday muz bloklarini sun'iy tashish majburiy emas — chuqurlikdagi geotermal izolyatsiyaning o'zi taomlarning saqlanish muddatini $4\times$ barobarga uzaytiradi.
+   - **Qo'shimcha Muzxona Kuchaytirgichi (Optional Icehouse Boost):** Agar podvalga qishda daryodan arralab olingan muz bloklari (`res_ice_block`) keltirib qo'yilsa, harorat $0^\circ\text{C} – +2^\circ\text{C}$ gacha tushib, saqlanish muddatini $10\times$ barobarga (butun yilga) yetkazadi.
+   - Tez ayniydigan oziq-ovqatlar (sut, pishloq, go'sht, baliq, sabzavotlar) aynimay saqlanadi.
 3. **Qurolxona / Aslaha Ombori (Armory):**
    - Quruq, pechka orqali quritiladigan maxsus xona.
    - Qilichlar, sovutlar, o'q-yoylar va qalqonlarni saqlash stendlari bilan jihozlangan. Metall buyumlarning zanglashini (rust decay) $100\%$ oldini oladi.
@@ -2869,6 +2952,23 @@ Ikki yoki undan ortiq fuqaro bir vaqtning o'zida bitta buyumni olishga borishi n
 
 ### 43.3. To'plamli Yuk Tashish Algoritmi (Batch Hauling Logic)
 Tashuvchi har safar bitta don uchun bormaydi. Algoritm $5$ metr radiusdagi bir xil toifadagi ashyolarni qidiradi va yuk ko'tarish chegarasi to'lgunga qadar barcha resurslarni bitta yurishda yig'ib oladi (Greedy Nearest-Neighbor Collection).
+
+---
+
+### 43.4. Bellwright Uslubidagi Uzoq Forpostlar Logistika Zanjiri (Outpost Logistics Chains & Scheduled Carts)
+
+Markaziy qal'adan 300–800 metr uzoqlikda joylashgan tog' shaxtalari yoki chuqur o'rmonzorlarda ishlaydigan ishchilar har kuni piyoda borib-kelishga ish vaqtining $70\%$ ini sarflamasligi uchun *Bellwright* tizimidagi kabi avtonom **Forpost Logistika Zanjiri (Outpost Hauling Network)** ishlaydi:
+
+1. **Forpost Boshpanasi (`OUTPOST_SHELTER`):** Konchilar yoki yog'ochkesarlar uzoq forpostdagi 4 o'rinli oddiy yog'och kulbada uxlaydi va mahalliy oziq-ovqat qutisidan ovqatlanadi.
+2. **Rejalashtirilgan Logistika Marshruti (Logistics Route & Schedule):** Maxsus tayinlangan aravakash (`Hauler / Muleteer`) kuniga ikki marta qatnov jadvaliga binoan harakatlanadi:
+   - **Tonggi Qatnov (07:00):** Markaziy qal'adan forpostga yangi pishgan non, ale, asboblar va mash'alalar yetkaziladi.
+   - **Kechki Qatnov (17:00):** Forpost omboridan kun davomida qazib olingan temir rudasi, ko'mir yoki yog'och xodalari yuklanib, markaziy omborga tushiriladi.
+
+| Marshrut Turi | Transport Vositasi | Jo'nash Vaqti | Yetkazib Beriladigan Asosiy Yuk | Qaytishda Yuklanadigan Resurs | Logistika Foydasi |
+|---|---|---|---|---|---|
+| **Tog' Kon Shaxtasi Marshruti**| Ot qo'shilgan ikki g'ildirakli arava | 07:00 va 17:00 | 20 ta non, 4 ta cho'kich, 10 mash'ala | 250 kg temir rudasi va tosh | Konchilar vaqti $80\%$ tejaladi, ishlab chiqarish $3\times$ oshadi |
+| **Uzoq O'rmon Kesish Forposti** | Ho'kiz aravasi (`Ox Cart`) | 08:00 va 18:00 | 15 ta non, 3 ta bolta, charxtosh | 500 kg eman va qarag'ay xodasi | Qal'ada doimiy qurilish yog'ochi taqchilligi bartaraf etiladi |
+| **Tog'li Qishloq Boqishi** | Eshakli xurjun (`Pack Mule`) | 06:30 va 16:30 | 10 ta non, 2 o'roq, tuz xaltalari | 120 kg pishloq va terilar | Shahar oziq-ovqat xilma-xilligi ta'minlanadi |
 
 ---
 
@@ -3560,6 +3660,31 @@ O'yinchi yoki otryad komandiri jang maydonida gorn chalaroq 120 voxel radiusdagi
 
 ---
 
+### 59.4. Qasr Qo'rg'oni Bunker Blokirovkasi (Citadel Keep Bunker Lockdown)
+
+Tashqi shahar devorlari buzilganda yoki dushman kuchlari darvozalarni yorib kirganda, Hukmdor yoki shahar Bailiffi markaziy mudofaa qo'ng'irog'ini (`KEEP_ALARM_BELL`) chalishi orqali Favqulodda Qasr Blokirovkasi (Keep Bunker Protocol) rejimini faollashtiradi:
+
+1. **Fuqarolarning Qasrga Chekinishi:** Shahardagi barcha tinch aholi (dehqonlar, hunarmandlar, bolalar va qariyalar) darhol barcha ishlarni tashlab, eng mustahkam monolit toshdan qurilgan Qasr Qo'rg'oni (Keep Citadel) ichiga yuguradi.
+2. **Temir Qoplamali Eshiklarni Zulfinlash (Barred Iron Gates):** Barcha fuqarolar ichkariga kirgach, og'ir eman va temir darvozalar ichkaridan yog'och xodalar bilan zulfinlanadi (`BARRED_STATE`). Bu eshiklar faqat taran (Battering Ram) yoki portlovchi porox bochkalari orqali buzilishi mumkin.
+3. **Fuqarolarning Safarbarligi:** Qasr ichidagi qurol-aslaha sandiqlaridan tinch aholiga yengil arbaletlar, palaxmonlar (slings) va toshlar beriladi. Fuqarolar qo'rg'on ambrazuralari va qasr tomidan pastdagi dushmanga tosh va o'q yog'diradi.
+
+---
+
+### 59.5. Mount & Blade Uslubidagi Otryad Buyruqlari va Tor Yo'lak Fizikasi (Squad Tactics & Corridor Deflection)
+
+*Mount & Blade* jang tizimidan andoza olingan holda, Hukmdor o'z soqchilari va jangchilariga klaviatura orqali tezkor buyruqlar beradi hamda tor venzel yo'laklarida qurol uzunligi fizikasi amal qiladi:
+
+1. **Tezkor F1–F3 Taktik Buyruqlar Matritsasi:**
+   - **`F1` (Harakat Buyrug'i):** `F1->F1` (Mening ortimdan yuring / Follow Me), `F1->F2` (Shu nuqtani ushlang / Hold Position), `F1->F3` (Hujumga o'ting / Charge), `F1->F4` (Qal'a ichiga chekinish / Fall Back).
+   - **`F2` (Saf O'zgartirish):** `F2->F1` (Chiziqli saf), `F2->F2` (Qalqon devori), `F2->F3` (Ponasimon saf), `F2->F4` (Kare aylana safi).
+   - **`F3` (Otishma Nazorati):** `F3->F1` (O't ochish erkin / Fire At Will), `F3->F2` (O't ochishni to'xtatish / Hold Fire).
+2. **1-Metrlik Tor Yo'laklarda Qurol Urilishi (Corridor Weapon Deflection):**
+   - Venzel dunyosida $1\text{m} \times 1\text{m}$ tor tosh yo'laklarda yoki zinalarda jang qilganda, 2 metrlik uzun ikki qo'lli qilichlar (`Zweihander`) yoki nayzalar (`Pike`) bilan yonlama zarba (Swing) berilganda qurol tosh devorga uriladi (`WEAPON_WALL_DEFLECTION`).
+   - Qurol uchqun chiqarib orqaga qaytadi, jangchi $1.2\text{ soniya}$ gandiraklaydi (Staggered) va dushmanga $0\text{ zarar}$ yetadi.
+   - **Taktik Yechim:** Qal'a ichida va tor yo'laklarda faqat sanchuvchi qisqa qurollar (Shortsword, Dagger, Mace, Thrusting Spear) bilan jang qilish talab etiladi.
+
+---
+
 # 60. JANGOVAR RUH (MILITARY MORALE)
 
 Urush taqdirini nafaqat qurollar, balki askarlarning yuragidagi jangovar ruh va ishonch hal qiladi. Qo'rqinch va ruhiy tushkunlik eng kuchli qo'shinni ham parokanda qilib yuborishi mumkin.
@@ -3799,14 +3924,29 @@ Quyidagi jadval 4 ta asosiy qurilish materiali uchun ruxsat etilgan maksimal gor
    - Poydevor qatlami faqat qattiq tabiiy tosh (Granit, Ohaktosh) yoki mustahkamlangan yo'nilgan tosh poydevordan iborat bo'lishi kerak.
    - Yumshoq tuproq, loy yoki qum ustiga qurilgan og'ir devorlar poydevor cho'kishi (Foundation Sinking) natijasida bino darz ketishiga va qulashiga sabab bo'ladi.
 
-### 65.4. Kaskadli Qulash Algoritmi (Cascading Cave-In Engine)
+### 65.4. Kaskadli Qulash Algoritmi va GPU Zarrachalar Fizikasi (Cascading Cave-In Engine)
 
 Agar dushman qamal trebucheti zarbasi, shaxtadagi portlash yoki yong'in bitta yuk ko'taruvchi markaziy ustunni yo'q qilsa, Godot 4 dvigateli zudlik bilan kenglik bo'yicha qidiruv (Breadth-First Search / BFS) algoritmini ishga tushiradi:
 1. Yo'q qilingan blok atrofidagi barcha qo'shni 6 ta voxel tekshiriladi.
 2. Har bir voxel uchun ona zamin bilan to'g'ridan-to'g'ri bog'langan yuk ko'tarish yo'li mavjudligi aniqlanadi.
-3. Agar bino tomi yoki shiftining biror qismi zamin bilan barqaror bog'lanishini yo'qotsa ($S_{struct} < 0.75$), ushbu voxel guruhi VoxelChunk statik to'ridan ajratib olinadi.
-4. Ajratilgan barcha bloklar avtomatik ravishda fizik xususiyatga ega RigidBody3D obyektlariga aylanadi va tortishish kuchi ta'sirida pastki qavatlarga qulaydi.
-5. Qulagan bloklar pastki konstruksiyalarga dinamik urilish zarbasi berib, butun ko'p qavatli binoni zanjirli kaskad shaklida to'liq vayron qiladi.
+3. Agar bino tomi yoki shiftining biror qismi zamin bilan barqaror bog'lanishini yo'qotsa ($S_{struct} < 0.75$), ushbu voxel guruhi VoxelChunk to'ridan ajratiladi.
+4. **Godot 4 Unumdorlik Modeli (GPU Particles & Rubble Grid):** Yuzlab alohida og'ir `RigidBody3D` fizik obyektlarini yaratish o'rniga (bu CPU fizikasini keskin sekinlashtiradi), tizim GPU zarrachalari (`GPUParticles3D`) orqali tosh va chang to'zonini vizual animatsiya qiladi hamda qulagan hududni bir zumda polga statik vayrona voksellari (`Rubble Voxel Blocks`) ko'rinishida joylashtiradi.
+5. Qulagan bloklar pastki konstruksiyalarga va ostida qolgan qahramon/fuqarolarga maydalovchi maydon zarari (Crushing AOE Damage) yetkazadi.
+
+---
+
+### 65.5. Valheim Uslubidagi Qurilish Barqarorligi Rangli Issiqlik Xaritasi (Structural Integrity Heatmap)
+
+O'yinchi qurilish bolg'asini (`Building Hammer`) qo'lida ushlab, yangi bloklarni joylashtirish rejimiga o'tganda, dunyodagi barcha qurilish bloklari *Valheim* va *Going Medieval* uslubidagi 4 xil rangli shaffof shader (Visual Overlay Heatmap) orqali yorishadi:
+
+| Rang Ko'rsatkichi | Barqarorlik ($S_{struct}$) | Konstruksiya Holati | Maksimal Qo'shimcha Yuk | O'yinchiga Tavsiya |
+|---|---|---|---|---|
+| **Moviy (Blue / Foundation)** | $1.00$ ($100\%$ Poydevor)| Qoyaga yoki tuproqqa chuqur ulangan poydevor | Cheksiz vertikal yuk | Istalgan balandlikdagi tosh minora qurish uchun xavfsiz asos |
+| **Yashil (Green / Stable)** | $0.75 – 0.99$ ($75–99\%$) | To'liq xavfsiz va mustahkam oraliq | Yuqori (Tosh, kamin, tomlar) | Turar-joy qavatlari va oraliq shiftlar uchun qulay |
+| **Sariq (Yellow / Strained)** | $0.40 – 0.74$ ($40–74\%$) | Kuchlanish ostidagi tayanchsiz oraliq | Past (Faqat yengil yog'och) | Qo'shimcha ustun yoki arkali tayanch o'rnatish shart |
+| **Qizil (Red / Critical)** | $< 0.40$ ($<40\%$ Kritik) | Qulash arafasidagi chegaraviy oraliq | $0\text{ kg}$ (Yuk ko'tarmaydi) | Keyingi qo'yilgan har qanday blok darhol pastga qulab tushadi |
+
+Bu tizim tufayli o'yinchi ko'zi bilan qaysi devorga tirgak kerakligini va qayerga tosh gumbaz qurish xavfsiz ekanligini bir zumda anglaydi.
 
 ---
 
@@ -5918,10 +6058,20 @@ Statik dunyolarda qo'llaniladigan bir butun monolit NavMesh o'zgaruvchan venzel 
 
 ### 117.3. Fuqarolar Harakati va To'siqlarni Aylanib O'tish
 
-- Fuqarolar `NavigationAgent3D` n ګرځi orqali harakatlanadi.
+- Fuqarolar `NavigationAgent3D` nodi orqali harakatlanadi.
 - **RVO2 Dinamik To'qnashuv Algoritmi:** Tor yo'llarda va ko'priklarda ikki fuqaro to'qnashib qolmasligi uchun RVO2 (Reciprocal Velocity Obstacles) orqali bir-birini avtomatik chetlab o'tadi.
 - **Pog'onali Ko'tarilish (Step Traversal):** Fuqaro $1.0\text{ metr}$ balandlikdagi bitta venzel pog'onasiga sakrashsiz, tabiiy qadam bilan ko'tariladi. Tik devorlar uchun maxsus narvon (`Ladder`) va zinalar (`Stairs`) qo'llaniladi.
 - **Tiqilib Qolishga Qarshi Nazoratchi (Anti-stuck Watchdog):** Agar fuqaro $3.0\text{ soniya}$ davomida mo'ljallangan nuqtaga qarab siljimasa, uning yo'li bekor qilinadi, to'siq atrofida yangi A* marshruti hisoblanadi.
+
+---
+
+### 117.4. Gibrid 3D Voxel Grid A* va Ierarxik Marshrutlash (Hierarchical 3D Voxel A* Architecture)
+
+Venzel dunyosida har bir blok buzilganda poligonli NavMeshni qayta bake qilish CPU oqimlarida kechikish keltirib chiqarmasligi uchun, o'yin **Gibrid 3D Voxel Grid A* (HPA*)** arxitekturasini qo'llaydi:
+
+1. **Doimiy $O(1)$ Yurish Biti Matritsasi (Walkability Bitmask):** Har bir $1\text{m} \times 1\text{m} \times 1\text{m}$ venzel ustuni pastda qattiq blok va tepada 2 ta bo'sh havo bloki mavjudligiga qarab yurish mumkin bo'lgan katak sifatida belgilanadi. Blok buzilganda yoki qo'yilganda matritsa $O(1)$ vaqtda yangilanadi (hech qanday poligon hisoblashlarsiz).
+2. **Ierarxik Klasterli Yo'l Qidiruv (HPA* Clusters):** Dunyo $16\times 16$ venzel o'lchamidagi makro-klasterlarga ajratilgan. Uzoq masofali yo'llar avval makro-darvozalarda qidiriladi, so'ngra mahalliy venzel A* orqali aniqlashtiriladi.
+3. **Trayektoriyani Silliqlash (Catmull-Rom Smoothing):** Fuqarolar venzel yo'li bo'ylab 90 gradus burchakda emas, Catmull-Rom silliqlash algoritmi yordamida tabiiy va ravon qadam tashlab harakatlanadi.
 
 ---
 
