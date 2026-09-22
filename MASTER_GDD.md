@@ -125,25 +125,21 @@ Biologik yosh kalendar yiliga to‘g‘ridan-to‘g‘ri bog‘lanmaydi, balki o
 
 ---
 
-# 5. SULOLA VA HUKMDORLIK (PLAYER DYNASTY)
+# 5. HUKMDORNING DAVOMIYLIGI VA YAGONA SHAXS MODELI (PERSISTENT MONARCH)
 
-Hukmdor ham keksayadi:
-- turmush qurishi;
-- farzand ko‘rishi;
-- voris tayinlashi mumkin.
-
-### Hukmdor o‘lsa:
-- Agar voris mavjud bo‘lsa: boshqaruv vorisga o‘tadi, qirollik davom etadi.
-- Agar voris bo‘lmasa: regency (muvaqqat noib) yoki succession crisis yuz beradi.
+O‘yinchining hukmdori keksayib tabiiy o'lim topmaydi (Vorislik va sulola avlodlari o'yinchi uchun qo'llanilmaydi).
+Hukmdor butun o‘yin davomida o'z saltanatini shaxsan barpo qiluvchi yagona doimiy qahramondir.
+O'yinda "Hardcore" va "Casual Survival" deb sun'iy ravishda ikkiga bo'linmaydi — o'yin yagona, adolatli va jiddiy omon qolish qonuniyatiga tayanadi.
+(Shahar fuqarolari esa tabiiy ravishda qariydi, ta'lim oladi, yangi avlod tug'iladi va vafot etadi).
 
 ---
 
-# 6. HUKMDOR O‘LIMI VA JANGDA YIQILISH (PLAYER DEATH)
+# 6. HUKMDORNING JANGDA YIQILISHI VA DAVOLANISHI (KNOCKOUT & RECOVERY)
 
-Jangda yiqilish oddiy arcade respawn emas:
-1. **Og‘ir yaralanish:** Hukmdor jangdan askarlari tomonidan olib chiqiladi va bir necha kun gospitalda davolanadi.
-2. **O‘lim va Vorislik:** Agar qahramon halok bo'lsa, o'yin voris nomidan davom etadi.
-3. **Sulola tugashi (Dynasty End):** Hech qanday qonuniy voris bo'lmasa — shonli mag'lubiyat tarixi qayd etiladi.
+Hukmdor jangda yiqilsa, permadeath (butunlay yo'q bo'lish) bo'lmaydi:
+1. **Og‘ir Yaralanish (Knocked Out):** Hukmdor jangda jarohatlanganda askarlari yoki fuqarolari uni darhol jang maydonidan xavfsiz boshpanaga olib chiqadi.
+2. **Gospitalda Davolanish:** Bir necha o'yin kuni davomida saroy yoki tabibxona to'shagida yotadi (bu vaqtda shahar ishlari avtomatlashtirilgan tartibda davom etadi).
+3. **Qayta Tiklanish:** Sog'aygach, hukmdor qaytadan o'z taxtiga o'tiradi va saltanatni boshqarishda davom etadi.
 
 ---
 
