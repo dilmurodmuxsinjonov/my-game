@@ -425,74 +425,506 @@ To'liq singan ($Durability = 0$) buyumdan boshlang'ich materialning qat'iy $15\%
 
 ---
 
-# 14. AHOLINING PAYDO BO‘LISHI
+# 14. AHOLINING PAYDO BO‘LISHI (POPULATION GENERATION & LIFECYCLE)
 
-1. **Signal Fire (Xaloskor Gulxan):** Dastlabki sarson-sargardonlarni jalb qiladi.
-2. **Captive Rescue (Asirlarni Qutqarish):** Qaroqchilar lageridagi tutqunlarni ozod qilish.
-3. **Village Bell (Shahar Qo'ng'irog'i):** Farovon shahar migrant va ustalarni chaqiradi.
-4. **River Docks (Daryo Porti):** Yollanma ishchilar va sayohatchilar kelishi.
-5. **Generations (Tug'ilish):** Baxtli oilalar nikohi va bolalar dunyoga kelishi.
+Voxel Lord: Feudal Realm o'yinida aholi sun'iy ravishda havodan yoki resurs sarflamasdan o'z-o'zidan paydo bo'lmaydi. Har bir fuqaro dunyo simulyatsiyasida aniq biologik, ijtimoiy va logistik sabab-oqibat zanjiri orqali dunyoga keladi yoki shaharga qo'shiladi.
 
----
+### 14.1. Aholining Kelib Chiqish Kanallari (Immigration Vectors & Spawning)
 
-# 15. MIGRATSIYA VA KETISH (EMIGRATION)
+1. **Xaloskor Gulxan (Signal Fire Beacon):**
+   - O'yinning dastlabki (Tier I) bosqichida quriladigan signal o'ti.
+   - Gulxan tutuni va yorug'ligi 250 metr radiusdagi sargardon qochqinlar (Refugees) va ovchilarni jalb qiladi.
+   - Har 3 o'yin kunida 1 marta yangi sargardon kelish ehtimoli tekshiriladi ($P_{refugee} = 0.40$).
+   - Kelgan qochqinlar past darajadagi asboblar va xarob kiyimlar bilan keladi, dastlabki mehnat kuchi bo'lib xizmat qiladi.
 
-Aholi shaharni tashlab ketish sabablari:
-- uzoq davom etgan ochlik;
-- boshpana yetishmasligi;
-- xavfsizlik pastligi (doimiy reydlar);
-- yuqori soliqlar (>30%);
-- davolanmagan vabo va kasallik;
-- zolimona hukmronlik.
+2. **Tutqunlarni Qutqarish (Captive Rescue Operations):**
+   - Dushman qaroqchilar (Bandits) qarorgohlari, o'rmon lagerlari va vayron bo'lgan karvonlardan asirlarni ozod qilish orqali.
+   - Ozod qilingan asirlar hukmdorga nisbatan $+50$ sodiqlik va minnatdorchilik hissi (`Grateful` xarakter xususiyati) bilan qo'shiladi.
+   - Odatda ular orasida malakali hunarmandlar (duradgor, temirchi, tabib) uchraydi.
 
----
+3. **Shahar Qo'ng'irog'i va Qasr Darvozasi (Village Bell & Gate Immigration):**
+   - Tier II va Tier III bosqichida shahar markaziy maydoniga o'rnatilgan cherkov yoki minora qo'ng'irog'i orqali.
+   - Yuqori obro' (Prestige $\ge 40$) va xalq roziligi (Morale $\ge 75$) bo'lganda, mintaqa bo'ylab tarqalgan erkin dehqonlar va hunarmand oilalar ko'chib keladi.
 
-# 16. OILA VA QARINDOSHLIK TIZIMI
+4. **Daryo Porti va Karvonsaroy (River Docks & Caravansary):**
+   - Savdo yo'llari va suv transporti orqali professional yollanma ishchilar, olimlar, me'morlar va tajribali usta-qurollar keladi.
+   - Yollash uchun shahar xazinasidan boshlang'ich kumush tanga (Contract Fee: 25–100 Silver) to'lanadi.
 
-Har bir fuqaro: `Partner, Parents, Children, Siblings, Household` aloqalariga ega.
-Nikoh ehtimoliga yosh, uy mavjudligi, ma'naviy ruhiyat (morale) va xavfsizlik ta'sir qiladi.
-
----
-
-# 17. UY-JOY TALABLARI (HOUSING)
-
-Uy parametrlari:
-- **Capacity (Sig'im)**
-- **Beds (To'shaklar)**
-- **Warmth (Issiqlik - Pechka)**
-- **Privacy (Shaxsiy hudud)**
-- **Beauty (Go'zallik va bezaklar)**
-- **Safety (Mustahkam devorlar)**
-Uy sifati to'g'ridan-to'g'ri unumdorlik va tug'ilishga ijobiy ta'sir ko'rsatadi.
+5. **Tabiiy Ko'payish (Demographic Generational Birth):**
+   - Shaharda xususiy uyga ega bo'lgan, qonuniy nikohdan o'tgan oilalarda bolalar tug'ilishi orqali shahar aholisining tabiiy o'sishi.
 
 ---
 
-# 18. FUQAROLAR EHTIYOJLARI (CITIZEN NEEDS)
+### 14.2. Demografik Hayot Sikli va Yosh Egri Chiziqlari (Demographic Lifecycle)
 
-Food, Water, Sleep, Warmth, Safety, Housing, Social, Entertainment, Health.
+Har bir fuqaroning hayoti 6 ta qat'iy biologik va ijtimoiy bosqichdan iborat:
 
----
-
-# 19. CITIZEN AI ARXITEKTURASI
-
-1. **High-Level Planner:** Kun tartibi va nima qilish kerakligini rejalashtiradi.
-2. **Finite State Machine (FSM):**
-   `Walk, Work, Eat, Sleep, Fight, Flee, Socialize, Heal, Transport, Rest`.
-
----
-
-# 20. VAZIFALAR USTUVORLIGI (TASK PRIORITY)
-
-`Critical → High → Normal → Low`.
-- Yong'in o'chirish = Critical.
-- Jasadlarni yig'ish = High.
-- Shaharni bezatish = Low.
+| Yosh Bosqichi | Davri (Yillar) | Jismoniy Mehnat Salohiyati | Harbiy Xizmat | Oziq-ovqat Iste'moli | Maxsus Imkoniyatlar va Cheklovlar |
+|---|---|---|---|---|---|
+| **Chaqaloq (Infant)** | 0 – 3 yosh | 0% (Mehnat qilmaydi) | Yo'q | $0.35\times$ (Ona suti/bo'tqa) | Onaning harakatini $-15\%$ ga sekinlashtiradi. Uyda yoki beshikda bo'ladi. |
+| **Bola (Child)** | 4 – 10 yosh | 25% (Yengil yordamchi) | Yo'q | $0.65\times$ | Tuxum yig'ish, qushlarni haydash, o'rmondan qulupnay terish, engil suv tashish. |
+| **Shogird (Apprentice)**| 11 – 15 yosh | 65% (Hunarmand shogirdi) | Yordamchi | $0.90\times$ | Biror usta (Master)ga biriktiriladi. Mahoratini 0 dan 40 gacha rivojlantiradi. |
+| **Voyaga Yetgan (Adult)**| 16 – 45 yosh | 100% (Maksimal unumdorlik)| To'liq chaqiruv | $1.00\times$ (Baza) | Nikoh qurish, og'ir konchilik, qurilish, dehqonchilik va armiyada xizmat qilish. |
+| **Faxriy (Veteran)** | 46 – 60 yosh | 85% (Jismoniy sekinlashuv)| Zaxira soqchi | $0.95\times$ | Ishlab chiqarish sifati $+25\%$, yangi avlodni o'qitish tezligi $+50\%$. |
+| **Oqsoqol (Elder)** | 61 – 75 yosh | 50% (Yengil aqliy mehnat) | Yo'q | $0.80\times$ | Sud maslahatchisi, diniy marosimlar boshqaruvchisi, shahar axloqiy nufuzi $+15\%$. |
 
 ---
 
-# 21. KASBLAR TIZIMI (JOB ROLES)
+### 14.3. Homiladorlik va Tug'ilish Ehtimoli Formulalari (Conception & Gestation)
 
-Farmer, Lumberjack, Miner, Builder, Hauler, Blacksmith, Carpenter, Hunter, Fisherman, Cook, Baker, Brewer, Tailor, Merchant, Doctor, Alchemist, Teacher, Guard, Soldier, Knight, Gravedigger, Priest, Bard va boshqalar.
+Nikohdagi er-xotin (ayol yoshi 16–48 oralig'ida) shaxsiy xonadonga ega bo'lsa, har bir fasl (7 o'yin kuni) oxirida homilador bo'lish ehtimoli quyidagi formula asosida hisoblanadi:
+
+$$P_{conception} = BaseFecundity(Age) \times \left(\frac{Morale}{100.0}\right)^2 \times ComfortMult \times NutritionMult \times (1.0 - 0.20 \times ExistingChildren)$$
+
+Bunda parametrlar:
+- **Yosh Koeffitsiyenti ($BaseFecundity$):**
+  - 16 – 22 yosh: $0.18$
+  - 23 – 32 yosh: $0.24$ (Maksimal reproduktiv cho'qqi)
+  - 33 – 40 yosh: $0.10$
+  - 41 – 48 yosh: $0.03$
+  - 49+ yosh: $0.00$
+- **Uy Qulayligi Multiplikatori ($ComfortMult$):**
+  $$ComfortMult = 0.50 + 0.50 \times \left(\frac{Score_{house}}{100.0}\right)$$
+  Qulay va issiq xonadon homiladorlik ehtimolini 2 barobarga oshiradi.
+- **Oziqlanish Sifati ($NutritionMult$):**
+  - Faqat non va suv: $0.60\times$
+  - Go'sht va sabzavotlar qo'shilgan turfa ratsion: $1.25\times$
+- **Mavjud Bolalar Cheklovi:** Har bir voyaga yetmagan bola oiladagi yangi homiladorlik ehtimolini $20\%$ ga qisqartiradi (maksimal 4 ta bolagacha).
+
+**Homiladorlik Davri va Onalik Debafflari (Gestation Logistics):**
+- **Davomiyligi:** 3 Fasl = 21 o'yin kuni (504 real daqiqa).
+- **Fiziologik O'zgarishlar:**
+  - Onaning harakatlanish tezligi: $-15\%$ sekinlashadi.
+  - Kaloriya va ochlik sarflanishi: $+25\%$ ga oshadi.
+  - Xavfli ishlardan ozod etish: Homilador ayol avtomatik ravishda harbiy xizmat, shaxtada kon qazish va og'ir tosh ko'tarish ishlaridan chetlatilib, yengil vazifalarga (to'quvchilik, non yopish, oshxona) o'tkaziladi.
+- **Tug'ruq Jarayoni va Xavflar:**
+  - Uyda issiqlik pechkasi va toza suv bo'lsa, ona va bolaning omon qolish ehtimoli $98\%$.
+  - Sovuq, iflos yoki qorong'u kulbada tug'ruq paytida $15\%$ chaqaloq nobud bo'lishi yoki onaning infektsiya (`Sepsis`) olish xavfi mavjud. Tabib (Doctor) mavjudligi bu xavfni butkul bartaraf etadi.
+
+---
+
+# 15. MIGRATSIYA VA KETISH (MIGRATION & EMIGRATION DYNAMICS)
+
+Shaharning aholi soni erkin bozor va hayot sharoitlariga mutanosib ravishda o'zgarib turadi. Farovon shahar yangi aholini o'ziga magnit kabi tortsa, qashshoqlashgan va xavfli shahar aholining ommaviy qochishiga sabab bo'ladi.
+
+### 15.1. Migratsiya Oqimi Tenglamasi (Immigration Influx Formula)
+
+Har bir o'yin kuni tongida (soat 06:00) yangi muhojirlar (Immigrants) karvoni kelishi quyidagi formula orqali hisoblanadi:
+
+$$\Delta Immigrants = \begin{cases} 
+  \min\left(FreeBeds, \; \left\lfloor (Morale - 70.0) \times 0.08 \times \left(1.0 + \frac{Prestige}{100.0}\right) \right\rfloor\right), & \text{agar } Morale > 75 \text{ va } FoodDays \ge 7 \\
+  0, & \text{aks holda}
+\end{cases}$$
+
+Bunda:
+- $FreeBeds$: Shahardagi bo'sh, tom bilan yopilgan va tayyor to'shaklar soni. Fuqarolar yotishga joyi bo'lmagan shaharga ko'chib kelmaydi.
+- $Morale \in [-100, +100]$: Shahar aholisining o'rtacha umumiy ruhiyati.
+- $Prestige \in [0, 100]$: Hukmdorning obro'yi, qurilgan saroylar, soborlar va toza ko'chalar beradigan nufuz.
+- $FoodDays$: Shahar omboridagi mavjud oziq-ovqat zahirasining butun aholiga necha kunga yetishi ($FoodDays = \frac{FoodReserve}{Population \times DailyConsumption}$).
+
+---
+
+### 15.2. Shaharni Tashlab Ketish Tenglamasi (Emigration & Defection Formula)
+
+Agar hayot sharoiti chidab bo'lmas darajaga tushsa, fuqarolar o'z mol-mulklarini yig'ishtirib, shahardan qochishga tushadi:
+
+$$\Delta Emigrants = \begin{cases} 
+  \left\lceil (35.0 - Morale) \times 0.04 \times Population \right\rceil, & \text{agar } Morale < 35 \text{ yoki } StarvationDays \ge 2 \\
+  0, & \text{aks holda}
+\end{cases}$$
+
+**Aholining Ketishiga Sabab Bo'luvchi Kritik Triggerlar:**
+1. **Ocharchilik (Famine):** Omborlarda 48 soatdan ortiq hech qanday taom qolmasligi va aholi ochlikdan salomatligini yo'qotishi ($-50$ Morale).
+2. **Boshpanasizlik (Homelessness):** Qishda yoki yomg'irda ko'chada yotish (Har tun uchun $-35$ Morale va gipotermiya xavfi).
+3. **Qaroqchilar va Reydlar Vahimasi:** Shahar devorlarining buzilishi, qo'riqchilar yo'qligi va fuqarolarning dushmanlar tomonidan o'ldirilishi ($-40$ Morale).
+4. **Zulmkor Soliqlar (Extortionate Tax):** Daromad yoki hosilning $25\%$ dan ortiq qismini soliq sifatida tortib olish ($-40$ Morale).
+5. **Karantinsiz Vabo va Ko'milmagan Jasadlar:** Ko'chalarda chiriyotgan murdalarning sassig'i va yuqumli o'lat ($-30$ Morale).
+
+---
+
+### 15.3. Ketish Logistikasi va Qaroqchilikka Qo'shilish Xavfi (Defection & Banditry)
+
+- **Ketish Jarayoni:** Shaharni tark etishga qaror qilgan fuqaro o'z kasbiy vazifasini zudlik bilan tashlaydi, shaxsiy sumkasiga ozgina taom va kumushini soladi, eng yaqin shahar darvozasi yoki xarita chetiga qarab harakatlanadi (`FLEE / EMIGRATE` holati).
+- **Qaroqchilikka O'tish Xavfi (Turn to Banditry):**
+  Agar shahardan ketayotgan fuqaroning ruhiyati o'ta past bo'lsa ($Morale < 15$) hamda uning xarakterida g'azab yoki ochko'zlik (`Aggressive`, `Greedy`) mavjud bo'lsa, u shunchaki ketib qolmaydi:
+  - U $45\%$ ehtimol bilan yaqin atrofdagi qaroqchilar to'dasiga qo'shiladi.
+  - Sobiq fuqaro qaroqchilar yetakchisiga shahar himoyasining zaif nuqtalarini, oziq-ovqat omborlari joylashuvini va soqchilar sonini aytib beradi.
+  - Bu keyingi qonli oydagi reydning aynan o'sha zaif darvozalarga yo'naltirilishiga sabab bo'ladi.
+
+---
+
+# 16. OILA VA QARINDOSHLIK TIZIMI (FAMILY & KINSHIP NETWORKS)
+
+Har bir fuqaro shunchaki yolg'iz iqtisodiy birlik emas, balki murakkab ijtimoiy munosabatlar tarmog'iga ega bo'lgan oila a'zosidir. Ushbu munosabatlar fuqarolarning yashash joyini tanlashiga, ishlab chiqarishiga, meros qoldirishiga va ruhiyatiga tubdan ta'sir qiladi.
+
+### 16.1. Oila Aloqalari Grafigi (Kinship Graph Data Structure)
+
+Har bir fuqaroning ma'lumotlar modelida quyidagi qon-qarindoshlik rishtalari kuzatiladi:
+- **Umr Yo'ldoshi (`Partner`):** Qonuniy nikohdagi eri yoki xotini.
+- **Ota-Onasi (`Parents`):** Ota va ona (2 tagacha ID).
+- **Farzandlari (`Children`):** Barcha tug'ilgan biologik bolalar ro'yxati.
+- **Aka-Uka / Opa-Singillar (`Siblings`):** Bir ota-onadan tug'ilgan jigarlar.
+- **Xonadon (`HouseholdID`):** Bitta tom ostida birgalikda yashovchi oila a'zolari to'plami.
+
+**Munosabatlar Matritsasi ($Affinity \in [-100, +100]$):**
+- Er-xotin o'rtasidagi doimiy mehr rishtasi har kuni birga ovqatlansa va bir to'shakda uxlasa $+0.5$ ga o'sadi (maksimal $+100$).
+- Yaqin qarindoshlar bir xonadonda yashasa, shahar xavfsizligidan qoniqish $+15\%$ ga oshadi.
+- Oiladagi janjallar (oziq-ovqat yetishmovchiligi, sovuq xona tufayli) munosabatlarni pasaytiradi.
+
+---
+
+### 16.2. Nikoh va Yangi Oila Qurish Qoidalari (Marriage Eligibility & Cohabitation)
+
+Nikoh tuzilishi quyidagi qat'iy shartlar bajarilganda sodir bo'ladi:
+1. **Yosh Cheklovi:** Ikkala nomzod ham 16 yoshdan oshgan va 48 yoshdan kichik bo'lishi lozim.
+2. **Qarindoshlik Ta'qiqi:** To'g'ridan-to'g'ri ota-ona, farzand yoki o'zaro o'g'il/qiz jigarlar o'rtasida nikoh tuzilishi man etiladi.
+3. **Munosabat Darajasi:** Ikkala fuqaroning bir-biriga bo'lgan ijobiy simpatiyasi $Affinity \ge 60$ bo'lishi kerak (bu ko'rsatkich Tavernada birga o'tirish, bozor maydonida muloqot va festivallarda oshadi).
+4. **Boshpana Mavjudligi:** Shaharda kamida bitta bo'sh xususiy uy (yoki yangi juftlik uchun kengaytirilgan xona) mavjud bo'lishi shart.
+5. **Nikoh To'yi (Wedding Feast):** Nikoh tuzilgach, mahalliy Cherkov/Soborda marosim o'tkaziladi va Tavernada kichik bayram qilinadi. Barcha mehmonlarga 24 soat davomida $+25$ Morale bonusi beriladi.
+6. **Birga Yashash Qoidasi (Cohabitation):** Juftlik bir xonadon ID siga o'tadi va bitta ikki kishilik to'shakka joylashadi. Bir to'shakda uxlash tana haroratini $+2^\circ\text{C}$ ga ko'taradi va charchoqni $-15\%$ tezroq yozadi.
+
+---
+
+### 16.3. Yaqinlar Yo'qotilishi va Merosxo'rlik Mexanikasi (Kin Grief & Inheritance)
+
+- **Motam va Qayg'u Debaffi (Grief):**
+  - Oiladagi er/xotin yoki farzand vafot etganda, tirik qolgan yaqinlar darhol $-50$ Morale jarimasiga duchor bo'ladi.
+  - Ushbu qayg'u 1 fasl (7 o'yin kuni) davomida chiziqli ravishda so'nib boradi ($Modifier_{grief}(t) = -50.0 \times (1.0 - \frac{t}{7})$).
+  - Motam davrida fuqaroning ish unumdorligi $-25\%$ ga tushadi, u tez-tez shahar qabristoniga borib qabr ustida duo qiladi (`VISIT_GRAVE` xulq-atvori).
+- **Merosxo'rlik (Inheritance Transfer):**
+  - Fuqaro vafot etganda, uning cho'ntagidagi barcha shaxsiy kumush tangalar, asboblar va qimmatbaho buyumlar birinchi navbatda uning bevasiga o'tadi.
+  - Agar bevasi bo'lmasa, to'ng'ich farzandiga (16 yoshdan katta bo'lsa), aks holda shahar yetimxonasiga yoki shahar xazinasiga topshiriladi.
+- **Xun Da'vosi (Blood Feud / Vendetta):**
+  - Agar fuqaro boshqa bir shahar fuqarosi tomonidan o'ldirilsa yoki zolimona qatl etilsa, marhumning aka-ukalari va farzandlari qotilga nisbatan $-100$ dushmanlik hissini shakllantiradi va imkon tug'ilganda shaxsiy qasos olishga intiladi.
+
+---
+
+# 17. UY-JOY TALABLARI (HOUSING QUALITY & ARCHITECTURAL SCORING)
+
+Uy — fuqaroning jismoniy va ruhiy tiklanishining bosh qo'rg'onidir. Sovuq kulbalarda yashagan fuqarolar tez kasal bo'ladi va isyon ko'taradi, hashamatli tosh uylarda yashovchilar esa yuqori unumdorlik va sadoqat ko'rsatadi.
+
+### 17.1. Algoritmik Uy Sifati Baholash Formulasi (Housing Quality Score Equation)
+
+Har bir turar-joy binosi ichki voxellar tuzilishi, mebellari va haroratiga qarab $0.0$ dan $100.0$ ballgacha baholanadi:
+
+$$Score_{house} = (S_{space} \times 0.20) + (S_{bed} \times 0.25) + (S_{warmth} \times 0.25) + (S_{materials} \times 0.15) + (S_{decor} \times 0.15)$$
+
+Har bir komponentning hisoblanish qoidalari:
+1. **Kenglik va Havo Hajmi ($S_{space} \in [0, 100]$):**
+   $$S_{space} = \min\left(100.0, \; \frac{EnclosedAirVoxels}{Occupants \times 12} \times 100.0\right)$$
+   Bunda har bir yashovchi uchun kamida 12 ta bo'sh havo voxeli ($12\text{ m}^3$) to'g'ri kelsa, maksimal 100 ball beriladi. Qisilib yashash bu ballni keskin tushiradi.
+2. **To'shak Sifati ($S_{bed} \in [0, 100]$):**
+   - Hamma yashovchiga taxta romli, pat yostiqli to'shak (`Comfortable Bed`): **100 ball**.
+   - Quruq somon to'shak (`Straw Pallet`): **40 ball**.
+   - Quruq yerda, tuproq ustida yotish (`Bare Ground`): **0 ball**.
+3. **Issiqlik va Tutun Chiqarish ($S_{warmth} \in [0, 100]$):**
+   - Tosh pechka (Hearth / Masonry Stove) va tom orqali tashqariga chiquvchi mo'ri (Chimney): **100 ball** (Harorat $+20^\circ\text{C}$, tutun yo'q).
+   - Ochiq gulxan (Open Firepit / Brazier): **50 ball** (Harorat oshadi, ammo xona ichida tutun to'planadi, ko'z achishi va yo'tal debaffi beradi).
+   - Isitish vositasi yo'q (muzdek xona): **0 ball**.
+4. **Devor va Tom Qurilish Materiali ($S_{materials} \in [0, 100]$):**
+   - Loy va qamishdan yasalgan chayla (Mud & Thatch): **20 ball**.
+   - Yog'och xoda va taxtalar (Logs & Planks): **50 ball**.
+   - Qoplama tosh devorlar (Cobblestone Masonry): **75 ball**.
+   - Tarashlangan tosh bloklar va pishiq g'isht (Ashlar Stone & Fired Brick): **100 ball**.
+5. **Ichki Bezak va Go'zallik ($S_{decor} \in [0, 100]$):**
+   - Polga to'shalgan jun gilamlar, devoriy gobelenlar, javonlar, yog'och stol-stul, shamdonlar va sirlangan shisha derazalar (Glazed Glass Windows). Har bir bezak voxeli xonaga $+5$ dan $+15$ gacha dekor balli qo'shadi (maksimal 100).
+
+---
+
+### 17.2. Uy-joy Toifalari va O'yin Balansi (4-Tier Housing Classification Table)
+
+| Toifa (Tier) | Ball Oralig'i | Uy Nomi va Konstruktsiyasi | Kunlik Morale Ta'siri | Homiladorlik / Tug'ilish Bonusi | Tungi Salomatlik Tiklanishi |
+|---|---|---|---|---|---|
+| **Tier 0** | $0 – 25$ | Qamish Kulba (Mud & Straw Hovel) | $-15$ (Doimiy norozilik) | $-50\%$ (Qattiq pasayish) | $+0 \text{ HP}$ (Tiklanmaydi) |
+| **Tier 1** | $26 – 50$ | Yog'och Uycha (Timber Log Cabin) | $+5$ (Qoniqarli boshpana) | Bazaviy ($1.00\times$) | $+10 \text{ HP}$ har kecha |
+| **Tier 2** | $51 – 75$ | Tosh Yarim-Karkas Uy (Stone Cottage)| $+15$ (Farovon xonadon) | $+20\%$ oshish | $+25 \text{ HP}$ har kecha |
+| **Tier 3** | $76 – 100$ | Feodal Manor / Saroy (Manor Estate) | $+30$ (Aristokratik dabdaba) | $+50\%$ oshish | $+50 \text{ HP}$ (To'liq tiklanish)|
+
+---
+
+### 17.3. Tom Mustahkamligi va Ob-havodan Himoya (Roof Weatherproofing)
+
+- **Yomg'ir va Qor O'tishi:** Agar tom voxellari qamish yoki eski taxtadan bo'lib, 3 fasldan ortiq ta'mirlanmasa, ularning suv o'tkazmasligi buziladi. Yomg'ir paytida xonada shilta ko'lmaklar paydo bo'ladi, issiqlik $-50\%$ ga soviydi va yashovchilarda shamollash (`Common Cold`) xastaligi boshlanadi.
+- **Mo'ri Shamollatishi (Smoke Ventilation Physics):** Olov yoqilgan xonada tomga ochilgan havo yo'li yoki tosh mo'ri bo'lishi shart. Agar xona to'liq yopiq bo'lsa, xonadagi har bir fuqaro soatiga $5\text{ HP}$ yo'qotadi va `Smoke Asphyxiation` (Tutundan bo'g'ilish) holatiga tushadi.
+
+---
+
+# 18. FUQAROLAR EHTIYOJLARI (CITIZEN PHYSIOLOGICAL NEEDS SIMULATION)
+
+Voxel Lord simulyatsiyasida fuqaroning hayotiyligi va mehnat unumdorligi doimiy ravishda hisoblab boriladigan fiziologik ehtiyojlar tizimiga asoslanadi. Har bir ehtiyoj o'ziga xos dinamik o'zgarish formulasiga ega.
+
+### 18.1. Ochlik Mexanikasi va Sarflanish Tenglamasi (Hunger Drain)
+
+Fuqaroning ochlik darajasi $Hunger \in [0.0, 100.0]$ oralig'ida bo'lib, 0 — to'q, 100 — qattiq ochlikni bildiradi.
+
+$$\frac{d(Hunger)}{dt} = BaseHungerRate \times ActivityMult(State) \times TempMult$$
+
+Bunda:
+- $BaseHungerRate = \frac{100.0}{24 \times 60} \approx 0.0694 \text{ ball/daqiqa}$ (Fuqaro hech narsa qilmasa, 24 soatda to'liq ochiqadi).
+- **Faoliyat Multiplikatori ($ActivityMult$):**
+  - Uxlayotganda (`SLEEP`): $0.50\times$
+  - Dam olayotganda / Gurunglashganda (`REST / SOCIALIZE`): $0.80\times$
+  - Oddiy yurishda (`WALK`): $1.15\times$
+  - Og'ir jismoniy mehnatda (Konchilik, Temirchilik, Yuk tashish): $1.60\times$
+  - Jang maydonida yugurish va zarba berishda (`FIGHT / FLEE`): $2.20\times$
+- **Harorat Ko'paytiruvchisi ($TempMult$):**
+  Agar fuqaroning tana harorati $T_{body} < 35.0^\circ\text{C}$ ga tushsa, organizm o'zini isitish uchun kaloriyalarni ko'p yoqadi: $TempMult = 1.30\times$.
+
+**Ochlik Bosqichlari va Salbiy Ta'sirlari:**
+- $0 – 30$ (**To'q / Sated**): Hech qanday jarima yo'q, ruhiyat barqaror.
+- $31 – 70$ (**Ishtaha Ochilgan / Peckish**): $-5$ Morale, fuqaro tushlik vaqtini kutadi.
+- $71 – 90$ (**Och / Hungry**): $-20$ Morale, ish tezligi $-15\%$. Fuqaro eng yaqin oziq-ovqat omboriga borishni rejalashtiradi.
+- $91 – 100$ (**Ocharchilik / Starving**): $-50$ Morale, ish tezligi $-40\%$. Fuqaro har soatda $2.5\text{ HP}$ salomatligini yo'qotadi va oxir-oqibat hushidan ketib halok bo'ladi.
+
+---
+
+### 18.2. Chanqoqlik Mexanikasi va Suv Ta'minoti (Thirst Drain)
+
+Chanqoqlik darajasi $Thirst \in [0.0, 100.0]$:
+
+$$\frac{d(Thirst)}{dt} = BaseThirstRate \times \left(1.0 + \max\left(0.0, \; \frac{T_{ambient} - 22.0}{10.0}\right)\right) \times ActivityMult$$
+
+- $BaseThirstRate = \frac{100.0}{16 \times 60} \approx 0.1042 \text{ ball/daqiqa}$ (Suvsiz 16 soatda to'liq chanqaydi).
+- **Issiq Havoda Bug'lanish:** Atrof-muhit harorati $22^\circ\text{C}$ dan oshganda har $10^\circ\text{C}$ uchun suv sarfi chiziqli oshib boradi (yozda $35^\circ\text{C}$ issiqda chanqoqlik $2.3\times$ tezlashadi).
+- **Ichimlik Manbalari va Sifat Turlari:**
+  - **Toza Quduq Suvi (Fresh Well Water):** Chanqoqni to'liq qondiradi, kasallik xavfi $0\%$.
+  - **Taverna Eli / Qora Pivosi (Ale / Beer):** Chanqoqni bosadi, $+15$ Morale beradi va og'riqni kamaytiradi.
+  - **Daryo Suvi (River Water):** Qoniqarli, ammo oqim yuqorisida shahar axlati bo'lsa $10\%$ ichburug' xavfi.
+  - **Turg'un Botqoq Suvi (Stagnant Pond):** Chanqoqni qondiradi, ammo $60\%$ ehtimol bilan vabo (`Cholera / Dysentery`) yuqtiradi.
+- **Suvsizlik Oqibati:** $Thirst = 100$ bo'lganda suvsizlanish (Dehydration) boshlanib, fuqaro har soatda $5.0\text{ HP}$ yo'qotadi va gandiraklab yuradi.
+
+---
+
+### 18.3. Issiqlik va Termoregulyatsiya Tenglamasi (Warmth & Thermoregulation)
+
+Fuqaroning ichki tana harorati dinamik Nyuton sovish qonuniyati asosida simulyatsiya qilinadi:
+
+$$\frac{dT_{body}}{dt} = \frac{(T_{ambient} + HeatSources + Insulation_{clothes}) - T_{body}}{\tau_{thermal}}$$
+
+Bunda:
+- Standart sog'lom tana harorati: $37.0^\circ\text{C}$.
+- Issiqlik inertsiyasi doimiysi: $\tau_{thermal} = 45 \text{ daqiqa}$.
+- **Kiyim Issiqlik Izolyatsiyasi ($Insulation_{clothes}$):**
+  - Oddiy zig'ir ko'ylak (Linen Shirt): $+4^\circ\text{C}$
+  - Qalin jun chakmon (Woolen Cloak): $+12^\circ\text{C}$
+  - Mo'ynali po'stin (Heavy Fur Parka): $+22^\circ\text{C}$
+- **Issiqlik Manbalari ($HeatSources$):**
+  - Gulxan yonida (3 metr masofada): $+25^\circ\text{C}$
+  - Uy ichidagi tosh kamin yonida: $+20^\circ\text{C}$
+  - Qo'ldagi mash'ala (Torch): $+3^\circ\text{C}$
+
+**Gipotermiya (Sovuq Qotish) Bosqichlari:**
+- $35.0^\circ\text{C} \le T_{body} < 36.5^\circ\text{C}$ (**Sovuq Qotgan / Chilled**): $-10$ Morale, tishlar taqillaydi, mehnat tezligi $-10\%$.
+- $32.0^\circ\text{C} \le T_{body} < 35.0^\circ\text{C}$ (**O'rtacha Gipotermiya**): $-30$ Morale, harakat tezligi $-35\%$, titroq tutadi, asboblar qo'ldan tushib ketishi mumkin.
+- $T_{body} < 32.0^\circ\text{C}$ (**Og'ir Gipotermiya / Qon Muzlashi**): $-60$ Morale, fuqaro yerga yiqiladi, soatiga $10.0\text{ HP}$ yo'qotadi va 3 soat ichida qutqarilmasa vafot etadi.
+
+---
+
+### 18.4. Charchoq va Energiya Balansi (Fatigue & Energy Drain)
+
+- **Uyg'oqlik Sarfi:** Fuqaro har daqiqada $+0.1042$ ball charchoq to'playdi (16 soatlik uzluksiz mehnatdan so'ng $Fatigue = 100$ ga yetadi).
+- **Uyqudagi Tiklanish:**
+  - Qulay uy to'shagida (`Bed`): daqiqasiga $-0.60$ ball (to'liq tiklanish 2.8 soatda / real vaqtda 2.8 daqiqada amalga oshadi).
+  - Somon ustida yoki polda: daqiqasiga $-0.25$ ball.
+- **Charchoq Oqibati:** $Fatigue > 90$ bo'lganda fuqaro har qanday ishni to'xtatadi va eng yaqin xavfsiz yerda to'g'ridan-to'g'ri yerga yiqilib uxlab qoladi (`COLLAPSE_SLEEP`).
+
+---
+
+# 19. CITIZEN AI ARXITEKTURASI (AI ARCHITECTURE & 10-STATE CANONICAL FSM)
+
+Voxel Lord fuqarolarining xulq-atvori ikki qavatli gibrid arxitekturaga tayanadi: yuqori bosqichli kun tartibi rejalashtiruvchisi (Utility-Based High-Level Planner) va pastki bosqichli deterministik Ierarxik Chekli Avtomat (Hierarchical Finite State Machine — HFSM). Tizim 10 ta kanonik holatni (Canonical States: `Walk`, `Work`, `Eat`, `Sleep`, `Fight`, `Flee`, `Socialize`, `Heal`, `Transport`, `Rest`) to'liq qamrab oladi.
+
+### 19.1. Ierarxik Qaror Qabul Qilish va Interrupt Darajalari
+
+Fuqaro har bir simulyatsiya qadamida o'z holatini quyidagi ustuvorlik zinapoyasi bo'yicha baholaydi:
+- **Priority Tier 0 (Favqulodda Falokat — Emergency):** O'lim xavfi, yong'in sodir bo'lishi, yirtqich hayvon yoki dushman qilich zarbasi ostida qolish. Har qanday joriy holatni bir zumda uzadi (Interrupt).
+- **Priority Tier 1 (Kritik Fiziologik Ehtiyojlar — Critical Survival):** Ochlik $>85$, Chanqoqlik $>85$, Tana harorati $<33^\circ\text{C}$, Qon ketish travmasi.
+- **Priority Tier 2 (Rejalashtirilgan Mehnat va Uyqu — Scheduled Shift):** Tonggi 06:00–18:00 ish smenasi, tungi 21:00–05:00 uyqu soati.
+- **Priority Tier 3 (Ijtimoiy va Bo'sh Vaqt — Secondary / Leisure):** Taverna, suhbat, ibodat, shahar maydonida sayr qilish.
+
+---
+
+### 19.2. 10 Asosiy Holatli FSM O'tish Jadvali (Complete 10-State FSM Transition Matrix)
+
+| Holat (State) | Kirish Shartlari (Entry Conditions) | Holat Ichidagi Fizik va Animatsion Xatti-harakat | Uzilish Triggerlari (Interrupt Conditions) | Chiqish Shartlari (Exit Conditions) | Keyingi Holat (Next State) |
+|---|---|---|---|---|---|
+| **1. WALK (Yurish)** | Belgilangan nuqtaga (Ishxona, To'shak, Ombor, Quduq) yo'l talab qilinganda. | `NavigationAgent3D` orqali marshrut hisoblaydi. Relyef koeffitsiyenti qo'llanadi (Loyda 0.8x, Tosh yo'lda 1.35x, Katta yo'lda 1.6x). | Dushman ko'rinsa $\rightarrow$ FLEE/FIGHT; Yong'in chiqsa $\rightarrow$ WORK (O'chirish); Ochlik $>85 \rightarrow$ EAT. | Mo'ljal masofasiga yetib kelindi ($\text{masofa} \le 1.2\text{m}$). | Mo'ljaldagi maqsadli holat (WORK, EAT, SLEEP, TRANSPORT). |
+| **2. WORK (Mehnat)** | Ish smenasida (06:00–18:00) o'z ish stoliga yetib kelgan; zarur asbobi mavjud. | Ish animatsiyasini ijro etadi. Har bir tsiklda progressni oshiradi: $\Delta P = \Delta t \cdot Skill \cdot ToolQuality$. Ochlik va charchoq $1.5\times$ tezlashadi. | Xavf $\rightarrow$ FLEE/FIGHT; Yong'in $\rightarrow$ O'chirish; Ochlik/Chanqoqlik $>85 \rightarrow$ EAT; Charchoq $>90 \rightarrow$ REST. | Ishlab chiqarish sikli tugadi, mahsulot chiqdi yoki soat 18:00 bo'ldi. | TRANSPORT (mahsulotni omborga eltish) yoki REST/SOCIALIZE. |
+| **3. EAT (Ovqatlanish)** | Ochlik $>60$ yoki rejadagi ovqat vaqti (12:00 tushlik, 19:00 kechki ovqat). | Eng yaqin oziq-ovqat ombori yoki xonadon qutisiga boradi. 1 porsiya taom olib, 8 sekund yeyish animatsiyasini o'ynaydi. Ochlikni tiklaydi. | To'g'ridan-to'g'ri jangovar hujum bo'lsa $\rightarrow$ FIGHT/FLEE; Yong'in trevogasi. | Ochlik 0 ga tushdi yoki oziq-ovqat to'liq yeb bo'lindi. | WORK (kunduzi bo'lsa) yoki SOCIALIZE / SLEEP (kechqurun bo'lsa). |
+| **4. SLEEP (Uxlagani Yotish)**| Tun kirdi (21:00–05:00) yoki o'ta yuqori charchoq ($Fatigue > 90$). | O'z to'shagiga yotadi (yo'q bo'lsa polda). Yotish animatsiyasi. Charchoq soatiga $-36$ ball kamayadi, salomatlik tiklanadi. | Uyga o't ketsa; Qaroqchilar eshikni buzganda; Shahar trevoga qo'ng'irog'i chalinsa $\rightarrow$ FLEE/FIGHT. | Uyg'onish soati yetdi (05:30) va Charchoq $<5.0$. | EAT (nonushta) $\rightarrow$ WALK $\rightarrow$ WORK. |
+| **5. FIGHT (Jang Qilish)** | Dushman ko'rish zonasida; Fuqaro askar/soqchi yoki qochishga yo'li yo'q fuqaro bo'lsa. | Qurol va qalqonni chiqaradi. Jangovar AI tsiklini boshlaydi: zarba berish, qalqon bilan to'sish, aylanib o'tish (strafe). | Salomatlik $<20\%$ va harbiy ruhiyat sinsa $\rightarrow$ FLEE; Komandir chekinish buyursa $\rightarrow$ FLEE. | Dushman o'ldirildi, hushidan ketdi yoki qochib ketdi. | HEAL (yarador bo'lsa) yoki GUARD / WALK. |
+| **6. FLEE (Qochish)** | Qurolsiz fuqaro 18m masofada dushman ko'rsa, yoki askar ruhiyati $Morale < 20$ bo'lib vahimaga tushsa. | Dushmandan teskari yo'nalishda eng yaqin qal'a devori, qasr qo'rg'oni yoki mustahkam darvozaga qarab $1.4\times$ tezlikda yuguradi. | Yo'l to'silib burchakka qisilsa $\rightarrow$ FIGHT (jonsarak himoya); Salomatlik 0 bo'lsa $\rightarrow$ KNOCKED OUT. | Xavfdan $35\text{m}$ uzoqlashdi va xavfsiz devor ichiga kirdi. | REST / HEAL / HIDE. |
+| **7. SOCIALIZE (Muloqot)** | Kechki bo'sh vaqt (18:00–21:00); Ochlik $<40$, Charchoq $<70$. | Taverna, qishloq qudug'i yoki shahar maydoniga boradi. Boshqa fuqarolar bilan gaplashadi, pivo ichadi. Morale $+15$ oshadi. | Shahar trevogasi $\rightarrow$ FLEE; Uyqu vaqti (21:00) $\rightarrow$ SLEEP; Ochlik $>75 \rightarrow$ EAT. | Muloqot vaqti (15–30 o'yin daqiqasi) tugadi yoki taverna yopildi. | WALK $\rightarrow$ SLEEP. |
+| **8. HEAL (Davolanish)** | Qon ketish, suyak sinishi, jiddiy jarohat yoki Salomatlik $<60.0$ bo'lganda. | Eng yaqin gospitalga yoki o'z to'shagiga boradi. Tabib unga bog'ich va malham qo'yishini kutadi. Tinch holatda soatiga $+5\text{ HP}$ tiklanadi. | Gospitalga o't ketsa yoki dushman bostirib kirsa $\rightarrow$ FLEE. | Salomatlik $\ge 95\%$ ga yetdi va barcha salbiy travma statuslari ketdi. | WORK yoki WALK. |
+| **9. TRANSPORT (Yuk Tashish)**| Ish joyida xomashyo tugasa yoki tayyor mahsulot to'lib ketganda, qurilish joyiga material kerak bo'lganda. | `ItemReservationManager` orqali ashyoni band qiladi, borib ko'taradi (yoki aravaga ortadi), omborga eltadi va bo'shatadi. | Yo'lda dushman uchrasa $\rightarrow$ yukni tashlab FLEE; Yong'in chiqsa $\rightarrow$ yukni tashlab WORK. | Yuk belgilangan ombor yoki dastgoh katagiga muvaffaqiyatli topshirildi. | WORK (avvalgi ishiga qaytish) yoki keyingi yuk tashish buyrug'i. |
+| **10. REST (Nafas Rostlash)**| Charchoq $70–89$ oralig'ida bo'lsa, yoki og'ir mehnatda Stamina to'liq tugaganda. | O'rindiqqa, yog'och xodaga yoki yerga o'tiradi. 5–10 daqiqa harakatsiz turadi. Stamina soniyasiga $+2.0$ tiklanadi, charchoq to'planishi to'xtaydi. | Dushman hujumi $\rightarrow$ FLEE/FIGHT; Favqulodda yong'in signali. | Stamina $100\%$ to'ldi va Charchoq $<50$ ga tushdi. | Oldingi to'xtatilgan WORK yoki WALK holatiga qaytish. |
+
+---
+
+### 19.3. Godot 4 GDScript Arxitektura Modeli (`CitizenFSM.gd`)
+
+```gdscript
+# res://scripts/ai/citizen_fsm.gd
+class_name CitizenFSM
+extends Node
+
+enum State {
+	WALK,
+	WORK,
+	EAT,
+	SLEEP,
+	FIGHT,
+	FLEE,
+	SOCIALIZE,
+	HEAL,
+	TRANSPORT,
+	REST
+}
+
+signal state_changed(old_state: State, new_state: State)
+
+@export var current_state: State = State.REST
+var previous_state: State = State.REST
+var state_time: float = 0.0
+
+@onready var citizen: Citizen = get_parent() as Citizen
+
+func _physics_process(delta: float) -> void:
+	state_time += delta
+	check_emergency_interrupts()
+	
+	match current_state:
+		State.WALK:
+			_process_walk(delta)
+		State.WORK:
+			_process_work(delta)
+		State.EAT:
+			_process_eat(delta)
+		State.SLEEP:
+			_process_sleep(delta)
+		State.FIGHT:
+			_process_fight(delta)
+		State.FLEE:
+			_process_flee(delta)
+		State.SOCIALIZE:
+			_process_socialize(delta)
+		State.HEAL:
+			_process_heal(delta)
+		State.TRANSPORT:
+			_process_transport(delta)
+		State.REST:
+			_process_rest(delta)
+
+func transition_to(new_state: State) -> void:
+	if current_state == new_state:
+		return
+	
+	_exit_state(current_state)
+	previous_state = current_state
+	current_state = new_state
+	state_time = 0.0
+	_enter_state(new_state)
+	state_changed.emit(previous_state, current_state)
+
+func check_emergency_interrupts() -> void:
+	# Tier 0 Interrupt: Dushman tahdidi
+	if citizen.perceived_threat != null and current_state != State.FIGHT and current_state != State.FLEE:
+		if citizen.is_combatant():
+			transition_to(State.FIGHT)
+		else:
+			transition_to(State.FLEE)
+		return
+	
+	# Tier 1 Interrupt: O'lim darajasidagi ochlik
+	if citizen.hunger >= 90.0 and current_state != State.EAT and current_state != State.FLEE:
+		transition_to(State.EAT)
+		return
+```
+
+---
+
+# 20. VAZIFALAR USTUVORLIGI (TASK PRIORITY & UTILITY DISPATCHING)
+
+Shaharda yuzlab topshiriqlar (daraxt kesish, kon qazish, hosil o'rish, tosh tashish, yaradorlarni davolash) vujudga kelganda, markaziy dispetcher har bir fuqaroga eng maqbul vazifani Matematik Foydalilik Funksiyasi (Utility Function) orqali taqsimlaydi.
+
+### 20.1. Vazifalarni Baholash Foydalilik Funksiyasi (Job Utility Function)
+
+Dispetcher har bir `(Citizen, Task)` juftligi uchun quyidagi ko'p faktorli ballni hisoblaydi:
+
+$$Score(Citizen, Task) = Priority_{base}(Task) \times W_{priority} + Skill(Citizen, Task.type) \times W_{skill} - Distance(Citizen, Task.pos) \times W_{dist} - Fatigue(Citizen) \times W_{fatigue}$$
+
+Bunda tizim vazn koeffitsiyentlari:
+- $W_{priority} = 40.0$: Vazifaning shahar uchun hayotiy muhimlik vazni.
+- $W_{skill} = 25.0$: Fuqaroning ushbu kasb bo'yicha mahorat ko'rsatkichi ($Skill \in [0, 100]$). Tajribali usta uzoqroqda bo'lsa ham unga topshiriladi.
+- $W_{dist} = 0.50$: Har bir voxel-metr masofa uchun ball ayiriladi (ortiqcha yurish vaqtini tejash).
+- $W_{fatigue} = 0.30$: Charchagan fuqaro og'ir jismoniy vazifalarga tanlanmaydi.
+
+---
+
+### 20.2. 7 Pog'onali Vazifalar Matritsasi (7-Tier Task Priority Base Matrix Table)
+
+| Ustuvorlik Toifasi | Bazaviy Ball ($Priority_{base}$) | Vazifa Misollari | To'xtatish Mumkinligi (Interruptible?) | Javob Berish Vaqti Cheklovi |
+|---|---|---|---|---|
+| **1. Favqulodda Falokat (Emergency)** | 1,000 | Yong'inni chelak bilan o'chirish, yirtqich hujumini qaytarish, qon ketayotgan yaradorga jarrohlik. | Yo'q (Qat'iy blokirovka) | Zudlik bilan (1–2 sekund) |
+| **2. Zudlik Harbiy (Urgent Military)** | 800 | Qal'a devoridagi merlonlarni egallash, tushirilgan panjarani yopish, devorni buzayotgan taranga hujum. | Faqat Emergency tomonidan | 5 sekund ichida |
+| **3. Sanitariya va Tibbiyot (Sanitation)**| 600 | Chiriyotgan murdalarni ko'chadan yig'ish, o'lat bemorlarini karantinga olish, dori damlash. | Ha, Harbiy vazifalar bilan | 60 soniya ichida |
+| **4. Kritik Omon Qolish (Critical Survival)**| 450 | Qorasovuq tushishidan oldin g'allani o'rib olish, granari bo'shab qolganda non yopish, qishki o'tin. | Ha | 2 o'yin soati ichida |
+| **5. Standart Ishlab Chiqarish (Production)**| 250 | Rudadan temir eritish, bolta va qilich yasash, o'rmondan yog'och tilish, tosh yo'nish. | Ha | Standart ish kuni tartibida |
+| **6. Logistika va Tashish (Hauling)** | 180 | Quymalarni qurolxonaga tashish, unni nonvoyxonaga eltish, bozor do'konlarini to'ldirish. | Ha | Navbat bilan bajariladi |
+| **7. Bezatish va Fuqarolik (Civic)** | 80 | Tosh ko'chalarga mayda tosh yotqizish, haykallar o'ymakorligi, manzarali gulzorlar ekish. | Ha | Bo'sh vaqtda |
+
+---
+
+### 20.3. Zaxiralash Boshqaruvi va Poyga Oldini Olish (`ItemReservationManager`)
+
+Bir nechta fuqarolarning bitta buyumga yoki cheklangan resursga birdaniga yugurishini (Race Condition) oldini olish uchun yagona markazlashtirilgan zaxira menejeri ishlaydi:
+- Fuqaro biror xomashyoni olishga qaror qilganda, u `ItemReservationManager.reserve_item(item_id, citizen_id)` chaqiruvini yuboradi.
+- Agar boshqa fuqaro avvalroq uni band qilgan bo'lsa, dispetcher zudlik bilan ikkinchi eng yaqin mos xomashyoni qidiradi.
+- Agar fuqaro yo'lda dushmanga duch kelib qochsa yoki vafot etsa, uning band qilgan buyumlari 15 sekundlik `timeout` o'tgach yana umumiy havzaga qaytariladi.
+
+---
+
+# 21. KASBLAR TIZIMI (FEUDAL PROFESSION CATALOG & WORK SCHEDULES)
+
+Voxel Lord feodal iqtisodiyoti chuqur ixtisoslashgan mehnat taqsimotiga tayanadi. Shaharda 23 ta kanonik feodal kasb mavjud bo'lib, ularning har biri o'z ish o'rni, asbobi, malaka talablari va kun tartibiga ega.
+
+### 21.1. Mehnat Tashkiloti va Smena Qoidalari
+
+- **Ish Vaqti:**
+  - Kunduzgi smena: 06:00 dan 18:00 gacha (12 o'yin soati = 12 real daqiqa).
+  - Tungi soqchilik smenasi: 18:00 dan 06:00 gacha (Qorovullar, tungi patrul).
+- **Asbob Majburiyati:** Fuqaro o'z kasbiga oid asbobsiz ishlay olmaydi (12-bo'limga qarang).
+- **Kasb Tanlash:** Fuqarolar o'zlarining eng yuqori mahoratiga qarab avtomatik tayinlanadi yoki Hukmdor tomonidan Royal Ledger orqali majburiy tayinlanishi mumkin.
+
+---
+
+### 21.2. Feodal Kasblar Master Katalogi (Comprehensive Feudal Job Catalog Matrix)
+
+| Kasb Nomi (O'zbekcha / Inglizcha) | Asosiy Ish Joyi (Workstation) | Talab Qilinadigan Asbob | Asosiy Mahorat (Primary Skill) | Ish Smenasi | Bazaviy Mehnat Unumi / Mahsulot |
+|---|---|---|---|---|---|
+| **Dehqon (Farmer)** | Ekin Dalasi / Omoch | O'roq va Ketmon (Hoe & Scythe) | Agriculture | 06:00 – 18:00 | Kuniga 8 bog' g'alla / sabzavot ekish va yig'ish. |
+| **Tegirmonchi (Miller)** | Shamol / Suv Tegirmoni | Qo'l mehnati / Richag | Milling | 07:00 – 18:00 | Kuniga 16 qop oliy navli un va kepak yanchish. |
+| **Nonvoy (Baker)** | Nonvoyxona Pechi | Nonvoy kuragi (Baking Peel) | Baking | 05:00 – 16:00 | Kuniga 24 ta issiq xushbo'y non pishirish. |
+| **Pivochi (Brewer)** | Pivo Qaynatish Xumi | Yog'och kurak, Qozon | Brewing | 08:00 – 18:00 | Kuniga 12 bochka to'yimli ale va pivo tayyorlash. |
+| **O'rmonchi (Woodcutter)**| O'rmon / Yog'och Tilish Maydoni| Yog'ochkesar Boltasi (Axe) | Forestry | 06:00 – 17:00 | Kuniga 12 ta eman yoki qarag'ay xodasi tayyorlash. |
+| **Duradgor (Carpenter)** | Duradgorxona Dastgohi | Arra, Randa va Bolg'a | Carpentry | 07:00 – 18:00 | Taxtalar, mebel, aravachalar va qurilish bloklari. |
+| **Konchi (Miner)** | Shaxta / Qazilma Galereyasi | Cho'kich / Kulang (Pickaxe) | Mining | 06:00 – 18:00 | Kuniga 10 ta ruda, ko'mir yoki granit qazib olish. |
+| **Erituvchi (Smelter)** | Domna Pechi / Bloomery | Olov qisqichi, Temir kurak | Metallurgy | 06:00 – 19:00 | Kuniga 8 ta tozalangan temir yoki po'lat quyma quyish. |
+| **Temirchi (Blacksmith)** | Temirchilik Sandoni (Anvil) | Temirchilik Bosqoni (Hammer) | Blacksmithing | 07:00 – 18:00 | Kuniga 4 ta sifatli mehnat quroli yoki mixlar yasash. |
+| **Quroloz (Armorer/Weaponsmith)**| Qal'a Qurolxonasi | Anvil, Charxtosh va Qisqich | Armorsmithing | 07:00 – 18:00 | Qilichlar, nayzalar, zanjir va plita sovutlar. |
+| **Tosh Yo'nuvchi (Mason)**| Tosh Kesish Maydoni | Tosh qalamchasi va Bolg'a | Masonry | 06:00 – 18:00 | Qal'a devorlari va poydevor uchun tarashlangan tosh. |
+| **To'quvchi (Weaver)** | To'quvchilik Dastgohi | Mokki (Shuttle), Ip urchug'i | Tailoring | 08:00 – 18:00 | Kuniga 6 to'p zig'ir yoki jun mato to'qish. |
+| **Ko'nchi (Tanner)** | Teri Oshlash Xumlari | Teri qirg'ich pichoq | Leatherworking | 07:00 – 17:00 | Xom teridan qalin sovut va etikka yaraydigan charm. |
+| **Tabib (Doctor/Herbalist)**| Gospital / Dorixona | Jarrohlik pichog'i, Qorishma hovoncha | Medicine | 24 soat navbatchilik | Yaradorlarni bog'lash, qon to'xtatish, dori berish. |
+| **G'assol (Gravedigger)**| Murdaxona / Qabriston | Bel (Shovel), Murda aravasi | Undertaking | Har doim (Chaqiruvda)| Ko'chalardagi murdalarni yig'ish, qabr qazish, ko'mish. |
+| **Shahar Soqchisi (Guard)**| Darvozaxona / Patrul Yo'li | Nayza va Qalqon (Spear & Shield)| Combat | 18:00 – 06:00 (Tungi)| Shahar ichki xavfsizligi, o'g'rilarni ushlash. |
+| **Piyoda Askar (Soldier)**| Kazarma / Mudofaa Devori | Qilich va Zirh (Sword & Armor)| Combat | Doimiy saf tayyorgarligi| Qamal va reydlarni qaytarish, jangovar yurishlar. |
+| **Kamonchi (Archer)** | Merlon Minorasi / Otish Maydoni| Jangovar Kamon va Sadaq | Marksmanship | 06:00 – 18:00 | Masofadan dushmanni yo'q qilish, devor himoyasi. |
+| **Ritsar (Knight)** | Ritsarlar Zali / Otxona | Jangovar Ot, Po'lat Qilich, Nayza| Chivalry & Combat | Elita qo'shin | Otdagi yengilmas zarba, jangda fuqarolar ruhiyatini oshirish. |
+| **Ruhoniy (Priest)** | Qishloq Cherkovi / Sobor | Muqaddas Kitob, Tutatqich | Theology | 06:00 – 20:00 | Diniy ibodatlar, nikoh marosimlari, qabrlarni muqaddaslash. |
+| **Baxshi (Bard)** | Taverna / Shahar Maydoni | Lute (Tanbur), Skripka | Performance | 17:00 – 23:00 | Musiqa chalish, qo'shiq aytish, shaharda Morale $+15$. |
+| **Bailiff (Shahar Boshqaruvchisi)**| Shahar Kengashi Zali | Pat-qalam, Hisob daftari | Stewardship | 08:00 – 17:00 | Soliq yig'ish, jinoyatchilarni sud qilish, hisobotlar. |
+| **Savdogar (Merchant)** | Bozor Rastasi / Karvonsaroy | Tarozu va Tangalar | Commerce | 08:00 – 17:00 | Chet el karvonlari bilan savdo qilish, resurs ayirboshlash. |
 
 ---
 
@@ -527,11 +959,54 @@ Tier 3 Elchixona (Embassy) binosi orqali Dunyo Xaritasi interfeysida boshqarilad
 
 ---
 
-# 23. MAHORAT TIZIMI (SKILL SYSTEM)
+# 23. MAHORAT TIZIMI (SKILL SYSTEM & CRAFT PROGRESSION)
 
-Har bir kasbda 0–100 daraja:
-`Novice (Yangi) → Apprentice (Shogird) → Journeyman (Usta yordamchisi) → Expert (Mutaxassis) → Master (Buyuk Usta)`.
-Master ustalar yangi avlod shogirdlarini o'qitish huquqiga ega.
+Voxel Lord feodal dunyosida har bir fuqaro tug'ma va orttirilgan mehnat va jangovar ko'nikmalar majmuasiga ega. Mahorat tizimi har bir kasb bo'yicha $0$ dan $100$ gacha bo'lgan uzluksiz shkalada o'lchanadi. Mahorat darajasi bevosita ish tezligiga, buyum sifatiga, resurs tejashga va yangi texnologik retseptlarni ochishga ta'sir ko'rsatadi.
+
+### 23.1. Mahorat Rivojlanishi Matematikasi va XP Tenglamalari (Progression Math)
+
+Fuqaroning ma'lum bir mahorat bo'yicha keyingi darajaga (Level) ko'tarilishi uchun talab qilinadigan tajriba ochkolari (XP) eksponentsial qonuniyat asosida o'sib boradi:
+
+$$XP_{required}(Level) = BaseXP \times (1 + Level)^{1.45}$$
+
+Bunda:
+- $BaseXP = 120 \text{ XP}$ (1-darajadan 2-darajaga o'tish uchun 120 XP kerak, 50-daraja uchun $\approx 35,400 \text{ XP}$, 100-daraja uchun $\approx 96,200 \text{ XP}$).
+
+**Har Bir Mehnat Amali Uchun Beriladigan XP Formulasi ($\Delta XP$):**
+Har safar fuqaro bitta qazish, eritish, bolg'alash, ekin o'rish yoki jangovar zarba amalini bajarganda:
+
+$$\Delta XP = BaseActionXP \times \left(1.0 + 0.5 \times Tier_{station}\right) \times \left(\frac{ToolQuality}{1.0}\right) \times \left(1.0 - 0.005 \times Level\right)$$
+
+- $BaseActionXP$: Amaliyot turiga qarab (Daraxt kesish: $8 \text{ XP}$, Temir qurol bolg'alash: $35 \text{ XP}$, Jarrohlik amaliyoti: $60 \text{ XP}$).
+- $Tier_{station} \in [1, 4]$: Ilg'or dastgohda ishlash yangi uslublarni tezroq o'rgatadi.
+- $ToolQuality$: Yuqori sifatli asbob bilan ishlash usta nozikligini oshiradi.
+- $(1.0 - 0.005 \times Level)$: Daraja oshgan sari oddiy takroriy ishlardan olinadigan tajriba tabiiy ravishda kamayadi (99-darajada bazaviy o'sish $50\%$ ga tushadi, faqat murakkab qirollik buyurtmalari orqali Grandmaster darajasiga erishish mumkin).
+
+---
+
+### 23.2. 5 Pog'onali Malaka Unvonlari Jadvali (Mastery Tiers Balance Table)
+
+| Malaka Pog'onasi | Mahorat Diapazoni (Level) | Mehnat / Qazish Tezligi Multiplikatori | Xato / Falokat Ehtimoli ($P_{fail}$) | Maksimal Buyum Sifati | Maxsus Imtiyozlar va Ta'lim Qobiliyati |
+|---|---|---|---|---|---|
+| **Yangi O'rganuvchi (Novice)** | $0 – 19$ | $1.00\times$ (Baza) | $15.0\%$ | Common (Oddiy) | Yangi shogird, ko'p charchaydi, asbobni tez eskirtiradi. Boshqalarga o'rgata olmaydi. |
+| **Shogird (Apprentice)** | $20 – 39$ | $1.15\times$ | $8.0\%$ | Fine (Sifatli) | Standart retseptlarni mustaqil bajara oladi, asbob eskirishi $-10\%$. |
+| **Usta Yordamchisi (Journeyman)**| $40 – 69$ | $1.35\times$ | $2.0\%$ | Masterwork (Usta) | Ishlab chiqarish unumi $+35\%$. Novice yoshlarni o'z yoniga shogirdlikka olish huquqi. |
+| **Buyuk Usta (Master)** | $70 – 89$ | $1.65\times$ | $0.0\%$ (Xato qilmaydi) | Royal (Qirollik) | Murakkab qotishmalar va arxitektura bloklarini ochadi. Apprentice darajasidagi shogirdlarni tayyorlaydi. |
+| **Afsonaviy Usta (Grandmaster)** | $90 – 100$ | $2.00\times$ | $0.0\%$ | Legendary (Afsonaviy)| Shahar nufuzi $+5$ Prestige aura beradi. Shahar bo'ylab tegishli sohada xomashyo isrofi $-15\%$. |
+
+---
+
+### 23.3. Ustoz-Shogird Tizimi va Bilim Uzatish Mexanikasi (Mentorship Dynamics)
+
+- **Shogird Biriktirish:** Hukmdor yoki shahar mehnati dispetcheri 11–15 yoshli o'smirni Master ($Skill \ge 70$) hunarmandga biriktirishi mumkin.
+- **Aura Ta'siri (Mentorship Proximity Bonus):**
+  - Shogird o'z ustozi bilan bir xona ichida yoki 8 metr masofada birgalikda ishlaganda:
+    $$\Delta XP_{apprentice} = \Delta XP \times 1.35$$
+    Shogird $35\%$ tezroq tajriba to'playdi.
+  - Usta shogirdning harakatlarini nazorat qiladi: agar shogird xatoga yo'l qo'ymoqchi bo'lsa, usta uni to'xtatadi ($P_{fail}$ xavfi $0\%$ ga tushadi).
+- **Merosiy Tajriba Kitoblari (Master Treatises):**
+  - Grandmaster darajasiga yetgan usta o'z hayotining so'nggi yillarida (Elder bosqichida) monastir kutubxonasida yoki o'z ustaxonasida "Hunarmand Risolasi" (`Craft Treatise`) kitobini yozishi mumkin.
+  - Ushbu kitob shahar kutubxonasida saqlanadi va kelgusi avlodlarning o'rganish tezligini butun shahar miqyosida doimiy $+10\%$ ga oshiradi.
 
 ---
 
@@ -1435,34 +1910,234 @@ Har bir boss o'z bosqichida ochiladi va mag'lub etilganda noyob mukofotlar va un
 
 ---
 
-# 73. JAROHAT VA SALOMATLIK STATUSLARI
+# 73. JAROHAT VA SALOMATLIK STATUSLARI (TRAUMA CONDITIONS & WOUND MECHANICS)
 
-Health, Qon ketishi (Bleeding), Og'riq (Pain), Suyak sinishi (Fracture), Yuqumli yiringlash (Infection).
+Voxel Lord: Feudal Realm o'yinida inson tanasi shunchaki bitta umumiy Health paneli bilan cheklanmaydi. Har bir fuqaro va hukmdor jang, kon qazish, yiqilish yoki sovuq urishi oqibatida vujudga keluvchi lokal travmatik statuslar (Trauma Status Effects) tizimiga ega. Davolanmagan jarohatlar o'z vaqtida bartaraf etilmasa, qon ketishidan o'limga yoki qorason (gangrena) asoratlariga olib keladi.
+
+### 73.1. Travmatik Holatlar va Fiziologik Buzilishlar Katalogi
+
+1. **Qon Ketishi (Bleeding Trauma):**
+   - **Yengil Qon Ketish (Minor Bleeding):** Pichoq yoki qamish kesganda. Qon yo'qotish: $-1.5 \text{ HP/min}$. 15 daqiqada o'z-o'zidan ivishi mumkin.
+   - **O'rtacha Qon Ketish (Moderate Bleeding):** Qilich yoki o'q jarohati. Qon yo'qotish: $-5.0 \text{ HP/min}$. Bog'ich (`Linen Bandage`) qo'yilmasa, 20 daqiqada qon tugab hushidan ketadi.
+   - **Arterial Kuchli Qon Ketish (Severe Arterial Bleeding):** Og'ir bolta yoki nayza sanchilganda. Qon yo'qotish: $-25.0 \text{ HP/min}$. Fuqaro 90 soniya ichida jgut yoki zudlik bilan jarrohlik ko'rsatilmasa vafot etadi.
+
+2. **Suyak Sinishi (Fractures & Dislocations):**
+   - **Qo'l Sinishi (Arm Fracture):** Og'ir gurzi (Blunt) zarbasi yoki tosh qulashi oqibatida. Fuqaro qo'lidagi asbob yoki qurolni darhol tushirib yuboradi, ishlab chiqarish va jang qilish qobiliyati $0\%$ ga tushadi.
+   - **Oyoq Sinishi (Leg Fracture):** Baland qoyadan yoki qal'a devoridan yiqilganda. Harakatlanish tezligi $-75\%$ ga sekinlashadi, fuqaro oqsoqlanib sudraladi, charchoq sarfi $3.0\times$ tezlashadi.
+   - **Qovurg'a Sinishi (Rib Fracture):** Kuchli zarba zarbasi. Stamina sig'imi $-50\%$, yugurish va og'ir yuk ko'tarish mutlaqo mumkin emas.
+
+3. **Miya Chayqalishi va Travma (Concussion & Head Trauma):**
+   - Dubulg'asiz boshga tushgan tosh yoki cho'kich zarbasi.
+   - 12 o'yin soati davomida ko'rish maydoni xiralashadi (Tunnel vision vignetting), harakatlanish trayektoriyasi chayqaladi (Erratic pathfinding), fuqaro o'z uyini adashtirib qo'yishi mumkin.
+
+4. **Kuyish Jarohatlari (Burns — 1st to 3rd Degree):**
+   - Olov, qaynoq smola (Boiling Pitch) yoki qamal mash'alalari ta'sirida.
+   - Terining himoya qatlami kuyishi oqibatida infektsiya tushish ehtimoli $+50\%$ ga oshadi, doimiy qattiq og'riq (Pain $-35$ Morale) beradi.
+
+5. **Yaraning Yiringlashi va Qorason (Wound Infection & Sepsis):**
+   - Agar ochiq qonagan yara 12 soat ichida toza bog'ich bilan bog'lanmasa va dezinfektsiya qilinmasa:
+     $$P_{infection} = 0.40 \times (1.0 + 0.5 \times MiasmaLocal)$$
+   - Isitma ko'tariladi ($T_{body} > 39.5^\circ\text{C}$), fuqaro alahsiraydi, har soatda $-2.0 \text{ HP}$ yo'qotadi. Tabib tomonidan kuydirish (Cautery) yoki amputatsiya qilinmasa, 48 soatda qon zaharlanib o'ladi.
 
 ---
 
-# 74. TABOBAT VA GOSPITAL TIZIMI
+### 73.2. Travma Balans Jadvali (Trauma Balance Table)
 
-Bog'lov materiallari (Bandage), dorivor damlamalar, Tabib (Doctor), Gospital va Alkimyoviy malhamlar.
-
----
-
-# 75. YUQUMLI KASALLIKLAR MEXANIKASI
-
-Yuqish zanjiri: `Kontakt → Inkubatsiya → Belgilar → Tuzalish / O'lim`. Tarqalish sabablari: iflos suv, buzilgan taom, ko'milmagan jasadlar, kalamushlar.
-
----
-
-# 76. SHAHAR SANITARIYASI
-
-Chiqindi chuqurlari, toza ichimlik suvi ta'minoti, jasadlarni o'z vaqtida yig'ish, kalamushlarga qarshi mushuklar va itlar boqish.
+| Travma Nomi | Asosiy Sababi | HP Sarflanishi / Minut | Mehnat / Harakat Cheklovi | Davomiyligi (Davolanmasa) | Talab Qilinadigan Tibbiy Amaliyot |
+|---|---|---|---|---|---|
+| **Yengil Kesilish** | Tikon, pichoq, asbob | $-1.5 \text{ HP}$ | Ish tezligi $-10\%$ | 15 daqiqa (O'zi bitadi) | Toza mato / Bog'ich |
+| **Arterial Qonash**| Qilich, nayza, halberd | $-25.0 \text{ HP}$ | Yugura olmaydi, hushdan ketadi| 90 soniya (O'lim muqarrar) | Turniket, Zudlik bilan Jarrohlik |
+| **Oyoq Sinishi** | Qulash, bolg'a zarbasi | $-0.2 \text{ HP}$ | Tezlik $-75\%$, yuk ko'tarmaydi| 7 kun (Noto'g'ri bitadi) | Yog'och shina (`Splint`) + 48h to'shak |
+| **Qo'l Sinishi** | Taran, devor qulashi | $-0.2 \text{ HP}$ | Qurol/asbob ishlata olmaydi | 7 kun (Nogironlik xavfi)| Fiksatsiya bog'ichi + Yengil ish |
+| **Miya Chayqalishi**| Boshga tosh urilishi | $0.0 \text{ HP}$ | Tezlik $-30\%$, yo'ldan adashish| 12 o'yin soati | Tinch qorong'u xonada uyqu |
+| **3-Darajali Kuyish**| Qaynoq smola, olov | $-1.0 \text{ HP}$ | Mehnat qobiliyati $-60\%$ | 5 kun (Doimiy chandiq) | Asal malhami (`Poultice`) + Toza doka |
+| **Qorason (Gangrena)**| Nopok yara, iflos botqoq| $-2.0 \text{ HP/soat}$ | Butkul to'shakka mixlanadi | 48 soat (Halokatli) | Jarrohlik amputatsiyasi / Kuydirish |
 
 ---
 
-# 77. QORA O‘LAT VA KARANTIN (THE BLACK PLAGUE)
+# 74. TABOBAT VA GOSPITAL TIZIMI (MEDICINE, SURGERY & CLINIC INFRASTRUCTURE)
 
-Epidemiya boshlanganda:
-Karantin e'lon qilish, O'lat Tabibi (Plague Doctor) jalb qilish, kasalxona izolatsiyasi, vabo gulxanida kiyimlarni yoqish.
+Shahar kengaygan sari jarohatlangan jangchilar va kasalmand fuqarolarni davolash uchun professional tibbiy infratuzilma — Qishloq Tabibxonasi (Apothecary) va Shahar Gospitali (Infirmary / Hospital) zarur bo'ladi.
+
+### 74.1. Shahar Gospitali Infratuzilmasi va Xonalari
+
+1. **Ko'rik Stoli (Examination Table):**
+   - Tabib yangi kelgan yaradorlarni qabul qiladi, travma turini aniqlaydi va birinchi yordam ko'rsatadi.
+2. **Jarrohlik To'shagi (Surgical Bed):**
+   - Suyaklarni to'g'rilash, chuqur o'qlarni sug'urish va amputatsiya amaliyotlari uchun mustahkam charm tasmali to'shak.
+3. **Dorixona Dastgohi (Apothecary Alchemy Still & Mortar):**
+   - Dorivor giyohlarni maydalash, spirtli damlamalar tayyorlash va antiseptik moylar qaynatish stoli.
+4. **Izolyatsiya Palatasi (Quarantine Ward):**
+   - Yuqumli kasallikka chalingan fuqarolarni boshqalardan ajratib saqlash uchun mo'ljallangan qalin devorli xona.
+5. **Kir Yuvish va Qaynatish Xomi (Sanitary Cauldron):**
+   - Iflos qonli dokalarni qaynoq suvda qaynatib qayta tozalash joyi (Infektsiya tarqalishini $95\%$ kamaytiradi).
+
+---
+
+### 74.2. Dorivor Giyohlar va Tibbiy Retseptlar (Herbal Medicine Recipes)
+
+| Dori / Malham Nomi | Kerakli Xomashyo | Tayyorlash Dastgohi | Tayyorlash Vaqti | Tibbiy Ta'siri va Qo'llanilishi |
+|---|---|---|---|---|
+| **Oddiy Bog'ich (Linen Bandage)** | 1 Zig'ir Mato + 1 Qaynoq Suv | Dorixona Stoli | 5 sekund | Qon ketishini (Bleeding) to'xtatadi. |
+| **Asalli Antiseptik Malham (Poultice)** | 1 Yovvoyi Asal + 2 Dorivor Giyoh | Hovoncha (Mortar) | 12 sekund | Yiringlash (Infection) xavfini yo'qotadi, kuyishni bitiradi. |
+| **Shina / Fiksator (Bone Splint)** | 2 Yog'och Taxta + 1 Doka Bog'ich | Duradgor Stoli | 10 sekund | Sinishni fiksatsiya qiladi, bitish vaqtini 7 kundan 2 kunga tushiradi. |
+| **Tol Po'stlog'i Damlamasi (Willow Bark)**| 2 Tol Po'stlog'i + 1 Suv Idishi | Dorixona Qozoni | 20 sekund | Og'riqni bosadi (Pain $-80\%$), shamollash isitmasini tushiradi. |
+| **Mo''jizaviy Panatseya (Miracle Elixir)**| 1 Tog' Za'faroni + 1 Spirt + 1 Oltingugurt | Distillyator | 45 sekund | Qora o'lat va qorasonning dastlabki bosqichini $60\%$ tuzatadi. |
+
+---
+
+### 74.3. Tabib Davolash Samaradorligi Formulasi (Doctor Healing Rate)
+
+Gospitalda yotgan bemorning har soatda tiklanadigan sog'lig'i quyidagi formula orqali hisoblanadi:
+
+$$Rate_{heal} = BaseHealRate \times \left(1.0 + 0.02 \cdot Skill_{doc}\right) \times Tier_{bed} \times CleanlinessMult$$
+
+Bunda:
+- $BaseHealRate = 4.0 \text{ HP/soat}$.
+- $Skill_{doc} \in [0, 100]$: Tabibning tibbiy mahorat darajasi (100-darajali Tabib davolash tezligini 3 barobarga oshiradi).
+- $Tier_{bed}$: Oddiy to'shak = $1.0\times$, Dezinfektsiyalangan pat to'shak = $1.4\times$.
+- $CleanlinessMult$: Gospital ichidagi sanitariya darajasiga qarab ($0.5\times$ dan $1.25\times$ gacha).
+
+**Jarrohlik Asboblari va Gigiyena:**
+Tabib qo'lida po'lat skalpel, suyak arrasi va kuydirish temiri (`Cautery Iron`) bo'lishi kerak. Har bir amaliyotdan oldin asboblar olovda qizdirilmasa, bemorga $30\%$ ehtimol bilan qon infektsiyasi yuqadi.
+
+---
+
+# 75. YUQUMLI KASALLIKLAR MEXANIKASI (EPIDEMIOLOGY & TRANSMISSION VECTORS)
+
+Zich joylashgan o'rta asr shaharlarida sanitariya qoidalariga rioya qilinmasa, epidemiyalar vujudga keladi. Kasalliklar tarqalishi klassik SIR (Susceptible-Infectious-Recovered) matematik epidemiologik modeli asosida real vaqtda hisoblanadi.
+
+### 75.1. Matematik Epidemiologik Model (Differential SIR Equations)
+
+Shahar aholisi 3 guruhga ajratiladi: $S$ — kasallikka moyil aholi, $I$ — yuqtirgan faol bemorlar, $R$ — tuzalib immunitet hosil qilganlar.
+
+$$\frac{dS}{dt} = -\beta \frac{S \cdot I}{N}$$
+$$\frac{dI}{dt} = \beta \frac{S \cdot I}{N} - \gamma I - \mu I$$
+$$\frac{dR}{dt} = \gamma I$$
+
+Bunda:
+- $N = S + I + R$: Jami shahar aholisi.
+- $\beta$: Kasallik yuqish koeffitsiyenti (Aholi zichligi, ko'chalardagi najas va kalamushlar soniga bog'liq).
+- $\gamma$: Sog'ayish tezligi koeffitsiyenti ($\gamma = \frac{1}{\text{Kasallik Davomiyligi}} \times (1.0 + 0.5 \cdot HospitalCare)$).
+- $\mu$: O'lim koeffitsiyenti.
+- **Bazaviy Reproduktiv Son ($R_0$):**
+  $$R_0 = \frac{\beta}{\gamma + \mu}$$
+  Agar $R_0 > 1.0$ bo'lsa, shaharda epidemiya eksponentsial avj oladi; agar shahar sanitariyasi va karantin hisobiga $R_0 < 1.0$ ga tushirilsa, kasallik so'nadi.
+
+---
+
+### 75.2. O'rta Asr Yuqumli Kasalliklar Katalogi
+
+| Kasallik Nomi | Asosiy Tarqalish Vektori | Inkubatsiya Davri | Simptomlar va Debafflar | Davolanmaganda O'lim Koeffitsiyenti ($\mu$) | Tuzalish / Immunitet |
+|---|---|---|---|---|---|
+| **Ichburug' / Vabo (Dysentery/Cholera)**| Iflos quduq suvi, buzilgan ovqat | 12 soat | Kuchli suvsizlanish, ich ketishi, harakat $-50\%$ | $35\%$ | 3 kun (Toza suv va tuzli sho'rva) |
+| **Zotiljam / Gripp (Influenza)** | Nafas yo'llari, sovuq xonalar | 24 soat | Yo'tal, baland isitma, ish tezligi $-40\%$ | $15\%$ (Keksalarda $45\%$) | 5 kun (Issiq kamin, tol po'stlog'i)|
+| **Kaltama (Typhus)** | Kiyimdagi tana bitlari, kir o'rinlar| 48 soat | Qizil toshmalar, alahsish, qattiq holsizlik | $40\%$ | 7 kun (Yuvinish, kiyimlarni qaynatish)|
+| **Quturish (Rabies)** | Quturgan bo'ri/it tishlashi | 36 soat | Suvdan qo'rqish, agressiv jazava, fuqarolarga hujum | $100\%$ (Davosi yo'q) | 2 soat ichida yara kuydirilmasa o'lim |
+
+---
+
+### 75.3. Tarqalish Zanjiri va Infektsiya Vektorlari (Vectors & Containment)
+
+1. **Kalamushlar va Bitlar Vektori (Vermin Vector):**
+   - Don omborlarida bug'doy nam tortsa yoki ko'chada axlat to'plansa, kalamushlar populyatsiyasi ko'payadi. Kalamushlar o'z ustida vabo burgalarini (`Xenopsylla`) tashiydi.
+2. **Ifloslangan Quduqlar (Waterborne Contamination):**
+   - Agar chiqindi o'rasi (Cesspool) quduqdan 15 metrdan yaqinroq masofada joylashsa, yerosti sizot suvlari orqali quduq zaharlanadi. Quduqdan ichgan har bir fuqaro $70\%$ ehtimol bilan vabo yuqtiradi.
+3. **Zich Tavernalar va Bozorlar (Airborne Droplet Vector):**
+   - Shamollagan fuqaro taverna yoki cherkovga borsa, 4 metr radiusdagi barcha suhbatdoshlariga zotiljam yuqtirish ehtimoli $+25\%$ ga oshadi.
+
+---
+
+# 76. SHAHAR SANITARIYASI (MUNICIPAL SANITATION & WASTE MANAGEMENT)
+
+Shahar kengaygani sari inson va chorva chiqindilari, oziq-ovqat qoldiqlari va iflos suvlar tabiiy ravishda to'planib boradi. Sanitariya nazorat qilinmasa, ko'chalarni Miasma (sassiq zaharli bug') qoplaydi.
+
+### 76.1. Chiqindi va Miasma To'planishi Dinamikasi
+
+Har bir turar-joy va ko'cha voxeli bo'yicha ifloslik darajasi $Filth \in [0.0, 100.0]$ har soatda quyidagi balans asosida yangilanadi:
+
+$$\frac{d(Filth)}{dt} = \sum Pop \times WasteRate + \sum Livestock \times DungRate - \sum SweeperCapacity$$
+
+- Har bir voyaga yetgan fuqaro kuniga $1.2 \text{ kg}$ maishiy va biologik chiqindi chiqaradi ($WasteRate \approx 0.05 \text{ filth/soat}$).
+- Har bir mol/ot kuniga $8.0 \text{ kg}$ go'ng chiqaradi ($DungRate \approx 0.25 \text{ filth/soat}$).
+- **Miasma Portlashi:** Agar ko'chadagi $Filth > 70.0$ bo'lsa, ushbu ko'chadan o'tgan fuqarolar $-20$ Morale yo'qotadi va pashshalar to'dasi paydo bo'ladi.
+
+---
+
+### 76.2. Sanitariya Infratuzilmasi va Toza Suv Tizimi
+
+1. **Hojatxona va Chiqindi O'rasi (Cesspool / Latrine Pit):**
+   - Qazilgan $2\times2\times3$ chuqurlikdagi tosh bilan qoplangan o'ra. Shahar najosatini o'ziga yutadi va ko'chaga chiqishini to'xtatadi.
+   - Har faslda bir marta tozalanishi shart.
+2. **Kompast O'ralari (Composting Pits):**
+   - Chiqindilar somon bilan aralashtirilib chirindi o'g'itga aylantiriladi. 1 fasldan so'ng ekin unumdorligini $+25\%$ ga oshiruvchi tabiiy o'g'it (`Fertilizer Barrel`) olinadi.
+3. **Oqova Ariqlar (Stone Drainage Ditches):**
+   - Tosh yotqizilgan ko'cha chetlaridagi ariqlar yomg'ir suvlarini shahar tashqarisidagi daryoga olib chiqib ketadi, ko'chalarda ko'lmak hosil bo'lishini bartaraf etadi.
+4. **Qopqoqli Suv Hovuzlari va Akveduklar (Aqueducts & Cisterns):**
+   - Tog' buloqlaridan tosh novlar orqali toza suv olib kelish. Quduqlarga tushadigan yukni kamaytiradi va vabo xavfini butunlay yo'q qiladi.
+
+---
+
+### 76.3. Shahar Tozalovchilari va Kemiruvchilarga Qarshi Kurash
+
+- **Tozalovchi (Street Sweeper / Dung Collector):**
+  - Qo'lida supurgi, belkurak va 2 g'ildirakli chiqindi aravasi bo'lgan munitsipal xizmatchi.
+  - Kundalik vazifasi: Ko'chalardagi axlat va tezaklarni to'plab shahar chetidagi kompost o'rasiga yoki kul xumdoniga eltish. 1 ta tozalovchi 35 ta fuqaroning chiqindisini zararsizlantirishga qodir.
+- **Mushuklar va Qopqonchi Itlar (Biological Pest Control):**
+  - Shaharda boqiladigan erkin mushuklar (Domestic Cats) omborlar va uylar atrofidagi sichqon va kalamushlar sonini $80\%$ ga qisqartiradi.
+  - Maxsus o'rgatilgan kalamush ovlovchi itlar (Terriers) shahar sanitariya darajasini $+15\%$ ga oshiradi.
+
+---
+
+# 77. QORA O‘LAT VA KARANTIN (THE BLACK PLAGUE & QUARANTINE PROTOCOLS)
+
+Qora O'lat (The Black Death / Bubonic Plague) — Voxel Lord dunyosidagi eng dahshatli tabiiy demografik ofatdir. U to'satdan shahar boyligi cho'qqiga chiqqanda yoki sanitariya kollapsga uchraganda boshlanadi va butun aholining uchdan ikki qismini qirib yuborish qudratiga ega.
+
+### 77.1. Qora O'latning Boshlanish Triggerlari va Klinik Bosqichlari
+
+O'lat epidemiyasi quyidagi omillar birlashganda yuzaga keladi:
+- Shahar o'rtacha iflosligi $Filth > 80.0$.
+- Ko'chada 48 soatdan ortiq ko'milmay yotgan jasadlar mavjudligi.
+- Kalamushlar soni aholi sonidan 2 barobar oshib ketishi.
+- Tashqi infitsirlangan savdo kemasi yoki karvoni shahar portiga kelishi.
+
+**O'latning Fiziologik Bosqichlari:**
+1. **Bubonik Bosqich (Bubonic Plague):**
+   - Qora burgalar chaqishi orqali yuqadi. Bo'yin, qo'ltiq va chovda qora zaharli bezlar (Buboes) shishib chiqadi.
+   - Harorat $41^\circ\text{C}$, darmonsizlik. Davolanmaganda o'lim darajasi: $65\%$.
+2. **Pnevmonik Bosqich (Pneumonic Plague):**
+   - Agar bubonik bemorlar olomon orasida yashasa, vabo nafas yo'llariga o'tadi va havo orqali tupuk zarralari bilan tarqala boshlaydi.
+   - O'pka qonab eriydi, qon tupurish. O'lim darajasi: $95\%$. Bemor 24–36 soat ichida halok bo'ladi.
+
+---
+
+### 77.2. Favqulodda Karantin Protokollari va Shahar Izolyatsiyasi
+
+Hukmdor shaharda o'lat aniqlanganda Royal Ledger orqali "Qora Karantin Farmoni" (`Black Quarantine Edict`) e'lon qilishi lozim:
+
+1. **Xonadonlarni Qulflash (Boarding Up Infected Houses):**
+   - Ichida o'lat chiqqan uyning eshigiga oq bo'yoq bilan Qizil Xoch (Red Cross) chiziladi va eshik tashqaridan taxtalar bilan qoqib mixlanadi.
+   - Barcha oila a'zolari 14 kun davomida uy ichida qoladi. Ularga maxsus darcha orqali non va suv berib turiladi.
+2. **Qochishga Qarshi Qurolli Kordon (Armed Sanitary Cordon):**
+   - Shahar darvozalari to'liq yopiladi, barcha savdo karvonlari to'xtatiladi.
+   - Shahardan ruxsatsiz qochmoqchi bo'lgan har qanday fuqaro kamonchilar tomonidan o'ldiriladi (Chunki bitta qochqin qo'shni qishloqlarga ham kasallik olib borishi mumkin).
+3. **Kiyim-kechak va To'shaklarni Yoqish (Sanitary Pyres):**
+   - Vafot etganlarning barcha kiyimlari, to'shaklari va yog'och asboblari shahar tashqarisidagi o'lat olovida kulga aylantiriladi.
+
+---
+
+### 77.3. O'lat Tabibi va Maxsus Himoya Vositalari (The Plague Doctor)
+
+Shaharda karantin choralari boshlanganda maxsus roldagi shifokor — **O'lat Tabibi (Plague Doctor)** tayinlanadi.
+
+- **Himoya Kostyumi Mexanikasi:**
+  - **Qush Tumshuqli Niqob (Beak Mask):** Tumshuq ichiga kofur (camphor), lavanda, yalpiz va quritilgan gul barglari tiqiladi. Bu tabibni zaharli "miasma" va tomchilar orqali zaharlanishdan asraydi.
+  - **Mum Shimdirilgan Teri Chopon (Waxed Heavy Leather Cloak):** Qalin charmga eritilgan mum surtiladi, bu o'lat burgalarining choponga yopishishi va chaqishiga to'sqinlik qiladi.
+  - **Tekshiruv Tayog'i (Wooden Examination Cane):** Tabib bemorga qo'li bilan tegmasdan, tayoq orqali kiyimini ko'tarib bubonlarni tekshiradi va pulsni o'lchaydi.
+- **O'yin Effekti:**
+  - O'lat Tabibi ishlayotgan hududda kasallik yuqish koeffitsiyenti $\beta$ darhol $-60\%$ ga pasayadi.
+  - Shahar aholisining vahima hissi pasayadi ($+15$ Morale himoya hissi).
+  - Tabib maxsus "Kuydirish Malhami" orqali bemorlardagi bubonlarni kuydirib, tirik qolish ehtimolini $25\%$ dan $60\%$ gacha oshiradi.
 
 ---
 
@@ -1550,21 +2225,137 @@ Kichik ibodatxona (Chapel), Shahar cherkovi (Church), Buyuk Sobor (Great Cathedr
 
 ---
 
-# 92. FUQAROLARNING TABIIY VA NOTABIIY O‘LIMI
+# 92. FUQAROLARNING TABIIY VA NOTABIIY O‘LIMI (MORTALITY & GOMPERTZ-MAKEHAM MODEL)
 
-O'lim sabablari: Keksalik (Old Age), Jang maydoni, Kasallik, Ochlik, Qahraton sovuq, Shaxtadagi baxtsiz hodisa.
+Voxel Lord: Feudal Realm dunyosida har bir inson umri cheklangan. Shahar aholisi o'lmas robotlar emas — ular tabiiy ravishda keksayadi, kasallik yoki jarohatdan vafot etadi. Aholining o'limi demografik balansni, oilaviy ruhiyatni va shahar iqtisodiyoti davomiyligini belgilovchi asosiy omillardan biridir.
+
+### 92.1. Gompertz-Makeham O'lim Ehtimoli Matematik Tenglamasi (Mortality Hazard Rate)
+
+Keksa fuqarolarning (50 yoshdan oshgan) tabiiy qarish va vafot etish xavfi biologik demografiyada qabul qilingan Gompertz-Makeham o'lim qonuniyati asosida har bir o'yin kuni tongida hisoblanadi:
+
+$$\lambda(Age) = \alpha + \beta \cdot e^{\gamma \cdot (Age - 50)}$$
+
+Bunda kalibrlangan koeffitsiyentlar:
+- $\alpha = 0.0001$: Tasodifiy biologik nosozliklar va baxtsiz hodisalarning yoshga bog'liq bo'lmagan bazaviy foni.
+- $\beta = 0.0005$: Qarish boshlanishining bazaviy kuchi.
+- $\gamma = 0.08$: Har yili qarish jadallashuvining eksponentsial ko'rsatkichi.
+- **Kunlik O'lim Ehtimoli ($P_{death}(day)$):**
+  $$P_{death}(day) = 1.0 - e^{-\lambda(Age)}$$
+
+**Yosh Bo'yicha Tabiiy O'lim Jadvali:**
+- **50 yosh:** $\lambda \approx 0.0006 \rightarrow P_{death}/kun \approx 0.06\%$ (Fasliga $\approx 0.4\%$).
+- **60 yosh:** $\lambda \approx 0.0016 \rightarrow P_{death}/kun \approx 0.16\%$ (Fasliga $\approx 1.1\%$).
+- **70 yosh:** $\lambda \approx 0.0029 \rightarrow P_{death}/kun \approx 0.29\%$ (Fasliga $\approx 2.0\%$).
+- **75 yosh:** $\lambda \approx 0.0038 \rightarrow P_{death}/kun \approx 0.38\%$ (Fasliga $\approx 2.6\%$).
+- **80+ yosh:** $\lambda > 0.0055 \rightarrow P_{death}/kun > 0.55\%$ (Yiliga $15\%$ dan ortiq tabiiy o'lim).
+
+**Salomatlik va Gospital Ta'siri (Hazard Mitigation):**
+Issiq, qulay tosh uylarda yashash, to'yimli go'shtli ratsion va shaharda yuqori malakali tabib mavjudligi o'lim xavfini quyidagi multiplikator bilan pasaytiradi:
+$$\lambda_{actual} = \lambda(Age) \times \left(1.0 - 0.60 \times HospitalTier \times CleanlinessMult\right)$$
+Ilg'or saroy sharoitida oqsoqollarning 80–85 yoshgacha yashash ehtimoli keskin ortadi.
 
 ---
 
-# 93. KO‘CHADA QOLGAN JASADLARNING FOJIASI
+### 92.2. Notabiiy O'lim Sabablari va Tibbiy Ekspertiza (Autopsy & Death Registry)
 
-Jasad ko'milmay qolsa, shahar sanitariyasi yemirilib, fuqarolar chuqur ruhiy tushkunlikka tushadi va vabo xavfi kuchayadi.
+Har bir fuqaro vafot etganda, shahar Bailiff (Boshqaruvchisi) yoki Tabibi voqea joyiga kelib dastlabki ko'rikni (Autopsy) o'tkazadi va Royal Ledger daftari "Qazo Kitobi"ga rasmiy o'lim sababini qayd etadi:
+
+1. **Keksalik (Old Age):** Gompertz-Makeham formulasiga ko'ra to'shakda tinch jon berish.
+2. **Jangovar Qurbon (Slain in Battle):** Dushman qilichi, kamon o'qi yoki qamal toshidan olgan jarohatlari oqibatida.
+3. **Yuqumli Vabo / O'lat (Plague / Infectious Disease):** Qora o'lat, vabo yoki kaltama asoratlaridan vafot etish.
+4. **Ochlik va Suvsizlik (Starvation / Dehydration):** $Hunger = 100$ yoki $Thirst = 100$ holatida 48 soatdan ortiq qolib ketish.
+5. **Qahraton Muzlash (Hypothermia / Freezing):** Qishda ko'chada boshpanasiz yoki isitilmagan kulbada tana harorati $28^\circ\text{C}$ dan pastga tushib ketishi.
+6. **Shaxta va Ishlab Chiqarish Falokati (Cave-in / Crushed):** Shaxtada shift qulashi, yiqilgan ulkan daraxt tagida qolish yoki domna pechidagi portlash.
+7. **Qotillik / Zahar (Homicide / Poison):** Shahardagi jinoyatchilar yoki josus xanjari bilan o'ldirilish.
 
 ---
 
-# 94. G‘ASSOL VA DAFN LOGISTIKASI (GRAVEDIGGER)
+### 92.3. O'lim Shok To'lqini va Shahar Ruhiyati (Death Shockwave Mechanics)
 
-O'liklar aravasi (Morgue Cart) bilan jasadlarni yig'ib, tobut yoki kafanda qabristonga yetkazuvchi maxsus xizmatchi.
+Fuqaro vafot etgan onda uning ijtimoiy aloqalari bo'yicha ruhiy zarba to'lqini tarqaladi:
+- **Bevasi va Bolalari:** $-50$ Morale (1 fasl / 7 kun davomida so'nadi).
+- **Aka-ukalari va Ota-onasi:** $-30$ Morale (4 kun davomida so'nadi).
+- **Ustaxonadagi Hamkasblari:** $-15$ Morale (2 kun davomida ish unumi $-15\%$).
+- **Shahar Aholisi:** Agar shahar himoyachisi bo'lgan ritsar jangda halok bo'lsa, butun shahar bo'ylab $-10$ Morale motam e'lon qilinadi.
+
+---
+
+# 93. KO‘CHADA QOLGAN JASADLARNING FOJIASI (UNBURIED CORPSES & MIASMA HAZARDS)
+
+O'rta asr feodal dunyosida o'liklarga ehtirom ko'rsatilmasligi va jasadlarning ochiq osmon ostida qolib ketishi shahar hayotini bir necha kun ichida jahannamga aylantiruvchi biologik va ruhiy halokat manbaidir.
+
+### 93.1. Jasadning Parchalanish Dinamikasi va Bosqichlari (48-Hour Decomposition Timeline)
+
+O'ldirilgan yoki vafot etgan inson jasadi ko'milmasa, 48 soatlik real vaqt dinamikasida quyidagi bosqichlarni bosib o'tadi:
+
+| Vaqt Oralig'i | Parchalanish Bosqichi | Tashqi Ko'rinish va Shader Vizuali | Morale Jarimasi (O'tgan fuqaroga) | Miasma va Yuqumlilik Xavfi |
+|---|---|---|---|---|
+| **0 – 6 soat** | Yangi Jasad (Fresh Corpse) | Rangi o'chgan, qon qotgan | $-15$ Morale | Miasma yo'q. Hashoratlar uchib kela boshlaydi. |
+| **6 – 24 soat** | Shishish va Sassiq (Putrefaction) | Tana ko'karadi, qorin shishadi, yashil dog'lar | $-30$ Morale | $+10 \text{ Filth/soat}$, pashshalar to'dasi, ko'ngil aynishi (`Nausea`). |
+| **24 – 48 soat**| Faol Chirish (Active Liquefaction) | Chiriyotgan to'qimalar, suyaklar ochiladi | $-45$ Morale | $+25 \text{ Filth/soat}$, 15m radiusda qora o'lat xavfi $+35\%$. |
+| **48+ soat** | Zaharli Bio-Xavf (Contaminated Skeleton)| Qora chirindi, skelet suyaklari | $-60$ Morale | Yerosti suvlarini zaharlaydi, 25m quduqlar vabo o'chog'iga aylanadi. |
+
+---
+
+### 93.2. Yirtqichlar va Qarg'alar Bosqini (Scavenger Dynamics)
+
+- **Qarg'alar To'dasi (Crows):**
+  - Jasad 6 soatdan ortiq yotib qolsa, osmonda 5–12 ta qarg'a aylanib ucha boshlaydi.
+  - Bu o'yinchi (Hukmdor) uchun vizual kompas signali bo'lib xizmat qiladi: osmonda aylanayotgan qarg'alar ko'ringan joyda ko'milmagan murda borligi ma'lum bo'ladi.
+- **Yirtqich Bo'rilar Hujumi (Wolf Infiltration):**
+  - Agar shahar devorlari tashqarisida yoki ochiq dalalarda 24 soatdan ortiq jasadlar qolib ketsa, chirigan go'sht hidi o'rmondagi yovvoyi bo'rilar to'dasini jalb qiladi.
+  - Bo'rilar jasadlarni yeb to'ygach, kechalari shahar ichidagi tirik fuqarolarga va chorva mollariga hujum qila boshlaydi.
+
+---
+
+### 93.3. Fuqarolar Ruhiyati Kollapsi va Isyon Xavfi (Religious Despair & Riots)
+
+- **Ajdodlar Ruhiga Hurmatsizlik:**
+  Agar ko'chada 3 tadan ortiq jasad ko'milmay yotgan bo'lsa, fuqarolar o'z hukmdorini "La'natlangan zolim" deb hisoblaydi.
+  - Cherkovdagi rohiblar shahar boshqaruviga qarshi va'z o'qiydi (Xalq dindorligi $-40\%$).
+  - Fuqarolar "Bizni itlardek ko'chada qoldirishmoqchi" deb vahimaga tushadi va shahardan ommaviy qochish (Emigration) sur'ati 3 barobarga oshadi.
+
+---
+
+# 94. G‘ASSOL VA DAFN LOGISTIKASI (GRAVEDIGGER & MORTUARY LOGISTICS)
+
+Shahar sanitariyasini va fuqarolar xotirjamligini saqlash uchun o'liklarni o'z vaqtida yig'ish va muqaddas dafn marosimlarini o'tkazuvchi maxsus kasb — **G'assol (Gravedigger & Undertaker)** faoliyati yo'lga qo'yiladi.
+
+### 94.1. G'assolxona va Murdalar Logistikasi Infratuzilmasi
+
+1. **G'assolxona (Undertaker's Shed / Mortuary):**
+   - Shahar chetida, qabriston darvozasi yonida quriladigan bino.
+   - Ichida tosh murda yuvish stoli, kafan va tobutlar zaxirasi, ohak bochkalari va belkuraklar saqlanadi.
+2. **Murda Tashish Aravasi (Morgue Cart):**
+   - 2 g'ildirakli, usti qora zig'ir brezent bilan yopilgan maxsus arava.
+   - Bitta reysda 4 tagacha jasadni sig'dira oladi. Ustining yopiqligi jasad tashilayotganda ko'chadagi fuqarolarga vizual travma yetkazishning oldini oladi.
+3. **G'assol Dispetcherlik Algoritmi:**
+   - Shaharda o'lim sodir bo'lishi bilan tizim darhol Priority 600 (`Sanitation & Health`) toifasidagi `COLLECT_CORPSE` vazifasini ochadi.
+   - G'assol o'z aravasini yetaklab jasad yotgan nuqtaga boradi, jasadni aravaga ortadi va qabristonga olib keladi.
+
+---
+
+### 94.2. Tobut Turlari va Hunarmandchilik Retseptlari (Coffin Crafting Table)
+
+| Tobut / Kafan Nomi | Kerakli Materiallar | Ishlab Chiqarish Stoli | Miasmani To'sish | Fuqaro Oilasiga Ruhiy Taskin |
+|---|---|---|---|---|
+| **Oddiy Kafan (Linen Shroud)** | 2 Zig'ir Mato | To'quvchi / G'assolxona | $60\%$ (Vaqtinchalik) | $+5$ Morale |
+| **Yog'och Tobut (Wooden Coffin)** | 4 Qoraqarag'ay Taxta + 2 Temir Mix | Duradgorxona | $100\%$ (To'liq to'sadi) | $+15$ Morale |
+| **Tosh Sarkofag (Stone Sarcophagus)**| 6 Tarashlangan Tosh + 2 Marmar | Tosh Yo'nuvchi | $100\%$ (Abadiy saqlaydi) | $+35$ Morale (Qirollik ehtiromi)|
+
+---
+
+### 94.3. Dafn Marosimi va Qabrni Muqaddaslash (Burial Ritual & Sanctification)
+
+To'liq dafn marosimi quyidagi 4 bosqichda amalga oshiriladi:
+1. **Qabr Qazish:** G'assol shahar qabristoni zonasida $2\times1\times2$ o'lchamdagi voxel chuqurlik qaziydi (Mehnat vaqti: 45 soniya).
+2. **Tobutni Tushirish:** Tobut qabr tubiga tushiriladi va ustiga tuproq voxellari qayta yopiladi.
+3. **Qabrtosh O'rnatish (Headstone):** Yog'och xoch yoki o'ymakor tosh lavha o'rnatiladi. Toshda marhumning ismi, kasbi va yashagan yillari muhrlanadi.
+4. **Ruhoniy Duosi va Muqaddaslash (`SanctifyGrave` Ritual):**
+   - Cherkov ruhoniysi (Priest) qabr boshiga kelib muqaddas suv sepadi va duo o'qiydi.
+   - **Qonli Oy Himoyasi (Anti-Necromancy Protection):**
+     - Ruhoniy tomonidan muqaddaslangan qabrlardan hech qachon sharpalar, arvohlar yoki zombi skeletlari chiqmaydi.
+     - Agar shahar chetidagi o'liklar shoshilinchda umumiy chuqurga (Mass Grave) ruhoniy duosisiz tashlansa, Qonli Oy (Blood Moon) reydi kechasida bu jasadlar yerdan tirilib, dushmanona o'liklar armiyasi (`Risen Skeletons`) sifatida shahar ichidan hujum boshlaydi!
 
 ---
 
