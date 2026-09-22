@@ -1,7 +1,7 @@
 # MASTER GAME DESIGN DOCUMENT (GDD)
 # "Voxel Lord: Feudal Realm" 👑
 
-> **Hujjat Maqomi:** To'liq Texnik Loyiha (Specification 1.3 — Jinoyatchilik va Sud Qo'shildi)  
+> **Hujjat Maqomi:** To'liq Texnik Loyiha (Specification 1.4 — Madaniyat va Turnirlar Qo'shildi)  
 > **Janr:** Birinchi Shaxs / Voxel Sandbox / O'rta Asrlar Koloniya Simulyatori (Colony Sim & Strategy)  
 > **Dvigatel:** Godot Engine 4.3+ (Forward+ / GDScript & C#)  
 > **Platforma:** PC (Steam / Windows, Linux)  
@@ -27,7 +27,8 @@
 15. [4 Fasl (Mavsumlar) va Dinamik Ob-havo Tizimi](#15-4-fasl-mavsumlar-va-dinamik-ob-havo-tizimi)
 16. [Oziq-ovqat Aynishi, Saqlash Usullari, Sanitariya va Vabo](#16-oziq-ovqat-aynishi-saqlash-usullari-sanitariya-va-vabo)
 17. [Jinoyatchilik, Sud, Qonunlar va Zindon Tizimi](#17-jinoyatchilik-sud-qonunlar-va-zindon-tizimi)
-18. [Godot 4 Texnik Arxitekturasi va Dasturiy Modullar](#18-godot-4-texnik-arxitekturasi-va-dasturiy-modullar)
+18. [Madaniyat, Bayramlar va Shohona Ritsarlar Turniri](#18-madaniyat-bayramlar-va-shohona-ritsarlar-turniri)
+19. [Godot 4 Texnik Arxitekturasi va Dasturiy Modullar](#19-godot-4-texnik-arxitekturasi-va-dasturiy-modullar)
 
 ---
 
@@ -267,25 +268,39 @@
 ## 17. JINOYATCHILIK, SUD, QONUNLAR VA ZINDON TIZIMI
 
 ### 17.1. Jinoyat Sabablari:
-* Ochlik (fuqaro 2 kun och qolsa ombordan o'g'irlaydi).
-* Haddan tashqari yuqori soliqlar (> 30%).
-* Taverna pivo mushtlashuvlari.
-* Qaroqchilar josusi (Infiltrator) — tunda darvozani ochishga urinadi.
+* Ochlik (fuqaro 2 kun och qolsa ombordan o'g'irlaydi), haddan tashqari yuqori soliqlar (> 30%), taverna mushtlashuvlari, qaroqchilar josusi (Infiltrator).
 
 ### 17.2. Huquq-Tartibot va Jazo Binolari:
 1. **Shahar Soqchilari (Constables):** Ko'chalarda patrul qilib jinoyatchini hibsga oladi.
 2. **Jazo Ustuni (Stocks & Pillory):** Kichik o'g'rilarni 3 kun taxtaga qisib qo'yish (xalq loy otadi, obro'si tushadi).
-3. **Qasr Zindoni (The Dungeon):** Og'ir jinoyatchilar va ushlangan qaroqchilar temir panjara ortida saqlanadi.
+3. **Qasr Zindoni (The Dungeon):** Og'ir jinoyatchilar temir panjara ortida saqlanadi.
 4. **Qatl Maydoni (Gallows):** Xiyonatchilar va josuslar uchun dor.
 
 ### 17.3. Hukmdor Sudi (The Royal Trials):
-* Og'ir jinoyat sodir bo'lganda Hukmdor shaxsan hukm chiqaradi:
-  * *Beva ayol (ochlikdan non o'g'irlagan):* Kechirish (Xalq mehri +20%) yoki Qonun ustuvorligi (+10% intizom).
-  * *Josus (qaroqchi agenti):* Dorga osish yoki Shaxtada umrbod og'ir mehnatga hukm qilish (Penal Labor).
+* Og'ir jinoyat sodir bo'lganda Hukmdor shaxsan hukm chiqaradi (Rahmdillik vs Qonun vs Shaxtada majburiy mehnat).
 
 ---
 
-## 18. GODOT 4 TEXNIK ARXITEKTURASI VA DASTURIY MODULLAR
+## 18. MADANIYAT, BAYRAMLAR VA SHOHONA RITSARLAR TURNIRI
+
+### 18.1. Aholining Quvonch Ehtiyoji
+Madaniyat va quvonch bo'lmasa fuqarolar tushkunlikka tushadi (ish unumi -30%, nikohlar to'xtaydi). Bayramlar esa baxtni 100% ga chiqaradi va nikohlarni 3 barobar ko'paytiradi.
+
+### 18.2. Katta Shohlik Bayramlari:
+1. **Buyuk Hosildorlik Bayrami (Kuzning 20-kuni):** Ulkan gulxan, bepul ziyofat, pivo, bardlar musiqasi.
+2. **Qishki Yule Bayrami (Qishning 25-kuni):** Shamlar, qishki sovuq tushkunligiga qarshi sovg'alar ulashish.
+3. **Shohona Ritsarlar Turniri (Jousting Arena):**
+   * Kamonchilar musobaqasi, qilichbozlik duellari va ot ustida nayza urishtirish (Jousting).
+   * G'olib ritsarga dafna gulchambari va 100 ta oltin mukofot. Butun qirollik obro'si (Prestige) ko'tariladi, yangi ritsarlar ko'chib keladi.
+
+### 18.3. Madaniy Infratuzilma:
+* **Taverna & Bardlar:** Minstrel NPC lirasini chalib fuqarolar stressini 0 ga tushiradi.
+* **Buyuk Sobor:** Vitrajli shisha derazalar, yakshanba ibodatlari (axloqiy poklik va intizom).
+* **Hukmdor Haykali:** Maydondagi bronza/marmar haykal (shohga sadoqat ramzi).
+
+---
+
+## 19. GODOT 4 TEXNIK ARXITEKTURASI VA DASTURIY MODULLAR
 
 * **Face Culling & Greedy Meshing:** `scripts/core/voxel_chunk.gd` — 120+ FPS ta'minlash.
 * **Aholi FSM & Yo'l topish:** `scripts/entities/citizen.gd` — NavigationAgent3D.
