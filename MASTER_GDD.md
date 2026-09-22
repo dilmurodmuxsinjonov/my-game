@@ -667,6 +667,57 @@ Ushbu sehrlar darajali emas — ular qit'ada sanoqli bo'lib, faqat dunyoning 5 t
 | **Zulmat Eruvchisi** | `RUNE_SMELT_STRIKE` | Magmatik Bedrock Xarobalari | Cho'kich (Pickaxe) | Har qanday rudani qazib olgan zahoti to'g'ridan-to'g'ri eritilgan metall quymasiga aylantiradi (domna pechida eritish bosqichini chetlab o'tadi). |
 | **Jon Rishtasi** | `RUNE_SOUL_TETHER` | Muz Qanoti (Frost Wyvern Boss)| Kamon, Arbalet | Otilgan o'q dushmanga tekkanda uni 5 soniyaga muzlatib yerga zanjirband qiladi va o'sha dushmanning harakat tezligini o'yinchiga qo'shib beradi. |
 
+#### 12.4.6. Runalarni Ishlab Chiqarish (Crafting) va Noyob O'lja (Loot) Qoidalari
+
+##### 12.4.6.1. Sehrgarlar va Alkimyo Laboratoriyasida Runalar Yasash (Mage Crafting)
+O'yindagi barcha oddiy qurol, asbob va sovut runalari (I, II, III darajalar) tasodifiy havoda paydo bo'lmaydi. Ularni feodal shahardagi **Sehrgarlar Minorasi (Arcane Sanctum)** yoki **Alkimyo Laboratoriyasi (Alchemical Lab)**da maxsus tayinlangan **Saroy Sehrgari (Court Mage / Enchanter NPC)** yoki o'yinchi tomonidan **Runik Stol (Runic Inscription Table)**da yasash (crafting) mumkin.
+
+Har bir runani o'yib yozish uchun 3 xil tarkibiy qism talab qilinadi:
+1. **Asosiy Runa Plitasi (Blank Slate):** Kvars toshi, marmar, granit yoki tozalangan ohaktosh plitasi.
+2. **Magik Bog'lovchi Mineral (Catalyst):** Lapislazuli kukuni, oltin qumi, sof oltingugurt yoki simob.
+3. **Maxsus Yirtqich va Maxluq O'ljalari (Mob Drops):** O'yindagi yovvoyi hayvonlar, qaroqchilar va xavfli g'or maxluqlaridan olinadigan biologik tarkibiy qismlar.
+
+| Runa Turi | Runa ID | Kerakli Minerallar va Plitalar | Kerakli Mob Droplari | Ishlab Chiqaruvchi Usta va Dastgoh |
+|---|---|---|---|---|
+| **Vibratsion Qazish** | `RUNE_SEISMIC_STRIKE` | 1x Silliq Kvars Plitasi + 4x Lapislazuli | 2x Yerosti Kalamushi Tirnog'i (`Cave Burrower Claws`) | Sehrgar / Runik Yozuv Stoli |
+| **Geologik Soflik** | `RUNE_VEIN_PURITY` | 1x Marmar Plita + 6x Oltin Qumi | 3x Nur Sochuvchi Lichinka Shilliq Pufagi (`Glow-Grub Sac`) | Sehrgar / Runik Yozuv Stoli |
+| **Monolit Blok Kesish** | `RUNE_PRECISION_QUARRY` | 1x Granit Plita + 2x Kvars Kristali | 2x Tosh Toshbaqasi Tirnog'i (`Cave Tortoise Talon`) | Sehrgar / Runik Yozuv Stoli |
+| **Yashovchan Metall** | `RUNE_LIVING_TEMPER` | 1x Qora Temir Plita + 2x Simob Qadahi | 2x Qadimiy Qora Daraxt Shirasi + 3x Bo'ri Yillik Yog'i | Alkimyogar / Qaynatish Qozoni |
+| **O'rmon Qulashi** | `RUNE_TIMBER_FALL` | 1x Qattiq Ohaktosh Plitasi + 3x Lapislazuli | 4x Yovvoyi To'ng'iz Qoziq Tishi (`Wild Boar Tusk`) | Sehrgar / Runik Yozuv Stoli |
+| **Dehqon Barakoti** | `RUNE_REAPERS_HARVEST` | 1x Pishirilgan Gil Plitasi + 5x Oltin Qumi | 2x Qirolicha Ari Qanoti (`Queen Bee Wing`) | Sehrgar / Runik Yozuv Stoli |
+| **Olmos Damli Tig'** | `RUNE_RAZOR_EDGE` | 1x Po'lat Plita + 2x Maydalangan Olmos | 3x Qora Bo'ri Jag' Suyagi (`Direwolf Fang`) | Sehrgar / Runik Yozuv Stoli |
+| **Magma Alangi** | `RUNE_SMOLDERING_PYRE` | 1x Bazalt Plitasi + 5x Oltingugurt | 3x Magmatik Qo'ng'iz Qobig'i (`Fire-Beetle Carapace`) | Alkimyogar / Eritish Xumdoni |
+| **Titratuvchi Zarb** | `RUNE_STAGGER_CONCUSSION` | 1x Og'ir Qo'rg'oshin Plitasi + 2x Lapislazuli | 2x Tog' Ayig'i Bosh Suyagi Bo'lagi (`Bear Skull Fragment`) | Sehrgar / Runik Yozuv Stoli |
+| **Urush Tovoni** | `RUNE_PLUNDER_SPOILS` | 1x Kumush Plita + 8x Oltin Qumi | 2x Qaroqchilar Yetakchisi Tamg'asi (`Bandit Leader Insignia`) | Sehrgar / Runik Yozuv Stoli |
+| **Shamol Yirtuvchi** | `RUNE_WINDPIERCER` | 1x Yengil Kvars Plitasi + 3x Lapislazuli | 6x Qora Qarg'a Qanot Pati (`Raven Flight Feather`) | Sehrgar / Runik Yozuv Stoli |
+| **Yoruvchi Ballistika** | `RUNE_BALLISTIC_PIERCE` | 1x Sayqallangan Obsidian + 4x Temir Qirindisi | 2x Vishildoq Qoya Iloni Tishi (`Rock Viper Fang`) | Sehrgar / Runik Yozuv Stoli |
+| **Po'lat Qobig'i** | `RUNE_IMPENETRABLE_WARD` | 1x Qattiq Po'lat Plitasi + 4x Lapislazuli | 4x Qoya Toshbaqasi Kosasi Plastinasi (`Carapace Shard`) | Sehrgar / Runik Yozuv Stoli |
+| **Ajdaho Qalqoni** | `RUNE_DRAGON_WARD` | 1x Olovbardosh Loy Plita + 6x Oltingugurt | 2x Magmatik Kaltakesak Terisi (`Fire Lizard Hide`) | Alkimyogar / Runik Yozuv Stoli |
+| **Qush Pati Qadami** | `RUNE_FEATHER_STRIDE` | 1x Yengil Pumza Tosh Plitasi + 2x Lapislazuli | 8x Tog' Burguti Pati (`Mountain Eagle Feather`) | Sehrgar / Runik Yozuv Stoli |
+| **G'avvos Nafasi** | `RUNE_ABYSSAL_LUNG` | 1x Moviy Shisha Plitasi + 3x Kumush Sim | 3x Suv Iloni Qovurg'a Suyagi (`River Serpent Rib`) | Alkimyogar / Runik Yozuv Stoli |
+| **Qasos Tikanlari** | `RUNE_BARBED_THORNS` | 1x Mis Plita + 4x Temir Qirindisi | 6x G'or Zaharli O'rgimchagi Tikani (`Cave Spider Needle`) | Sehrgar / Runik Yozuv Stoli |
+| **Muz Yurar Qadam** | `RUNE_FROST_TREAD` | 1x Oq Marmar Plita + 3x Muz Kristallari | 2x Qutb Bo'risi Panja Mo'ynasi (`Frost Wolf Paw`) | Sehrgar / Runik Yozuv Stoli |
+
+**Runalarni Darajalash (Upgrade to Level II and III):**
+- **Daraja I:** Jadvaldagi bazaviy komponentlar bilan tayyorlanadi.
+- **Daraja II:** 2 dona Daraja I runasi + 6 dona Lapislazuli + 1 dona Elita Mob Dropi (masalan, Alpha Wolf Pelt yoki Cave Broodmother Gland).
+- **Daraja III:** 2 dona Daraja II runasi + 1 dona Olmos + 1 dona Nodir Kimyoviy Ekstrakt (Alchemical Purified Quicksilver).
+
+##### 12.4.6.2. Noyob va Afsonaviy Narsalarning "Faqat O'lja" Qat'iy Qoidasi (Non-Craftable Exclusive Drop Rule)
+O'yindagi feodal kashfiyot zavqini va xavfli ekspeditsiyalar qiymatini saqlab qolish uchun quyidagi qat'iy qoida joriy etiladi:
+
+1. **Yaratish Mutlaqo Taqiqlangan (Crafting Probability = 0%):**
+   - Barcha **Afsonaviy Runalar** (`RUNE_SPECTRAL_PHANTOM`, `RUNE_THUNDER_WRATH`, `RUNE_VOID_VISION`, `RUNE_AEGIS_VANGUARD`, `RUNE_SMELT_STRIKE`, `RUNE_SOUL_TETHER`);
+   - 10.4-bo'limdagi barcha **Hukmdor Uzuklari va Tumorlari** (`RING_SOVEREIGN_AUTHORITY`, `RING_EARTHWARDEN`, `RING_ETERNAL_VIGIL`, `AMULET_PHOENIX_CREST`, `TALISMAN_FROSTWARD`);
+   - Barcha **Qadimiy Hukmdor Kitoblari (Ancient Sovereign Tomes)** (`TOME_ROYAL_RALLY`, `TOME_ANCIENT_ARCHITECT`, `TOME_TAX_HARVESTER`, `TOME_IRON_DISCIPLINE`, `TOME_TACTICAL_RETREAT`).
+   - Hech bir fuqaro, saroy sehrgari yoki hatto Hukmdorning o'zi ham ushbu buyumlarni biron-bir dastgohda yasay olmaydi (retsepti mavjud emas).
+2. **Qo'lga Kiritishning Yagona Manbalari (Exclusive Acquisition Sources):**
+   - **Afsonaviy Dunyo Bosslari (World Bosses):** 5 ta gigant boss (Zulmat Onasi, Qoya Kolossi, Muz Qanoti, Magma Titani, Qadimiy O'rmon Ruhoniysi) mag'lub etilganda $100\%$ kafolatlangan holda bitta noyob afsonaviy runa yoki artefakt tushadi.
+   - **Chuqur Yerosti Daxmalari (Ancient Crypts & Dungeons at $-200\text{m} \dots -350\text{m}$):** Maxfiy daxma qorovullari yengilgach, muhrlangan temir sandiqlardan $8\% - 15\%$ ehtimollik bilan topiladi.
+   - **Raqib Feodal Qasrlarining Markaziy G'aznasi (Enemy Castle Royal Vaults):** Raqib lord poytaxti egallanganda uning shaxsiy xazinasidan $25\%$ ehtimol bilan bitta noyob artefakt o'lja qilinadi.
+3. **Yo'qotish va Qayta Tiklash:**
+   - Agar o'yinchi afsonaviy artefaktni shaxta tubidagi erigan lavaga tushirib yo'qotsa yoki uni qaroqchilar o'g'irlab ketsa, uni ustaxonada qayta tiklab bo'lmaydi. Uni faqat yangi kashf etilmagan qadimiy daxmalardan yoki yangi dushman qal'alaridan qidirib topish lozim.
+
 ---
 
 # 13. CRAFTING (YASASH) TIZIMI VA DASTGOHLAR ARXITEKTURASI
