@@ -35,6 +35,11 @@ const RECIPES: Dictionary = {
 			"name": "Wooden Crate",
 			"inputs": {"planks": 4},
 			"output": {"name": "Wooden Crate", "type": "placeable", "icon": "📦", "count": 1}
+		},
+		{
+			"name": "Wall Torch (x4)",
+			"inputs": {"logs": 1, "coal": 1},
+			"output": {"name": "Torch", "type": "placeable", "icon": "🕯️", "count": 4}
 		}
 	],
 	"workbench": [
@@ -62,6 +67,11 @@ const RECIPES: Dictionary = {
 			"name": "Cobblestone Blocks (x8)",
 			"inputs": {"stone": 8},
 			"output": {"name": "Cobblestone", "type": "block", "block_type": 9, "icon": "🪨", "count": 8}
+		},
+		{
+			"name": "Wheat Seeds (x4)",
+			"inputs": {"wheat": 1},
+			"output": {"name": "Wheat Seeds", "type": "seed", "icon": "🌱", "count": 4}
 		}
 	],
 	"campfire": [

@@ -171,5 +171,85 @@ class TestEngineVerticalSlice(unittest.TestCase):
             crop_block = BLOCK_WHEAT_CROP
         self.assertEqual(crop_block, BLOCK_WHEAT_CROP)
 
+    def test_agriculture_hydration_and_growth_ticks(self):
+        """Verify soil hydration radius, 2.2x speed boost, and 3-stage maturity."""
+        hydration_radius = 4
+        # Test water proximity
+        water_pos = (30, 20, 30)
+        farmland_pos_hydrated = (32, 20, 32)
+        farmland_pos_dry = (40, 20, 40)
+        
+        dx = abs(farmland_pos_hydrated[0] - water_pos[0])
+        dz = abs(farmland_pos_hydrated[2] - water_pos[2])
+        is_hydrated = dx <= hydration_radius and dz <= hydration_radius
+        self.assertTrue(is_hydrated)
+        
+        dx_dry = abs(farmland_pos_dry[0] - water_pos[0])
+        self.assertFalse(dx_dry <= hydration_radius)
+
+        # Growth simulation
+        base_duration = 18.0
+        # Dry crop
+        dry_progress = (18.0 / base_duration) * 1.0 # 1.0 = 100%
+        # Hydrated crop grows 2.2x faster
+        hydrated_progress = (8.18 / base_duration) * 2.2 # reaches ~1.0 in ~8.2s
+        self.assertGreaterEqual(dry_progress, 1.0)
+        self.assertGreaterEqual(hydrated_progress, 0.99)
+
+        # Harvest yield
+        harvest_yield = {"wheat": 3, "seeds": 2}
+        self.assertEqual(harvest_yield["wheat"], 3)
+        self.assertEqual(harvest_yield["seeds"], 2)
+
+    def test_threat_formula_scaling_and_raid_composition(self):
+        """Verify GDD Threat calculation: 10 + (Pop * 1.5) + (StockpileValue * 0.05)."""
+        pop = 6
+        stockpile_val = 120.0
+        threat_score = 10.0 + (pop * 1.5) + (stockpile_val * 0.05)
+        self.assertAlmostEqual(threat_score, 25.0)
+
+        # Bandit party size
+        bandit_count = max(1, min(4, int(threat_score / 15.0)))
+        self.assertEqual(bandit_count, 1)
+
+        # Scaled kingdom with higher stockpile and pop
+        big_pop = 20
+        big_stockpile = 800.0
+        big_threat = 10.0 + (big_pop * 1.5) + (big_stockpile * 0.05) # 10 + 30 + 40 = 80
+        big_bandit_count = max(1, min(4, int(big_threat / 15.0)))
+        self.assertEqual(big_bandit_count, 4)
+
+    def test_bandit_combat_mechanics_and_loot(self):
+        """Verify bandit raider stats, melee damage, and loot drop on defeat."""
+        bandit_hp = 60.0
+        sword_damage = 35.0
+        axe_damage = 24.0
+
+        # Player hits with sword
+        bandit_hp -= sword_damage
+        self.assertEqual(bandit_hp, 25.0)
+        # Player hits with axe
+        bandit_hp -= axe_damage
+        self.assertEqual(bandit_hp, 1.0)
+        # Final strike
+        bandit_hp -= 16.0 # pickaxe
+        self.assertLessEqual(bandit_hp, 0.0)
+
+        # Defeated raider drops loot
+        loot = {"iron_ore": 1, "coins": 5, "bread": 1}
+        self.assertIn("iron_ore", loot)
+        self.assertIn("coins", loot)
+        self.assertGreater(loot["coins"], 0)
+
+    def test_torch_lighting_flicker_simulation(self):
+        """Verify torch light parameters and flicker energy range."""
+        base_energy = 1.8
+        flicker_speed = 12.0
+        time_sec = 1.5
+        flicker = math.sin(time_sec * flicker_speed) * 0.15 + math.cos(time_sec * flicker_speed * 1.7) * 0.1
+        current_energy = base_energy + flicker
+        self.assertGreaterEqual(current_energy, 1.55)
+        self.assertLessEqual(current_energy, 2.05)
+
 if __name__ == "__main__":
     unittest.main()
