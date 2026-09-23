@@ -7,6 +7,8 @@ extends Control
 var health_bar: ProgressBar
 var hunger_bar: ProgressBar
 var stamina_bar: ProgressBar
+var warmth_bar: ProgressBar
+var season_weather_label: Label
 var crosshair: Control
 var hotbar_container: HBoxContainer
 var notification_label: Label
@@ -84,6 +86,19 @@ func _create_ui_elements() -> void:
 	hunger_bar.add_theme_stylebox_override("fill", sb_hu)
 	vitals_vbox.add_child(hunger_bar)
 	
+	# Warmth Bar
+	var wl = Label.new()
+	wl.text = "🔥 WARMTH"
+	vitals_vbox.add_child(wl)
+	warmth_bar = ProgressBar.new()
+	warmth_bar.value = 100.0
+	warmth_bar.custom_minimum_size = Vector2(200, 14)
+	warmth_bar.show_percentage = false
+	var sb_wm = StyleBoxFlat.new()
+	sb_wm.bg_color = Color(0.95, 0.45, 0.15)
+	warmth_bar.add_theme_stylebox_override("fill", sb_wm)
+	vitals_vbox.add_child(warmth_bar)
+	
 	# 3. Notification Label (Top Center)
 	notification_label = Label.new()
 	notification_label.anchor_left = 0.5
@@ -93,6 +108,18 @@ func _create_ui_elements() -> void:
 	notification_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	notification_label.modulate = Color(1.0, 1.0, 1.0, 0.0)
 	add_child(notification_label)
+	
+	# 4. Season & Weather Label (Top Right)
+	season_weather_label = Label.new()
+	season_weather_label.anchor_left = 1.0
+	season_weather_label.anchor_right = 1.0
+	season_weather_label.offset_left = -280.0
+	season_weather_label.offset_top = 24.0
+	season_weather_label.offset_right = -24.0
+	season_weather_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	season_weather_label.text = "🌸 Spring | 16°C\nClear Sky"
+	season_weather_label.add_theme_font_size_override("font_size", 16)
+	add_child(season_weather_label)
 	
 	# 4. Hotbar Container (Bottom Center)
 	hotbar_container = HBoxContainer.new()
@@ -128,6 +155,7 @@ func bind_player(player: Player) -> void:
 	player.health_changed.connect(_on_health_changed)
 	player.stamina_changed.connect(_on_stamina_changed)
 	player.hunger_changed.connect(_on_hunger_changed)
+	player.warmth_changed.connect(_on_warmth_changed)
 	player.hotbar_slot_changed.connect(_on_hotbar_changed)
 	player.block_action_performed.connect(_on_block_action)
 	
@@ -148,6 +176,14 @@ func _on_hunger_changed(hg: float, max_hg: float) -> void:
 	if hunger_bar:
 		# Hunger is inverted: 0 hunger = 100% satiated
 		hunger_bar.value = ((max_hg - hg) / max_hg) * 100.0
+
+func _on_warmth_changed(wm: float, max_wm: float) -> void:
+	if warmth_bar:
+		warmth_bar.value = (wm / max_wm) * 100.0
+
+func update_season_display(season_name: String, temp: float, weather_name: String) -> void:
+	if season_weather_label:
+		season_weather_label.text = "%s | %.1f°C\n%s" % [season_name, temp, weather_name]
 
 func _on_hotbar_changed(index: int, item: Dictionary) -> void:
 	_highlight_active_slot(index)

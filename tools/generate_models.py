@@ -407,6 +407,52 @@ def build_bandit():
 
     export_glb("bandit.glb")
 
+# -------------------------------------------------------------
+# 11. Feudal Merchant Trade Caravan Cart
+# -------------------------------------------------------------
+def build_caravan_cart():
+    reset_scene()
+    mat_wood = create_material("CartWood", (0.38, 0.24, 0.12, 1.0), roughness=0.88)
+    mat_iron = create_material("CartIron", (0.28, 0.28, 0.30, 1.0), roughness=0.4, metallic=0.85)
+    mat_canvas = create_material("CartCanvas", (0.85, 0.82, 0.74, 1.0), roughness=0.95)
+
+    # Cart chassis base
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0, 0.6))
+    chassis = bpy.context.active_object
+    chassis.name = "CartBed"
+    chassis.scale = (1.4, 2.2, 0.15)
+    chassis.data.materials.append(mat_wood)
+
+    # Axle
+    bpy.ops.mesh.primitive_cylinder_add(radius=0.06, depth=1.8, vertices=8, location=(0, 0, 0.45), rotation=(0, math.radians(90), 0))
+    axle = bpy.context.active_object
+    axle.data.materials.append(mat_iron)
+
+    # Left & Right Spoked Wooden Wheels
+    for x_side in [-0.85, 0.85]:
+        bpy.ops.mesh.primitive_cylinder_add(radius=0.45, depth=0.08, vertices=12, location=(x_side, 0, 0.45), rotation=(0, math.radians(90), 0))
+        wheel = bpy.context.active_object
+        wheel.data.materials.append(mat_wood)
+        bpy.ops.mesh.primitive_cylinder_add(radius=0.46, depth=0.06, vertices=12, location=(x_side, 0, 0.45), rotation=(0, math.radians(90), 0))
+        rim = bpy.context.active_object
+        rim.data.materials.append(mat_iron)
+
+    # Front Hitch Shafts
+    for x_hitch in [-0.4, 0.4]:
+        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(x_hitch, 1.6, 0.55))
+        shaft = bpy.context.active_object
+        shaft.scale = (0.08, 1.4, 0.08)
+        shaft.data.materials.append(mat_wood)
+
+    # Arched Canvas Canopy Cover
+    bpy.ops.mesh.primitive_cylinder_add(radius=0.72, depth=2.0, vertices=12, location=(0, 0, 1.2), rotation=(math.radians(90), 0, 0))
+    canopy = bpy.context.active_object
+    canopy.name = "CanvasCanopy"
+    canopy.scale = (1.0, 1.0, 0.75)
+    canopy.data.materials.append(mat_canvas)
+
+    export_glb("caravan_cart.glb")
+
 if __name__ == "__main__":
     print("[BLENDER SCRIPT] Starting procedural 3D medieval model generation...")
     build_pickaxe()
@@ -419,4 +465,5 @@ if __name__ == "__main__":
     build_furnace()
     build_support_beam()
     build_bandit()
+    build_caravan_cart()
     print("[BLENDER SCRIPT] All models generated successfully!")
