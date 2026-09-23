@@ -95,6 +95,28 @@ def build_diorama():
     # 9. Support Beam standing as mine entrance marker
     import_asset("support_beam.glb", (-4.2, -0.5, 0.0), rot_z=90)
 
+    # 10. Create-Style Kinetic Windmill in far background
+    import_asset("windmill.glb", (-4.5, 5.0, 0.0), rot_z=35, scale=0.85)
+
+    # 11. Arcane Enchanter's Table & Runestone
+    import_asset("enchanter_table.glb", (-0.8, -2.2, 0.0), rot_z=15)
+    import_asset("runestone.glb", (-0.4, -2.3, 0.0), rot_z=-20)
+
+    # 12. Farmer's Delight Cooking Pot simmering near campfire
+    import_asset("cooking_pot.glb", (-0.3, 0.5, 0.0), rot_z=45)
+
+    # 13. Bandit Warlord Raid Boss
+    import_asset("bandit_warlord.glb", (4.8, -1.6, 0.0), rot_z=-85)
+
+    # 14. Royal War Horn resting on workbench
+    import_asset("war_horn.glb", (1.2, -1.7, 0.72), rot_z=20, scale=0.9)
+
+    # 15. MineColonies Hauler Wheelbarrow near central crate
+    import_asset("wheelbarrow.glb", (2.6, -0.6, 0.0), rot_z=-35, scale=0.95)
+
+    # 16. Architect's Drafting Desk with parchment & quill
+    import_asset("architect_desk.glb", (-2.2, -2.6, 0.0), rot_z=25, scale=0.95)
+
     # Render output path
     output_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "assets"))
     output_path = os.path.join(output_dir, "showcase_realm.png")

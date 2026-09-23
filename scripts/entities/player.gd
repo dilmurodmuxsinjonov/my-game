@@ -1,6 +1,8 @@
 class_name Player
 extends CharacterBody3D
 
+const BlueprintConstruction = preload("res://scripts/world/blueprint_construction.gd")
+
 ## First-Person Monarch Controller.
 ## Follows the Single Persistent Monarch Paradigm: No dynasty, no permadeath;
 ## if fallen in battle, monarch recuperates and respawns at the royal castle hearth.
@@ -418,10 +420,25 @@ func _handle_secondary_action() -> void:
 			emit_signal("hotbar_slot_changed", active_slot, item)
 			return
 
-	# 8. Placeable workstation placement (Furnace, Campfire, Crate, Workbench, Watchtower, Enchanter Table, Windmill, Cooking Pot)
+	# 7.5. Holographic Blueprint Placement (MineColonies style)
+	if item.get("type") == "blueprint" and item.get("count", 0) > 0:
+		_place_blueprint(item, hit_point, hit_normal)
+		return
+
+	# 8. Placeable workstation placement (Furnace, Campfire, Crate, Workbench, Watchtower, Enchanter Table, Windmill, Cooking Pot, Architect Desk)
 	if item.get("type") == "placeable" and item.get("count", 0) > 0 and item.get("name") != "Torch":
 		var item_name = item.get("name", "")
-		if "Watchtower" in item_name:
+		if "Architect" in item_name:
+			var ws = Workstation.new()
+			ws.station_type = Workstation.StationType.WORKBENCH
+			ws.custom_name = "Architect's Drafting Desk"
+			ws.position = hit_point + hit_normal * 0.1
+			get_tree().current_scene.add_child(ws)
+			item["count"] -= 1
+			emit_signal("block_action_performed", "place_station", Vector3i(int(ws.position.x), int(ws.position.y), int(ws.position.z)), 0)
+			emit_signal("hotbar_slot_changed", active_slot, item)
+			return
+		elif "Watchtower" in item_name:
 			var wt = Watchtower.new()
 			wt.position = hit_point + hit_normal * 0.1
 			get_tree().current_scene.add_child(wt)
@@ -520,3 +537,28 @@ func _add_resource_from_mined_block(block_type: int) -> void:
 			supply_chain.add_resource("gate", 1)
 		VoxelChunk.BlockType.WHEAT_CROP:
 			supply_chain.add_resource("wheat", 2)
+
+func _place_blueprint(item: Dictionary, hit_point: Vector3, hit_normal: Vector3) -> void:
+	var place_pos = hit_point + hit_normal * 0.05
+	var bp = BlueprintConstruction.new()
+	bp.structure_id = item.get("blueprint_id", "cottage")
+	bp.display_name = item.get("name", "Worker Cottage Blueprint")
+	bp.position = place_pos
+	
+	if bp.structure_id == "cottage":
+		bp.required_resources = {"logs": 8, "stone": 12}
+		bp.bounds_size = Vector3(4.0, 3.0, 4.0)
+	elif bp.structure_id == "watchtower":
+		bp.required_resources = {"logs": 8, "stone_bricks": 4}
+		bp.bounds_size = Vector3(3.0, 8.0, 3.0)
+	elif bp.structure_id == "granary":
+		bp.required_resources = {"logs": 12, "stone": 8, "iron_ingots": 2}
+		bp.bounds_size = Vector3(5.0, 4.0, 5.0)
+		
+	get_tree().current_scene.add_child(bp)
+	item["count"] -= 1
+	if item["count"] <= 0:
+		hotbar[active_slot] = {}
+	emit_signal("block_action_performed", "place_blueprint", Vector3i(int(place_pos.x), int(place_pos.y), int(place_pos.z)), 0)
+	emit_signal("hotbar_slot_changed", active_slot, hotbar[active_slot])
+

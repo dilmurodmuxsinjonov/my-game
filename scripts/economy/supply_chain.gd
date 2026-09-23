@@ -2,9 +2,31 @@ class_name SupplyChain
 extends RefCounted
 
 ## Manages kingdom inventory, production chains, tool wear, and citizen food distribution.
+## Includes RimWorld-style 'Do Until X' production threshold management.
 
 signal inventory_updated(item_name: String, new_amount: int)
 signal morale_updated(new_morale: float)
+signal quota_changed(item_name: String, target_qty: int, mode: int)
+
+enum QuotaMode {
+	DO_FOREVER = 0,
+	DO_UNTIL_X = 1,
+	PAUSED = 2
+}
+
+# Production Quotas ("Do Until X")
+var quotas: Dictionary = {
+	"bread": 50,
+	"tools": 10,
+	"weapons": 5,
+	"iron_ingots": 20
+}
+var quota_modes: Dictionary = {
+	"bread": QuotaMode.DO_UNTIL_X,
+	"tools": QuotaMode.DO_UNTIL_X,
+	"weapons": QuotaMode.DO_UNTIL_X,
+	"iron_ingots": QuotaMode.DO_FOREVER
+}
 
 # Stockpile inventory
 var inventory: Dictionary = {
@@ -42,11 +64,39 @@ func consume_resource(item: String, amount: int) -> bool:
 		return true
 	return false
 
+func get_resource(item: String) -> int:
+	return inventory.get(item, 0)
+
+func set_quota(item: String, target_amount: int, mode: QuotaMode = QuotaMode.DO_UNTIL_X) -> void:
+	quotas[item] = maxi(0, target_amount)
+	quota_modes[item] = mode
+	emit_signal("quota_changed", item, quotas[item], mode)
+
+func get_quota(item: String) -> int:
+	return quotas.get(item, 999999)
+
+func get_quota_mode(item: String) -> QuotaMode:
+	return quota_modes.get(item, QuotaMode.DO_FOREVER)
+
+func is_quota_reached(item: String) -> bool:
+	var mode = get_quota_mode(item)
+	if mode == QuotaMode.PAUSED:
+		return true
+	if mode == QuotaMode.DO_FOREVER:
+		return false
+	var current = get_resource(item)
+	var limit = get_quota(item)
+	return current >= limit
+
+func can_produce(item: String) -> bool:
+	return not is_quota_reached(item)
+
 func process_production_cycle(assigned_citizens: Dictionary) -> Dictionary:
 	var report = {
 		"produced": {},
 		"consumed": {},
-		"unfed_citizens": 0
+		"unfed_citizens": 0,
+		"paused_by_quota": []
 	}
 	
 	# 1. Farmers produce wheat
@@ -55,16 +105,24 @@ func process_production_cycle(assigned_citizens: Dictionary) -> Dictionary:
 	add_resource("wheat", wheat_produced)
 	report["produced"]["wheat"] = wheat_produced
 	
-	# 2. Bakers turn wheat into bread (1 wheat -> 2 bread)
+	# 2. Bakers turn wheat into bread (1 wheat -> 2 bread) respecting quota
 	var bakers = assigned_citizens.get("baker", 0)
-	var wheat_needed = bakers * 2
-	var wheat_used = mini(inventory.get("wheat", 0), wheat_needed)
-	if wheat_used > 0:
-		consume_resource("wheat", wheat_used)
-		var bread_produced = wheat_used * 2
-		add_resource("bread", bread_produced)
-		report["produced"]["bread"] = bread_produced
-		report["consumed"]["wheat"] = wheat_used
+	if can_produce("bread"):
+		var wheat_needed = bakers * 2
+		if get_quota_mode("bread") == QuotaMode.DO_UNTIL_X:
+			var needed_bread = maxi(0, get_quota("bread") - get_resource("bread"))
+			var max_wheat = int(ceil(float(needed_bread) / 2.0))
+			wheat_needed = mini(wheat_needed, max_wheat)
+			
+		var wheat_used = mini(inventory.get("wheat", 0), wheat_needed)
+		if wheat_used > 0:
+			consume_resource("wheat", wheat_used)
+			var bread_produced = wheat_used * 2
+			add_resource("bread", bread_produced)
+			report["produced"]["bread"] = bread_produced
+			report["consumed"]["wheat"] = wheat_used
+	else:
+		report["paused_by_quota"].append("bread")
 
 	# 3. Lumberjacks produce logs
 	var lumberjacks = assigned_citizens.get("lumberjack", 0)
@@ -84,12 +142,16 @@ func process_production_cycle(assigned_citizens: Dictionary) -> Dictionary:
 	report["produced"]["iron_ore"] = iron_produced
 	report["produced"]["coal"] = coal_produced
 
-	# 5. Blacksmiths turn iron ore/ingots and logs into tools & weapons
+	# 5. Blacksmiths turn iron ore/ingots and logs into tools & weapons respecting quotas
 	var blacksmiths = assigned_citizens.get("blacksmith", 0)
 	for i in range(blacksmiths):
-		if consume_resource("iron_ore", 2) and consume_resource("logs", 1):
-			add_resource("tools", 1)
-			report["produced"]["tools"] = report["produced"].get("tools", 0) + 1
+		if can_produce("tools"):
+			if consume_resource("iron_ore", 2) and consume_resource("logs", 1):
+				add_resource("tools", 1)
+				report["produced"]["tools"] = report["produced"].get("tools", 0) + 1
+		else:
+			if not "tools" in report["paused_by_quota"]:
+				report["paused_by_quota"].append("tools")
 
 	# 6. Citizen food consumption (1 bread per citizen per cycle)
 	var total_citizens: int = 0
