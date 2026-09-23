@@ -1,0 +1,117 @@
+# Voxel Lord: Feudal Realm — Minecraft Modlaridan Olingan Mexanikalar va Integratsiya
+
+Ushbu hujjat "Voxel Lord: Feudal Realm" o'yini uchun Minecraft ekotizimidagi eng sara va chuqur mexanikali modlardan saralab olingan tizimlar to'plamidir. Bu tizimlar quruq ko'chirish emas, balki bizning 1st-person feodal hukmdor va voxel koloniya arxitekturasiga to'liq moslashtirilgan.
+
+---
+
+## 1. MINECOLONIES — Aholi, Shahar Qurilishi va Logistika
+
+MineColonies — shahar boshqaruvi va avtonom NPC simulyatsiyasining eng yetakchi namunasi. Undan quyidagi yadrolar olinadi:
+
+### 1.1. Quruvchi Fuqaro (Builder Citizen) va Arxitektura Chizmalari (Blueprints)
+- **Muammo**: Hukmdor har bir uy, devor yoki omborni o'zi kubikma-kubik qo'yib chiqishi zerikarli mikromenejmentga aylanadi.
+- **Yechim (MineColonies andozasi)**:
+  - Hukmdor dunyoga yarim shaffof (hologramma) bino qolipini joylashtiradi (masalan: "Tosh minorali darvoza", "Nonvoyxona", "Dehqon uyi").
+  - Quruvchi kasbidagi fuqaro (`Builder`) ombordan kerakli resurslarni (yog'och, tosh g'isht, taxta) o'zi olib keladi va blokma-blok binoni qura boshlaydi.
+  - Hukmdor esa faqat resurslar yetkazib berilishini va strategik joylashuvni nazorat qiladi.
+
+### 1.2. Kuryer / Logist Fuqaro (Deliveryman / Hauler)
+- Qasr kengaygani sari shaxtadan chiqqan rudani temirchiga, daladan o'rilgan bug'doyni tegirmon va nonvoyga qo'lda tashish imkonsiz bo'ladi.
+- Maxsus **Kuryer** fuqarolar aravalar yoki qoplar bilan uzoq nuqtalardan markaziy omborga va ustaxonalarga resurslarni avtomatik tashiydi.
+
+### 1.3. Kasbiy Mahorat va Tajriba (Proficiency Tiers)
+- Fuqarolar ish jarayonida o'z sohasida tajriba to'playdi:
+  - **Shogird (Apprentice)**: Ishlash tezligi 1.0x, resurs yo'qotish ehtimoli bor.
+  - **Usta (Journeyman)**: Tezlik 1.5x, asboblar kamroq eskiradi.
+  - **Bosh Usta (Master)**: Tezlik 2.2x, qo'shimcha nodir mahsulotlar yaratish imkoniyati (+15% sifat).
+
+---
+
+## 2. TERRAFIRMACRAFT (TFC) — Realistik Geologiya, Metallurgiya va Fasllar
+
+TFC — tirik qolish va tabiiy qonuniyatlarning eng chuqur modidir. Undan olingan qismlar:
+
+### 2.1. Shaxta Xavfsizligi va Geologik Qatlamlar (Cave-ins & Strata)
+- Tosh va ruda shiftlari havoda shunchaki muallaq osilib tura olmaydi.
+- Agar g'or yoki shaxta 4 blokdan kengroq qazilsa va tayanch to'sini (`Support Beam`) qo'yilmasa, o'pirilish (Cave-in) xavfi yuzaga keladi.
+- Rudalar chuqurlik qatlamlariga (Coal -> Copper -> Iron -> Gold -> Deep Gems) aniq ajratilgan.
+
+### 2.2. Oziq-ovqat Saqlanishi va Chirish (Food Preservation & Spoilage)
+- Go'sht, sut va pishirilgan taomlar yozda ochiq havoda 3-4 kunda ayniydi.
+- **Saqlash usullari**:
+  - **Tuzlash (Curing/Salting)**: Savdo karvonidan olingan tosh tuz bilan go'shtni tuzlash (saqlash muddati 30 kunga uzayadi).
+  - **Dudlash (Smoking)**: Gulxan yoki maxsus dudxonada dudlash.
+  - **Yerto'la (Cellar)**: Yer ostidagi sovuq qorong'i xonalarda saqlash (chirash tezligini 70% ga sekinlashtiradi).
+
+---
+
+## 3. TINKERS' CONSTRUCT — Modulli Qurol va Asboblar Tizimi
+
+Klassik "oddiy temir qilich" o'rniga, qurollar alohida qismlardan yasaladi va ularning har biri alohida xususiyat beradi:
+
+### 3.1. Qurol Anatomiyasi
+1. **Tig' / Bosh qism (Blade / Head)**: Asosiy zarar va qazish tezligini belgilaydi.
+   - *Temir*: Balanslashgan, o'rtacha o'tkir.
+   - *Po'lat*: Yuqori zarar va o'tkirlik.
+   - *Oltin*: Yuqori sehr o'tkazuvchanligi.
+2. **Gardis / Bog'lovchi (Crossguard / Binding)**: Chidamlilik va maxsus himoyani belgilaydi.
+3. **Dasta (Handle / Rod)**: Umumiy chidamlilik multiplikatori va silkinishni kamaytirish.
+
+### 3.2. Sandon (Anvil)da Zarb Qilish
+- Eritilgan temir va po'lat shunchaki dastgohda 1 soniyada qurolga aylanmaydi.
+- Sandonda bolg'a bilan zarb qilinadi, so'ngra suv yoki moyda toblanadi (Quenching). Bu qurol sifatini (Quality: Common, Fine, Masterwork) oshiradi.
+
+---
+
+## 4. APOTHEOSIS & ENIGMATIC LEGACY — Sehirlar, Affikslar va Noyoblik
+
+Foydalanuvchining aniq talabi: Oddiy sehirlar materiallar va mob droplaridan sehrgarlar tomonidan yasaladi, noyob afsonaviy narsalar faqatgina qaroqchilar va xazinalardan tushadi.
+
+### 4.1. Sehirlar Tasnifi va Darajalari
+Barcha sehirlar I dan V gacha darajaga ega bo'ladi:
+- **Sharpness (O'tkirlik I-V)**: Kesuvchi qurollar uchun qo'shimcha jismoniy zarar.
+- **Unbreaking (Mustahkamlik I-III)**: Qurol eskirish ehtimolini kamaytiradi.
+- **Efficiency (Tezkorlik I-V)**: Kon va o'tin chopish tezligini oshiradi.
+- **Protection (Himoya I-IV)**: Sovutlar uchun umumiy zararni pasaytirish.
+- **Feather Falling (Yengil Qadam I-IV)**: Balandlikdan sakrashdagi zararni yo'qotish.
+- **Power (Kuch I-V)**: Kamon o'qining uchish kuchi va zararini oshiradi.
+
+### 4.2. Oddiy Sehirlarni Yasash (Sehrgar Laboratoriyasi)
+- Shaharda **Sehrgar (Enchanter / Alchemist)** fuqarosi bo'ladi.
+- Sehr tayyorlash uchun kerak bo'ladi:
+  - *Sehrli Qog'oz / Runa*: Teridan tayyorlangan pergament + qimmatbaho tosh kukuni.
+  - *Mob droplari*: Qaroqchilardan tushgan qon tomchisi, o'rgimchak ipi, zahar, bo'ri tishi.
+  - *O'simliklar*: Yovvoyi dorivor giyohlar va ildizlar.
+- Sehrgar ularni qaynatib, pergamentga sehrli runa bitadi. Hukmdor bu runani sandonda qurol yoki sovutga qo'shadi.
+
+### 4.3. Noyob va Afsonaviy Sehrlar (Faqat Qaroqchilar Boshliqlari va Xazinalardan Tushadi)
+Ushbu sehirlarni hech qaysi sehrgar yasay olmaydi, ular faqat dunyoda topiladi:
+1. **`Dragon's Breath` (Ajdaho Nafasi)**: Har bir qilich zarbasida dushmanni 4 soniya olovda yondiradi.
+2. **`Windstrider` (Shamol Hukmdori)**: Harakatlanish tezligini +30% ga oshiradi va suv ustida yurish imkonini beradi.
+3. **`Vampiric Leech` (Qon So'rgich)**: Dushmanga berilgan zararning 15% miqdorida Hukmdorning jonini davolaydi.
+4. **`Thunderstrike` (Yashin Urishi)**: Kamondan otilgan o'q tushgan yerga yashin chaqirib, atrofdagi barcha qaroqchilarga ommaviy zarar beradi.
+5. **`Fortress Heart` (Qal'a Yuragi)**: Sovutga o'rnatilganda, Hukmdorning joni 25% dan pastga tushsa, 5 soniyaga barcha zararlarni 90% ga qaytaruvchi qalqon hosil qiladi.
+
+---
+
+## 5. FARMER'S DELIGHT — Feodal Qishloq Xo'jaligi va Oshxona
+
+Oddiygina "non yeb qorin to'yg'azish" o'rniga, to'yimli va murakkab feodal taomlar:
+
+### 5.1. Ekinlar Turfaligi
+- Bug'doy (Wheat), Arpa (Barley), Karam (Cabbage), Piyoz (Onion), Sabzi (Carrot), Zaytun (Olive).
+- Boyitilgan Qora Tuproq (`Rich Compost Soil`): Hayvon go'ngi va o'simlik qoldiqlaridan tayyorlanadi, ekinlar unda 2 barobar tezroq unib chiqadi.
+
+### 5.2. Qozonda Qaynatilgan Taomlar (Cooking Pot Meals)
+- **Qovurilgan Go'sht va Sabzavotlar**: Qorinni 40% ga to'yg'azadi va +20% chidamlilik beradi.
+- **Qirollik Sho'rvasi (Hearty Stew)**: Qorinni to'liq to'yg'azadi, fuqarolarning ma'naviyatini +30 ga ko'taradi va 1 kun davomida sovuq qotishdan himoya qiladi (Thermal Resistance).
+
+---
+
+## 6. CREATE MOD — Suv va Shamol Mexanikasi (Feodal Avtomatizatsiya)
+
+Medieval davrning haqiqiy muhandisligi:
+1. **Suv Tegirmoni (Water Wheel)**: Daryo oqimiga o'rnatiladi. Aylanma harakat energiyasini venzelli g'ildiraklar orqali uzatadi.
+2. **Shamol Tegirmoni (Windmill)**: Qir va tepaliklarda quriladi.
+3. **Mexanik Bolg'a (Mechanical Trip Hammer)**: Suv yoki shamol kuchi bilan tinimsiz urilib, temir va ruda quymalarini qo'l mehnatini sarflamasdan yanchadi.
+4. **Un Tegirmon Toshlari (Millstones)**: Bug'doyni sanoat darajasida unga aylantiradi.

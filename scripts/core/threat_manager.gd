@@ -12,10 +12,12 @@ var voxel_world: VoxelWorld
 var supply_chain: SupplyChain
 var player_ref: Node3D
 var active_bandits: Array[Bandit] = []
+var active_warlords: Array[BanditWarlord] = []
 
 var wave_timer: float = 0.0
 var wave_interval: float = 150.0 # 2.5 minutes between threat cycles
 var threat_score: float = 10.0
+var raid_wave_count: int = 0
 
 func _init(p_world: VoxelWorld = null, p_supply: SupplyChain = null) -> void:
 	voxel_world = p_world
@@ -40,9 +42,11 @@ func _evaluate_threat_and_spawn() -> void:
 	threat_score = 10.0 + (pop * 1.5) + (stockpile_val * 0.05)
 	var bandit_count = clampi(int(threat_score / 15.0), 1, 4)
 	
-	spawn_raid(bandit_count)
+	raid_wave_count += 1
+	var spawn_boss = (raid_wave_count % 2 == 0) or threat_score >= 30.0
+	spawn_raid(bandit_count, spawn_boss)
 
-func spawn_raid(count: int) -> void:
+func spawn_raid(count: int, spawn_boss: bool = false) -> void:
 	if not voxel_world:
 		return
 		
@@ -66,8 +70,18 @@ func spawn_raid(count: int) -> void:
 		# Set target to player or settlement center
 		if player_ref:
 			bandit.set_target(player_ref)
+
+	if spawn_boss:
+		var warlord = BanditWarlord.new()
+		warlord.voxel_world = voxel_world
+		warlord.position = Vector3(edge_x - 2, edge_y + 1.2, edge_z - 2)
+		warlord.defeated.connect(_on_warlord_defeated)
+		get_parent().add_child(warlord)
+		active_warlords.append(warlord)
+		if player_ref:
+			warlord.set_target(player_ref)
 			
-	emit_signal("raid_spawned", count)
+	emit_signal("raid_spawned", count + (1 if spawn_boss else 0))
 
 func _on_bandit_defeated(bandit: Bandit, loot: Dictionary) -> void:
 	active_bandits.erase(bandit)
@@ -76,5 +90,17 @@ func _on_bandit_defeated(bandit: Bandit, loot: Dictionary) -> void:
 			supply_chain.add_resource(item, loot[item])
 			
 	emit_signal("bandit_slain", loot)
-	if active_bandits.is_empty():
+	_check_raid_over()
+
+func _on_warlord_defeated(warlord: BanditWarlord, loot: Dictionary) -> void:
+	active_warlords.erase(warlord)
+	if supply_chain:
+		for item in loot.keys():
+			supply_chain.add_resource(item, loot[item])
+			
+	emit_signal("bandit_slain", loot)
+	_check_raid_over()
+
+func _check_raid_over() -> void:
+	if active_bandits.is_empty() and active_warlords.is_empty():
 		emit_signal("raid_defeated")

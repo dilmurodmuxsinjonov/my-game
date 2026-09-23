@@ -4,3 +4,12 @@ __pycache__/
 .import/
 .godot/
 export/
+.tools/
+unreal/Binaries/
+unreal/Intermediate/
+unreal/Saved/
+unreal/DerivedDataCache/
+unreal/.vs/
+unreal/Build/CoreTests/
+*.sln
+*.VC.db
