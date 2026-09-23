@@ -120,6 +120,12 @@ func _spawn_initial_workstations() -> void:
 	wt.position = Vector3(28.5, wt_y + 0.1, 28.5)
 	add_child(wt)
 
+	# 6. Arcane Enchanter's Table
+	var et = EnchanterTable.new()
+	var et_y = voxel_world.get_surface_height(34, 30)
+	et.position = Vector3(34.5, et_y + 0.1, 30.5)
+	add_child(et)
+
 func _spawn_initial_citizens() -> void:
 	var roles_to_spawn = [
 		{"role": Citizen.Role.FARMER, "name": "Geoffrey"},
@@ -198,7 +204,7 @@ func _on_open_crafting() -> void:
 		crafting_menu.open_menu(null)
 
 func _on_interact_requested(target: Node3D) -> void:
-	if (target is Workstation or target is TradeCaravan) and crafting_menu:
+	if (target is Workstation or target is TradeCaravan or target is EnchanterTable) and crafting_menu:
 		crafting_menu.open_menu(target)
 
 func _on_item_crafted(recipe_name: String, _item: Dictionary) -> void:

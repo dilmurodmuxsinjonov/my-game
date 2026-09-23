@@ -175,8 +175,9 @@ func take_damage(amount: float, knockback: Vector3 = Vector3.ZERO) -> void:
 func _die() -> void:
 	var loot = {
 		"iron_ore": 1,
-		"coins": 5,
-		"bread": 1
+		"coins": randi_range(3, 8),
+		"bread": 1,
+		"blood_vial": 1
 	}
 	emit_signal("defeated", self, loot)
 	queue_free()

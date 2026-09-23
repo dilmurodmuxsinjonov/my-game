@@ -10,6 +10,7 @@ var player: Player
 var supply_chain: SupplyChain
 var active_workstation: Workstation = null
 var active_caravan: TradeCaravan = null
+var active_enchanter: EnchanterTable = null
 
 var is_open: bool = false
 
@@ -95,6 +96,11 @@ const RECIPES: Dictionary = {
 			"output": {"name": "Watchtower", "type": "placeable", "icon": "🏰", "count": 1}
 		},
 		{
+			"name": "Arcane Enchanter's Table",
+			"inputs": {"stone_bricks": 4, "gems": 1, "logs": 2},
+			"output": {"name": "Arcane Enchanter's Table", "type": "placeable", "icon": "🔮", "count": 1}
+		},
+		{
 			"name": "Defensive Gate",
 			"inputs": {"logs": 4, "iron_ingots": 2},
 			"output": {"name": "Defensive Gate", "type": "block", "block_type": 21, "icon": "🚪", "count": 1}
@@ -147,6 +153,28 @@ const RECIPES: Dictionary = {
 			"name": "Forge Steel Ingot",
 			"inputs": {"iron_ore": 2, "coal": 3},
 			"output": {"name": "Steel Ingot", "type": "material", "icon": "⚔️", "count": 1}
+		}
+	],
+	"enchanter": [
+		{
+			"name": "Rune of Sharpness I",
+			"inputs": {"blood_vial": 1, "stone": 2, "flax": 1},
+			"output": {"name": "Rune of Sharpness I", "type": "rune", "enchantment": "sharpness", "level": 1, "icon": "🗡️", "count": 1}
+		},
+		{
+			"name": "Rune of Protection I",
+			"inputs": {"wolf_pelt": 1, "herbs": 2, "stone": 2},
+			"output": {"name": "Rune of Protection I", "type": "rune", "enchantment": "protection", "level": 1, "icon": "🛡️", "count": 1}
+		},
+		{
+			"name": "Rune of Unbreaking I",
+			"inputs": {"wolf_tooth": 1, "iron_ingots": 1},
+			"output": {"name": "Rune of Unbreaking I", "type": "rune", "enchantment": "unbreaking", "level": 1, "icon": "💎", "count": 1}
+		},
+		{
+			"name": "Rune of Power I",
+			"inputs": {"spider_thread": 1, "blood_vial": 1, "logs": 1},
+			"output": {"name": "Rune of Power I", "type": "rune", "enchantment": "power", "level": 1, "icon": "🏹", "count": 1}
 		}
 	]
 }
@@ -237,9 +265,16 @@ func open_menu(target: Node = null) -> void:
 	if target is TradeCaravan:
 		active_caravan = target
 		active_workstation = null
+		active_enchanter = null
 		_populate_caravan_trade()
+	elif target is EnchanterTable:
+		active_caravan = null
+		active_workstation = null
+		active_enchanter = target
+		_populate_enchanter_recipes()
 	else:
 		active_caravan = null
+		active_enchanter = null
 		active_workstation = target as Workstation
 		_populate_recipes()
 
@@ -248,6 +283,7 @@ func close_menu() -> void:
 	visible = false
 	active_workstation = null
 	active_caravan = null
+	active_enchanter = null
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -259,6 +295,38 @@ func _unhandled_input(event: InputEvent) -> void:
 				open_menu(null)
 		elif event.keycode == KEY_E and is_open:
 			close_menu()
+
+func _populate_enchanter_recipes() -> void:
+	for child in recipe_list_vbox.get_children():
+		child.queue_free()
+		
+	header_title.text = "🔮 ARCANE ENCHANTER'S TABLE"
+	var recipes = RECIPES.get("enchanter", [])
+	for recipe in recipes:
+		var row = HBoxContainer.new()
+		row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		
+		var name_lbl = Label.new()
+		name_lbl.text = "%s %s" % [recipe["output"].get("icon", "🔮"), recipe["name"]]
+		name_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		row.add_child(name_lbl)
+		
+		var req_text = "Cost: "
+		for mat in recipe["inputs"].keys():
+			var count = recipe["inputs"][mat]
+			var avail = supply_chain.inventory.get(mat, 0) if supply_chain else 0
+			req_text += "%s: %d/%d  " % [mat, avail, count]
+		var cost_lbl = Label.new()
+		cost_lbl.text = req_text
+		cost_lbl.modulate = Color(0.75, 0.85, 1.0)
+		row.add_child(cost_lbl)
+		
+		var btn = Button.new()
+		btn.text = " Inscribe Rune "
+		btn.pressed.connect(_on_craft_pressed.bind(recipe))
+		row.add_child(btn)
+		
+		recipe_list_vbox.add_child(row)
 
 func _populate_recipes() -> void:
 	# Clear previous recipes
@@ -360,13 +428,29 @@ func _on_craft_pressed(recipe: Dictionary) -> void:
 	for mat in recipe["inputs"].keys():
 		supply_chain.consume_resource(mat, recipe["inputs"][mat])
 		
-	# Add crafted item to player hotbar
+	# Add crafted item to player hotbar or inscribe if rune
 	var out_item = recipe["output"].duplicate()
 	if player:
+		if out_item.get("type") == "rune":
+			var cur_item = player.hotbar[player.active_slot]
+			if cur_item.get("type") in ["tool", "weapon", "bow"] or cur_item.get("tool_type") in ["sword", "axe", "pickaxe", "bow"]:
+				if not cur_item.has("enchantments"):
+					cur_item["enchantments"] = {}
+				cur_item["enchantments"][out_item["enchantment"]] = out_item["level"]
+				player.emit_signal("hotbar_slot_changed", player.active_slot, cur_item)
+				status_label.text = "Inscribed %s onto %s!" % [out_item["name"], cur_item.get("name", "Tool")]
+				emit_signal("item_crafted", recipe["name"], out_item)
+				if active_enchanter:
+					_populate_enchanter_recipes()
+				return
 		_add_to_player_hotbar(out_item)
 		
 	status_label.text = "Crafted: %s!" % recipe["name"]
 	emit_signal("item_crafted", recipe["name"], out_item)
+	if active_enchanter:
+		_populate_enchanter_recipes()
+	elif active_workstation:
+		_populate_recipes()
 
 func _add_to_player_hotbar(item: Dictionary) -> void:
 	# Try stack with existing slot

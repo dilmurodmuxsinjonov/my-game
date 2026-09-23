@@ -142,7 +142,7 @@ func _physics_process(delta: float) -> void:
 func _check_hovered_interactive() -> void:
 	if raycast and raycast.is_colliding():
 		var col = raycast.get_collider()
-		if col is Workstation or col is TradeCaravan:
+		if col is Workstation or col is TradeCaravan or col is EnchanterTable:
 			if hovered_interactive != col:
 				if hovered_interactive and hovered_interactive.has_method("set_prompt_visible"):
 					hovered_interactive.set_prompt_visible(false)
@@ -177,6 +177,12 @@ func _handle_movement(delta: float) -> void:
 	# Sprint check
 	var is_sprinting = Input.is_key_pressed(KEY_SHIFT) and input_dir != Vector2.ZERO and stamina > 5.0
 	var speed = SPRINT_SPEED if is_sprinting else WALK_SPEED
+	
+	# Windstrider Legendary Affix speed bonus (+30%)
+	var active_item = hotbar[active_slot]
+	var enchs = active_item.get("enchantments", {})
+	if EnchantmentManager.has_windstrider(enchs):
+		speed *= 1.3
 	
 	if is_sprinting:
 		stamina = maxf(0.0, stamina - delta * 12.0)
@@ -253,7 +259,12 @@ func _update_thermal_balance(delta: float) -> void:
 		take_damage(delta * 2.5)
 
 func take_damage(amount: float) -> void:
-	health = maxf(0.0, health - amount)
+	var item = hotbar[active_slot]
+	var enchs = item.get("enchantments", {})
+	var final_dmg = EnchantmentManager.calculate_armor_mitigation(amount, enchs)
+	if EnchantmentManager.has_fortress_heart(enchs) and health < (max_health * 0.25):
+		final_dmg *= 0.1 # 90% emergency barrier when critical HP
+	health = maxf(0.0, health - final_dmg)
 	emit_signal("health_changed", health, max_health)
 	if health <= 0.0:
 		_respawn_monarch()
@@ -286,8 +297,8 @@ func _handle_primary_action() -> void:
 		_fire_player_arrow()
 		return
 		
-	# 1. Melee combat against enemies (Bandit, etc.)
-	if collider is Bandit:
+	# 1. Melee combat against enemies (Bandit, BanditWarlord)
+	if collider is Bandit or collider is BanditWarlord:
 		var dmg = 20.0
 		if item.get("tool_type") == "sword":
 			dmg = 35.0
@@ -295,6 +306,20 @@ func _handle_primary_action() -> void:
 			dmg = 24.0
 		elif item.get("tool_type") == "pickaxe":
 			dmg = 16.0
+			
+		var enchs = item.get("enchantments", {})
+		dmg = EnchantmentManager.calculate_melee_damage(dmg, enchs)
+		
+		# Vampiric leech life steal
+		var lsteal = EnchantmentManager.apply_life_steal(dmg, enchs)
+		if lsteal > 0.0:
+			health = minf(max_health, health + lsteal)
+			emit_signal("health_changed", health, max_health)
+			
+		# Dragon's breath fiery combustion
+		if EnchantmentManager.has_dragons_breath(enchs):
+			dmg += 8.0
+			
 		var knockback = -camera.global_transform.basis.z.normalized()
 		collider.take_damage(dmg, knockback)
 		emit_signal("block_action_performed", "attack", Vector3i.ZERO, 0)
@@ -321,6 +346,18 @@ func _handle_secondary_action() -> void:
 		emit_signal("hotbar_slot_changed", active_slot, item)
 		return
 		
+	# 2. Inscribe Rune directly onto primary weapon (slot 0)
+	if item.get("type") == "rune" and item.get("count", 0) > 0:
+		var target_item = hotbar[0]
+		if target_item.get("type") in ["tool", "weapon", "bow"] or target_item.get("tool_type") in ["sword", "axe", "pickaxe", "bow"]:
+			if not target_item.has("enchantments"):
+				target_item["enchantments"] = {}
+			target_item["enchantments"][item.get("enchantment", "sharpness")] = item.get("level", 1)
+			item["count"] -= 1
+			emit_signal("hotbar_slot_changed", active_slot, item)
+			emit_signal("hotbar_slot_changed", 0, target_item)
+			return
+		
 	if not raycast or not raycast.is_colliding():
 		return
 		
@@ -328,7 +365,7 @@ func _handle_secondary_action() -> void:
 	var hit_point = raycast.get_collision_point()
 	var hit_normal = raycast.get_collision_normal()
 	
-	# 2. Farmland hoe tilling
+	# 3. Farmland hoe tilling
 	if item.get("tool_type") == "hoe" and voxel_world:
 		var center = hit_point - hit_normal * 0.4
 		var target_pos = Vector3i(int(floor(center.x)), int(floor(center.y)), int(floor(center.z)))
@@ -338,7 +375,7 @@ func _handle_secondary_action() -> void:
 			emit_signal("block_action_performed", "till", target_pos, VoxelChunk.BlockType.FARMLAND)
 			return
 
-	# 3. Seed planting on Farmland
+	# 4. Seed planting on Farmland
 	if (item.get("type") == "seed" or item.get("name") == "Wheat Seeds") and item.get("count", 0) > 0 and voxel_world:
 		var center = hit_point - hit_normal * 0.4
 		var target_pos = Vector3i(int(floor(center.x)), int(floor(center.y)), int(floor(center.z)))
@@ -350,7 +387,7 @@ func _handle_secondary_action() -> void:
 			emit_signal("hotbar_slot_changed", active_slot, item)
 			return
 
-	# 4. Torch placement
+	# 5. Torch placement
 	if item.get("name") == "Torch" and item.get("count", 0) > 0:
 		var torch = Torch.new()
 		var torch_pos = hit_point + hit_normal * 0.1
@@ -361,7 +398,7 @@ func _handle_secondary_action() -> void:
 		emit_signal("hotbar_slot_changed", active_slot, item)
 		return
 
-	# 4. Block placement
+	# 6. Block placement
 	if voxel_world and item.get("type") == "block" and item.get("count", 0) > 0:
 		var btype = item.get("block_type", VoxelChunk.BlockType.STONE)
 		var result = voxel_world.place_block(hit_point, hit_normal, btype)
@@ -371,7 +408,7 @@ func _handle_secondary_action() -> void:
 			emit_signal("hotbar_slot_changed", active_slot, item)
 			return
 
-	# 5. Placeable workstation placement (Furnace, Campfire, Crate, Workbench)
+	# 7. Placeable workstation placement (Furnace, Campfire, Crate, Workbench, Watchtower, Enchanter Table)
 	if item.get("type") == "placeable" and item.get("count", 0) > 0 and item.get("name") != "Torch":
 		var item_name = item.get("name", "")
 		if "Watchtower" in item_name:
@@ -380,6 +417,14 @@ func _handle_secondary_action() -> void:
 			get_tree().current_scene.add_child(wt)
 			item["count"] -= 1
 			emit_signal("block_action_performed", "place_station", Vector3i(int(wt.position.x), int(wt.position.y), int(wt.position.z)), 0)
+			emit_signal("hotbar_slot_changed", active_slot, item)
+			return
+		elif "Enchanter" in item_name:
+			var et = EnchanterTable.new()
+			et.position = hit_point + hit_normal * 0.1
+			get_tree().current_scene.add_child(et)
+			item["count"] -= 1
+			emit_signal("block_action_performed", "place_station", Vector3i(int(et.position.x), int(et.position.y), int(et.position.z)), 0)
 			emit_signal("hotbar_slot_changed", active_slot, item)
 			return
 
@@ -404,11 +449,18 @@ func _handle_secondary_action() -> void:
 func _fire_player_arrow() -> void:
 	if not camera:
 		return
+	var item = hotbar[active_slot]
+	var enchs = item.get("enchantments", {})
+	var base_dmg = 45.0
+	var final_dmg = EnchantmentManager.calculate_arrow_damage(base_dmg, enchs)
+	var speed = 36.0
+	if enchs.has(EnchantmentManager.ENCH_POWER):
+		speed *= (1.0 + enchs[EnchantmentManager.ENCH_POWER] * 0.15)
 	var proj = Projectile.new()
 	var spawn_pos = camera.global_position - camera.global_transform.basis.z * 0.4 + Vector3(0, -0.1, 0)
 	var dir = -camera.global_transform.basis.z.normalized()
 	get_tree().current_scene.add_child(proj)
-	proj.launch(spawn_pos, dir, 36.0, 45.0, self)
+	proj.launch(spawn_pos, dir, speed, final_dmg, self)
 	emit_signal("block_action_performed", "shoot_arrow", Vector3i.ZERO, 0)
 
 func _add_resource_from_mined_block(block_type: int) -> void:

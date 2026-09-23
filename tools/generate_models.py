@@ -578,6 +578,139 @@ def build_watchtower():
 
     export_glb("watchtower.glb")
 
+# -------------------------------------------------------------
+# 15. Enchanter's Table Workstation
+# -------------------------------------------------------------
+def build_enchanter_table():
+    reset_scene()
+    mat_wood = create_material("TableWood", (0.22, 0.12, 0.06, 1.0), roughness=0.6)
+    mat_cloth = create_material("TableCloth", (0.15, 0.10, 0.35, 1.0), roughness=0.8)
+    mat_crystal = create_material("ArcaneCrystal", (0.75, 0.25, 1.0, 1.0), roughness=0.1)
+    bsdf = mat_crystal.node_tree.nodes.get("Principled BSDF")
+    if bsdf:
+        bsdf.inputs["Emission Color"].default_value = (0.8, 0.3, 1.0, 1.0)
+        bsdf.inputs["Emission Strength"].default_value = 2.5
+    mat_page = create_material("TomePage", (0.92, 0.88, 0.78, 1.0), roughness=0.9)
+
+    # Table Top
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0, 0.75))
+    top = bpy.context.active_object
+    top.scale = (1.4, 1.0, 0.12)
+    top.data.materials.append(mat_wood)
+
+    # 4 Legs
+    for x, y in [(-0.55, -0.38), (0.55, -0.38), (-0.55, 0.38), (0.55, 0.38)]:
+        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(x, y, 0.35))
+        leg = bpy.context.active_object
+        leg.scale = (0.12, 0.12, 0.7)
+        leg.data.materials.append(mat_wood)
+
+    # Cloth runner over table
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0, 0.82))
+    cloth = bpy.context.active_object
+    cloth.scale = (0.7, 1.02, 0.02)
+    cloth.data.materials.append(mat_cloth)
+
+    # Open Tome on left
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(-0.35, 0, 0.88), rotation=(0, 0, math.radians(10)))
+    book = bpy.context.active_object
+    book.scale = (0.42, 0.32, 0.05)
+    book.data.materials.append(mat_page)
+
+    # Floating Arcane Crystal on right
+    bpy.ops.mesh.primitive_cone_add(radius1=0.12, radius2=0.0, depth=0.35, location=(0.35, 0, 1.05), rotation=(math.radians(15), 0, 0))
+    crystal = bpy.context.active_object
+    crystal.name = "FloatingCrystal"
+    crystal.data.materials.append(mat_crystal)
+
+    export_glb("enchanter_table.glb")
+
+# -------------------------------------------------------------
+# 16. Bandit Warlord (Raid Boss)
+# -------------------------------------------------------------
+def build_bandit_warlord():
+    reset_scene()
+    mat_armor = create_material("WarlordPlate", (0.15, 0.15, 0.17, 1.0), metallic=0.9, roughness=0.3)
+    mat_gold = create_material("WarlordGold", (0.9, 0.75, 0.15, 1.0), metallic=0.95, roughness=0.2)
+    mat_cape = create_material("WarlordCape", (0.55, 0.08, 0.08, 1.0), roughness=0.8)
+    mat_axe = create_material("WarlordAxe", (0.25, 0.25, 0.28, 1.0), metallic=0.85, roughness=0.35)
+
+    # Heavy Armored Torso (scaled up)
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0, 1.2))
+    torso = bpy.context.active_object
+    torso.scale = (0.55, 0.32, 0.65)
+    torso.data.materials.append(mat_armor)
+
+    # Gold Trim Belt
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0, 0.9))
+    belt = bpy.context.active_object
+    belt.scale = (0.57, 0.34, 0.1)
+    belt.data.materials.append(mat_gold)
+
+    # Armored Head & Horned Helmet
+    bpy.ops.mesh.primitive_cube_add(size=0.36, location=(0, 0, 1.68))
+    head = bpy.context.active_object
+    head.data.materials.append(mat_armor)
+
+    # Left & Right Helmet Horns
+    bpy.ops.mesh.primitive_cone_add(radius1=0.06, radius2=0.0, depth=0.28, location=(-0.24, 0, 1.85), rotation=(0, math.radians(-35), 0))
+    lhorn = bpy.context.active_object
+    lhorn.data.materials.append(mat_gold)
+
+    bpy.ops.mesh.primitive_cone_add(radius1=0.06, radius2=0.0, depth=0.28, location=(0.24, 0, 1.85), rotation=(0, math.radians(35), 0))
+    rhorn = bpy.context.active_object
+    rhorn.data.materials.append(mat_gold)
+
+    # Crimson Battle Cape
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0.22, 1.05))
+    cape = bpy.context.active_object
+    cape.scale = (0.52, 0.06, 0.9)
+    cape.data.materials.append(mat_cape)
+
+    # Heavy Legs
+    for x in [-0.16, 0.16]:
+        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(x, 0, 0.45))
+        leg = bpy.context.active_object
+        leg.scale = (0.18, 0.22, 0.85)
+        leg.data.materials.append(mat_armor)
+
+    # Massive Battleaxe
+    bpy.ops.mesh.primitive_cylinder_add(radius=0.03, depth=1.6, vertices=8, location=(0.48, -0.1, 1.1), rotation=(math.radians(20), 0, 0))
+    axe_haft = bpy.context.active_object
+    axe_haft.data.materials.append(mat_armor)
+
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0.48, -0.15, 1.65), rotation=(math.radians(20), 0, 0))
+    axe_blade = bpy.context.active_object
+    axe_blade.scale = (0.04, 0.45, 0.35)
+    axe_blade.data.materials.append(mat_axe)
+
+    export_glb("bandit_warlord.glb")
+
+# -------------------------------------------------------------
+# 17. Enchanted Runestone Tablet
+# -------------------------------------------------------------
+def build_runestone():
+    reset_scene()
+    mat_slate = create_material("RuneSlate", (0.18, 0.18, 0.20, 1.0), roughness=0.6)
+    mat_rune = create_material("RuneGlow", (1.0, 0.82, 0.25, 1.0), roughness=0.2)
+    bsdf = mat_rune.node_tree.nodes.get("Principled BSDF")
+    if bsdf:
+        bsdf.inputs["Emission Color"].default_value = (1.0, 0.85, 0.3, 1.0)
+        bsdf.inputs["Emission Strength"].default_value = 3.0
+
+    # Polished Slate Tablet (0.35m x 0.45m x 0.06m)
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0, 0.03))
+    tablet = bpy.context.active_object
+    tablet.scale = (0.35, 0.45, 0.06)
+    tablet.data.materials.append(mat_slate)
+
+    # Glowing Rune Inscription on top
+    bpy.ops.mesh.primitive_cylinder_add(radius=0.12, depth=0.07, vertices=8, location=(0, 0, 0.035))
+    rune = bpy.context.active_object
+    rune.data.materials.append(mat_rune)
+
+    export_glb("runestone.glb")
+
 if __name__ == "__main__":
     print("[BLENDER SCRIPT] Starting procedural 3D medieval model generation...")
     build_pickaxe()
@@ -594,5 +727,9 @@ if __name__ == "__main__":
     build_bow()
     build_arrow()
     build_watchtower()
+    build_enchanter_table()
+    build_bandit_warlord()
+    build_runestone()
     print("[BLENDER SCRIPT] All models generated successfully!")
+
 
