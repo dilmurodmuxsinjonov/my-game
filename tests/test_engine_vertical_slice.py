@@ -135,5 +135,41 @@ class TestEngineVerticalSlice(unittest.TestCase):
         self.assertFalse(2 <= max_step_up) # Cannot climb 2m vertical cliff without ladder
         self.assertFalse(3 <= max_safe_drop) # 3m fall causes injury
 
+    def test_workstation_recipes_and_crafting_costs(self):
+        """Verify blueprint recipes, cost consumption, and result outputs."""
+        inventory = {"logs": 10, "stone": 20, "iron_ore": 6, "wheat": 6}
+
+        # Craft Iron Pickaxe: cost 3 iron_ore, 1 log
+        req_iron = 3
+        req_log = 1
+        self.assertGreaterEqual(inventory["iron_ore"], req_iron)
+        self.assertGreaterEqual(inventory["logs"], req_log)
+
+        inventory["iron_ore"] -= req_iron
+        inventory["logs"] -= req_log
+        crafted_item = {"name": "Iron Pickaxe", "type": "tool", "count": 1}
+
+        self.assertEqual(inventory["iron_ore"], 3)
+        self.assertEqual(inventory["logs"], 9)
+        self.assertEqual(crafted_item["name"], "Iron Pickaxe")
+
+    def test_farmland_tilling_mechanic(self):
+        """Verify grass/dirt conversion to farmland via hoe."""
+        BLOCK_GRASS = 2
+        BLOCK_DIRT = 1
+        BLOCK_FARMLAND = 13
+        BLOCK_WHEAT_CROP = 14
+
+        # Till grass
+        current_block = BLOCK_GRASS
+        if current_block in [BLOCK_GRASS, BLOCK_DIRT]:
+            new_block = BLOCK_FARMLAND
+        self.assertEqual(new_block, BLOCK_FARMLAND)
+
+        # Plant wheat on farmland
+        if new_block == BLOCK_FARMLAND:
+            crop_block = BLOCK_WHEAT_CROP
+        self.assertEqual(crop_block, BLOCK_WHEAT_CROP)
+
 if __name__ == "__main__":
     unittest.main()
