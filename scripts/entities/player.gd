@@ -13,6 +13,7 @@ signal hotbar_slot_changed(slot_index: int, item_data: Dictionary)
 signal block_action_performed(action: String, block_pos: Vector3i, block_type: int)
 signal interact_requested(target: Node3D)
 signal open_crafting_requested()
+signal war_horn_sounded()
 
 # Movement constants
 const WALK_SPEED: float = 5.0
@@ -142,7 +143,7 @@ func _physics_process(delta: float) -> void:
 func _check_hovered_interactive() -> void:
 	if raycast and raycast.is_colliding():
 		var col = raycast.get_collider()
-		if col is Workstation or col is TradeCaravan or col is EnchanterTable:
+		if col is Workstation or col is TradeCaravan or col is EnchanterTable or col is CookingPot:
 			if hovered_interactive != col:
 				if hovered_interactive and hovered_interactive.has_method("set_prompt_visible"):
 					hovered_interactive.set_prompt_visible(false)
@@ -335,18 +336,27 @@ func _handle_primary_action() -> void:
 func _handle_secondary_action() -> void:
 	var item = hotbar[active_slot]
 	
-	# 1. Food consumption
+	# 1. Food consumption (Hearty stews, rations, broth)
 	if item.get("type") == "food" and item.get("count", 0) > 0:
 		var nutrition = item.get("nutrition", 20.0)
+		var warmth_bonus = item.get("warmth_bonus", 0.0)
 		hunger = maxf(0.0, hunger - nutrition)
 		health = minf(max_health, health + 10.0)
+		if warmth_bonus > 0.0:
+			warmth = minf(max_warmth, warmth + warmth_bonus)
+			emit_signal("warmth_changed", warmth, max_warmth)
 		item["count"] -= 1
 		emit_signal("hunger_changed", hunger, max_hunger)
 		emit_signal("health_changed", health, max_health)
 		emit_signal("hotbar_slot_changed", active_slot, item)
 		return
 		
-	# 2. Inscribe Rune directly onto primary weapon (slot 0)
+	# 2. Sound Royal War Horn (Civilian Bunker Retreat / All-Clear)
+	if item.get("name") == "Royal War Horn" or item.get("tool_type") == "horn":
+		emit_signal("war_horn_sounded")
+		return
+		
+	# 3. Inscribe Rune directly onto primary weapon (slot 0)
 	if item.get("type") == "rune" and item.get("count", 0) > 0:
 		var target_item = hotbar[0]
 		if target_item.get("type") in ["tool", "weapon", "bow"] or target_item.get("tool_type") in ["sword", "axe", "pickaxe", "bow"]:
@@ -365,7 +375,7 @@ func _handle_secondary_action() -> void:
 	var hit_point = raycast.get_collision_point()
 	var hit_normal = raycast.get_collision_normal()
 	
-	# 3. Farmland hoe tilling
+	# 4. Farmland hoe tilling
 	if item.get("tool_type") == "hoe" and voxel_world:
 		var center = hit_point - hit_normal * 0.4
 		var target_pos = Vector3i(int(floor(center.x)), int(floor(center.y)), int(floor(center.z)))
@@ -375,7 +385,7 @@ func _handle_secondary_action() -> void:
 			emit_signal("block_action_performed", "till", target_pos, VoxelChunk.BlockType.FARMLAND)
 			return
 
-	# 4. Seed planting on Farmland
+	# 5. Seed planting on Farmland
 	if (item.get("type") == "seed" or item.get("name") == "Wheat Seeds") and item.get("count", 0) > 0 and voxel_world:
 		var center = hit_point - hit_normal * 0.4
 		var target_pos = Vector3i(int(floor(center.x)), int(floor(center.y)), int(floor(center.z)))
@@ -387,7 +397,7 @@ func _handle_secondary_action() -> void:
 			emit_signal("hotbar_slot_changed", active_slot, item)
 			return
 
-	# 5. Torch placement
+	# 6. Torch placement
 	if item.get("name") == "Torch" and item.get("count", 0) > 0:
 		var torch = Torch.new()
 		var torch_pos = hit_point + hit_normal * 0.1
@@ -398,7 +408,7 @@ func _handle_secondary_action() -> void:
 		emit_signal("hotbar_slot_changed", active_slot, item)
 		return
 
-	# 6. Block placement
+	# 7. Block placement
 	if voxel_world and item.get("type") == "block" and item.get("count", 0) > 0:
 		var btype = item.get("block_type", VoxelChunk.BlockType.STONE)
 		var result = voxel_world.place_block(hit_point, hit_normal, btype)
@@ -408,7 +418,7 @@ func _handle_secondary_action() -> void:
 			emit_signal("hotbar_slot_changed", active_slot, item)
 			return
 
-	# 7. Placeable workstation placement (Furnace, Campfire, Crate, Workbench, Watchtower, Enchanter Table)
+	# 8. Placeable workstation placement (Furnace, Campfire, Crate, Workbench, Watchtower, Enchanter Table, Windmill, Cooking Pot)
 	if item.get("type") == "placeable" and item.get("count", 0) > 0 and item.get("name") != "Torch":
 		var item_name = item.get("name", "")
 		if "Watchtower" in item_name:
@@ -425,6 +435,23 @@ func _handle_secondary_action() -> void:
 			get_tree().current_scene.add_child(et)
 			item["count"] -= 1
 			emit_signal("block_action_performed", "place_station", Vector3i(int(et.position.x), int(et.position.y), int(et.position.z)), 0)
+			emit_signal("hotbar_slot_changed", active_slot, item)
+			return
+		elif "Windmill" in item_name:
+			var wm = Windmill.new()
+			wm.supply_chain = supply_chain
+			wm.position = hit_point + hit_normal * 0.1
+			get_tree().current_scene.add_child(wm)
+			item["count"] -= 1
+			emit_signal("block_action_performed", "place_station", Vector3i(int(wm.position.x), int(wm.position.y), int(wm.position.z)), 0)
+			emit_signal("hotbar_slot_changed", active_slot, item)
+			return
+		elif "Cooking Pot" in item_name:
+			var cp = CookingPot.new()
+			cp.position = hit_point + hit_normal * 0.1
+			get_tree().current_scene.add_child(cp)
+			item["count"] -= 1
+			emit_signal("block_action_performed", "place_station", Vector3i(int(cp.position.x), int(cp.position.y), int(cp.position.z)), 0)
 			emit_signal("hotbar_slot_changed", active_slot, item)
 			return
 

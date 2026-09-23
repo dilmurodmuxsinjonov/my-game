@@ -24,6 +24,7 @@ var caravan_interval: float = 160.0
 var day_timer: float = 0.0
 var day_duration: float = 120.0 # 2 minutes per full day cycle
 var sun_light: DirectionalLight3D
+var is_royal_alarm_active: bool = false
 
 func _ready() -> void:
 	supply_chain = SupplyChain.new()
@@ -57,6 +58,7 @@ func _ready() -> void:
 		player.open_crafting_requested.connect(_on_open_crafting)
 		player.interact_requested.connect(_on_interact_requested)
 		player.block_action_performed.connect(_on_player_block_action)
+		player.war_horn_sounded.connect(_on_war_horn_sounded)
 		
 		# Position player on top of surface terrain at spawn
 		var spawn_x = 32
@@ -125,6 +127,19 @@ func _spawn_initial_workstations() -> void:
 	var et_y = voxel_world.get_surface_height(34, 30)
 	et.position = Vector3(34.5, et_y + 0.1, 30.5)
 	add_child(et)
+
+	# 7. Farmer's Delight Hearth Cooking Pot
+	var cp = CookingPot.new()
+	var cp_y = voxel_world.get_surface_height(32, 34)
+	cp.position = Vector3(32.5, cp_y + 0.1, 34.5)
+	add_child(cp)
+
+	# 8. Create-Style Kinetic Windmill & Milling Tower
+	var wm = Windmill.new()
+	wm.supply_chain = supply_chain
+	var wm_y = voxel_world.get_surface_height(38, 38)
+	wm.position = Vector3(38.5, wm_y + 0.1, 38.5)
+	add_child(wm)
 
 func _spawn_initial_citizens() -> void:
 	var roles_to_spawn = [
@@ -204,8 +219,20 @@ func _on_open_crafting() -> void:
 		crafting_menu.open_menu(null)
 
 func _on_interact_requested(target: Node3D) -> void:
-	if (target is Workstation or target is TradeCaravan or target is EnchanterTable) and crafting_menu:
+	if (target is Workstation or target is TradeCaravan or target is EnchanterTable or target is CookingPot) and crafting_menu:
 		crafting_menu.open_menu(target)
+
+func _on_war_horn_sounded() -> void:
+	is_royal_alarm_active = not is_royal_alarm_active
+	var hearth_pos = Vector3(32, voxel_world.get_surface_height(32, 32), 32) if voxel_world else Vector3(32, 16, 32)
+	for c in citizens:
+		c.on_royal_alarm(is_royal_alarm_active, hearth_pos)
+		
+	if hud:
+		if is_royal_alarm_active:
+			hud.show_notification("📯 THE ROYAL WAR HORN SOUNDS! All Civilians Retreat to the Keep!")
+		else:
+			hud.show_notification("📯 ALL CLEAR! Citizens resume daily feudal duties.")
 
 func _on_item_crafted(recipe_name: String, _item: Dictionary) -> void:
 	if hud:

@@ -263,6 +263,20 @@ func _transition_to(new_state: State) -> void:
 		state_timer = 0.0
 		emit_signal("state_changed", self, old, new_state)
 
+func on_royal_alarm(active: bool, bunker_pos: Vector3 = Vector3(32, 0, 32)) -> void:
+	if current_role == Role.GUARD:
+		if active:
+			_transition_to(State.DEFENDING)
+	else:
+		if active:
+			_navigate_to(bunker_pos, State.FLEEING)
+			if nameplate:
+				nameplate.text = "%s\n[RETREATING TO KEEP]" % citizen_name
+		else:
+			_transition_to(State.IDLE)
+			if nameplate:
+				nameplate.text = "%s\n[%s]" % [citizen_name, _get_role_name(current_role)]
+
 func take_damage(amount: float) -> void:
 	health = maxf(0.0, health - amount)
 	if nameplate:
