@@ -1,10 +1,11 @@
-[gd_scene load_steps=7 format=3 uid="uid://c6v2x8y3k8lm0"]
+[gd_scene load_steps=8 format=3 uid="uid://c6v2x8y3k8lm0"]
 
 [ext_resource type="Script" path="res://scripts/core/game_manager.gd" id="1_gm"]
 [ext_resource type="Script" path="res://scripts/core/voxel_world.gd" id="2_vw"]
 [ext_resource type="Script" path="res://scripts/entities/player.gd" id="3_pl"]
 [ext_resource type="Script" path="res://scripts/ui/hud.gd" id="4_hud"]
 [ext_resource type="Script" path="res://scripts/ui/royal_ledger.gd" id="5_rl"]
+[ext_resource type="Script" path="res://scripts/ui/crafting_menu.gd" id="6_cm"]
 
 [sub_resource type="Environment" id="Environment_sky"]
 background_mode = 1
@@ -49,3 +50,13 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("5_rl")
+
+[node name="CraftingMenu" type="Control" parent="UI"]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("6_cm")

@@ -10,6 +10,8 @@ signal stamina_changed(new_stamina: float, max_stamina: float)
 signal hunger_changed(new_hunger: float, max_hunger: float)
 signal hotbar_slot_changed(slot_index: int, item_data: Dictionary)
 signal block_action_performed(action: String, block_pos: Vector3i, block_type: int)
+signal interact_requested(target: Node3D)
+signal open_crafting_requested()
 
 # Movement constants
 const WALK_SPEED: float = 5.0
@@ -37,6 +39,7 @@ var hunger: float = 0.0 # 0 = satisfied, 100 = starving
 # External references
 var voxel_world: VoxelWorld
 var supply_chain: SupplyChain
+var hovered_workstation: Workstation = null
 
 # Hotbar Inventory (8 slots)
 var active_slot: int = 0
@@ -112,6 +115,11 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif event is InputEventKey and event.pressed:
 		if event.keycode >= KEY_1 and event.keycode <= KEY_8:
 			_select_slot(event.keycode - KEY_1)
+		elif event.keycode == KEY_E and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
+			if hovered_workstation:
+				emit_signal("interact_requested", hovered_workstation)
+			else:
+				emit_signal("open_crafting_requested")
 		elif event.keycode == KEY_ESCAPE:
 			if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
 				Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
@@ -125,6 +133,21 @@ func _select_slot(index: int) -> void:
 func _physics_process(delta: float) -> void:
 	_update_vitals(delta)
 	_handle_movement(delta)
+	_check_hovered_interactive()
+
+func _check_hovered_interactive() -> void:
+	if raycast and raycast.is_colliding():
+		var col = raycast.get_collider()
+		if col is Workstation:
+			if hovered_workstation != col:
+				if hovered_workstation:
+					hovered_workstation.set_prompt_visible(false)
+				hovered_workstation = col
+				hovered_workstation.set_prompt_visible(true)
+			return
+	if hovered_workstation:
+		hovered_workstation.set_prompt_visible(false)
+		hovered_workstation = null
 
 func _handle_movement(delta: float) -> void:
 	# Gravity
@@ -230,7 +253,6 @@ func _handle_secondary_action() -> void:
 		emit_signal("hotbar_slot_changed", active_slot, item)
 		return
 		
-	# 2. Block placement
 	if not raycast or not raycast.is_colliding():
 		return
 		
@@ -238,7 +260,17 @@ func _handle_secondary_action() -> void:
 	var hit_point = raycast.get_collision_point()
 	var hit_normal = raycast.get_collision_normal()
 	
-	if voxel_world and item.get("type") == "block" and item.get("count", 0) > 0:
+	# 2. Farmland hoe tilling
+	if item.get("tool_type") == "hoe" and voxel_world:
+		var center = hit_point - hit_normal * 0.4
+		var target_pos = Vector3i(int(floor(center.x)), int(floor(center.y)), int(floor(center.z)))
+		var cur_type = voxel_world.get_block_world(target_pos)
+		if cur_type == VoxelChunk.BlockType.GRASS or cur_type == VoxelChunk.BlockType.DIRT:
+			voxel_world.set_block_world(target_pos, VoxelChunk.BlockType.FARMLAND, true)
+			emit_signal("block_action_performed", "till", target_pos, VoxelChunk.BlockType.FARMLAND)
+			return
+
+	# 3. Block placement
 		var btype = item.get("block_type", VoxelChunk.BlockType.STONE)
 		var result = voxel_world.place_block(hit_point, hit_normal, btype)
 		if result["success"]:
