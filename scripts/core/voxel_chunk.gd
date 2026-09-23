@@ -1,11 +1,13 @@
 class_name VoxelChunk
 extends StaticBody3D
 
-## Handles 3D voxel block storage and optimized mesh generation with face culling.
+## High-performance voxel chunk handling 16x32x16 voxel blocks with 6-face culling,
+## vertex color lighting, and dynamic trimesh collision generation.
 
 const CHUNK_SIZE_X: int = 16
 const CHUNK_SIZE_Y: int = 32
 const CHUNK_SIZE_Z: int = 16
+const TOTAL_BLOCKS: int = CHUNK_SIZE_X * CHUNK_SIZE_Y * CHUNK_SIZE_Z
 
 enum BlockType {
 	AIR = 0,
@@ -14,36 +16,90 @@ enum BlockType {
 	STONE = 3,
 	WOOD = 4,
 	LEAVES = 5,
-	IRON_ORE = 6
+	IRON_ORE = 6,
+	COAL_ORE = 7,
+	GOLD_ORE = 8,
+	COBBLESTONE = 9,
+	PLANKS = 10,
+	WATER = 11,
+	GLASS = 12,
+	FARMLAND = 13,
+	WHEAT_CROP = 14
 }
 
-var blocks: Array = []
+# Block properties
+const BLOCK_HARDNESS: Dictionary = {
+	BlockType.AIR: 0.0,
+	BlockType.DIRT: 0.5,
+	BlockType.GRASS: 0.6,
+	BlockType.STONE: 1.5,
+	BlockType.WOOD: 1.0,
+	BlockType.LEAVES: 0.2,
+	BlockType.IRON_ORE: 2.5,
+	BlockType.COAL_ORE: 1.8,
+	BlockType.GOLD_ORE: 2.8,
+	BlockType.COBBLESTONE: 1.4,
+	BlockType.PLANKS: 0.8,
+	BlockType.WATER: 0.0,
+	BlockType.GLASS: 0.3,
+	BlockType.FARMLAND: 0.5,
+	BlockType.WHEAT_CROP: 0.1
+}
+
+# Chunk grid coordinate (e.g. (0,0), (1,0))
+var chunk_pos: Vector2i = Vector2i.ZERO
+
+# 3D block array flattened for performance
+var blocks: PackedByteArray = PackedByteArray()
+var is_dirty: bool = true
+
 var mesh_instance: MeshInstance3D
 var collision_shape: CollisionShape3D
+var static_material: StandardMaterial3D
 
-func _init() -> void:
-	# Initialize 3D array flattened
-	blocks.resize(CHUNK_SIZE_X * CHUNK_SIZE_Y * CHUNK_SIZE_Z)
+func _init(p_chunk_pos: Vector2i = Vector2i.ZERO) -> void:
+	chunk_pos = p_chunk_pos
+	blocks.resize(TOTAL_BLOCKS)
 	blocks.fill(BlockType.AIR)
+	position = Vector3(chunk_pos.x * CHUNK_SIZE_X, 0, chunk_pos.y * CHUNK_SIZE_Z)
 
 func _ready() -> void:
 	mesh_instance = MeshInstance3D.new()
 	collision_shape = CollisionShape3D.new()
 	add_child(mesh_instance)
 	add_child(collision_shape)
+	
+	# Create shared voxel vertex color material
+	static_material = StandardMaterial3D.new()
+	static_material.vertex_color_use_as_albedo = true
+	static_material.roughness = 0.85
+	static_material.metallic_specular = 0.15
+	mesh_instance.material_override = static_material
+
+func _get_index(x: int, y: int, z: int) -> int:
+	return x + (y * CHUNK_SIZE_X) + (z * CHUNK_SIZE_X * CHUNK_SIZE_Y)
 
 func get_block(x: int, y: int, z: int) -> int:
 	if x < 0 or x >= CHUNK_SIZE_X or y < 0 or y >= CHUNK_SIZE_Y or z < 0 or z >= CHUNK_SIZE_Z:
 		return BlockType.AIR
-	return blocks[x + y * CHUNK_SIZE_X + z * CHUNK_SIZE_X * CHUNK_SIZE_Y]
+	return blocks[_get_index(x, y, z)]
 
 func set_block(x: int, y: int, z: int, type: int) -> void:
 	if x >= 0 and x < CHUNK_SIZE_X and y >= 0 and y < CHUNK_SIZE_Y and z >= 0 and z < CHUNK_SIZE_Z:
-		blocks[x + y * CHUNK_SIZE_X + z * CHUNK_SIZE_X * CHUNK_SIZE_Y] = type
+		blocks[_get_index(x, y, z)] = type
+		is_dirty = true
+
+func is_solid(type: int) -> bool:
+	return type != BlockType.AIR and type != BlockType.WATER and type != BlockType.WHEAT_CROP
+
+func is_transparent(type: int) -> bool:
+	return type == BlockType.AIR or type == BlockType.WATER or type == BlockType.LEAVES or type == BlockType.GLASS or type == BlockType.WHEAT_CROP
 
 func build_mesh() -> void:
 	var surface_tool = SurfaceTool.new()
 	surface_tool.begin(Mesh.PRIMITIVE_TRIANGLES)
+	
+	var has_geometry: bool = false
 	
 	for x in range(CHUNK_SIZE_X):
 		for y in range(CHUNK_SIZE_Y):
@@ -51,52 +107,90 @@ func build_mesh() -> void:
 				var block = get_block(x, y, z)
 				if block == BlockType.AIR:
 					continue
-				_add_culled_cube(surface_tool, x, y, z, block)
+				
+				var pos = Vector3(x, y, z)
+				var color = _get_block_color(block)
+				
+				# Top (+Y)
+				if is_transparent(get_block(x, y + 1, z)):
+					_add_face(surface_tool, pos, Vector3.UP, color, [Vector3(0,1,0), Vector3(1,1,0), Vector3(1,1,1), Vector3(0,1,1)], 1.0)
+					has_geometry = true
+				
+				# Bottom (-Y)
+				if y > 0 and is_transparent(get_block(x, y - 1, z)):
+					_add_face(surface_tool, pos, Vector3.DOWN, color, [Vector3(0,0,1), Vector3(1,0,1), Vector3(1,0,0), Vector3(0,0,0)], 0.5)
+					has_geometry = true
+				
+				# South (+Z)
+				if is_transparent(get_block(x, y, z + 1)):
+					_add_face(surface_tool, pos, Vector3.BACK, color, [Vector3(0,0,1), Vector3(1,0,1), Vector3(1,1,1), Vector3(0,1,1)], 0.85)
+					has_geometry = true
+				
+				# North (-Z)
+				if is_transparent(get_block(x, y, z - 1)):
+					_add_face(surface_tool, pos, Vector3.FORWARD, color, [Vector3(1,0,0), Vector3(0,0,0), Vector3(0,1,0), Vector3(1,1,0)], 0.85)
+					has_geometry = true
+				
+				# East (+X)
+				if is_transparent(get_block(x + 1, y, z)):
+					_add_face(surface_tool, pos, Vector3.RIGHT, color, [Vector3(1,0,1), Vector3(1,0,0), Vector3(1,1,0), Vector3(1,1,1)], 0.75)
+					has_geometry = true
+				
+				# West (-X)
+				if is_transparent(get_block(x - 1, y, z)):
+					_add_face(surface_tool, pos, Vector3.LEFT, color, [Vector3(0,0,0), Vector3(0,0,1), Vector3(0,1,1), Vector3(0,1,0)], 0.75)
+					has_geometry = true
 
-	surface_tool.generate_normals()
-	var mesh = surface_tool.commit()
-	mesh_instance.mesh = mesh
-	
-	# Generate collision
-	if mesh:
-		collision_shape.shape = mesh.create_trimesh_shape()
+	if has_geometry:
+		surface_tool.generate_normals()
+		var mesh = surface_tool.commit()
+		if mesh_instance:
+			mesh_instance.mesh = mesh
+		if collision_shape and mesh:
+			collision_shape.shape = mesh.create_trimesh_shape()
+	else:
+		if mesh_instance:
+			mesh_instance.mesh = null
+		if collision_shape:
+			collision_shape.shape = null
+			
+	is_dirty = false
 
-func _add_culled_cube(st: SurfaceTool, x: int, y: int, z: int, block_type: int) -> void:
-	var pos = Vector3(x, y, z)
+func _add_face(st: SurfaceTool, offset: Vector3, normal: Vector3, base_color: Color, v: Array, shade: float) -> void:
+	var shaded_color = base_color * shade
+	shaded_color.a = 1.0
+	st.set_color(shaded_color)
+	st.set_normal(normal)
 	
-	# Check 6 adjacent neighbors (Face culling optimization)
-	if get_block(x, y + 1, z) == BlockType.AIR: # Top
-		_create_face(st, pos, [Vector3(0,1,0), Vector3(1,1,0), Vector3(1,1,1), Vector3(0,1,1)], block_type)
-	if get_block(x, y - 1, z) == BlockType.AIR: # Bottom
-		_create_face(st, pos, [Vector3(0,0,1), Vector3(1,0,1), Vector3(1,0,0), Vector3(0,0,0)], block_type)
-	if get_block(x, y, z + 1) == BlockType.AIR: # South
-		_create_face(st, pos, [Vector3(0,0,1), Vector3(1,0,1), Vector3(1,1,1), Vector3(0,1,1)], block_type)
-	if get_block(x, y, z - 1) == BlockType.AIR: # North
-		_create_face(st, pos, [Vector3(1,0,0), Vector3(0,0,0), Vector3(0,1,0), Vector3(1,1,0)], block_type)
-	if get_block(x + 1, y, z) == BlockType.AIR: # East
-		_create_face(st, pos, [Vector3(1,0,1), Vector3(1,0,0), Vector3(1,1,0), Vector3(1,1,1)], block_type)
-	if get_block(x - 1, y, z) == BlockType.AIR: # West
-		_create_face(st, pos, [Vector3(0,0,0), Vector3(0,0,1), Vector3(0,1,1), Vector3(0,1,0)], block_type)
-
-func _create_face(st: SurfaceTool, offset: Vector3, v: Array, block_type: int) -> void:
-	var color = _get_block_color(block_type)
-	st.set_color(color)
-	
-	# Triangle 1
+	# Quad as two triangles (0, 1, 2) and (0, 2, 3)
+	st.set_uv(Vector2(0, 0))
 	st.add_vertex(offset + v[0])
+	st.set_uv(Vector2(1, 0))
 	st.add_vertex(offset + v[1])
+	st.set_uv(Vector2(1, 1))
 	st.add_vertex(offset + v[2])
-	# Triangle 2
+	
+	st.set_uv(Vector2(0, 0))
 	st.add_vertex(offset + v[0])
+	st.set_uv(Vector2(1, 1))
 	st.add_vertex(offset + v[2])
+	st.set_uv(Vector2(0, 1))
 	st.add_vertex(offset + v[3])
 
 func _get_block_color(type: int) -> Color:
 	match type:
-		BlockType.GRASS: return Color(0.25, 0.65, 0.20)
-		BlockType.DIRT: return Color(0.45, 0.28, 0.15)
-		BlockType.STONE: return Color(0.55, 0.55, 0.55)
-		BlockType.WOOD: return Color(0.40, 0.25, 0.10)
-		BlockType.LEAVES: return Color(0.18, 0.50, 0.15)
-		BlockType.IRON_ORE: return Color(0.70, 0.60, 0.50)
-		_: return Color.WHITE
+		BlockType.GRASS: return Color(0.28, 0.65, 0.22)
+		BlockType.DIRT: return Color(0.48, 0.32, 0.18)
+		BlockType.STONE: return Color(0.52, 0.52, 0.54)
+		BlockType.COBBLESTONE: return Color(0.42, 0.42, 0.44)
+		BlockType.WOOD: return Color(0.40, 0.25, 0.12)
+		BlockType.PLANKS: return Color(0.68, 0.52, 0.30)
+		BlockType.LEAVES: return Color(0.18, 0.52, 0.15, 0.9)
+		BlockType.IRON_ORE: return Color(0.72, 0.58, 0.48)
+		BlockType.COAL_ORE: return Color(0.22, 0.22, 0.24)
+		BlockType.GOLD_ORE: return Color(0.85, 0.75, 0.25)
+		BlockType.WATER: return Color(0.15, 0.40, 0.80, 0.6)
+		BlockType.GLASS: return Color(0.85, 0.92, 0.95, 0.4)
+		BlockType.FARMLAND: return Color(0.35, 0.22, 0.12)
+		BlockType.WHEAT_CROP: return Color(0.82, 0.75, 0.22)
+		_: return Color(0.9, 0.9, 0.9)
