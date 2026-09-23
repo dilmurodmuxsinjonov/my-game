@@ -8,6 +8,7 @@ extends CharacterBody3D
 signal health_changed(new_health: float, max_health: float)
 signal stamina_changed(new_stamina: float, max_stamina: float)
 signal hunger_changed(new_hunger: float, max_hunger: float)
+signal warmth_changed(new_warmth: float, max_warmth: float)
 signal hotbar_slot_changed(slot_index: int, item_data: Dictionary)
 signal block_action_performed(action: String, block_pos: Vector3i, block_type: int)
 signal interact_requested(target: Node3D)
@@ -28,6 +29,9 @@ var max_stamina: float = 100.0
 var stamina: float = 100.0
 var max_hunger: float = 100.0
 var hunger: float = 0.0 # 0 = satisfied, 100 = starving
+var max_warmth: float = 100.0
+var warmth: float = 100.0
+var ambient_temperature: float = 16.0
 
 # Nodes
 @onready var head: Node3D = Node3D.new()
@@ -39,7 +43,7 @@ var hunger: float = 0.0 # 0 = satisfied, 100 = starving
 # External references
 var voxel_world: VoxelWorld
 var supply_chain: SupplyChain
-var hovered_workstation: Workstation = null
+var hovered_interactive: Node3D = null
 
 # Hotbar Inventory (8 slots)
 var active_slot: int = 0
@@ -116,8 +120,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		if event.keycode >= KEY_1 and event.keycode <= KEY_8:
 			_select_slot(event.keycode - KEY_1)
 		elif event.keycode == KEY_E and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
-			if hovered_workstation:
-				emit_signal("interact_requested", hovered_workstation)
+			if hovered_interactive:
+				emit_signal("interact_requested", hovered_interactive)
 			else:
 				emit_signal("open_crafting_requested")
 		elif event.keycode == KEY_ESCAPE:
@@ -138,16 +142,18 @@ func _physics_process(delta: float) -> void:
 func _check_hovered_interactive() -> void:
 	if raycast and raycast.is_colliding():
 		var col = raycast.get_collider()
-		if col is Workstation:
-			if hovered_workstation != col:
-				if hovered_workstation:
-					hovered_workstation.set_prompt_visible(false)
-				hovered_workstation = col
-				hovered_workstation.set_prompt_visible(true)
+		if col is Workstation or col is TradeCaravan:
+			if hovered_interactive != col:
+				if hovered_interactive and hovered_interactive.has_method("set_prompt_visible"):
+					hovered_interactive.set_prompt_visible(false)
+				hovered_interactive = col
+				if hovered_interactive and hovered_interactive.has_method("set_prompt_visible"):
+					hovered_interactive.set_prompt_visible(true)
 			return
-	if hovered_workstation:
-		hovered_workstation.set_prompt_visible(false)
-		hovered_workstation = null
+	if hovered_interactive:
+		if hovered_interactive.has_method("set_prompt_visible"):
+			hovered_interactive.set_prompt_visible(false)
+		hovered_interactive = null
 
 func _handle_movement(delta: float) -> void:
 	# Gravity
@@ -205,6 +211,46 @@ func _update_vitals(delta: float) -> void:
 		# Passive health regeneration when well fed
 		health = minf(max_health, health + delta * 1.5)
 		emit_signal("health_changed", health, max_health)
+		
+	# Thermal warmth loop
+	_update_thermal_balance(delta)
+
+func _update_thermal_balance(delta: float) -> void:
+	var is_sheltered = false
+	if voxel_world:
+		var head_pos = Vector3i(int(floor(global_position.x)), int(floor(global_position.y + 1.8)), int(floor(global_position.z)))
+		for dy in range(1, 9):
+			var check_block = voxel_world.get_block_world(head_pos + Vector3i(0, dy, 0))
+			if check_block != VoxelChunk.BlockType.AIR and check_block != VoxelChunk.BlockType.WATER:
+				is_sheltered = true
+				break
+				
+	var is_near_heat = false
+	var scene = get_tree().current_scene
+	if scene:
+		for child in scene.get_children():
+			if child is Torch:
+				if global_position.distance_to(child.global_position) < 4.0:
+					is_near_heat = true
+					break
+			elif child is Workstation:
+				if child.station_type == Workstation.StationType.CAMPFIRE or child.station_type == Workstation.StationType.FURNACE:
+					if global_position.distance_to(child.global_position) < 7.0:
+						is_near_heat = true
+						break
+
+	if is_near_heat or ambient_temperature >= 15.0:
+		warmth = minf(max_warmth, warmth + delta * 6.0)
+	elif ambient_temperature < 5.0 and not is_sheltered:
+		var cold_severity = maxf(1.0, (5.0 - ambient_temperature) * 0.4)
+		warmth = maxf(0.0, warmth - delta * cold_severity)
+	elif ambient_temperature < 0.0 and is_sheltered:
+		warmth = maxf(0.0, warmth - delta * 0.5)
+
+	emit_signal("warmth_changed", warmth, max_warmth)
+	
+	if warmth <= 0.0:
+		take_damage(delta * 2.5)
 
 func take_damage(amount: float) -> void:
 	health = maxf(0.0, health - amount)
@@ -219,9 +265,11 @@ func _respawn_monarch() -> void:
 	health = 50.0
 	hunger = 40.0
 	stamina = 100.0
+	warmth = 100.0
 	emit_signal("health_changed", health, max_health)
 	emit_signal("hunger_changed", hunger, max_hunger)
 	emit_signal("stamina_changed", stamina, max_stamina)
+	emit_signal("warmth_changed", warmth, max_warmth)
 
 func _handle_primary_action() -> void:
 	if not raycast or not raycast.is_colliding():

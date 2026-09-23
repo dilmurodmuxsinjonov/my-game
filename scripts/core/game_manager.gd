@@ -15,6 +15,10 @@ var citizens: Array[Citizen] = []
 var workstations: Array[Workstation] = []
 var agriculture_manager: AgricultureManager
 var threat_manager: ThreatManager
+var season_manager: SeasonManager
+var active_caravans: Array[TradeCaravan] = []
+var caravan_timer: float = 0.0
+var caravan_interval: float = 160.0
 
 # Game day/night simulation
 var day_timer: float = 0.0
@@ -25,7 +29,7 @@ func _ready() -> void:
 	supply_chain = SupplyChain.new()
 	sun_light = $DirectionalLight3D
 	
-	# Initialize Agriculture & Threat Systems
+	# Initialize Agriculture, Threat & Season Systems
 	agriculture_manager = AgricultureManager.new(voxel_world, supply_chain)
 	agriculture_manager.name = "AgricultureManager"
 	add_child(agriculture_manager)
@@ -38,6 +42,12 @@ func _ready() -> void:
 	threat_manager.raid_spawned.connect(_on_raid_spawned)
 	threat_manager.raid_defeated.connect(_on_raid_defeated)
 	threat_manager.bandit_slain.connect(_on_bandit_slain)
+	
+	season_manager = SeasonManager.new(agriculture_manager)
+	season_manager.name = "SeasonManager"
+	add_child(season_manager)
+	season_manager.season_changed.connect(_on_season_changed)
+	season_manager.weather_changed.connect(_on_weather_changed)
 	
 	# Wire up player
 	if player:
@@ -68,9 +78,10 @@ func _ready() -> void:
 		crafting_menu.supply_chain = supply_chain
 		crafting_menu.item_crafted.connect(_on_item_crafted)
 		
-	# Spawn initial workstations and citizens
+	# Spawn initial workstations, citizens, and trade caravan
 	_spawn_initial_workstations()
 	_spawn_initial_citizens()
+	spawn_trade_caravan()
 	
 	print("[GAME MANAGER] Voxel Lord realm successfully initialized!")
 
@@ -146,6 +157,20 @@ func _process(delta: float) -> void:
 		var sun_height = sin(angle_rad)
 		sun_light.light_energy = maxf(0.1, sun_height * 1.2)
 
+	# Thermal climate & seasonal updates
+	if season_manager:
+		var current_temp = season_manager.calculate_current_temperature(progress)
+		if player:
+			player.ambient_temperature = current_temp
+		if hud:
+			hud.update_season_display(season_manager.get_season_name(), current_temp, season_manager.get_weather_name())
+			
+	# Caravan periodic arrival
+	caravan_timer += delta
+	if caravan_timer >= caravan_interval:
+		caravan_timer = 0.0
+		spawn_trade_caravan()
+
 func _on_role_reassigned(role_name: String, _delta: int) -> void:
 	var role_enum = Citizen.Role.UNASSIGNED
 	match role_name:
@@ -165,7 +190,7 @@ func _on_open_crafting() -> void:
 		crafting_menu.open_menu(null)
 
 func _on_interact_requested(target: Node3D) -> void:
-	if target is Workstation and crafting_menu:
+	if (target is Workstation or target is TradeCaravan) and crafting_menu:
 		crafting_menu.open_menu(target)
 
 func _on_item_crafted(recipe_name: String, _item: Dictionary) -> void:
@@ -207,3 +232,37 @@ func _on_raid_defeated() -> void:
 func _on_bandit_slain(_loot: Dictionary) -> void:
 	if hud:
 		hud.show_notification("☠️ Bandit Slain! Spoils gathered.")
+
+func spawn_trade_caravan() -> void:
+	if active_caravans.size() > 0:
+		return
+		
+	var caravan = TradeCaravan.new()
+	var spawn_x = 36
+	var spawn_z = 28
+	var surface_y = voxel_world.get_surface_height(spawn_x, spawn_z) if voxel_world else 16
+	caravan.position = Vector3(spawn_x + 0.5, surface_y + 1.0, spawn_z + 0.5)
+	caravan.traded.connect(_on_caravan_traded)
+	caravan.departed.connect(_on_caravan_departed.bind(caravan))
+	add_child(caravan)
+	active_caravans.append(caravan)
+	if hud:
+		hud.show_notification("🐪 An Exotic Trade Caravan has arrived in the realm!")
+
+func _on_caravan_traded(item_bought: String, cost: int) -> void:
+	if hud:
+		hud.show_notification("💰 Traded %s for %d coins with the caravan!" % [item_bought.capitalize(), cost])
+
+func _on_caravan_departed(caravan: TradeCaravan) -> void:
+	active_caravans.erase(caravan)
+	if hud:
+		hud.show_notification("🐪 Trade Caravan has departed for distant lands.")
+
+func _on_season_changed(_old_season: SeasonManager.Season, new_season: SeasonManager.Season) -> void:
+	if hud and season_manager:
+		hud.show_notification("🍂 Season changed to %s!" % season_manager.get_season_name(new_season))
+
+func _on_weather_changed(new_weather: SeasonManager.Weather) -> void:
+	if hud and season_manager:
+		hud.show_notification("🌧️ Weather: %s" % season_manager.get_weather_name(new_weather))
+

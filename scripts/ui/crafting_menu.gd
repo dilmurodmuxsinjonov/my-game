@@ -9,6 +9,7 @@ signal item_crafted(recipe_name: String, result_item: Dictionary)
 var player: Player
 var supply_chain: SupplyChain
 var active_workstation: Workstation = null
+var active_caravan: TradeCaravan = null
 
 var is_open: bool = false
 
@@ -198,17 +199,25 @@ func _build_ui() -> void:
 	hint.modulate = Color(0.6, 0.6, 0.6)
 	main_vbox.add_child(hint)
 
-func open_menu(station: Workstation = null) -> void:
-	active_workstation = station
+func open_menu(target: Node = null) -> void:
 	is_open = true
 	visible = true
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-	_populate_recipes()
+	
+	if target is TradeCaravan:
+		active_caravan = target
+		active_workstation = null
+		_populate_caravan_trade()
+	else:
+		active_caravan = null
+		active_workstation = target as Workstation
+		_populate_recipes()
 
 func close_menu() -> void:
 	is_open = false
 	visible = false
 	active_workstation = null
+	active_caravan = null
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -340,3 +349,85 @@ func _add_to_player_hotbar(item: Dictionary) -> void:
 	# Place in active slot or first empty
 	player.hotbar[player.active_slot] = item
 	player.emit_signal("hotbar_slot_changed", player.active_slot, item)
+
+func _populate_caravan_trade() -> void:
+	for child in recipe_list_vbox.get_children():
+		child.queue_free()
+		
+	if not active_caravan or not supply_chain:
+		return
+		
+	header_title.text = "🐪 FEUDAL TRADE CARAVAN"
+	var coins = supply_chain.inventory.get("coins", 0)
+	status_label.text = "Royal Treasury: %d Gold Coins" % coins
+	
+	# Section 1: Buy Exotic Goods
+	var sec1 = Label.new()
+	sec1.text = "--- EXOTIC WARES TO BUY ---"
+	sec1.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	sec1.modulate = Color(1.0, 0.85, 0.4)
+	recipe_list_vbox.add_child(sec1)
+	
+	for item_key in active_caravan.wares.keys():
+		var ware = active_caravan.wares[item_key]
+		var row = HBoxContainer.new()
+		row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		
+		var name_lbl = Label.new()
+		name_lbl.text = "%s %s (Stock: %d)" % [ware.get("icon", "📦"), item_key.capitalize(), ware["stock"]]
+		name_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		row.add_child(name_lbl)
+		
+		var price_lbl = Label.new()
+		price_lbl.text = "%d Coins" % ware["price"]
+		price_lbl.modulate = Color(1.0, 0.85, 0.3)
+		row.add_child(price_lbl)
+		
+		var buy_btn = Button.new()
+		buy_btn.text = " Buy 1 "
+		buy_btn.disabled = ware["stock"] <= 0 or coins < ware["price"]
+		buy_btn.pressed.connect(_on_caravan_buy.bind(item_key))
+		row.add_child(buy_btn)
+		
+		recipe_list_vbox.add_child(row)
+		
+	# Section 2: Sell Realm Surplus
+	var sec2 = Label.new()
+	sec2.text = "--- SELL REALM COMMODITIES (Earn Coins) ---"
+	sec2.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	sec2.modulate = Color(0.6, 0.85, 1.0)
+	recipe_list_vbox.add_child(sec2)
+	
+	for item_key in active_caravan.purchase_rates.keys():
+		var rate = active_caravan.purchase_rates[item_key]
+		var available = supply_chain.inventory.get(item_key, 0)
+		var row = HBoxContainer.new()
+		row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		
+		var name_lbl = Label.new()
+		name_lbl.text = "• %s (Stored: %d)" % [item_key.capitalize(), available]
+		name_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		row.add_child(name_lbl)
+		
+		var rate_lbl = Label.new()
+		rate_lbl.text = "+%d Coins each" % rate
+		rate_lbl.modulate = Color(0.4, 0.9, 0.4)
+		row.add_child(rate_lbl)
+		
+		var sell_btn = Button.new()
+		sell_btn.text = " Sell 5 "
+		sell_btn.disabled = available < 5
+		sell_btn.pressed.connect(_on_caravan_sell.bind(item_key, 5))
+		row.add_child(sell_btn)
+		
+		recipe_list_vbox.add_child(row)
+
+func _on_caravan_buy(item_key: String) -> void:
+	if active_caravan and active_caravan.buy_item(item_key, supply_chain):
+		status_label.text = "Purchased 1 %s from Trade Caravan!" % item_key.capitalize()
+		_populate_caravan_trade()
+
+func _on_caravan_sell(item_key: String, amount: int) -> void:
+	if active_caravan and active_caravan.sell_resource(item_key, amount, supply_chain):
+		status_label.text = "Sold %d %s for coins!" % [amount, item_key.capitalize()]
+		_populate_caravan_trade()
