@@ -281,6 +281,11 @@ func _handle_primary_action() -> void:
 	
 	var item = hotbar[active_slot]
 	
+	# 0. Ranged archery attack
+	if item.get("tool_type") == "bow":
+		_fire_player_arrow()
+		return
+		
 	# 1. Melee combat against enemies (Bandit, etc.)
 	if collider is Bandit:
 		var dmg = 20.0
@@ -368,8 +373,17 @@ func _handle_secondary_action() -> void:
 
 	# 5. Placeable workstation placement (Furnace, Campfire, Crate, Workbench)
 	if item.get("type") == "placeable" and item.get("count", 0) > 0 and item.get("name") != "Torch":
-		var st_type = item.get("station_type", Workstation.StationType.CAMPFIRE)
 		var item_name = item.get("name", "")
+		if "Watchtower" in item_name:
+			var wt = Watchtower.new()
+			wt.position = hit_point + hit_normal * 0.1
+			get_tree().current_scene.add_child(wt)
+			item["count"] -= 1
+			emit_signal("block_action_performed", "place_station", Vector3i(int(wt.position.x), int(wt.position.y), int(wt.position.z)), 0)
+			emit_signal("hotbar_slot_changed", active_slot, item)
+			return
+
+		var st_type = item.get("station_type", Workstation.StationType.CAMPFIRE)
 		if "Furnace" in item_name:
 			st_type = Workstation.StationType.FURNACE
 		elif "Crate" in item_name:
@@ -386,6 +400,16 @@ func _handle_secondary_action() -> void:
 		emit_signal("block_action_performed", "place_station", Vector3i(int(ws.position.x), int(ws.position.y), int(ws.position.z)), 0)
 		emit_signal("hotbar_slot_changed", active_slot, item)
 		return
+
+func _fire_player_arrow() -> void:
+	if not camera:
+		return
+	var proj = Projectile.new()
+	var spawn_pos = camera.global_position - camera.global_transform.basis.z * 0.4 + Vector3(0, -0.1, 0)
+	var dir = -camera.global_transform.basis.z.normalized()
+	get_tree().current_scene.add_child(proj)
+	proj.launch(spawn_pos, dir, 36.0, 45.0, self)
+	emit_signal("block_action_performed", "shoot_arrow", Vector3i.ZERO, 0)
 
 func _add_resource_from_mined_block(block_type: int) -> void:
 	if not supply_chain:
@@ -409,5 +433,11 @@ func _add_resource_from_mined_block(block_type: int) -> void:
 			supply_chain.add_resource("stone_bricks", 1)
 		VoxelChunk.BlockType.SUPPORT_BEAM:
 			supply_chain.add_resource("support_beam", 1)
+		VoxelChunk.BlockType.WOODEN_PALISADE:
+			supply_chain.add_resource("palisade", 1)
+		VoxelChunk.BlockType.STONE_BATTLEMENT:
+			supply_chain.add_resource("battlement", 1)
+		VoxelChunk.BlockType.WOODEN_GATE:
+			supply_chain.add_resource("gate", 1)
 		VoxelChunk.BlockType.WHEAT_CROP:
 			supply_chain.add_resource("wheat", 2)

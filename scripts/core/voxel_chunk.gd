@@ -28,7 +28,10 @@ enum BlockType {
 	COPPER_ORE = 15,
 	STONE_BRICKS = 16,
 	SUPPORT_BEAM = 17,
-	DEEP_GEM_ORE = 18
+	DEEP_GEM_ORE = 18,
+	WOODEN_PALISADE = 19,
+	STONE_BATTLEMENT = 20,
+	WOODEN_GATE = 21
 }
 
 # Block properties
@@ -51,7 +54,10 @@ const BLOCK_HARDNESS: Dictionary = {
 	BlockType.COPPER_ORE: 2.0,
 	BlockType.STONE_BRICKS: 2.2,
 	BlockType.SUPPORT_BEAM: 1.2,
-	BlockType.DEEP_GEM_ORE: 3.5
+	BlockType.DEEP_GEM_ORE: 3.5,
+	BlockType.WOODEN_PALISADE: 2.5,
+	BlockType.STONE_BATTLEMENT: 3.0,
+	BlockType.WOODEN_GATE: 1.8
 }
 
 # Chunk grid coordinate (e.g. (0,0), (1,0))
@@ -205,4 +211,7 @@ func _get_block_color(type: int) -> Color:
 		BlockType.STONE_BRICKS: return Color(0.60, 0.60, 0.62)
 		BlockType.SUPPORT_BEAM: return Color(0.35, 0.20, 0.10)
 		BlockType.DEEP_GEM_ORE: return Color(0.20, 0.85, 0.85)
+		BlockType.WOODEN_PALISADE: return Color(0.32, 0.18, 0.08)
+		BlockType.STONE_BATTLEMENT: return Color(0.50, 0.50, 0.52)
+		BlockType.WOODEN_GATE: return Color(0.45, 0.28, 0.14)
 		_: return Color(0.9, 0.9, 0.9)

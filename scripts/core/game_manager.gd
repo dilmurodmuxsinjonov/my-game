@@ -114,6 +114,12 @@ func _spawn_initial_workstations() -> void:
 	add_child(fn)
 	workstations.append(fn)
 
+	# 5. Defensive Watchtower
+	var wt = Watchtower.new()
+	var wt_y = voxel_world.get_surface_height(28, 28)
+	wt.position = Vector3(28.5, wt_y + 0.1, 28.5)
+	add_child(wt)
+
 func _spawn_initial_citizens() -> void:
 	var roles_to_spawn = [
 		{"role": Citizen.Role.FARMER, "name": "Geoffrey"},
@@ -121,7 +127,8 @@ func _spawn_initial_citizens() -> void:
 		{"role": Citizen.Role.LUMBERJACK, "name": "Robin"},
 		{"role": Citizen.Role.LUMBERJACK, "name": "Barnaby"},
 		{"role": Citizen.Role.MINER, "name": "Giles"},
-		{"role": Citizen.Role.BAKER, "name": "Elsbeth"}
+		{"role": Citizen.Role.BAKER, "name": "Elsbeth"},
+		{"role": Citizen.Role.GUARD, "name": "Percival"}
 	]
 	
 	var spawn_center = Vector3(32, 0, 32)
@@ -179,6 +186,7 @@ func _on_role_reassigned(role_name: String, _delta: int) -> void:
 		"miner": role_enum = Citizen.Role.MINER
 		"baker": role_enum = Citizen.Role.BAKER
 		"blacksmith": role_enum = Citizen.Role.BLACKSMITH
+		"guard": role_enum = Citizen.Role.GUARD
 		
 	for c in citizens:
 		if c.current_role != role_enum and c.current_role == Citizen.Role.UNASSIGNED:

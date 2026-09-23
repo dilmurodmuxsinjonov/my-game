@@ -32,6 +32,7 @@ var flash_material: StandardMaterial3D
 const GRAVITY: float = 16.0
 
 func _ready() -> void:
+	add_to_group("bandits")
 	_setup_visuals()
 	if voxel_world:
 		pathfinder = GridPathfinder3D.new(voxel_world)

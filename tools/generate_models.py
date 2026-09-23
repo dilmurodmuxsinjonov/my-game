@@ -453,6 +453,131 @@ def build_caravan_cart():
 
     export_glb("caravan_cart.glb")
 
+# -------------------------------------------------------------
+# 12. Hunting Bow
+# -------------------------------------------------------------
+def build_bow():
+    reset_scene()
+    mat_wood = create_material("BowWood", (0.35, 0.20, 0.08, 1.0), roughness=0.7)
+    mat_grip = create_material("BowGrip", (0.20, 0.12, 0.05, 1.0), roughness=0.6)
+    mat_string = create_material("BowString", (0.9, 0.9, 0.85, 1.0), roughness=0.4)
+
+    # Central grip handle
+    bpy.ops.mesh.primitive_cylinder_add(radius=0.035, depth=0.18, vertices=8, location=(0, 0, 0))
+    grip = bpy.context.active_object
+    grip.name = "BowGrip"
+    grip.data.materials.append(mat_grip)
+
+    # Upper curved limb (3 angled segments)
+    bpy.ops.mesh.primitive_cylinder_add(radius=0.03, depth=0.35, vertices=8, location=(0, 0.06, 0.24), rotation=(math.radians(20), 0, 0))
+    u1 = bpy.context.active_object
+    u1.data.materials.append(mat_wood)
+
+    bpy.ops.mesh.primitive_cylinder_add(radius=0.025, depth=0.35, vertices=8, location=(0, 0.16, 0.52), rotation=(math.radians(40), 0, 0))
+    u2 = bpy.context.active_object
+    u2.data.materials.append(mat_wood)
+
+    # Lower curved limb (3 angled segments)
+    bpy.ops.mesh.primitive_cylinder_add(radius=0.03, depth=0.35, vertices=8, location=(0, 0.06, -0.24), rotation=(math.radians(-20), 0, 0))
+    l1 = bpy.context.active_object
+    l1.data.materials.append(mat_wood)
+
+    bpy.ops.mesh.primitive_cylinder_add(radius=0.025, depth=0.35, vertices=8, location=(0, 0.16, -0.52), rotation=(math.radians(-40), 0, 0))
+    l2 = bpy.context.active_object
+    l2.data.materials.append(mat_wood)
+
+    # Taut Bowstring (connecting upper tip and lower tip)
+    bpy.ops.mesh.primitive_cylinder_add(radius=0.008, depth=1.35, vertices=6, location=(0, 0.26, 0))
+    bstring = bpy.context.active_object
+    bstring.name = "BowString"
+    bstring.data.materials.append(mat_string)
+
+    export_glb("hunting_bow.glb")
+
+# -------------------------------------------------------------
+# 13. Bodkin Arrow
+# -------------------------------------------------------------
+def build_arrow():
+    reset_scene()
+    mat_wood = create_material("ArrowWood", (0.55, 0.40, 0.22, 1.0), roughness=0.6)
+    mat_iron = create_material("ArrowIron", (0.2, 0.22, 0.25, 1.0), metallic=0.9, roughness=0.3)
+    mat_feather = create_material("ArrowFletch", (0.85, 0.82, 0.75, 1.0), roughness=0.5)
+
+    # Arrow Shaft (0.8m long)
+    bpy.ops.mesh.primitive_cylinder_add(radius=0.012, depth=0.8, vertices=8, location=(0, 0, 0))
+    shaft = bpy.context.active_object
+    shaft.name = "ArrowShaft"
+    shaft.data.materials.append(mat_wood)
+
+    # Iron Bodkin Point (tapered cone)
+    bpy.ops.mesh.primitive_cone_add(radius1=0.025, radius2=0.0, depth=0.1, vertices=6, location=(0, 0, 0.44))
+    head = bpy.context.active_object
+    head.name = "ArrowHead"
+    head.data.materials.append(mat_iron)
+
+    # 3 Fletching Feathers (120 degrees apart)
+    for angle in [0, 120, 240]:
+        rad = math.radians(angle)
+        fx = math.cos(rad) * 0.025
+        fy = math.sin(rad) * 0.025
+        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(fx, fy, -0.32), rotation=(0, 0, rad))
+        fletch = bpy.context.active_object
+        fletch.scale = (0.004, 0.04, 0.12)
+        fletch.data.materials.append(mat_feather)
+
+    export_glb("arrow.glb")
+
+# -------------------------------------------------------------
+# 14. Watchtower Workstation / Defensive Structure
+# -------------------------------------------------------------
+def build_watchtower():
+    reset_scene()
+    mat_post = create_material("TowerPost", (0.32, 0.18, 0.08, 1.0), roughness=0.8)
+    mat_plank = create_material("TowerPlank", (0.42, 0.26, 0.12, 1.0), roughness=0.7)
+    mat_roof = create_material("TowerRoof", (0.28, 0.15, 0.06, 1.0), roughness=0.85)
+
+    # 4 Main Vertical Posts (4.5m tall)
+    post_coords = [(-1.0, -1.0), (1.0, -1.0), (-1.0, 1.0), (1.0, 1.0)]
+    for x, y in post_coords:
+        bpy.ops.mesh.primitive_cylinder_add(radius=0.12, depth=4.5, vertices=8, location=(x, y, 2.25))
+        post = bpy.context.active_object
+        post.data.materials.append(mat_post)
+
+    # Elevated Timber Floor Platform (at Z = 3.5m)
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0, 3.5))
+    floor = bpy.context.active_object
+    floor.name = "PlatformFloor"
+    floor.scale = (2.4, 2.4, 0.15)
+    floor.data.materials.append(mat_plank)
+
+    # Platform Guard Railing / Crenellations (Z = 4.0m)
+    rail_configs = [
+        (0, 1.15, 2.4, 0.08),
+        (0, -1.15, 2.4, 0.08),
+        (-1.15, 0, 0.08, 2.4),
+        (1.15, 0, 0.08, 2.4)
+    ]
+    for rx, ry, sx, sy in rail_configs:
+        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(rx, ry, 4.0))
+        rail = bpy.context.active_object
+        rail.scale = (sx, sy, 0.8)
+        rail.data.materials.append(mat_plank)
+
+    # Access Ladder on Back Face
+    for lz in [0.6, 1.2, 1.8, 2.4, 3.0]:
+        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, -1.0, lz))
+        rung = bpy.context.active_object
+        rung.scale = (0.6, 0.08, 0.05)
+        rung.data.materials.append(mat_post)
+
+    # Roof Canopy (Pyramid at Z = 5.2m)
+    bpy.ops.mesh.primitive_cone_add(radius1=1.6, radius2=0.0, depth=1.2, vertices=4, location=(0, 0, 5.2), rotation=(0, 0, math.radians(45)))
+    roof = bpy.context.active_object
+    roof.name = "TowerRoof"
+    roof.data.materials.append(mat_roof)
+
+    export_glb("watchtower.glb")
+
 if __name__ == "__main__":
     print("[BLENDER SCRIPT] Starting procedural 3D medieval model generation...")
     build_pickaxe()
@@ -466,4 +591,8 @@ if __name__ == "__main__":
     build_support_beam()
     build_bandit()
     build_caravan_cart()
+    build_bow()
+    build_arrow()
+    build_watchtower()
     print("[BLENDER SCRIPT] All models generated successfully!")
+
