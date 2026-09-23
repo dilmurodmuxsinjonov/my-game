@@ -122,6 +122,31 @@ const RECIPES: Dictionary = {
 			"output": {"name": "Defensive Gate", "type": "block", "block_type": 21, "icon": "🚪", "count": 1}
 		},
 		{
+			"name": "Architect's Drafting Desk",
+			"inputs": {"logs": 4, "stone": 2, "planks": 4},
+			"output": {"name": "Architect Desk", "type": "placeable", "icon": "📐", "count": 1}
+		},
+		{
+			"name": "Hauler's Wheelbarrow",
+			"inputs": {"logs": 3, "iron_ingots": 1},
+			"output": {"name": "Hauler's Wheelbarrow", "type": "tool", "tool_type": "wheelbarrow", "icon": "🛒", "count": 1}
+		},
+		{
+			"name": "Worker Cottage Blueprint",
+			"inputs": {"logs": 2, "stone": 2},
+			"output": {"name": "Worker Cottage Blueprint", "type": "blueprint", "blueprint_id": "cottage", "icon": "🏠", "count": 1}
+		},
+		{
+			"name": "Watchtower Blueprint",
+			"inputs": {"logs": 3, "stone": 3},
+			"output": {"name": "Watchtower Blueprint", "type": "blueprint", "blueprint_id": "watchtower", "icon": "🏰", "count": 1}
+		},
+		{
+			"name": "Granary Silo Blueprint",
+			"inputs": {"logs": 4, "stone": 2},
+			"output": {"name": "Granary Silo Blueprint", "type": "blueprint", "blueprint_id": "granary", "icon": "🌾", "count": 1}
+		},
+		{
 			"name": "Farmland Hoe",
 			"inputs": {"logs": 2, "stone": 2},
 			"output": {"name": "Farmland Hoe", "type": "tool", "tool_type": "hoe", "icon": "🌾", "block_type": 13, "count": 1}
@@ -269,6 +294,21 @@ func _build_ui() -> void:
 	header_title.add_theme_font_size_override("font_size", 18)
 	main_vbox.add_child(header_title)
 	
+	var tab_bar = HBoxContainer.new()
+	tab_bar.alignment = BoxContainer.ALIGNMENT_CENTER
+	tab_bar.add_theme_constant_override("separation", 10)
+	main_vbox.add_child(tab_bar)
+	
+	var btn_recipes = Button.new()
+	btn_recipes.text = " 🛠️ Workshop Recipes "
+	btn_recipes.pressed.connect(_on_tab_recipes_pressed)
+	tab_bar.add_child(btn_recipes)
+	
+	var btn_quotas = Button.new()
+	btn_quotas.text = " 📊 Production Quotas ('Do Until X') "
+	btn_quotas.pressed.connect(_populate_quotas)
+	tab_bar.add_child(btn_quotas)
+	
 	var scroll = ScrollContainer.new()
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	main_vbox.add_child(scroll)
@@ -338,6 +378,94 @@ func _unhandled_input(event: InputEvent) -> void:
 				open_menu(null)
 		elif event.keycode == KEY_E and is_open:
 			close_menu()
+
+func _on_tab_recipes_pressed() -> void:
+	if active_enchanter:
+		_populate_enchanter_recipes()
+	elif active_cooking_pot:
+		_populate_cooking_recipes()
+	elif active_caravan:
+		_populate_caravan_trade()
+	else:
+		_populate_recipes()
+
+func _populate_quotas() -> void:
+	for child in recipe_list_vbox.get_children():
+		child.queue_free()
+		
+	header_title.text = "📊 ROYAL PRODUCTION QUOTAS ('DO UNTIL X')"
+	status_label.text = "RimWorld-style quotas: Workers pause production when stock limits are met."
+	
+	if not supply_chain:
+		var err = Label.new()
+		err.text = "Error: Supply chain not linked!"
+		recipe_list_vbox.add_child(err)
+		return
+		
+	var tracked_items = ["bread", "tools", "weapons", "iron_ingots"]
+	for item in tracked_items:
+		var row = HBoxContainer.new()
+		row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		
+		# Name & Current Stock
+		var name_lbl = Label.new()
+		var cur_stock = supply_chain.get_resource(item)
+		name_lbl.text = "• %s (Current: %d)" % [item.capitalize(), cur_stock]
+		name_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		row.add_child(name_lbl)
+		
+		# Quota Mode Button
+		var cur_mode = supply_chain.get_quota_mode(item)
+		var mode_btn = Button.new()
+		mode_btn.text = " Mode: %s " % _get_quota_mode_label(cur_mode)
+		mode_btn.pressed.connect(_cycle_quota_mode.bind(item))
+		row.add_child(mode_btn)
+		
+		# Decrement Button
+		var dec_btn = Button.new()
+		dec_btn.text = " -5 "
+		dec_btn.pressed.connect(_adjust_quota.bind(item, -5))
+		row.add_child(dec_btn)
+		
+		# Target Limit Label
+		var target_lbl = Label.new()
+		var cur_quota = supply_chain.get_quota(item)
+		target_lbl.text = " Target: %d " % cur_quota
+		target_lbl.modulate = Color(1.0, 0.85, 0.4)
+		row.add_child(target_lbl)
+		
+		# Increment Button
+		var inc_btn = Button.new()
+		inc_btn.text = " +5 "
+		inc_btn.pressed.connect(_adjust_quota.bind(item, 5))
+		row.add_child(inc_btn)
+		
+		recipe_list_vbox.add_child(row)
+
+func _get_quota_mode_label(m: int) -> String:
+	match m:
+		SupplyChain.QuotaMode.DO_FOREVER: return "DO FOREVER"
+		SupplyChain.QuotaMode.DO_UNTIL_X: return "DO UNTIL X"
+		SupplyChain.QuotaMode.PAUSED: return "PAUSED"
+		_: return "UNKNOWN"
+
+func _cycle_quota_mode(item: String) -> void:
+	if not supply_chain:
+		return
+	var cur = supply_chain.get_quota_mode(item)
+	var next_mode = (cur + 1) % 3
+	var cur_limit = supply_chain.get_quota(item)
+	supply_chain.set_quota(item, cur_limit, next_mode)
+	_populate_quotas()
+
+func _adjust_quota(item: String, delta: int) -> void:
+	if not supply_chain:
+		return
+	var cur_mode = supply_chain.get_quota_mode(item)
+	var cur_limit = supply_chain.get_quota(item)
+	var new_limit = maxi(0, cur_limit + delta)
+	supply_chain.set_quota(item, new_limit, cur_mode)
+	_populate_quotas()
 
 func _populate_cooking_recipes() -> void:
 	for child in recipe_list_vbox.get_children():

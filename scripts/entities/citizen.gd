@@ -1,7 +1,10 @@
 class_name Citizen
 extends CharacterBody3D
 
-## Autonomous Medieval Citizen with 10-state HFSM and 3D Voxel Grid Pathfinding.
+const BlueprintConstruction = preload("res://scripts/world/blueprint_construction.gd")
+
+## Autonomous Medieval Citizen with 12-state HFSM and 3D Voxel Grid Pathfinding.
+## Supports MineColonies Builder AI, Delivery Courier Hauler AI, and Combat Defense.
 
 signal state_changed(citizen: Citizen, old_state: State, new_state: State)
 signal work_cycle_completed(citizen: Citizen, role: Role, resource_produced: String, amount: int)
@@ -13,7 +16,9 @@ enum Role {
 	LUMBERJACK = 3,
 	MINER = 4,
 	BLACKSMITH = 5,
-	GUARD = 6
+	GUARD = 6,
+	BUILDER = 7,
+	HAULER = 8
 }
 
 enum State {
@@ -27,7 +32,9 @@ enum State {
 	SLEEPING = 7,
 	HEALING = 8,
 	FLEEING = 9,
-	DEFENDING = 10
+	DEFENDING = 10,
+	BUILDING = 11,
+	HAULING = 12
 }
 
 @export var citizen_name: String = "Aldous"
@@ -56,11 +63,20 @@ var shoot_cooldown: float = 0.0
 var target_bandit: Node3D = null
 var watchtower_ref: Node3D = null
 
+# MineColonies Builder & Hauler Systems
+var target_blueprint: Node3D = null # BlueprintConstruction
+var carried_resources: Dictionary = {}
+var hauler_capacity: int = 10
+var royal_stockpile_pos: Vector3 = Vector3(32, 20, 32)
+var hauling_target_pos: Vector3 = Vector3.ZERO
+var is_delivering_to_blueprint: bool = false
+var wheelbarrow_instance: Node3D = null
+
 # Locations & Timers
 var workplace_pos: Vector3 = Vector3.ZERO
 var home_pos: Vector3 = Vector3.ZERO
 var state_timer: float = 0.0
-var work_duration: float = 4.0 # Seconds per productive cycle
+var work_duration: float = 3.5 # Seconds per productive cycle
 var wander_cooldown: float = 3.0
 
 # Node components
@@ -114,12 +130,39 @@ func set_role(new_role: Role, work_target: Vector3 = Vector3.ZERO) -> void:
 	if nameplate:
 		nameplate.text = "%s\n[%s]" % [citizen_name, _get_role_name(current_role)]
 		
+	# Manage wheelbarrow equipment for hauler role
+	if current_role == Role.HAULER:
+		_equip_wheelbarrow(true)
+	else:
+		_equip_wheelbarrow(false)
+		
 	if current_role == Role.UNASSIGNED:
 		_transition_to(State.IDLE)
 	elif current_role == Role.GUARD:
 		_navigate_to(workplace_pos, State.DEFENDING)
+	elif current_role == Role.BUILDER:
+		_setup_builder_task()
+	elif current_role == Role.HAULER:
+		_setup_hauler_task()
 	else:
 		_navigate_to(workplace_pos, State.MOVING_TO_WORK)
+
+func _equip_wheelbarrow(equip: bool) -> void:
+	if equip:
+		if not wheelbarrow_instance:
+			var wb_path = "res://assets/models/wheelbarrow.glb"
+			if ResourceLoader.exists(wb_path):
+				var res = load(wb_path)
+				if res:
+					wheelbarrow_instance = res.instantiate()
+					wheelbarrow_instance.position = Vector3(0, 0.1, -0.65)
+					wheelbarrow_instance.rotation_degrees = Vector3(0, 180, 0)
+					add_child(wheelbarrow_instance)
+		elif wheelbarrow_instance:
+			wheelbarrow_instance.visible = true
+	else:
+		if wheelbarrow_instance:
+			wheelbarrow_instance.visible = false
 
 func _navigate_to(target: Vector3, next_state: State) -> void:
 	if not pathfinder and voxel_world:
@@ -144,6 +187,10 @@ func _physics_process(delta: float) -> void:
 		State.IDLE:
 			if current_role == Role.GUARD:
 				_transition_to(State.DEFENDING)
+			elif current_role == Role.BUILDER:
+				_setup_builder_task()
+			elif current_role == Role.HAULER:
+				_setup_hauler_task()
 			else:
 				state_timer += delta
 				if state_timer >= wander_cooldown:
@@ -163,7 +210,15 @@ func _physics_process(delta: float) -> void:
 			if state_timer >= work_duration:
 				state_timer = 0.0
 				_complete_work_cycle()
-				
+
+		State.BUILDING:
+			velocity.x = 0
+			velocity.z = 0
+			_process_builder_work(delta)
+
+		State.HAULING:
+			_follow_path(delta, State.IDLE)
+
 		State.DEFENDING:
 			velocity.x = 0
 			velocity.z = 0
@@ -187,7 +242,7 @@ func _follow_path(delta: float, on_reach_state: State) -> void:
 	if current_path.is_empty() or path_index >= current_path.size():
 		velocity.x = 0
 		velocity.z = 0
-		_transition_to(on_reach_state)
+		_on_path_completed(on_reach_state)
 		return
 		
 	var target = current_path[path_index]
@@ -199,7 +254,7 @@ func _follow_path(delta: float, on_reach_state: State) -> void:
 		if path_index >= current_path.size():
 			velocity.x = 0
 			velocity.z = 0
-			_transition_to(on_reach_state)
+			_on_path_completed(on_reach_state)
 			return
 		target = current_path[path_index]
 		diff = target - global_position
@@ -213,6 +268,135 @@ func _follow_path(delta: float, on_reach_state: State) -> void:
 	if dir.length_squared() > 0.01:
 		var target_rot = atan2(-dir.x, -dir.z)
 		rotation.y = lerp_angle(rotation.y, target_rot, 10.0 * delta)
+
+func _on_path_completed(fallback_state: State) -> void:
+	if current_state == State.HAULING:
+		_complete_hauler_dropoff()
+	elif current_role == Role.BUILDER:
+		if target_blueprint and is_instance_valid(target_blueprint):
+			if not target_blueprint.has_all_materials() and not carried_resources.is_empty():
+				# Deliver materials to blueprint
+				for res in carried_resources.keys():
+					var delivered = target_blueprint.deliver_material(res, carried_resources[res])
+					carried_resources[res] -= delivered
+				carried_resources.clear()
+				
+			if target_blueprint.has_all_materials():
+				_transition_to(State.BUILDING)
+			else:
+				_setup_builder_task()
+		else:
+			_transition_to(State.IDLE)
+	else:
+		_transition_to(fallback_state)
+
+## --- MineColonies Builder AI ---
+
+func _find_nearest_blueprint() -> Node3D:
+	var bps = get_tree().get_nodes_in_group("blueprints")
+	var nearest: Node3D = null
+	var min_d = 9999.0
+	for bp in bps:
+		if bp is BlueprintConstruction and not bp.is_completed:
+			var d = global_position.distance_to(bp.global_position)
+			if d < min_d:
+				min_d = d
+				nearest = bp
+	return nearest
+
+func _setup_builder_task() -> void:
+	target_blueprint = _find_nearest_blueprint()
+	if not target_blueprint or not is_instance_valid(target_blueprint):
+		_transition_to(State.IDLE)
+		return
+		
+	# Check if blueprint needs materials
+	var missing = target_blueprint.get_missing_materials()
+	if not missing.is_empty():
+		# Can we grab supplies from the kingdom stockpile?
+		var grabbed = false
+		if supply_chain:
+			for res in missing.keys():
+				var needed = missing[res]
+				var available = supply_chain.get_resource(res)
+				if available > 0:
+					var take = mini(needed, mini(available, 6))
+					if supply_chain.consume_resource(res, take):
+						carried_resources[res] = carried_resources.get(res, 0) + take
+						grabbed = true
+						break
+						
+		if grabbed:
+			# Walk to blueprint to deliver materials
+			_navigate_to(target_blueprint.global_position, State.MOVING_TO_WORK)
+			return
+		elif not target_blueprint.has_all_materials():
+			# Waiting for resources, wander or idle
+			_transition_to(State.IDLE)
+			return
+			
+	# Has materials, go build!
+	_navigate_to(target_blueprint.global_position, State.BUILDING)
+
+func _process_builder_work(delta: float) -> void:
+	if not target_blueprint or not is_instance_valid(target_blueprint) or target_blueprint.is_completed:
+		target_blueprint = null
+		_setup_builder_task()
+		return
+		
+	state_timer += delta
+	if state_timer >= 1.2: # Construction hammer tick
+		state_timer = 0.0
+		var done = target_blueprint.advance_construction(1.0)
+		emit_signal("work_cycle_completed", self, Role.BUILDER, "construction", 1)
+		if done:
+			target_blueprint.complete_construction(voxel_world)
+			target_blueprint = null
+			_setup_builder_task()
+
+## --- Delivery Hauler Logistics AI ---
+
+func _setup_hauler_task() -> void:
+	# 1. Prioritize supplying active blueprints from Royal Stockpile
+	var bp = _find_nearest_blueprint()
+	if bp and not bp.has_all_materials() and supply_chain:
+		var missing = bp.get_missing_materials()
+		for res in missing.keys():
+			var needed = missing[res]
+			var avail = supply_chain.get_resource(res)
+			if avail > 0:
+				var take = mini(needed, mini(avail, hauler_capacity))
+				if supply_chain.consume_resource(res, take):
+					carried_resources[res] = take
+					is_delivering_to_blueprint = true
+					target_blueprint = bp
+					hauling_target_pos = bp.global_position
+					_navigate_to(hauling_target_pos, State.HAULING)
+					if nameplate:
+						nameplate.text = "%s\n[HAULING: %s x%d]" % [citizen_name, res.capitalize(), take]
+					return
+					
+	# 2. General logistical consolidation / wandering
+	_transition_to(State.IDLE)
+
+func _complete_hauler_dropoff() -> void:
+	if is_delivering_to_blueprint and target_blueprint and is_instance_valid(target_blueprint):
+		for res in carried_resources.keys():
+			target_blueprint.deliver_material(res, carried_resources[res])
+		emit_signal("work_cycle_completed", self, Role.HAULER, "blueprint_delivery", 1)
+	elif supply_chain and not carried_resources.is_empty():
+		for res in carried_resources.keys():
+			supply_chain.add_resource(res, carried_resources[res])
+		emit_signal("work_cycle_completed", self, Role.HAULER, "stockpile_haul", 1)
+		
+	carried_resources.clear()
+	is_delivering_to_blueprint = false
+	target_blueprint = null
+	if nameplate:
+		nameplate.text = "%s\n[%s]" % [citizen_name, _get_role_name(current_role)]
+	_setup_hauler_task()
+
+## --- Standard Work Cycles & Defense ---
 
 func _complete_work_cycle() -> void:
 	var item_name: String = ""
@@ -229,11 +413,11 @@ func _complete_work_cycle() -> void:
 			item_name = "stone"
 			item_qty = 2
 		Role.BAKER:
-			if supply_chain and supply_chain.consume_resource("wheat", 1):
+			if supply_chain and supply_chain.can_produce("bread") and supply_chain.consume_resource("wheat", 1):
 				item_name = "bread"
 				item_qty = 2
 		Role.BLACKSMITH:
-			if supply_chain and supply_chain.consume_resource("iron_ore", 1):
+			if supply_chain and supply_chain.can_produce("tools") and supply_chain.consume_resource("iron_ore", 1):
 				item_name = "tools"
 				item_qty = 1
 				
@@ -339,4 +523,6 @@ func _get_role_name(r: Role) -> String:
 		Role.MINER: return "Miner"
 		Role.BLACKSMITH: return "Blacksmith"
 		Role.GUARD: return "Guard"
+		Role.BUILDER: return "Builder"
+		Role.HAULER: return "Hauler"
 		_: return "Peasant"
