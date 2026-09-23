@@ -13,6 +13,8 @@ extends Node3D
 var supply_chain: SupplyChain
 var citizens: Array[Citizen] = []
 var workstations: Array[Workstation] = []
+var agriculture_manager: AgricultureManager
+var threat_manager: ThreatManager
 
 # Game day/night simulation
 var day_timer: float = 0.0
@@ -23,12 +25,28 @@ func _ready() -> void:
 	supply_chain = SupplyChain.new()
 	sun_light = $DirectionalLight3D
 	
+	# Initialize Agriculture & Threat Systems
+	agriculture_manager = AgricultureManager.new(voxel_world, supply_chain)
+	agriculture_manager.name = "AgricultureManager"
+	add_child(agriculture_manager)
+	agriculture_manager.crop_matured.connect(_on_crop_matured)
+	agriculture_manager.crop_harvested.connect(_on_crop_harvested)
+
+	threat_manager = ThreatManager.new(voxel_world, supply_chain)
+	threat_manager.name = "ThreatManager"
+	add_child(threat_manager)
+	threat_manager.raid_spawned.connect(_on_raid_spawned)
+	threat_manager.raid_defeated.connect(_on_raid_defeated)
+	threat_manager.bandit_slain.connect(_on_bandit_slain)
+	
 	# Wire up player
 	if player:
 		player.voxel_world = voxel_world
 		player.supply_chain = supply_chain
+		threat_manager.player_ref = player
 		player.open_crafting_requested.connect(_on_open_crafting)
 		player.interact_requested.connect(_on_interact_requested)
+		player.block_action_performed.connect(_on_player_block_action)
 		
 		# Position player on top of surface terrain at spawn
 		var spawn_x = 32
@@ -146,3 +164,39 @@ func _on_interact_requested(target: Node3D) -> void:
 func _on_item_crafted(recipe_name: String, _item: Dictionary) -> void:
 	if hud:
 		hud.show_notification("Crafted %s" % recipe_name)
+
+func _on_player_block_action(action: String, pos: Vector3i, btype: int) -> void:
+	match action:
+		"till":
+			if agriculture_manager:
+				agriculture_manager.register_farmland(pos)
+		"plant":
+			if agriculture_manager:
+				agriculture_manager.plant_crop(pos, "wheat")
+		"mine":
+			if btype == VoxelChunk.BlockType.WHEAT_CROP and agriculture_manager:
+				agriculture_manager.harvest_crop(pos)
+
+func _on_crop_matured(pos: Vector3i) -> void:
+	# Dispatch available farmer to harvest
+	for c in citizens:
+		if c.current_role == Citizen.Role.FARMER:
+			if c.current_state == Citizen.State.IDLE or c.current_state == Citizen.State.WANDER:
+				c._navigate_to(Vector3(pos.x + 0.5, pos.y, pos.z + 0.5), Citizen.State.HARVESTING)
+				break
+
+func _on_crop_harvested(_pos: Vector3i, yield_data: Dictionary) -> void:
+	if hud:
+		hud.show_notification("🌾 Harvest: +%d Wheat, +%d Seeds" % [yield_data.get("wheat", 2), yield_data.get("seeds", 1)])
+
+func _on_raid_spawned(count: int) -> void:
+	if hud:
+		hud.show_notification("⚠️ Bandit Raid approaching! %d Raiders spotted!" % count)
+
+func _on_raid_defeated() -> void:
+	if hud:
+		hud.show_notification("⚔️ Raid Repelled! The Realm is Secure.")
+
+func _on_bandit_slain(_loot: Dictionary) -> void:
+	if hud:
+		hud.show_notification("☠️ Bandit Slain! Spoils gathered.")

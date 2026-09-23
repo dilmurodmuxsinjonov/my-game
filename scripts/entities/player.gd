@@ -47,11 +47,11 @@ var hotbar: Array = [
 	{"name": "Iron Pickaxe", "type": "tool", "tool_type": "pickaxe", "icon": "⛏️", "block_type": 0, "count": 1},
 	{"name": "Wood Axe", "type": "tool", "tool_type": "axe", "icon": "🪓", "block_type": 0, "count": 1},
 	{"name": "Knight Sword", "type": "tool", "tool_type": "sword", "icon": "⚔️", "block_type": 0, "count": 1},
-	{"name": "Cobblestone", "type": "block", "block_type": VoxelChunk.BlockType.COBBLESTONE, "icon": "🪨", "count": 64},
-	{"name": "Wood Planks", "type": "block", "block_type": VoxelChunk.BlockType.PLANKS, "icon": "🪵", "count": 64},
-	{"name": "Stone Blocks", "type": "block", "block_type": VoxelChunk.BlockType.STONE, "icon": "🧱", "count": 64},
 	{"name": "Farmland Hoe", "type": "tool", "tool_type": "hoe", "icon": "🌾", "block_type": VoxelChunk.BlockType.FARMLAND, "count": 1},
-	{"name": "Ration Bread", "type": "food", "nutrition": 25.0, "icon": "🍞", "count": 16}
+	{"name": "Wheat Seeds", "type": "seed", "icon": "🌱", "count": 16},
+	{"name": "Torch", "type": "placeable", "icon": "🕯️", "count": 8},
+	{"name": "Ration Bread", "type": "food", "nutrition": 25.0, "icon": "🍞", "count": 16},
+	{"name": "Cobblestone", "type": "block", "block_type": VoxelChunk.BlockType.COBBLESTONE, "icon": "🪨", "count": 64}
 ]
 
 var respawn_position: Vector3 = Vector3(32.0, 25.0, 32.0)
@@ -233,6 +233,21 @@ func _handle_primary_action() -> void:
 	
 	var item = hotbar[active_slot]
 	
+	# 1. Melee combat against enemies (Bandit, etc.)
+	if collider is Bandit:
+		var dmg = 20.0
+		if item.get("tool_type") == "sword":
+			dmg = 35.0
+		elif item.get("tool_type") == "axe":
+			dmg = 24.0
+		elif item.get("tool_type") == "pickaxe":
+			dmg = 16.0
+		var knockback = -camera.global_transform.basis.z.normalized()
+		collider.take_damage(dmg, knockback)
+		emit_signal("block_action_performed", "attack", Vector3i.ZERO, 0)
+		return
+	
+	# 2. Voxel mining
 	if voxel_world and (collider is VoxelChunk or collider == voxel_world):
 		var result = voxel_world.mine_block(hit_point, hit_normal)
 		if result["success"]:
@@ -270,7 +285,31 @@ func _handle_secondary_action() -> void:
 			emit_signal("block_action_performed", "till", target_pos, VoxelChunk.BlockType.FARMLAND)
 			return
 
-	# 3. Block placement
+	# 3. Seed planting on Farmland
+	if (item.get("type") == "seed" or item.get("name") == "Wheat Seeds") and item.get("count", 0) > 0 and voxel_world:
+		var center = hit_point - hit_normal * 0.4
+		var target_pos = Vector3i(int(floor(center.x)), int(floor(center.y)), int(floor(center.z)))
+		var above_pos = target_pos + Vector3i.UP
+		var cur_type = voxel_world.get_block_world(target_pos)
+		if cur_type == VoxelChunk.BlockType.FARMLAND and voxel_world.get_block_world(above_pos) == VoxelChunk.BlockType.AIR:
+			item["count"] -= 1
+			emit_signal("block_action_performed", "plant", above_pos, VoxelChunk.BlockType.WHEAT_CROP)
+			emit_signal("hotbar_slot_changed", active_slot, item)
+			return
+
+	# 4. Torch placement
+	if item.get("name") == "Torch" and item.get("count", 0) > 0:
+		var torch = Torch.new()
+		var torch_pos = hit_point + hit_normal * 0.1
+		torch.position = torch_pos
+		get_tree().current_scene.add_child(torch)
+		item["count"] -= 1
+		emit_signal("block_action_performed", "torch", Vector3i(int(torch_pos.x), int(torch_pos.y), int(torch_pos.z)), 0)
+		emit_signal("hotbar_slot_changed", active_slot, item)
+		return
+
+	# 4. Block placement
+	if voxel_world and item.get("type") == "block" and item.get("count", 0) > 0:
 		var btype = item.get("block_type", VoxelChunk.BlockType.STONE)
 		var result = voxel_world.place_block(hit_point, hit_normal, btype)
 		if result["success"]:

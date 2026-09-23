@@ -247,6 +247,16 @@ func _transition_to(new_state: State) -> void:
 		state_timer = 0.0
 		emit_signal("state_changed", self, old, new_state)
 
+func take_damage(amount: float) -> void:
+	health = maxf(0.0, health - amount)
+	if nameplate:
+		nameplate.text = "%s\n[%s] (HP: %d)" % [citizen_name, _get_role_name(current_role), int(health)]
+	if health < 30.0 and current_role != Role.GUARD:
+		_transition_to(State.FLEEING)
+	if health <= 0.0:
+		_transition_to(State.HEALING)
+		health = 25.0
+
 func _get_role_name(r: Role) -> String:
 	match r:
 		Role.FARMER: return "Farmer"
