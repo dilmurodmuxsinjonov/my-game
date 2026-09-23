@@ -76,13 +76,17 @@ func _generate_chunk_terrain(chunk: VoxelChunk, cpos: Vector2i) -> void:
 				elif ly >= surface_y - 2:
 					chunk.set_block(lx, ly, lz, VoxelChunk.BlockType.DIRT)
 				else:
-					# Underground strata & ores
+					# Underground geological strata & mineral deposits
 					var ore_sample = ore_noise.get_noise_3d(float(wx), float(ly), float(wz))
-					if ly < 8 and ore_sample > 0.45:
+					if ly < 5 and ore_sample > 0.48:
+						chunk.set_block(lx, ly, lz, VoxelChunk.BlockType.DEEP_GEM_ORE)
+					elif ly < 8 and ore_sample > 0.42:
 						chunk.set_block(lx, ly, lz, VoxelChunk.BlockType.GOLD_ORE)
-					elif ly < 16 and ore_sample > 0.35:
+					elif ly < 15 and ore_sample > 0.35:
 						chunk.set_block(lx, ly, lz, VoxelChunk.BlockType.IRON_ORE)
-					elif ly < 22 and ore_sample > 0.28:
+					elif ly < 20 and ore_sample > 0.30:
+						chunk.set_block(lx, ly, lz, VoxelChunk.BlockType.COPPER_ORE)
+					elif ly < 25 and ore_sample > 0.25:
 						chunk.set_block(lx, ly, lz, VoxelChunk.BlockType.COAL_ORE)
 					else:
 						chunk.set_block(lx, ly, lz, VoxelChunk.BlockType.STONE)

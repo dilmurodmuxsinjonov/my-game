@@ -45,19 +45,27 @@ func _setup_visuals() -> void:
 	collision_shape.position = Vector3(0, 0.85, 0)
 	add_child(collision_shape)
 	
-	# Bandit Mesh (dark bandit raider colors)
-	model_mesh = MeshInstance3D.new()
-	var body_mesh = CapsuleMesh.new()
-	body_mesh.radius = 0.35
-	body_mesh.height = 1.7
-	model_mesh.mesh = body_mesh
-	model_mesh.position = Vector3(0, 0.85, 0)
-	
-	default_material = StandardMaterial3D.new()
-	default_material.albedo_color = Color(0.35, 0.15, 0.15) # Crimson raider tunic
-	default_material.roughness = 0.8
-	model_mesh.material_override = default_material
-	add_child(model_mesh)
+	# Load Blender-generated bandit model
+	var glb_path = "res://assets/models/bandit.glb"
+	if ResourceLoader.exists(glb_path):
+		var scene_res = load(glb_path)
+		if scene_res:
+			var inst = scene_res.instantiate()
+			add_child(inst)
+	else:
+		# Fallback capsule mesh
+		model_mesh = MeshInstance3D.new()
+		var body_mesh = CapsuleMesh.new()
+		body_mesh.radius = 0.35
+		body_mesh.height = 1.7
+		model_mesh.mesh = body_mesh
+		model_mesh.position = Vector3(0, 0.85, 0)
+		
+		default_material = StandardMaterial3D.new()
+		default_material.albedo_color = Color(0.35, 0.15, 0.15) # Crimson raider tunic
+		default_material.roughness = 0.8
+		model_mesh.material_override = default_material
+		add_child(model_mesh)
 	
 	flash_material = StandardMaterial3D.new()
 	flash_material.albedo_color = Color(1.0, 0.2, 0.2)

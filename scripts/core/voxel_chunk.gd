@@ -24,7 +24,11 @@ enum BlockType {
 	WATER = 11,
 	GLASS = 12,
 	FARMLAND = 13,
-	WHEAT_CROP = 14
+	WHEAT_CROP = 14,
+	COPPER_ORE = 15,
+	STONE_BRICKS = 16,
+	SUPPORT_BEAM = 17,
+	DEEP_GEM_ORE = 18
 }
 
 # Block properties
@@ -43,7 +47,11 @@ const BLOCK_HARDNESS: Dictionary = {
 	BlockType.WATER: 0.0,
 	BlockType.GLASS: 0.3,
 	BlockType.FARMLAND: 0.5,
-	BlockType.WHEAT_CROP: 0.1
+	BlockType.WHEAT_CROP: 0.1,
+	BlockType.COPPER_ORE: 2.0,
+	BlockType.STONE_BRICKS: 2.2,
+	BlockType.SUPPORT_BEAM: 1.2,
+	BlockType.DEEP_GEM_ORE: 3.5
 }
 
 # Chunk grid coordinate (e.g. (0,0), (1,0))
@@ -193,4 +201,8 @@ func _get_block_color(type: int) -> Color:
 		BlockType.GLASS: return Color(0.85, 0.92, 0.95, 0.4)
 		BlockType.FARMLAND: return Color(0.35, 0.22, 0.12)
 		BlockType.WHEAT_CROP: return Color(0.82, 0.75, 0.22)
+		BlockType.COPPER_ORE: return Color(0.78, 0.45, 0.28)
+		BlockType.STONE_BRICKS: return Color(0.60, 0.60, 0.62)
+		BlockType.SUPPORT_BEAM: return Color(0.35, 0.20, 0.10)
+		BlockType.DEEP_GEM_ORE: return Color(0.20, 0.85, 0.85)
 		_: return Color(0.9, 0.9, 0.9)

@@ -96,6 +96,13 @@ func _spawn_initial_workstations() -> void:
 	add_child(cr)
 	workstations.append(cr)
 
+	# 4. Stone Bloomery Furnace
+	var fn = Workstation.new(Workstation.StationType.FURNACE)
+	var fn_y = voxel_world.get_surface_height(30, 32)
+	fn.position = Vector3(30.5, fn_y + 1.0, 32.5)
+	add_child(fn)
+	workstations.append(fn)
+
 func _spawn_initial_citizens() -> void:
 	var roles_to_spawn = [
 		{"role": Citizen.Role.FARMER, "name": "Geoffrey"},

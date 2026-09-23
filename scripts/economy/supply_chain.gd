@@ -13,8 +13,11 @@ var inventory: Dictionary = {
 	"logs": 30,
 	"planks": 15,
 	"stone": 25,
-	"iron_ore": 0,
-	"iron_ingots": 0,
+	"coal": 12,
+	"iron_ore": 6,
+	"copper_ore": 4,
+	"iron_ingots": 2,
+	"copper_ingot": 0,
 	"tools": 10,
 	"weapons": 5
 }
@@ -69,16 +72,19 @@ func process_production_cycle(assigned_citizens: Dictionary) -> Dictionary:
 	add_resource("logs", logs_produced)
 	report["produced"]["logs"] = logs_produced
 
-	# 4. Miners produce stone and iron ore
+	# 4. Miners produce stone, coal, and iron ore
 	var miners = assigned_citizens.get("miner", 0)
 	var stone_produced = miners * 3
 	var iron_produced = miners * 1
+	var coal_produced = miners * 2
 	add_resource("stone", stone_produced)
 	add_resource("iron_ore", iron_produced)
+	add_resource("coal", coal_produced)
 	report["produced"]["stone"] = stone_produced
 	report["produced"]["iron_ore"] = iron_produced
+	report["produced"]["coal"] = coal_produced
 
-	# 5. Blacksmiths turn iron ore and logs into tools & weapons
+	# 5. Blacksmiths turn iron ore/ingots and logs into tools & weapons
 	var blacksmiths = assigned_citizens.get("blacksmith", 0)
 	for i in range(blacksmiths):
 		if consume_resource("iron_ore", 2) and consume_resource("logs", 1):
