@@ -711,6 +711,155 @@ def build_runestone():
 
     export_glb("runestone.glb")
 
+# -------------------------------------------------------------
+# 18. Create-Style Kinetic Windmill & Milling Tower
+# -------------------------------------------------------------
+def build_windmill():
+    reset_scene()
+    mat_stone = create_material("MillStone", (0.35, 0.35, 0.36, 1.0), roughness=0.9)
+    mat_wood = create_material("MillWood", (0.42, 0.26, 0.14, 1.0), roughness=0.8)
+    mat_roof = create_material("MillRoof", (0.55, 0.45, 0.30, 1.0), roughness=0.95)
+    mat_sail = create_material("MillSail", (0.88, 0.86, 0.80, 1.0), roughness=0.9)
+    mat_iron = create_material("MillIron", (0.25, 0.25, 0.27, 1.0), roughness=0.4, metallic=0.9)
+
+    # 1. Stone Round Tower Base (Height 2.8m, Radius 1.1m)
+    bpy.ops.mesh.primitive_cylinder_add(radius=1.1, depth=2.8, vertices=12, location=(0, 0, 1.4))
+    tower = bpy.context.active_object
+    tower.data.materials.append(mat_stone)
+
+    # 2. Upper Timber Machinery Loft (Height 1.2m, Radius 0.95m)
+    bpy.ops.mesh.primitive_cylinder_add(radius=0.95, depth=1.2, vertices=10, location=(0, 0, 3.4))
+    loft = bpy.context.active_object
+    loft.data.materials.append(mat_wood)
+
+    # 3. Conical Thatched / Shingle Roof
+    bpy.ops.mesh.primitive_cone_add(radius1=1.2, depth=1.1, vertices=12, location=(0, 0, 4.55))
+    roof = bpy.context.active_object
+    roof.data.materials.append(mat_roof)
+
+    # 4. Central Horizontal Rotor Hub
+    bpy.ops.mesh.primitive_cylinder_add(radius=0.18, depth=0.45, vertices=8, location=(0, 1.05, 3.4), rotation=(math.radians(90), 0, 0))
+    hub = bpy.context.active_object
+    hub.data.materials.append(mat_iron)
+
+    # 5. Four Kinetic Lattice Sails (Cross configuration, 1.8m span)
+    for angle in [0, 90, 180, 270]:
+        rad = math.radians(angle)
+        # Wooden sail spar beam
+        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 1.2, 3.4))
+        spar = bpy.context.active_object
+        spar.scale = (0.06, 0.04, 1.8)
+        spar.rotation_euler = (0, rad, 0)
+        spar.data.materials.append(mat_wood)
+
+        # Cloth wind-catching sail vane
+        sx = 0.45 * math.cos(rad)
+        sz = 0.45 * math.sin(rad)
+        bpy.ops.mesh.primitive_cube_add(size=1.0, location=(sx, 1.22, 3.4 + sz))
+        sail = bpy.context.active_object
+        sail.scale = (0.45, 0.02, 0.75)
+        sail.rotation_euler = (0, rad, 0)
+        sail.data.materials.append(mat_sail)
+
+    export_glb("windmill.glb")
+
+# -------------------------------------------------------------
+# 19. Farmer's Delight Cast Iron Cooking Pot & Hearth
+# -------------------------------------------------------------
+def build_cooking_pot():
+    reset_scene()
+    mat_iron = create_material("PotIron", (0.18, 0.18, 0.20, 1.0), roughness=0.5, metallic=0.8)
+    mat_ember = create_material("PotEmber", (0.95, 0.45, 0.1, 1.0), roughness=0.3)
+    bsdf_e = mat_ember.node_tree.nodes.get("Principled BSDF")
+    if bsdf_e:
+        bsdf_e.inputs["Emission Color"].default_value = (1.0, 0.4, 0.05, 1.0)
+        bsdf_e.inputs["Emission Strength"].default_value = 2.5
+    mat_stew = create_material("StewBroth", (0.68, 0.38, 0.15, 1.0), roughness=0.2)
+    mat_wood = create_material("LadleWood", (0.48, 0.32, 0.18, 1.0), roughness=0.8)
+
+    # 1. Hot glowing embers base
+    bpy.ops.mesh.primitive_cylinder_add(radius=0.45, depth=0.08, vertices=8, location=(0, 0, 0.04))
+    embers = bpy.context.active_object
+    embers.data.materials.append(mat_ember)
+
+    # 2. Three Iron Tripod Legs
+    for i in range(3):
+        angle = math.radians(i * 120.0)
+        lx = 0.32 * math.cos(angle)
+        ly = 0.32 * math.sin(angle)
+        bpy.ops.mesh.primitive_cylinder_add(radius=0.03, depth=0.4, vertices=6, location=(lx, ly, 0.2), rotation=(math.radians(15) * math.sin(angle), -math.radians(15) * math.cos(angle), 0))
+        leg = bpy.context.active_object
+        leg.data.materials.append(mat_iron)
+
+    # 3. Main Cauldron Body (Round bottom pot)
+    bpy.ops.mesh.primitive_cylinder_add(radius=0.38, depth=0.36, vertices=12, location=(0, 0, 0.38))
+    cauldron = bpy.context.active_object
+    cauldron.data.materials.append(mat_iron)
+
+    # 4. Pot Rim & Handles
+    bpy.ops.mesh.primitive_torus_add(major_radius=0.39, minor_radius=0.03, location=(0, 0, 0.56))
+    rim = bpy.context.active_object
+    rim.data.materials.append(mat_iron)
+
+    for side in [-0.42, 0.42]:
+        bpy.ops.mesh.primitive_torus_add(major_radius=0.07, minor_radius=0.015, location=(side, 0, 0.48), rotation=(0, math.radians(90), 0))
+        handle = bpy.context.active_object
+        handle.data.materials.append(mat_iron)
+
+    # 5. Hearty Simmering Stew Surface
+    bpy.ops.mesh.primitive_cylinder_add(radius=0.36, depth=0.02, vertices=10, location=(0, 0, 0.50))
+    stew = bpy.context.active_object
+    stew.data.materials.append(mat_stew)
+
+    # 6. Wooden Stew Stirring Ladle
+    bpy.ops.mesh.primitive_cylinder_add(radius=0.02, depth=0.55, vertices=6, location=(0.18, 0.12, 0.62), rotation=(math.radians(-25), math.radians(20), 0))
+    ladle = bpy.context.active_object
+    ladle.data.materials.append(mat_wood)
+
+    export_glb("cooking_pot.glb")
+
+# -------------------------------------------------------------
+# 20. Royal Feudal War Horn (Colony Alarm & Rally Heraldry)
+# -------------------------------------------------------------
+def build_war_horn():
+    reset_scene()
+    mat_horn = create_material("HornBone", (0.75, 0.70, 0.60, 1.0), roughness=0.6)
+    mat_gold = create_material("HornGold", (0.95, 0.78, 0.25, 1.0), roughness=0.3, metallic=0.9)
+    mat_strap = create_material("HornLeather", (0.35, 0.20, 0.12, 1.0), roughness=0.9)
+
+    # Segmented curved horn body (tapering from 0.08m bell down to 0.025m mouthpiece)
+    segments = 6
+    for i in range(segments):
+        t = i / float(segments)
+        radius = 0.08 * (1.0 - t * 0.7)
+        angle = math.radians(t * 55.0)
+        hx = t * 0.38
+        hy = math.sin(angle) * 0.14
+        hz = 0.05 + (1.0 - math.cos(angle)) * 0.08
+
+        bpy.ops.mesh.primitive_cylinder_add(radius=radius, depth=0.08, vertices=8, location=(hx, hy, hz), rotation=(0, angle, 0))
+        seg = bpy.context.active_object
+        seg.data.materials.append(mat_horn)
+
+    # Gilded brass bell rim at wide opening
+    bpy.ops.mesh.primitive_torus_add(major_radius=0.085, minor_radius=0.015, location=(0, 0, 0.05), rotation=(0, 0, 0))
+    bell = bpy.context.active_object
+    bell.data.materials.append(mat_gold)
+
+    # Brass mouthpiece at narrow end
+    t_end = 1.0
+    end_angle = math.radians(55.0)
+    bpy.ops.mesh.primitive_cylinder_add(radius=0.03, depth=0.06, vertices=8, location=(0.38, math.sin(end_angle)*0.14, 0.05 + (1.0 - math.cos(end_angle))*0.08), rotation=(0, end_angle, 0))
+    mouthpiece = bpy.context.active_object
+    mouthpiece.data.materials.append(mat_gold)
+
+    # Decorative leather hanging cord
+    bpy.ops.mesh.primitive_torus_add(major_radius=0.18, minor_radius=0.01, location=(0.20, 0.08, 0.14), rotation=(math.radians(45), 0, 0))
+    cord = bpy.context.active_object
+    cord.data.materials.append(mat_strap)
+
+    export_glb("war_horn.glb")
+
 if __name__ == "__main__":
     print("[BLENDER SCRIPT] Starting procedural 3D medieval model generation...")
     build_pickaxe()
@@ -730,6 +879,9 @@ if __name__ == "__main__":
     build_enchanter_table()
     build_bandit_warlord()
     build_runestone()
+    build_windmill()
+    build_cooking_pot()
+    build_war_horn()
     print("[BLENDER SCRIPT] All models generated successfully!")
 
 

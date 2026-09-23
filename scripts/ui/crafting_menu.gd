@@ -11,6 +11,7 @@ var supply_chain: SupplyChain
 var active_workstation: Workstation = null
 var active_caravan: TradeCaravan = null
 var active_enchanter: EnchanterTable = null
+var active_cooking_pot: CookingPot = null
 
 var is_open: bool = false
 
@@ -101,6 +102,21 @@ const RECIPES: Dictionary = {
 			"output": {"name": "Arcane Enchanter's Table", "type": "placeable", "icon": "🔮", "count": 1}
 		},
 		{
+			"name": "Kinetic Windmill Tower",
+			"inputs": {"logs": 12, "stone_bricks": 8, "fine_fabric": 2},
+			"output": {"name": "Kinetic Windmill Tower", "type": "placeable", "icon": "⚙️", "count": 1}
+		},
+		{
+			"name": "Cooking Pot & Hearth",
+			"inputs": {"iron_ingots": 3, "logs": 2, "stone": 4},
+			"output": {"name": "Cooking Pot", "type": "placeable", "icon": "🍲", "count": 1}
+		},
+		{
+			"name": "Royal War Horn",
+			"inputs": {"wolf_tooth": 2, "gold_ingot": 1, "logs": 1},
+			"output": {"name": "Royal War Horn", "type": "tool", "tool_type": "horn", "icon": "📯", "count": 1}
+		},
+		{
 			"name": "Defensive Gate",
 			"inputs": {"logs": 4, "iron_ingots": 2},
 			"output": {"name": "Defensive Gate", "type": "block", "block_type": 21, "icon": "🚪", "count": 1}
@@ -175,6 +191,23 @@ const RECIPES: Dictionary = {
 			"name": "Rune of Power I",
 			"inputs": {"spider_thread": 1, "blood_vial": 1, "logs": 1},
 			"output": {"name": "Rune of Power I", "type": "rune", "enchantment": "power", "level": 1, "icon": "🏹", "count": 1}
+		}
+	],
+	"cooking_pot": [
+		{
+			"name": "Hearty Hunter Stew",
+			"inputs": {"meat": 1, "wheat": 2, "herbs": 1},
+			"output": {"name": "Hearty Hunter Stew", "type": "food", "nutrition": 60.0, "warmth_bonus": 40.0, "icon": "🍲", "count": 1}
+		},
+		{
+			"name": "Feudal Vegetable Broth",
+			"inputs": {"wheat": 2, "herbs": 2},
+			"output": {"name": "Vegetable Broth", "type": "food", "nutrition": 35.0, "warmth_bonus": 25.0, "icon": "🥣", "count": 1}
+		},
+		{
+			"name": "Roasted Noble Feast",
+			"inputs": {"meat": 2, "bread": 2, "herbs": 2},
+			"output": {"name": "Noble Feast", "type": "food", "nutrition": 85.0, "warmth_bonus": 50.0, "icon": "🍖", "count": 1}
 		}
 	]
 }
@@ -266,15 +299,24 @@ func open_menu(target: Node = null) -> void:
 		active_caravan = target
 		active_workstation = null
 		active_enchanter = null
+		active_cooking_pot = null
 		_populate_caravan_trade()
 	elif target is EnchanterTable:
 		active_caravan = null
 		active_workstation = null
+		active_cooking_pot = null
 		active_enchanter = target
 		_populate_enchanter_recipes()
+	elif target is CookingPot:
+		active_caravan = null
+		active_workstation = null
+		active_enchanter = null
+		active_cooking_pot = target
+		_populate_cooking_recipes()
 	else:
 		active_caravan = null
 		active_enchanter = null
+		active_cooking_pot = null
 		active_workstation = target as Workstation
 		_populate_recipes()
 
@@ -284,6 +326,7 @@ func close_menu() -> void:
 	active_workstation = null
 	active_caravan = null
 	active_enchanter = null
+	active_cooking_pot = null
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -295,6 +338,38 @@ func _unhandled_input(event: InputEvent) -> void:
 				open_menu(null)
 		elif event.keycode == KEY_E and is_open:
 			close_menu()
+
+func _populate_cooking_recipes() -> void:
+	for child in recipe_list_vbox.get_children():
+		child.queue_free()
+		
+	header_title.text = "🍲 FEUDAL HEARTH & COOKING POT"
+	var recipes = RECIPES.get("cooking_pot", [])
+	for recipe in recipes:
+		var row = HBoxContainer.new()
+		row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		
+		var name_lbl = Label.new()
+		name_lbl.text = "%s %s" % [recipe["output"].get("icon", "🍲"), recipe["name"]]
+		name_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		row.add_child(name_lbl)
+		
+		var req_text = "Cost: "
+		for mat in recipe["inputs"].keys():
+			var count = recipe["inputs"][mat]
+			var avail = supply_chain.inventory.get(mat, 0) if supply_chain else 0
+			req_text += "%s: %d/%d  " % [mat, avail, count]
+		var cost_lbl = Label.new()
+		cost_lbl.text = req_text
+		cost_lbl.modulate = Color(1.0, 0.8, 0.5)
+		row.add_child(cost_lbl)
+		
+		var btn = Button.new()
+		btn.text = " Simmer Meal "
+		btn.pressed.connect(_on_craft_pressed.bind(recipe))
+		row.add_child(btn)
+		
+		recipe_list_vbox.add_child(row)
 
 func _populate_enchanter_recipes() -> void:
 	for child in recipe_list_vbox.get_children():
@@ -449,6 +524,8 @@ func _on_craft_pressed(recipe: Dictionary) -> void:
 	emit_signal("item_crafted", recipe["name"], out_item)
 	if active_enchanter:
 		_populate_enchanter_recipes()
+	elif active_cooking_pot:
+		_populate_cooking_recipes()
 	elif active_workstation:
 		_populate_recipes()
 
