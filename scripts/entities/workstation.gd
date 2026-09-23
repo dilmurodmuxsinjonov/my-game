@@ -62,10 +62,18 @@ func _setup_station() -> void:
 			collision_box.position = Vector3(0, 0.5, 0)
 			
 		StationType.FURNACE:
-			glb_path = "res://assets/models/workbench.glb"
+			glb_path = "res://assets/models/furnace.glb"
 			station_name = "Stone Bloomery Furnace"
 			box_shape.size = Vector3(1.2, 1.4, 1.2)
 			collision_box.position = Vector3(0, 0.7, 0)
+			
+			omni_light = OmniLight3D.new()
+			omni_light.light_color = Color(1.0, 0.45, 0.1)
+			omni_light.light_energy = 3.2
+			omni_light.omni_range = 7.0
+			omni_light.shadow_enabled = true
+			omni_light.position = Vector3(0, 0.6, 0)
+			add_child(omni_light)
 
 	collision_box.shape = box_shape
 	add_child(collision_box)

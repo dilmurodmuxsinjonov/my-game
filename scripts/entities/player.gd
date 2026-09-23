@@ -316,6 +316,28 @@ func _handle_secondary_action() -> void:
 			item["count"] -= 1
 			emit_signal("block_action_performed", "place", result["pos"], result["type"])
 			emit_signal("hotbar_slot_changed", active_slot, item)
+			return
+
+	# 5. Placeable workstation placement (Furnace, Campfire, Crate, Workbench)
+	if item.get("type") == "placeable" and item.get("count", 0) > 0 and item.get("name") != "Torch":
+		var st_type = item.get("station_type", Workstation.StationType.CAMPFIRE)
+		var item_name = item.get("name", "")
+		if "Furnace" in item_name:
+			st_type = Workstation.StationType.FURNACE
+		elif "Crate" in item_name:
+			st_type = Workstation.StationType.CRATE
+		elif "Campfire" in item_name:
+			st_type = Workstation.StationType.CAMPFIRE
+		elif "Workbench" in item_name:
+			st_type = Workstation.StationType.WORKBENCH
+			
+		var ws = Workstation.new(st_type)
+		ws.position = hit_point + hit_normal * 0.5
+		get_tree().current_scene.add_child(ws)
+		item["count"] -= 1
+		emit_signal("block_action_performed", "place_station", Vector3i(int(ws.position.x), int(ws.position.y), int(ws.position.z)), 0)
+		emit_signal("hotbar_slot_changed", active_slot, item)
+		return
 
 func _add_resource_from_mined_block(block_type: int) -> void:
 	if not supply_chain:
@@ -329,5 +351,15 @@ func _add_resource_from_mined_block(block_type: int) -> void:
 			supply_chain.add_resource("iron_ore", 1)
 		VoxelChunk.BlockType.COAL_ORE:
 			supply_chain.add_resource("coal", 1)
+		VoxelChunk.BlockType.COPPER_ORE:
+			supply_chain.add_resource("copper_ore", 1)
+		VoxelChunk.BlockType.GOLD_ORE:
+			supply_chain.add_resource("gold_ore", 1)
+		VoxelChunk.BlockType.DEEP_GEM_ORE:
+			supply_chain.add_resource("gems", 1)
+		VoxelChunk.BlockType.STONE_BRICKS:
+			supply_chain.add_resource("stone_bricks", 1)
+		VoxelChunk.BlockType.SUPPORT_BEAM:
+			supply_chain.add_resource("support_beam", 1)
 		VoxelChunk.BlockType.WHEAT_CROP:
 			supply_chain.add_resource("wheat", 2)

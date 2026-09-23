@@ -280,6 +280,133 @@ def build_citizen():
 
     export_glb("citizen.glb")
 
+# -------------------------------------------------------------
+# 8. Smelting Furnace Workstation
+# -------------------------------------------------------------
+def build_furnace():
+    reset_scene()
+    mat_stone = create_material("FurnaceStone", (0.35, 0.35, 0.37, 1.0), roughness=0.9)
+    mat_hearth = create_material("FurnaceFire", (1.0, 0.35, 0.05, 1.0), roughness=0.2)
+    bsdf = mat_hearth.node_tree.nodes.get("Principled BSDF")
+    if bsdf:
+        bsdf.inputs["Emission Color"].default_value = (1.0, 0.3, 0.02, 1.0)
+        bsdf.inputs["Emission Strength"].default_value = 4.0
+    mat_iron = create_material("FurnaceGrate", (0.2, 0.2, 0.2, 1.0), roughness=0.5, metallic=0.9)
+
+    # Base stone body
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0, 0.5))
+    base = bpy.context.active_object
+    base.name = "FurnaceBase"
+    base.scale = (0.9, 0.9, 1.0)
+    base.data.materials.append(mat_stone)
+
+    # Hearth opening / interior fire
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, -0.42, 0.35))
+    fire = bpy.context.active_object
+    fire.name = "HearthFire"
+    fire.scale = (0.45, 0.2, 0.35)
+    fire.data.materials.append(mat_hearth)
+
+    # Iron Grate bars
+    for i in [-0.15, 0.0, 0.15]:
+        bpy.ops.mesh.primitive_cylinder_add(radius=0.015, depth=0.35, vertices=6, location=(i, -0.45, 0.35))
+        bar = bpy.context.active_object
+        bar.data.materials.append(mat_iron)
+
+    # Chimney stack
+    bpy.ops.mesh.primitive_cylinder_add(radius=0.25, depth=0.5, vertices=8, location=(0, 0, 1.25))
+    chimney = bpy.context.active_object
+    chimney.name = "Chimney"
+    chimney.data.materials.append(mat_stone)
+
+    export_glb("furnace.glb")
+
+# -------------------------------------------------------------
+# 9. Mine Structural Support Beam
+# -------------------------------------------------------------
+def build_support_beam():
+    reset_scene()
+    mat_wood = create_material("BeamWood", (0.32, 0.20, 0.10, 1.0), roughness=0.92)
+    mat_bracket = create_material("IronBracket", (0.25, 0.25, 0.27, 1.0), roughness=0.4, metallic=0.8)
+
+    # Vertical post
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0, 1.0))
+    post = bpy.context.active_object
+    post.name = "SupportPost"
+    post.scale = (0.22, 0.22, 2.0)
+    post.data.materials.append(mat_wood)
+
+    # Top crossbeam
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0, 1.95))
+    cross = bpy.context.active_object
+    cross.name = "TopCrossbeam"
+    cross.scale = (0.9, 0.25, 0.18)
+    cross.data.materials.append(mat_wood)
+
+    # Diagonal braces
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(-0.25, 0, 1.65), rotation=(0, math.radians(45), 0))
+    brace1 = bpy.context.active_object
+    brace1.scale = (0.1, 0.18, 0.4)
+    brace1.data.materials.append(mat_wood)
+
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0.25, 0, 1.65), rotation=(0, math.radians(-45), 0))
+    brace2 = bpy.context.active_object
+    brace2.scale = (0.1, 0.18, 0.4)
+    brace2.data.materials.append(mat_wood)
+
+    # Iron bracket bands
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0, 1.85))
+    bracket = bpy.context.active_object
+    bracket.scale = (0.26, 0.26, 0.08)
+    bracket.data.materials.append(mat_bracket)
+
+    export_glb("support_beam.glb")
+
+# -------------------------------------------------------------
+# 10. Bandit Raider Entity
+# -------------------------------------------------------------
+def build_bandit():
+    reset_scene()
+    mat_tunic = create_material("BanditTunic", (0.25, 0.12, 0.12, 1.0), roughness=0.85)
+    mat_pants = create_material("BanditPants", (0.18, 0.16, 0.15, 1.0), roughness=0.88)
+    mat_hood = create_material("BanditHood", (0.15, 0.10, 0.10, 1.0), roughness=0.9)
+    mat_steel = create_material("BanditSteel", (0.6, 0.6, 0.65, 1.0), roughness=0.3, metallic=0.85)
+
+    # Torso
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0, 1.05))
+    torso = bpy.context.active_object
+    torso.scale = (0.44, 0.26, 0.55)
+    torso.data.materials.append(mat_tunic)
+
+    # Head & Hood
+    bpy.ops.mesh.primitive_cube_add(size=0.34, location=(0, 0, 1.5))
+    head = bpy.context.active_object
+    head.data.materials.append(mat_hood)
+
+    # Spiked helmet tip
+    bpy.ops.mesh.primitive_cone_add(radius1=0.04, depth=0.15, vertices=6, location=(0, 0, 1.72))
+    spike = bpy.context.active_object
+    spike.data.materials.append(mat_steel)
+
+    # Left & Right Legs
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(-0.12, 0, 0.4))
+    lleg = bpy.context.active_object
+    lleg.scale = (0.14, 0.18, 0.75)
+    lleg.data.materials.append(mat_pants)
+
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0.12, 0, 0.4))
+    rleg = bpy.context.active_object
+    rleg.scale = (0.14, 0.18, 0.75)
+    rleg.data.materials.append(mat_pants)
+
+    # Weapon in hand (Dagger)
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0.32, -0.2, 0.85), rotation=(math.radians(35), 0, 0))
+    dagger = bpy.context.active_object
+    dagger.scale = (0.04, 0.04, 0.4)
+    dagger.data.materials.append(mat_steel)
+
+    export_glb("bandit.glb")
+
 if __name__ == "__main__":
     print("[BLENDER SCRIPT] Starting procedural 3D medieval model generation...")
     build_pickaxe()
@@ -289,4 +416,7 @@ if __name__ == "__main__":
     build_campfire()
     build_crate()
     build_citizen()
+    build_furnace()
+    build_support_beam()
+    build_bandit()
     print("[BLENDER SCRIPT] All models generated successfully!")

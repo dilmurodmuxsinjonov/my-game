@@ -40,6 +40,16 @@ const RECIPES: Dictionary = {
 			"name": "Wall Torch (x4)",
 			"inputs": {"logs": 1, "coal": 1},
 			"output": {"name": "Torch", "type": "placeable", "icon": "🕯️", "count": 4}
+		},
+		{
+			"name": "Smelting Furnace",
+			"inputs": {"stone": 8},
+			"output": {"name": "Smelting Furnace", "type": "placeable", "station_type": 3, "icon": "🌋", "count": 1}
+		},
+		{
+			"name": "Mine Support Beam (x2)",
+			"inputs": {"logs": 2, "stone": 1},
+			"output": {"name": "Support Beam", "type": "block", "block_type": 17, "icon": "🪵", "count": 2}
 		}
 	],
 	"workbench": [
@@ -79,6 +89,33 @@ const RECIPES: Dictionary = {
 			"name": "Baked Rations (x2)",
 			"inputs": {"wheat": 2},
 			"output": {"name": "Ration Bread", "type": "food", "nutrition": 25.0, "icon": "🍞", "count": 2}
+		}
+	],
+	"furnace": [
+		{
+			"name": "Smelt Iron Ingot",
+			"inputs": {"iron_ore": 1, "coal": 1},
+			"output": {"name": "Iron Ingot", "type": "material", "icon": "🔩", "count": 1}
+		},
+		{
+			"name": "Smelt Copper Ingot",
+			"inputs": {"copper_ore": 1, "coal": 1},
+			"output": {"name": "Copper Ingot", "type": "material", "icon": "🪙", "count": 1}
+		},
+		{
+			"name": "Smelt Gold Ingot",
+			"inputs": {"gold_ore": 1, "coal": 2},
+			"output": {"name": "Gold Ingot", "type": "material", "icon": "🧈", "count": 1}
+		},
+		{
+			"name": "Bake Stone Bricks (x4)",
+			"inputs": {"stone": 4, "coal": 1},
+			"output": {"name": "Stone Bricks", "type": "block", "block_type": 16, "icon": "🧱", "count": 4}
+		},
+		{
+			"name": "Forge Steel Ingot",
+			"inputs": {"iron_ore": 2, "coal": 3},
+			"output": {"name": "Steel Ingot", "type": "material", "icon": "⚔️", "count": 1}
 		}
 	]
 }
@@ -198,6 +235,9 @@ func _populate_recipes() -> void:
 			Workstation.StationType.CAMPFIRE:
 				category = "campfire"
 				header_title.text = "🔥 SETTLEMENT CAMPFIRE"
+			Workstation.StationType.FURNACE:
+				category = "furnace"
+				header_title.text = "🌋 STONE BLOOMERY FURNACE"
 			Workstation.StationType.CRATE:
 				header_title.text = "📦 ROYAL STOCKPILE CRATE"
 				_populate_crate_storage()
