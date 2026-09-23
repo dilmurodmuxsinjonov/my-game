@@ -51,6 +51,16 @@ const RECIPES: Dictionary = {
 			"name": "Mine Support Beam (x2)",
 			"inputs": {"logs": 2, "stone": 1},
 			"output": {"name": "Support Beam", "type": "block", "block_type": 17, "icon": "🪵", "count": 2}
+		},
+		{
+			"name": "Wooden Palisade (x4)",
+			"inputs": {"logs": 4},
+			"output": {"name": "Wooden Palisade", "type": "block", "block_type": 19, "icon": "🪵", "count": 4}
+		},
+		{
+			"name": "Stone Battlement (x4)",
+			"inputs": {"stone_bricks": 4},
+			"output": {"name": "Stone Battlement", "type": "block", "block_type": 20, "icon": "🧱", "count": 4}
 		}
 	],
 	"workbench": [
@@ -68,6 +78,26 @@ const RECIPES: Dictionary = {
 			"name": "Knight's Sword",
 			"inputs": {"iron_ore": 3, "logs": 1},
 			"output": {"name": "Knight Sword", "type": "tool", "tool_type": "sword", "icon": "⚔️", "count": 1}
+		},
+		{
+			"name": "Hunting Bow",
+			"inputs": {"logs": 3, "fine_fabric": 1},
+			"output": {"name": "Hunting Bow", "type": "tool", "tool_type": "bow", "icon": "🏹", "count": 1}
+		},
+		{
+			"name": "Arrow Bundle (x10)",
+			"inputs": {"logs": 1, "iron_ingots": 1},
+			"output": {"name": "Arrows", "type": "arrow", "icon": "🎯", "count": 10}
+		},
+		{
+			"name": "Defensive Watchtower",
+			"inputs": {"logs": 8, "stone_bricks": 4},
+			"output": {"name": "Watchtower", "type": "placeable", "icon": "🏰", "count": 1}
+		},
+		{
+			"name": "Defensive Gate",
+			"inputs": {"logs": 4, "iron_ingots": 2},
+			"output": {"name": "Defensive Gate", "type": "block", "block_type": 21, "icon": "🚪", "count": 1}
 		},
 		{
 			"name": "Farmland Hoe",

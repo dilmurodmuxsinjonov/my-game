@@ -26,7 +26,8 @@ enum State {
 	EATING = 6,
 	SLEEPING = 7,
 	HEALING = 8,
-	FLEEING = 9
+	FLEEING = 9,
+	DEFENDING = 10
 }
 
 @export var citizen_name: String = "Aldous"
@@ -49,6 +50,11 @@ var path_index: int = 0
 var pathfinder: GridPathfinder3D
 var voxel_world: VoxelWorld
 var supply_chain: SupplyChain
+
+# Guard & Defense
+var shoot_cooldown: float = 0.0
+var target_bandit: Node3D = null
+var watchtower_ref: Node3D = null
 
 # Locations & Timers
 var workplace_pos: Vector3 = Vector3.ZERO
@@ -110,6 +116,8 @@ func set_role(new_role: Role, work_target: Vector3 = Vector3.ZERO) -> void:
 		
 	if current_role == Role.UNASSIGNED:
 		_transition_to(State.IDLE)
+	elif current_role == Role.GUARD:
+		_navigate_to(workplace_pos, State.DEFENDING)
 	else:
 		_navigate_to(workplace_pos, State.MOVING_TO_WORK)
 
@@ -134,16 +142,19 @@ func _physics_process(delta: float) -> void:
 		
 	match current_state:
 		State.IDLE:
-			state_timer += delta
-			if state_timer >= wander_cooldown:
-				state_timer = 0.0
-				_start_wandering()
+			if current_role == Role.GUARD:
+				_transition_to(State.DEFENDING)
+			else:
+				state_timer += delta
+				if state_timer >= wander_cooldown:
+					state_timer = 0.0
+					_start_wandering()
 				
 		State.WANDER:
-			_follow_path(delta, State.IDLE)
+			_follow_path(delta, State.DEFENDING if current_role == Role.GUARD else State.IDLE)
 			
 		State.MOVING_TO_WORK:
-			_follow_path(delta, State.WORKING)
+			_follow_path(delta, State.DEFENDING if current_role == Role.GUARD else State.WORKING)
 			
 		State.WORKING:
 			velocity.x = 0
@@ -153,6 +164,11 @@ func _physics_process(delta: float) -> void:
 				state_timer = 0.0
 				_complete_work_cycle()
 				
+		State.DEFENDING:
+			velocity.x = 0
+			velocity.z = 0
+			_process_guard_defense(delta)
+				
 		State.EATING:
 			velocity.x = 0
 			velocity.z = 0
@@ -160,7 +176,7 @@ func _physics_process(delta: float) -> void:
 			if state_timer >= 2.0:
 				state_timer = 0.0
 				hunger = maxf(0.0, hunger - 40.0)
-				_transition_to(State.IDLE if current_role == Role.UNASSIGNED else State.MOVING_TO_WORK)
+				_transition_to(State.IDLE if current_role == Role.UNASSIGNED else (State.DEFENDING if current_role == Role.GUARD else State.MOVING_TO_WORK))
 				
 		State.FLEEING:
 			_follow_path(delta, State.IDLE)
@@ -256,6 +272,50 @@ func take_damage(amount: float) -> void:
 	if health <= 0.0:
 		_transition_to(State.HEALING)
 		health = 25.0
+
+func _process_guard_defense(delta: float) -> void:
+	shoot_cooldown = maxf(0.0, shoot_cooldown - delta)
+	
+	# Scan for bandits
+	var scan_range = 24.0
+	var damage_mult = 1.0
+	if watchtower_ref:
+		scan_range *= Watchtower.RANGE_BONUS_MULT
+		damage_mult *= Watchtower.DAMAGE_BONUS_MULT
+		
+	if not target_bandit or not is_instance_valid(target_bandit) or target_bandit.health <= 0.0 or global_position.distance_to(target_bandit.global_position) > scan_range:
+		target_bandit = null
+		var bandits = get_tree().get_nodes_in_group("bandits")
+		var closest_dist = scan_range
+		for b in bandits:
+			if b is Node3D and is_instance_valid(b) and b.get("health") > 0.0:
+				var d = global_position.distance_to(b.global_position)
+				if d < closest_dist:
+					closest_dist = d
+					target_bandit = b
+					
+	if target_bandit and is_instance_valid(target_bandit):
+		var diff = target_bandit.global_position - global_position
+		diff.y = 0
+		if diff.length_squared() > 0.01:
+			var target_rot = atan2(-diff.x, -diff.z)
+			rotation.y = lerp_angle(rotation.y, target_rot, 8.0 * delta)
+			
+		if shoot_cooldown <= 0.0:
+			shoot_cooldown = 1.8
+			_fire_arrow_at(target_bandit, damage_mult)
+	else:
+		state_timer += delta
+		if state_timer >= 3.0:
+			state_timer = 0.0
+			_start_wandering()
+
+func _fire_arrow_at(target: Node3D, dmg_mult: float) -> void:
+	var proj = Projectile.new()
+	var spawn_pos = global_position + Vector3(0, 1.3, 0)
+	var dir = (target.global_position + Vector3(0, 0.8, 0) - spawn_pos).normalized()
+	get_parent().add_child(proj)
+	proj.launch(spawn_pos, dir, 32.0, 30.0 * dmg_mult, self)
 
 func _get_role_name(r: Role) -> String:
 	match r:

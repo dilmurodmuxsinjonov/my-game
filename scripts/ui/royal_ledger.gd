@@ -27,7 +27,8 @@ var assigned_citizens: Dictionary = {
 	"lumberjack": 2,
 	"miner": 1,
 	"baker": 1,
-	"blacksmith": 0
+	"blacksmith": 0,
+	"guard": 0
 }
 var total_citizens: int = 8
 
@@ -130,7 +131,7 @@ func _build_ui() -> void:
 	demo_title.add_theme_font_size_override("font_size", 15)
 	col1.add_child(demo_title)
 	
-	for role in ["farmer", "lumberjack", "miner", "baker", "blacksmith"]:
+	for role in ["farmer", "lumberjack", "miner", "baker", "blacksmith", "guard"]:
 		var row = HBoxContainer.new()
 		var r_name = Label.new()
 		r_name.text = role.capitalize() + ":"
