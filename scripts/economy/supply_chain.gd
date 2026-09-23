@@ -32,6 +32,11 @@ var quota_modes: Dictionary = {
 var inventory: Dictionary = {
 	"wheat": 20,
 	"bread": 50,
+	"meat": 15,
+	"rock_salt": 10,
+	"cured_meat": 0,
+	"smoked_meat": 0,
+	"compost": 0,
 	"logs": 30,
 	"planks": 15,
 	"stone": 25,
@@ -40,9 +45,23 @@ var inventory: Dictionary = {
 	"copper_ore": 4,
 	"iron_ingots": 2,
 	"copper_ingot": 0,
+	"steel_ingot": 4,
 	"tools": 10,
 	"weapons": 5
 }
+
+func salt_meat(amount: int) -> bool:
+	if consume_resource("meat", amount) and consume_resource("rock_salt", amount):
+		add_resource("cured_meat", amount)
+		return true
+	return false
+
+func smoke_meat(amount: int) -> bool:
+	var wood_needed = maxi(1, int(ceil(float(amount) / 2.0)))
+	if consume_resource("meat", amount) and consume_resource("logs", wood_needed):
+		add_resource("smoked_meat", amount)
+		return true
+	return false
 
 # Production rates per game cycle (1 game hour)
 var daily_production: Dictionary = {}

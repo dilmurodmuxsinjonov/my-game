@@ -1,6 +1,8 @@
 class_name CraftingMenu
 extends Control
 
+const Anvil = preload("res://scripts/world/anvil.gd")
+
 ## Crafting & Workstation GUI Modal.
 ## Manages recipes for Handcrafting, Carpentry Workbench, Campfire Cooking, and Stockpile Crates.
 
@@ -12,6 +14,7 @@ var active_workstation: Workstation = null
 var active_caravan: TradeCaravan = null
 var active_enchanter: EnchanterTable = null
 var active_cooking_pot: CookingPot = null
+var active_anvil: Node = null
 
 var is_open: bool = false
 
@@ -160,6 +163,16 @@ const RECIPES: Dictionary = {
 			"name": "Wheat Seeds (x4)",
 			"inputs": {"wheat": 1},
 			"output": {"name": "Wheat Seeds", "type": "seed", "icon": "🌱", "count": 4}
+		},
+		{
+			"name": "Blacksmith's Anvil",
+			"inputs": {"iron_ingots": 4, "logs": 2},
+			"output": {"name": "Blacksmith's Anvil", "type": "placeable", "icon": "⚒️", "count": 1}
+		},
+		{
+			"name": "Timber Smoke Rack",
+			"inputs": {"logs": 3},
+			"output": {"name": "Timber Smoke Rack", "type": "placeable", "icon": "🍖", "count": 1}
 		}
 	],
 	"campfire": [
@@ -167,6 +180,16 @@ const RECIPES: Dictionary = {
 			"name": "Baked Rations (x2)",
 			"inputs": {"wheat": 2},
 			"output": {"name": "Ration Bread", "type": "food", "nutrition": 25.0, "icon": "🍞", "count": 2}
+		},
+		{
+			"name": "Oak-Smoked Meat",
+			"inputs": {"meat": 1, "logs": 1},
+			"output": {"name": "Oak-Smoked Meat", "type": "food", "nutrition": 40.0, "warmth_bonus": 15.0, "icon": "🍖", "count": 1}
+		},
+		{
+			"name": "Salt-Cured Meat",
+			"inputs": {"meat": 1, "rock_salt": 1},
+			"output": {"name": "Salt-Cured Meat", "type": "food", "nutrition": 45.0, "warmth_bonus": 10.0, "icon": "🥓", "count": 1}
 		}
 	],
 	"furnace": [
@@ -351,12 +374,21 @@ func open_menu(target: Node = null) -> void:
 		active_caravan = null
 		active_workstation = null
 		active_enchanter = null
+		active_anvil = null
 		active_cooking_pot = target
 		_populate_cooking_recipes()
+	elif target is Anvil:
+		active_caravan = null
+		active_workstation = null
+		active_enchanter = null
+		active_cooking_pot = null
+		active_anvil = target
+		_populate_anvil_forging()
 	else:
 		active_caravan = null
 		active_enchanter = null
 		active_cooking_pot = null
+		active_anvil = null
 		active_workstation = target as Workstation
 		_populate_recipes()
 
@@ -367,6 +399,7 @@ func close_menu() -> void:
 	active_caravan = null
 	active_enchanter = null
 	active_cooking_pot = null
+	active_anvil = null
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -384,6 +417,8 @@ func _on_tab_recipes_pressed() -> void:
 		_populate_enchanter_recipes()
 	elif active_cooking_pot:
 		_populate_cooking_recipes()
+	elif active_anvil:
+		_populate_anvil_forging()
 	elif active_caravan:
 		_populate_caravan_trade()
 	else:
@@ -466,6 +501,161 @@ func _adjust_quota(item: String, delta: int) -> void:
 	var new_limit = maxi(0, cur_limit + delta)
 	supply_chain.set_quota(item, new_limit, cur_mode)
 	_populate_quotas()
+
+var selected_blade: String = "iron"
+var selected_guard: String = "iron"
+var selected_handle: String = "oak"
+
+func _populate_anvil_forging() -> void:
+	for child in recipe_list_vbox.get_children():
+		child.queue_free()
+
+	header_title.text = "⚒️ TINKERS' MODULAR BLACKSMITH ANVIL"
+	status_label.text = "Select components to assemble a custom modular blade."
+
+	var preview_data = Anvil.assemble_modular_weapon(selected_blade, selected_guard, selected_handle)
+
+	# 1. Blade Selection Row
+	var blade_row = HBoxContainer.new()
+	blade_row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var b_lbl = Label.new()
+	b_lbl.text = "Blade Component:"
+	b_lbl.custom_minimum_size = Vector2(160, 0)
+	blade_row.add_child(b_lbl)
+
+	for b_key in Anvil.BLADE_COMPONENTS.keys():
+		var btn = Button.new()
+		var b_info = Anvil.BLADE_COMPONENTS[b_key]
+		btn.text = "%s %s" % [b_info.get("icon", "🗡️"), b_info["name"]]
+		btn.pressed.connect(_on_select_blade.bind(b_key))
+		if b_key == selected_blade:
+			btn.modulate = Color(1.0, 0.9, 0.4)
+		blade_row.add_child(btn)
+	recipe_list_vbox.add_child(blade_row)
+
+	# 2. Guard Selection Row
+	var guard_row = HBoxContainer.new()
+	guard_row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var g_lbl = Label.new()
+	g_lbl.text = "Crossguard Component:"
+	g_lbl.custom_minimum_size = Vector2(160, 0)
+	guard_row.add_child(g_lbl)
+
+	for g_key in Anvil.GUARD_COMPONENTS.keys():
+		var btn = Button.new()
+		var g_info = Anvil.GUARD_COMPONENTS[g_key]
+		btn.text = "%s %s" % [g_info.get("icon", "🛡️"), g_info["name"]]
+		btn.pressed.connect(_on_select_guard.bind(g_key))
+		if g_key == selected_guard:
+			btn.modulate = Color(1.0, 0.9, 0.4)
+		guard_row.add_child(btn)
+	recipe_list_vbox.add_child(guard_row)
+
+	# 3. Handle Selection Row
+	var handle_row = HBoxContainer.new()
+	handle_row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var h_lbl = Label.new()
+	h_lbl.text = "Grip & Handle:"
+	h_lbl.custom_minimum_size = Vector2(160, 0)
+	handle_row.add_child(h_lbl)
+
+	for h_key in Anvil.HANDLE_COMPONENTS.keys():
+		var btn = Button.new()
+		var h_info = Anvil.HANDLE_COMPONENTS[h_key]
+		btn.text = "%s %s" % [h_info.get("icon", "🪵"), h_info["name"]]
+		btn.pressed.connect(_on_select_handle.bind(h_key))
+		if h_key == selected_handle:
+			btn.modulate = Color(1.0, 0.9, 0.4)
+		handle_row.add_child(btn)
+	recipe_list_vbox.add_child(handle_row)
+
+	# 4. Assembled Weapon Stats Summary Box
+	var stat_panel = PanelContainer.new()
+	var stat_margin = MarginContainer.new()
+	stat_margin.add_theme_constant_override("margin_left", 12)
+	stat_margin.add_theme_constant_override("margin_right", 12)
+	stat_margin.add_theme_constant_override("margin_top", 8)
+	stat_margin.add_theme_constant_override("margin_bottom", 8)
+	stat_panel.add_child(stat_margin)
+
+	var stat_vbox = VBoxContainer.new()
+	stat_margin.add_child(stat_vbox)
+
+	var title_lbl = Label.new()
+	title_lbl.text = "⚔️ %s" % preview_data["name"]
+	title_lbl.add_theme_font_size_override("font_size", 16)
+	title_lbl.modulate = Color(1.0, 0.85, 0.3)
+	stat_vbox.add_child(title_lbl)
+
+	var stat_lbl = Label.new()
+	stat_lbl.text = "Damage: %.1f | Max Durability: %d | Crit: %d%% | Stamina Mult: %.2fx | Parry: %d%%" % [
+		preview_data["damage"],
+		preview_data["max_durability"],
+		int(preview_data["crit_chance"] * 100),
+		preview_data["stamina_cost_mult"],
+		int(preview_data["parry_defense"] * 100)
+	]
+	stat_lbl.modulate = Color(0.9, 0.95, 1.0)
+	stat_vbox.add_child(stat_lbl)
+
+	# Calculate total component costs
+	var total_cost: Dictionary = {}
+	var b_cost = Anvil.BLADE_COMPONENTS[selected_blade]["cost"]
+	var g_cost = Anvil.GUARD_COMPONENTS[selected_guard]["cost"]
+	var h_cost = Anvil.HANDLE_COMPONENTS[selected_handle]["cost"]
+	for d in [b_cost, g_cost, h_cost]:
+		for mat in d.keys():
+			total_cost[mat] = total_cost.get(mat, 0) + d[mat]
+
+	var cost_text = "Required Material Costs: "
+	for mat in total_cost.keys():
+		var avail = supply_chain.get_resource(mat) if supply_chain else 0
+		cost_text += "%s: %d/%d  " % [mat.capitalize(), avail, total_cost[mat]]
+	var cost_lbl = Label.new()
+	cost_lbl.text = cost_text
+	cost_lbl.modulate = Color(0.8, 0.8, 0.8)
+	stat_vbox.add_child(cost_lbl)
+
+	recipe_list_vbox.add_child(stat_panel)
+
+	# 5. Strike Anvil / Forge Button
+	var forge_btn = Button.new()
+	forge_btn.text = " ⚒️ Strike Anvil & Quench Modular Weapon ⚒️ "
+	forge_btn.add_theme_font_size_override("font_size", 16)
+	forge_btn.pressed.connect(_on_forge_modular_weapon_pressed.bind(preview_data, total_cost))
+	recipe_list_vbox.add_child(forge_btn)
+
+func _on_select_blade(k: String) -> void:
+	selected_blade = k
+	_populate_anvil_forging()
+
+func _on_select_guard(k: String) -> void:
+	selected_guard = k
+	_populate_anvil_forging()
+
+func _on_select_handle(k: String) -> void:
+	selected_handle = k
+	_populate_anvil_forging()
+
+func _on_forge_modular_weapon_pressed(weapon_data: Dictionary, total_cost: Dictionary) -> void:
+	if not supply_chain:
+		status_label.text = "Error: Supply chain not connected!"
+		return
+
+	for mat in total_cost.keys():
+		if supply_chain.get_resource(mat) < total_cost[mat]:
+			status_label.text = "Missing materials! Need more %s!" % mat.capitalize()
+			return
+
+	for mat in total_cost.keys():
+		supply_chain.consume_resource(mat, total_cost[mat])
+
+	if player:
+		_add_to_player_hotbar(weapon_data)
+
+	status_label.text = "Masterwork Forged: %s!" % weapon_data["name"]
+	emit_signal("item_crafted", weapon_data["name"], weapon_data)
+	_populate_anvil_forging()
 
 func _populate_cooking_recipes() -> void:
 	for child in recipe_list_vbox.get_children():
