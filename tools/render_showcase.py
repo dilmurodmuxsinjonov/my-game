@@ -117,6 +117,12 @@ def build_diorama():
     # 16. Architect's Drafting Desk with parchment & quill
     import_asset("architect_desk.glb", (-2.2, -2.6, 0.0), rot_z=25, scale=0.95)
 
+    # 17. Tinkers' Blacksmith Dual-Horn Anvil & Quenching Tank
+    import_asset("anvil.glb", (0.2, -2.4, 0.0), rot_z=10, scale=0.95)
+
+    # 18. TerraFirmaCraft Timber Smoke Rack near campfire
+    import_asset("smoke_rack.glb", (-1.2, 1.2, 0.0), rot_z=-55, scale=0.9)
+
     # Render output path
     output_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "assets"))
     output_path = os.path.join(output_dir, "showcase_realm.png")
