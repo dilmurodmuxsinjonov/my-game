@@ -201,6 +201,15 @@ def build_diorama():
     # 41. Tinkers' Seared Tool Casting Table with Clay Mold
     import_asset("casting_table.glb", (-1.6, 2.1, 0.0), rot_z=30, scale=0.95)
 
+    # 42. Frontier Outpost Banner & Logistical Waypoint Signpost
+    import_asset("outpost_banner.glb", (-4.6, 1.2, 0.0), rot_z=-20, scale=0.95)
+
+    # 43. Crown Tax Collector's Strongbox Wagon
+    import_asset("tax_sheriff_cart.glb", (3.2, -2.6, 0.0), rot_z=110, scale=0.90)
+
+    # 44. Sanctified Ceremonial Stone Funeral Pyre
+    import_asset("funeral_pyre.glb", (-1.2, -4.2, 0.0), rot_z=15, scale=0.90)
+
     # Render output path
     output_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "assets"))
     output_path = os.path.join(output_dir, "showcase_realm.png")

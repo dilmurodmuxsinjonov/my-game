@@ -23,6 +23,8 @@ const GuardPost = preload("res://scripts/world/guard_post.gd")
 const SmelteryController = preload("res://scripts/world/smeltery_controller.gd")
 const CastingBasin = preload("res://scripts/world/casting_basin.gd")
 const CastingTable = preload("res://scripts/world/casting_table.gd")
+const Outpost = preload("res://scripts/world/outpost.gd")
+const FuneralPyre = preload("res://scripts/world/funeral_pyre.gd")
 
 ## First-Person Monarch Controller.
 ## Follows the Single Persistent Monarch Paradigm: No dynasty, no permadeath;
@@ -707,6 +709,24 @@ func _handle_secondary_action() -> void:
 			get_tree().current_scene.add_child(ct)
 			item["count"] -= 1
 			emit_signal("block_action_performed", "place_station", Vector3i(int(ct.position.x), int(ct.position.y), int(ct.position.z)), 0)
+			emit_signal("hotbar_slot_changed", active_slot, item)
+			return
+		elif "Outpost" in item_name:
+			var op = Outpost.new()
+			op.supply_chain = supply_chain
+			op.position = hit_point + hit_normal * 0.1
+			get_tree().current_scene.add_child(op)
+			item["count"] -= 1
+			emit_signal("block_action_performed", "place_station", Vector3i(int(op.position.x), int(op.position.y), int(op.position.z)), 0)
+			emit_signal("hotbar_slot_changed", active_slot, item)
+			return
+		elif "Funeral Pyre" in item_name or "Pyre" in item_name:
+			var fp = FuneralPyre.new()
+			fp.supply_chain = supply_chain
+			fp.position = hit_point + hit_normal * 0.1
+			get_tree().current_scene.add_child(fp)
+			item["count"] -= 1
+			emit_signal("block_action_performed", "place_station", Vector3i(int(fp.position.x), int(fp.position.y), int(fp.position.z)), 0)
 			emit_signal("hotbar_slot_changed", active_slot, item)
 			return
 

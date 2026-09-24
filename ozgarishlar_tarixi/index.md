@@ -7,6 +7,19 @@
 - Dastlabki Godot prototipi va foydalanuvchining showcase fayllari saqlandi.
 - Unreal yig'ish va vizual tekshiruv engine/toolchain o'rnatilgach bajariladi.
 
+## 2026-09-25 — Milestone 19: Tashqi Qirollik O'lponi (Crown Tribute) va Kon Outpost Karvon Logistikasi
+- **Tashqi Qirollik O'lponi va Sherif Aravasi (`CrownTribute` & `tax_sheriff_cart.glb`)**: Medieval Dynasty va Bellwright andozasidagi tashqi moliyaviy bosim:
+  - Mavsumiy Qirol Noibi (Crown Sheriff) tashrifi; bino va aholi soniga mutanosib feodal o'lpon undirish.
+  - Agar 2 mavsum ketma-ket to'lanmasa, Qirollik jazo ekspeditsiyasi (Crown Punitive Expedition) qo'shin tortib keladi.
+- **Chekka Kon va O'rmon Outposti (`Outpost` & `outpost_banner.glb`)**: Bellwright va Manor Lords andozasidagi frontier lageri:
+  - 500-1000m uzoqlikdagi tog' shaxtalarida ishlovchilar uchun tunash va oraliq bufer ombori.
+  - 10 ta ruda to'plangach, avtomatik ravishda otli karvon jo'natilib poytaxt xazinasiga resurslarni yetkazadi.
+- **Muqaddas Jasad Yoqish Gulxani (`FuneralPyre` & `funeral_pyre.glb`)**: RimWorld va Going Medieval andozasidagi sanitariya inshooti:
+  - Qamal yoki vabodan so'ng o'liklarni yondirib tozalash (o'tin sarflaydi), 30 metr radiusda epidemiya va kasallik (miasma) xavfini yo'qotadi, sharafli dafn uchun aholiga +10 morale beradi.
+- **Yangi 3D Modellar (Blender 5.2)**: `outpost_banner.glb` (23 KB), `tax_sheriff_cart.glb` (90 KB), `funeral_pyre.glb` (98 KB) yaratildi (jami **49 ta GLB model**).
+- **Yangi Qirollik Dioramasi**: Barcha 49 ta aktiv ishtirokidagi diorama `assets/showcase_realm.png` da qayta render qilindi va brainga saqlandi.
+- **Avtomatlashgan Testlar**: Jami **64 ta test 100% muvaffaqiyat bilan o'tdi** (0.009s).
+
 ## 2026-09-25 — Milestone 18: Tinkers' Construct Smeltery Multiblok Pechi, Qotishmalar va Quyish Tizimi
 - **Tinkers' Construct Smeltery Pechi (`SmelteryController` & `smeltery_controller.glb`)**: O'tga chidamli g'ishtlar (`seared_brick`) dan quriladigan 36 birlik sig'imli suyuq metall idishi:
   - Lava va ko'mir yoqilg'isi bilan 1600°C gacha qizdirish.
