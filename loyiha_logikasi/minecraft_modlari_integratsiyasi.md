@@ -105,6 +105,24 @@ Klassik "oddiy temir qilich" o'rniga, qurollar alohida qismlardan yasaladi va ul
 - Eritilgan temir va po'lat shunchaki dastgohda 1 soniyada qurolga aylanmaydi.
 - Sandonda bolg'a bilan zarb qilinadi, so'ngra suv yoki moyda toblanadi (Quenching). Bu qurol sifatini (Quality: Common, Fine, Masterwork) oshiradi.
 
+### 3.3. Suyuq Metall Eritish Pechi (Smeltery), Qolip Stoli (Casting Table) va Quyish Havzasi (Casting Basin) — [Milestone 18 da to'liq integratsiya qilindi]
+- **Tinkers' Smeltery Multiblok Nazoratchisi (`SmelteryController`, `smeltery_controller.glb`)**:
+  - O'tga chidamli tosh g'ishtlar (`seared_brick`) dan barpo etiladigan yuqori hajmli suyuq metall qozoni (36 birlik sig'im).
+  - Lava yoki yuqori kaloriyali ko'mir yordamida 1600°C gacha qiziydi.
+  - Xom rudalarni 2 barobar ko'proq metall hosil qilgan holda eritadi (1 ta ruda -> 2 ta suyuq birlik).
+- **Metallurgik Qotishma Tizimi (`AlloyManager`)**:
+  - *Bronza*: 3 birlik Mis + 1 birlik Qalay -> 4 birlik Suyuq Bronza ($\ge 950$°C).
+  - *Tozalangan Po'lat*: 1 birlik Temir + 1 birlik Uglerod/Ko'mir gazi -> 1 birlik Suyuq Po'lat ($\ge 1450$°C).
+  - *Elektrum (Qirollik oltin qotishmasi)*: 1 birlik Oltin + 1 birlik Kumush -> 2 birlik Suyuq Elektrum ($\ge 1000$°C).
+- **Quyish Havzasi (`CastingBasin`, `casting_basin.glb`)**:
+  - 9 birlik suyuq metallni qabul qiladi va sovutish vaqtidan so'ng yaxlit qattiq metall blokini (`bronze_block`, `iron_block`, `steel_block`) beradi.
+- **Qolip Stoli (`CastingTable`, `casting_table.glb`)**:
+  - Almashtiriladigan sopol va bronza qoliplarni o'z ichiga oladi:
+    - *Ingot qolipi (1 birlik)*: Metall quymalari quyish.
+    - *Qilich tig'i qolipi (2 birlik)*: Qilich tig'ini to'g'ridan-to'g'ri bir xil aniqlikda quyish.
+    - *Cho'kich boshi qolipi (3 birlik)*: Kon cho'kichi boshini quyish.
+    - *Bolta boshi qolipi (3 birlik)*: O'tinchi boltasi boshini quyish.
+
 ---
 
 ## 4. APOTHEOSIS & ENIGMATIC LEGACY — Sehirlar, Affikslar va Noyoblik

@@ -90,7 +90,14 @@ var inventory: Dictionary = {
 	"mechanical_press": 0,
 	"town_hall_desk": 0,
 	"treasury_vault": 0,
-	"guard_post": 0
+	"guard_post": 0,
+	"seared_brick": 16,
+	"smeltery_controller": 0,
+	"casting_basin": 0,
+	"casting_table": 0,
+	"bronze_block": 0,
+	"steel_block": 0,
+	"iron_block": 0
 }
 
 func salt_meat(amount: int) -> bool:
@@ -342,6 +349,42 @@ func craft_guard_post(amount: int = 1) -> bool:
 		consume_resource("logs", wood_needed)
 		consume_resource("iron_ingots", iron_needed)
 		add_resource("guard_post", amount)
+		return true
+	return false
+
+func craft_seared_brick(amount: int = 4) -> bool:
+	var stone_needed = amount
+	var coal_needed = int(ceil(float(amount) / 4.0))
+	if inventory.get("stone", 0) >= stone_needed and inventory.get("coal", 0) >= coal_needed:
+		consume_resource("stone", stone_needed)
+		consume_resource("coal", coal_needed)
+		add_resource("seared_brick", amount)
+		return true
+	return false
+
+func craft_smeltery_controller(amount: int = 1) -> bool:
+	var brick_needed = amount * 8
+	var cu_needed = amount * 1
+	if inventory.get("seared_brick", 0) >= brick_needed and inventory.get("copper_ingot", 0) >= cu_needed:
+		consume_resource("seared_brick", brick_needed)
+		consume_resource("copper_ingot", cu_needed)
+		add_resource("smeltery_controller", amount)
+		return true
+	return false
+
+func craft_casting_basin(amount: int = 1) -> bool:
+	var brick_needed = amount * 7
+	if inventory.get("seared_brick", 0) >= brick_needed:
+		consume_resource("seared_brick", brick_needed)
+		add_resource("casting_basin", amount)
+		return true
+	return false
+
+func craft_casting_table(amount: int = 1) -> bool:
+	var brick_needed = amount * 7
+	if inventory.get("seared_brick", 0) >= brick_needed:
+		consume_resource("seared_brick", brick_needed)
+		add_resource("casting_table", amount)
 		return true
 	return false
 

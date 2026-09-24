@@ -7,6 +7,20 @@
 - Dastlabki Godot prototipi va foydalanuvchining showcase fayllari saqlandi.
 - Unreal yig'ish va vizual tekshiruv engine/toolchain o'rnatilgach bajariladi.
 
+## 2026-09-25 — Milestone 18: Tinkers' Construct Smeltery Multiblok Pechi, Qotishmalar va Quyish Tizimi
+- **Tinkers' Construct Smeltery Pechi (`SmelteryController` & `smeltery_controller.glb`)**: O'tga chidamli g'ishtlar (`seared_brick`) dan quriladigan 36 birlik sig'imli suyuq metall idishi:
+  - Lava va ko'mir yoqilg'isi bilan 1600°C gacha qizdirish.
+  - Xom rudalarni 2x ko'paytiruvchi eritish (1 ta ruda -> 2 birlik suyuq metall).
+- **Metallurgik Qotishma Tizimi (`AlloyManager`)**:
+  - *Bronza*: 3 Mis + 1 Qalay -> 4 Suyuq Bronza ($\ge 950$°C).
+  - *Tozalangan Po'lat*: 1 Temir + 1 Uglerod/Ko'mir gazi -> 1 Suyuq Po'lat ($\ge 1450$°C).
+  - *Qirollik Elektrumi*: 1 Oltin + 1 Kumush -> 2 Suyuq Elektrum ($\ge 1000$°C).
+- **Quyish Havzasi (`CastingBasin` & `casting_basin.glb`)**: 9 birlik suyuq metallni qabul qilib, sovutgandan keyin yaxlit qattiq metall bloklarini (`bronze_block`, `iron_block`, `steel_block`) beradi.
+- **Qolip Stoli (`CastingTable` & `casting_table.glb`)**: Almashtiriladigan qoliplar (Ingot, Qilich tig'i, Cho'kich boshi, Bolta boshi) orqali metallni isrof qilmasdan to'g'ridan-to'g'ri qurol-asbob qismlariga quyish.
+- **Yangi 3D Modellar (Blender 5.2)**: `smeltery_controller.glb` (132 KB), `casting_basin.glb` (25 KB), `casting_table.glb` (27 KB) yaratildi (jami **46 ta GLB model**).
+- **Yangi Qirollik Dioramasi**: Barcha 46 ta aktiv ishtirokidagi diorama `assets/showcase_realm.png` da qayta render qilindi va brainga saqlandi.
+- **Avtomatlashgan Testlar**: Jami **61 ta test 100% muvaffaqiyat bilan o'tdi** (0.009s).
+
 ## 2026-09-25 — Milestone 17: MineColonies Shahar Kengashi, Qirollik Xazinasi va Garnizon Soqchilar Posti
 - **MineColonies Shahar Kengashi (`TownHall` & `town_hall_desk.glb`)**: Koloniya ma'muriy markazi va hududiy chegaralar yadrosi:
   - 4 ta rivojlanish bosqichi: Hamlet (32m radius, 8 aholi) -> Village (48m radius, 20 aholi) -> Township (64m radius, 45 aholi) -> Royal City (96m radius, 100 aholi).

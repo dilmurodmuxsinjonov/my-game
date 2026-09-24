@@ -288,6 +288,26 @@ const RECIPES: Dictionary = {
 			"name": "Garrison Sentry Post & Weapon Rack",
 			"inputs": {"logs": 4, "iron_ingots": 2},
 			"output": {"name": "Guard Post", "type": "placeable", "icon": "🛡️", "count": 1}
+		},
+		{
+			"name": "Seared Refractory Bricks (x4)",
+			"inputs": {"stone": 4, "coal": 1},
+			"output": {"name": "Seared Brick", "type": "item", "icon": "🧱", "count": 4}
+		},
+		{
+			"name": "Tinkers' Smeltery Controller",
+			"inputs": {"seared_brick": 8, "copper_ingot": 1},
+			"output": {"name": "Smeltery Controller", "type": "placeable", "icon": "🔥", "count": 1}
+		},
+		{
+			"name": "Seared Casting Basin",
+			"inputs": {"seared_brick": 7},
+			"output": {"name": "Casting Basin", "type": "placeable", "icon": "🪣", "count": 1}
+		},
+		{
+			"name": "Seared Casting Table",
+			"inputs": {"seared_brick": 7},
+			"output": {"name": "Casting Table", "type": "placeable", "icon": "🛠️", "count": 1}
 		}
 	],
 	"campfire": [
