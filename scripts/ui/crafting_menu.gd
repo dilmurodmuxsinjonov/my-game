@@ -308,6 +308,16 @@ const RECIPES: Dictionary = {
 			"name": "Seared Casting Table",
 			"inputs": {"seared_brick": 7},
 			"output": {"name": "Casting Table", "type": "placeable", "icon": "🛠️", "count": 1}
+		},
+		{
+			"name": "Frontier Outpost Banner",
+			"inputs": {"logs": 4, "stone": 2},
+			"output": {"name": "Outpost Banner", "type": "placeable", "icon": "🚩", "count": 1}
+		},
+		{
+			"name": "Sanctified Funeral Pyre",
+			"inputs": {"stone": 6, "logs": 4},
+			"output": {"name": "Funeral Pyre", "type": "placeable", "icon": "🔥", "count": 1}
 		}
 	],
 	"campfire": [

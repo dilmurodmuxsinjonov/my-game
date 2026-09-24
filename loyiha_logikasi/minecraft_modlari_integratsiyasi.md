@@ -210,8 +210,31 @@ Medieval davrning haqiqiy muhandisligi:
 - [x] **Create Mod Mexanik Konveyer Lentasi (Conveyor Belt)**: `ConveyorBelt` (`scripts/world/conveyor_belt.gd` & `conveyor_belt.glb`), 16 SU quvvat sarflaydi, 2.0 m/s tezlikda resurslarni stanoklar va omborlar o'rtasida avtomatik tashish.
 - [x] **Create Mod Gravitatsion Truba (Gravity Chute)**: `Chute` (`scripts/world/chute.gd` & `chute.glb`), 0 SU energiya talab qiluvchi tortishish kuchi trubasi, 4 ta narsa/soniya tezlikda yuqoridagi don siloslaridan pastdagi tegirmon toshlariga resurslarni tushirish.
 - [x] **Create Mod Sanoat Shtamplash Pressi (Mechanical Press)**: `MechanicalPress` (`scripts/world/mechanical_press.gd` & `mechanical_press.glb`), 48 SU quvvat sarflaydi, temir quymalardan sovut plastinalari (`iron_sheet`), mis tunukalari (`copper_sheet`) va oltin quymalardan qirollik oltin tangalarini (`gold_coins` — 1:10) shtamplab zarb qilish.
-- [x] **3D Blender 5.2 Modellar**: Jami **40 ta to'liq modellashtirilgan va import qilingan GLB 3D aktivlar** (`conveyor_belt.glb`, `chute.glb`, `mechanical_press.glb` qo'shildi).
+- [x] **MineColonies Shahar Kengashi & Qirollik Xazinasi (Town Hall & Treasury)**: `TownHall` (`town_hall_desk.glb`), `TreasuryVault` (`treasury_vault.glb`), `GuardPost` (`guard_post.glb`) — 4 ta rivojlanish darajasi (Hamlet -> Royal City), feodal soliqlar va garnizon oyliklari.
+- [x] **Tinkers' Construct Suyuq Metall Pechi & Quyish Tizimi (Smeltery & Casting)**: `SmelteryController` (`smeltery_controller.glb`), `AlloyManager`, `CastingBasin` (`casting_basin.glb`), `CastingTable` (`casting_table.glb`) — 36 birlik suyuq metall qozoni, Bronza, Po'lat va Elektrum qotishmalari, quyish havzasi va asbob qoliplari.
+- [x] **Tashqi Qirollik O'lponi va Logistika Outpostlari (Crown Tribute & Outposts)**: `CrownTribute` (`tax_sheriff_cart.glb`), `Outpost` (`outpost_banner.glb`), `FuneralPyre` (`funeral_pyre.glb`) — Tashqi soliq bosimi, uzoq kon logistikasi va sanitariya gulxani.
+- [x] **3D Blender 5.2 Modellar**: Jami **49 ta to'liq modellashtirilgan va import qilingan GLB 3D aktivlar**.
 
+---
 
+## 8. O'XSHASH JANR GIGANTLARIDAN OLINGAN LOGISTIKA VA IQTISODIYOT (Medieval Dynasty, Bellwright, Manor Lords, RimWorld)
 
+### 8.1. Tashqi Qirollik O'lponi va Qirol Noibi (Royal Crown Tribute & Sheriff) — [Medieval Dynasty / Bellwright]
+- **Muammo**: O'yinda tashqi iqtisodiy bosim bo'lmasa, hukmdor cheksiz resurs yig'ib tezda zerikib qoladi.
+- **Yechim (`CrownTribute` & `tax_sheriff_cart.glb`)**:
+  - Har mavsum (7 o'yin kuni) oxirida poytaxtdan Qirol Noibi (Crown Sheriff) qurollangan karvonda tashrif buyuradi.
+  - O'lpon bazaviy to'lov (40 oltin) + har bir bino uchun 5 oltin + har bir fuqaro uchun 2 oltindan iborat.
+  - Agar xazinada pul bo'lmasa va 2 marta o'lpon to'lanmasa, Qirollik jazo ekspeditsiyasi (Crown Punitive Expedition) qo'shin tortib keladi va qasrni qamal qiladi.
 
+### 8.2. Uzoq Masofali Kon Outposti va Karvon Tizimi (Outpost & Pack Caravan) — [Bellwright / Manor Lords]
+- **Muammo**: 500-1000m uzoqlikdagi tog' shaxtalariga fuqarolarni har kuni qasrdan piyoda qatnatish vaqtni behuda sarflaydi.
+- **Yechim (`Outpost` & `outpost_banner.glb`)**:
+  - Kon yonida kichik chegara posti o'rnatiladi. Konchilar shu yerda tunab qoladi.
+  - Qazilgan ruda Outpost mahalliy omborida to'planadi (minimal chegara: 10 ta ruda).
+  - Me'yor to'plangach, avtomatik ravishda otli yuk karvoni yo'lga chiqib markaziy qasr omboriga yetkazadi.
+
+### 8.3. Muqaddas Jasad Yoqish Gulxani va Epidemiya Qarshiligi (Funeral Pyre) — [RimWorld / Going Medieval]
+- **Muammo**: Katta jang yoki kasallik paytida o'nlab jasadlarni bittalab ko'mishga vaqt yetmaydi; ochiqda qolgan murdalar shahar bo'ylab kasallik (miasma) tarqatadi.
+- **Yechim (`FuneralPyre` & `funeral_pyre.glb`)**:
+  - Tosh platformali marosim o'chog'i. Jasadlar o'tin bilan birga muqaddas olovda yondiriladi.
+  - Sanitariya tozalanadi, epidemiya xavfi yo'qoladi, marhumlar ehtirom qilingani uchun aholi ruhiyatiga +10 morale beriladi va Qonli Oyda zombi tirilishi xavfi 0% ga tushiriladi.

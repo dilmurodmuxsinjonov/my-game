@@ -97,7 +97,10 @@ var inventory: Dictionary = {
 	"casting_table": 0,
 	"bronze_block": 0,
 	"steel_block": 0,
-	"iron_block": 0
+	"iron_block": 0,
+	"outpost_banner": 0,
+	"tax_sheriff_cart": 0,
+	"funeral_pyre": 0
 }
 
 func salt_meat(amount: int) -> bool:
@@ -385,6 +388,26 @@ func craft_casting_table(amount: int = 1) -> bool:
 	if inventory.get("seared_brick", 0) >= brick_needed:
 		consume_resource("seared_brick", brick_needed)
 		add_resource("casting_table", amount)
+		return true
+	return false
+
+func craft_outpost_banner(amount: int = 1) -> bool:
+	var wood_needed = amount * 4
+	var stone_needed = amount * 2
+	if inventory.get("logs", 0) >= wood_needed and inventory.get("stone", 0) >= stone_needed:
+		consume_resource("logs", wood_needed)
+		consume_resource("stone", stone_needed)
+		add_resource("outpost_banner", amount)
+		return true
+	return false
+
+func craft_funeral_pyre(amount: int = 1) -> bool:
+	var stone_needed = amount * 6
+	var logs_needed = amount * 4
+	if inventory.get("stone", 0) >= stone_needed and inventory.get("logs", 0) >= logs_needed:
+		consume_resource("stone", stone_needed)
+		consume_resource("logs", logs_needed)
+		add_resource("funeral_pyre", amount)
 		return true
 	return false
 
