@@ -63,7 +63,13 @@ var inventory: Dictionary = {
 	"support_beam": 4,
 	"prospector_pick": 1,
 	"mine_cart": 0,
-	"mining_rail": 0
+	"mining_rail": 0,
+	"ruby": 0,
+	"sapphire": 0,
+	"topaz": 0,
+	"deep_gem": 0,
+	"boss_trophy": 0,
+	"gem_cutting_table": 0
 }
 
 func salt_meat(amount: int) -> bool:
@@ -157,6 +163,32 @@ func smelt_silver_ore(amount: int = 1) -> bool:
 		consume_resource("silver_ore", amount)
 		consume_resource("coal", amount)
 		add_resource("silver_ingot", amount)
+		return true
+	return false
+
+func craft_gem_cutting_table(amount: int = 1) -> bool:
+	var wood_needed = amount * 4
+	var iron_needed = amount * 2
+	var stone_needed = amount * 1
+	if inventory.get("planks", 0) >= wood_needed and inventory.get("iron_ingots", 0) >= iron_needed and inventory.get("stone", 0) >= stone_needed:
+		consume_resource("planks", wood_needed)
+		consume_resource("iron_ingots", iron_needed)
+		consume_resource("stone", stone_needed)
+		add_resource("gem_cutting_table", amount)
+		return true
+	return false
+
+func cut_gemstone(gem_name: String) -> bool:
+	if inventory.get("gems", 0) >= 1:
+		consume_resource("gems", 1)
+		add_resource(gem_name, 1)
+		return true
+	return false
+
+func place_trophy() -> bool:
+	if consume_resource("boss_trophy", 1):
+		morale = minf(100.0, morale + 10.0)
+		morale_updated.emit(morale)
 		return true
 	return false
 

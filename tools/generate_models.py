@@ -1691,6 +1691,165 @@ def build_mining_lantern():
 
     export_glb("mining_lantern.glb")
 
+# -------------------------------------------------------------
+# 33. Apotheosis Gem Cutting Table (gem_cutting_table.glb)
+# -------------------------------------------------------------
+def build_gem_cutting_table():
+    reset_scene()
+    mat_wood = create_material("TableMahogany", (0.28, 0.15, 0.08, 1.0), roughness=0.7)
+    mat_brass = create_material("JewelerBrass", (0.85, 0.68, 0.22, 1.0), roughness=0.25, metallic=0.9)
+    mat_stone = create_material("GrindstoneCarborundum", (0.35, 0.35, 0.38, 1.0), roughness=0.9)
+    mat_ruby = create_material("CutRubyGlow", (0.95, 0.12, 0.18, 1.0), roughness=0.1)
+    bsdf_r = mat_ruby.node_tree.nodes.get("Principled BSDF")
+    if bsdf_r and "Emission Color" in bsdf_r.inputs:
+        bsdf_r.inputs["Emission Color"].default_value = (0.95, 0.12, 0.18, 1.0)
+        bsdf_r.inputs["Emission Strength"].default_value = 2.5
+    mat_sapphire = create_material("CutSapphireGlow", (0.15, 0.35, 0.95, 1.0), roughness=0.1)
+    bsdf_s = mat_sapphire.node_tree.nodes.get("Principled BSDF")
+    if bsdf_s and "Emission Color" in bsdf_s.inputs:
+        bsdf_s.inputs["Emission Color"].default_value = (0.15, 0.35, 0.95, 1.0)
+        bsdf_s.inputs["Emission Strength"].default_value = 2.5
+
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0, 0.75))
+    top = bpy.context.active_object
+    top.scale = (1.30, 0.85, 0.08)
+    top.data.materials.append(mat_wood)
+
+    for lx in [-0.55, 0.55]:
+        for ly in [-0.34, 0.34]:
+            bpy.ops.mesh.primitive_cube_add(size=1.0, location=(lx, ly, 0.36))
+            leg = bpy.context.active_object
+            leg.scale = (0.10, 0.10, 0.72)
+            leg.data.materials.append(mat_wood)
+
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0, 0.15))
+    stretcher = bpy.context.active_object
+    stretcher.scale = (1.10, 0.08, 0.06)
+    stretcher.data.materials.append(mat_wood)
+
+    bpy.ops.mesh.primitive_cylinder_add(radius=0.18, depth=0.04, vertices=20, location=(-0.25, 0.05, 0.82))
+    grind_wheel = bpy.context.active_object
+    grind_wheel.data.materials.append(mat_stone)
+
+    bpy.ops.mesh.primitive_cylinder_add(radius=0.035, depth=0.10, vertices=12, location=(-0.25, 0.05, 0.84))
+    spindle = bpy.context.active_object
+    spindle.data.materials.append(mat_brass)
+
+    bpy.ops.mesh.primitive_cylinder_add(radius=0.04, depth=0.06, vertices=10, location=(-0.45, -0.25, 0.82))
+    arm_base = bpy.context.active_object
+    arm_base.data.materials.append(mat_brass)
+
+    bpy.ops.mesh.primitive_cylinder_add(radius=0.015, depth=0.25, vertices=8, location=(-0.45, -0.25, 0.95))
+    arm_post = bpy.context.active_object
+    arm_post.data.materials.append(mat_brass)
+
+    bpy.ops.mesh.primitive_cylinder_add(radius=0.012, depth=0.22, vertices=8, location=(-0.36, -0.15, 1.07))
+    arm_horiz = bpy.context.active_object
+    arm_horiz.rotation_euler = (math.radians(35), math.radians(45), 0)
+    arm_horiz.data.materials.append(mat_brass)
+
+    bpy.ops.mesh.primitive_torus_add(major_radius=0.09, minor_radius=0.012, location=(-0.25, 0.0, 1.05))
+    lens_bezel = bpy.context.active_object
+    lens_bezel.data.materials.append(mat_brass)
+
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(-0.05, 0.08, 0.84))
+    dop_stick = bpy.context.active_object
+    dop_stick.scale = (0.16, 0.03, 0.03)
+    dop_stick.data.materials.append(mat_brass)
+
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0.35, 0.0, 0.81))
+    tray = bpy.context.active_object
+    tray.scale = (0.35, 0.50, 0.04)
+    tray.data.materials.append(mat_wood)
+
+    bpy.ops.mesh.primitive_cone_add(radius1=0.04, depth=0.05, vertices=8, location=(0.28, 0.10, 0.85))
+    ruby = bpy.context.active_object
+    ruby.rotation_euler = (math.radians(180), 0, 0)
+    ruby.data.materials.append(mat_ruby)
+
+    bpy.ops.mesh.primitive_cone_add(radius1=0.045, depth=0.06, vertices=6, location=(0.40, -0.08, 0.85))
+    sapphire = bpy.context.active_object
+    sapphire.rotation_euler = (math.radians(180), 0, 0)
+    sapphire.data.materials.append(mat_sapphire)
+
+    export_glb("gem_cutting_table.glb")
+
+# -------------------------------------------------------------
+# 34. Warlord's Golden Trophy Pedestal (boss_trophy.glb)
+# -------------------------------------------------------------
+def build_boss_trophy():
+    reset_scene()
+    mat_stone = create_material("MarblePedestal", (0.82, 0.80, 0.78, 1.0), roughness=0.4)
+    mat_gold = create_material("TrophyGold", (0.92, 0.78, 0.18, 1.0), roughness=0.2, metallic=0.95)
+    mat_horn = create_material("BeastHornIvory", (0.22, 0.18, 0.14, 1.0), roughness=0.6)
+    mat_steel = create_material("ConqueredAxe", (0.24, 0.25, 0.28, 1.0), roughness=0.35, metallic=0.9)
+    mat_ruby_crest = create_material("CrestRuby", (0.90, 0.10, 0.15, 1.0), roughness=0.1)
+    bsdf_rc = mat_ruby_crest.node_tree.nodes.get("Principled BSDF")
+    if bsdf_rc and "Emission Color" in bsdf_rc.inputs:
+        bsdf_rc.inputs["Emission Color"].default_value = (0.90, 0.10, 0.15, 1.0)
+        bsdf_rc.inputs["Emission Strength"].default_value = 3.0
+
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0, 0.10))
+    tier1 = bpy.context.active_object
+    tier1.scale = (0.75, 0.75, 0.20)
+    tier1.data.materials.append(mat_stone)
+
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0, 0.30))
+    tier2 = bpy.context.active_object
+    tier2.scale = (0.60, 0.60, 0.20)
+    tier2.data.materials.append(mat_stone)
+
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0, 0.58))
+    tier3 = bpy.context.active_object
+    tier3.scale = (0.48, 0.48, 0.36)
+    tier3.data.materials.append(mat_stone)
+
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, -0.25, 0.58))
+    plaque = bpy.context.active_object
+    plaque.scale = (0.34, 0.02, 0.20)
+    plaque.data.materials.append(mat_gold)
+
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, 0, 0.78))
+    cap = bpy.context.active_object
+    cap.scale = (0.54, 0.54, 0.06)
+    cap.data.materials.append(mat_gold)
+
+    bpy.ops.mesh.primitive_cylinder_add(radius=0.022, depth=0.85, vertices=10, location=(0, 0, 1.05))
+    axe_shaft = bpy.context.active_object
+    axe_shaft.rotation_euler = (0, math.radians(45), 0)
+    axe_shaft.data.materials.append(mat_steel)
+
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0.22, 0, 1.25))
+    axe_blade = bpy.context.active_object
+    axe_blade.scale = (0.16, 0.03, 0.24)
+    axe_blade.rotation_euler = (0, math.radians(45), 0)
+    axe_blade.data.materials.append(mat_steel)
+
+    for sign in [-1, 1]:
+        bpy.ops.mesh.primitive_cone_add(radius1=0.06, depth=0.45, vertices=10, location=(sign * 0.18, 0, 0.98))
+        horn = bpy.context.active_object
+        horn.rotation_euler = (math.radians(-15), math.radians(sign * 45), math.radians(sign * 20))
+        horn.data.materials.append(mat_horn)
+
+    bpy.ops.mesh.primitive_torus_add(major_radius=0.12, minor_radius=0.02, location=(0, 0, 0.88))
+    crown_ring = bpy.context.active_object
+    crown_ring.data.materials.append(mat_gold)
+
+    for i in range(5):
+        ang = math.radians(i * 72)
+        cx = 0.12 * math.cos(ang)
+        cy = 0.12 * math.sin(ang)
+        bpy.ops.mesh.primitive_cone_add(radius1=0.025, depth=0.08, vertices=6, location=(cx, cy, 0.94))
+        crown_spire = bpy.context.active_object
+        crown_spire.data.materials.append(mat_gold)
+
+    bpy.ops.mesh.primitive_cone_add(radius1=0.04, depth=0.06, vertices=8, location=(0, 0, 0.92))
+    crest_gem = bpy.context.active_object
+    crest_gem.rotation_euler = (math.radians(180), 0, 0)
+    crest_gem.data.materials.append(mat_ruby_crest)
+
+    export_glb("boss_trophy.glb")
+
 if __name__ == "__main__":
     print("[BLENDER SCRIPT] Starting procedural 3D medieval model generation...")
     build_pickaxe()
@@ -1725,6 +1884,8 @@ if __name__ == "__main__":
     build_prospector_pick()
     build_mine_cart()
     build_mining_lantern()
+    build_gem_cutting_table()
+    build_boss_trophy()
     print("[BLENDER SCRIPT] All models generated successfully!")
 
 

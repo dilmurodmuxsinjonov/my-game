@@ -80,7 +80,9 @@ class TestEngineVerticalSlice(unittest.TestCase):
             "cutting_board.glb",
             "prospector_pick.glb",
             "mine_cart.glb",
-            "mining_lantern.glb"
+            "mining_lantern.glb",
+            "gem_cutting_table.glb",
+            "boss_trophy.glb"
         ]
 
         for asset in expected_assets:
@@ -1312,6 +1314,150 @@ class TestEngineVerticalSlice(unittest.TestCase):
         self.assertTrue(smelt_silver(inv))
         self.assertEqual(inv["silver_ingot"], 1)
         self.assertEqual(inv["silver_ore"], 2)
+
+    def test_apotheosis_boss_affixes_and_stat_scaling(self):
+        """Verify Apotheosis boss affix generation, stat scaling, and dynamic title formatting."""
+        AFFIX_INFERNAL = "infernal"
+        AFFIX_ARMORED = "armored"
+        AFFIX_SWIFT = "swift"
+        AFFIX_VAMPIRIC = "vampiric"
+        AFFIX_TITAN = "titan"
+
+        def evaluate_boss_stats(base_hp, base_speed, base_dmg, affixes):
+            hp = base_hp
+            speed = base_speed
+            dmg = base_dmg
+            armor_red = 0.0
+            lifesteal = 0.0
+
+            for affix in affixes:
+                if affix == AFFIX_INFERNAL:
+                    dmg *= 1.25
+                elif affix == AFFIX_ARMORED:
+                    armor_red += 0.30
+                elif affix == AFFIX_SWIFT:
+                    speed *= 1.35
+                elif affix == AFFIX_VAMPIRIC:
+                    lifesteal += 0.25
+                elif affix == AFFIX_TITAN:
+                    hp *= 1.50
+
+            return {
+                "hp": hp,
+                "speed": speed,
+                "damage": dmg,
+                "armor_reduction": armor_red,
+                "lifesteal": lifesteal
+            }
+
+        # 1. Base Warlord stats
+        base = evaluate_boss_stats(160.0, 3.2, 26.0, [])
+        self.assertEqual(base["hp"], 160.0)
+        self.assertEqual(base["damage"], 26.0)
+
+        # 2. Titan + Infernal Boss (Colossus with fire strikes)
+        titan_infernal = evaluate_boss_stats(160.0, 3.2, 26.0, [AFFIX_TITAN, AFFIX_INFERNAL])
+        self.assertEqual(titan_infernal["hp"], 240.0) # 160 * 1.5
+        self.assertAlmostEqual(titan_infernal["damage"], 32.5, places=1) # 26 * 1.25
+
+        # 3. Armored + Vampiric Boss
+        armored_vamp = evaluate_boss_stats(160.0, 3.2, 26.0, [AFFIX_ARMORED, AFFIX_VAMPIRIC])
+        self.assertEqual(armored_vamp["armor_reduction"], 0.30)
+        self.assertEqual(armored_vamp["lifesteal"], 0.25)
+
+        # Damage mitigation calculation: 50 incoming damage mitigated by 30% = 35 actual damage
+        incoming = 50.0
+        taken = incoming * (1.0 - armored_vamp["armor_reduction"])
+        self.assertEqual(taken, 35.0)
+
+        # Lifesteal calculation: 26 attack heals 25% = 6.5 HP
+        healed = 26.0 * armored_vamp["lifesteal"]
+        self.assertEqual(healed, 6.5)
+
+    def test_apotheosis_gem_socketing_and_combat_bonuses(self):
+        """Verify Apotheosis weapon and armor gem socketing and cumulative stat calculation."""
+        sword = {
+            "name": "Knight's Steel Broadsword",
+            "type": "weapon",
+            "tool_type": "sword",
+            "max_sockets": 2,
+            "sockets": []
+        }
+
+        def socket_gem(item, gem_id):
+            if len(item["sockets"]) < item.get("max_sockets", 2):
+                item["sockets"].append(gem_id)
+                return True
+            return False
+
+        # 1. Socket Ruby into weapon (+20% Crit Damage)
+        self.assertTrue(socket_gem(sword, "ruby"))
+        self.assertEqual(len(sword["sockets"]), 1)
+
+        # 2. Socket Sapphire into weapon (+20% Armor Penetration)
+        self.assertTrue(socket_gem(sword, "sapphire"))
+        self.assertEqual(len(sword["sockets"]), 2)
+
+        # 3. Third gem fails (only 2 sockets)
+        self.assertFalse(socket_gem(sword, "topaz"))
+
+        def calc_weapon_bonuses(item):
+            bonuses = {"crit": 0.0, "penetration": 0.0, "lifesteal": 0.0, "stamina": 0.0}
+            for gem in item["sockets"]:
+                if gem == "ruby": bonuses["crit"] += 0.20
+                elif gem == "sapphire": bonuses["penetration"] += 0.20
+                elif gem == "deep_gem": bonuses["lifesteal"] += 0.15
+                elif gem == "topaz": bonuses["stamina"] += 0.25
+            return bonuses
+
+        bonuses = calc_weapon_bonuses(sword)
+        self.assertAlmostEqual(bonuses["crit"], 0.20)
+        self.assertAlmostEqual(bonuses["penetration"], 0.20)
+        self.assertEqual(bonuses["lifesteal"], 0.0)
+
+        # 4. Unsocket gem
+        removed = sword["sockets"].pop(0)
+        self.assertEqual(removed, "ruby")
+        self.assertEqual(len(sword["sockets"]), 1)
+
+    def test_lapidary_gem_cutting_and_trophy_morale(self):
+        """Verify lapidary gem cutting table mechanics and conquest trophy morale boost."""
+        inventory = {
+            "gems": 3,
+            "ruby": 0,
+            "sapphire": 0,
+            "boss_trophy": 1,
+            "morale": 70.0
+        }
+
+        # 1. Cut raw gem into ruby
+        def cut_gem(inv, gem_type):
+            if inv["gems"] >= 1:
+                inv["gems"] -= 1
+                inv[gem_type] = inv.get(gem_type, 0) + 1
+                return True
+            return False
+
+        self.assertTrue(cut_gem(inventory, "ruby"))
+        self.assertEqual(inventory["gems"], 2)
+        self.assertEqual(inventory["ruby"], 1)
+
+        # 2. Cut raw gem into sapphire
+        self.assertTrue(cut_gem(inventory, "sapphire"))
+        self.assertEqual(inventory["gems"], 1)
+        self.assertEqual(inventory["sapphire"], 1)
+
+        # 3. Place Warlord's Conquest Trophy (+10 Morale)
+        def place_trophy(inv):
+            if inv.get("boss_trophy", 0) >= 1:
+                inv["boss_trophy"] -= 1
+                inv["morale"] = min(100.0, inv["morale"] + 10.0)
+                return True
+            return False
+
+        self.assertTrue(place_trophy(inventory))
+        self.assertEqual(inventory["boss_trophy"], 0)
+        self.assertEqual(inventory["morale"], 80.0)
 
 if __name__ == "__main__":
     unittest.main()

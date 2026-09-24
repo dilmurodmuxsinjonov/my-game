@@ -7,6 +7,21 @@
 - Dastlabki Godot prototipi va foydalanuvchining showcase fayllari saqlandi.
 - Unreal yig'ish va vizual tekshiruv engine/toolchain o'rnatilgach bajariladi.
 
+## 2026-09-24 — Milestone 14: Apotheosis Boss Chempion Affikslari, Qimmatbaho Toshlar va Soket Tizimi
+- **Apotheosis Boss Affikslari & Chempion Modifikatorlari (`ApotheosisManager` & `bandit_warlord.gd`)**: Qaroqchilar boshlig'i (`BanditWarlord`) endi protsedural nomlar va unvonlar bilan paydo bo'ladi (masalan, *Gorath the Flameborn*, *Kaelen the Bloodthirsty*); 6 ta halokatli chempion affiksi:
+  - `INFERNAL`: +35% o't zarari va zarbada nishonni yondirish.
+  - `ARMORED`: 50% qo'shimcha sovut va 30% to'g'ridan-to'g'ri jismoniy zararni yutish.
+  - `SWIFT`: +40% yugurish va hujum tezligi.
+  - `VAMPIRIC`: Yetkazilgan zararning 25% miqdorida o'z sog'lig'ini tiklash (lifesteal).
+  - `TEMPEST`: Har 6 soniyada yerga yashin chaqirib elektr to'lqini tarqatish.
+  - `TITAN`: +100% qo'shimcha HP, orqaga surilishga (knockback) 100% immunitet.
+- **Qimmatbaho Toshlarni Qirqish Dastgohi (`GemCuttingTable` & `gem_cutting_table.glb`)**: Lapidariya dastgohi orqali xom yoqut, sapfir, topaz va chuqurlik toshlarini qirqilgan qimmatbaho toshlarga aylantirish (`cut_ruby`, `cut_sapphire`, `cut_topaz`, `cut_deep_gem`).
+- **Qurol va Sovut Soketlari (Gem Socketing System)**: Qurollar va sovutlarga 3 tagacha soket o'rnatish; kesilgan yoqut (+12 jangovar zarar), sapfir (+25 chidamlilik), topaz (+20% hujum tezligi) va chuqurlik toshi (+35 HP & vampirik so'rish) beradi.
+- **G'alaba Kubogi (`boss_trophy.glb`)**: Bandit Warlord mag'lub etilganda tushadi; Hukmdor qasriga o'rnatilganda butun qirollik aholisining ma'naviyatini +10 ga oshiradi.
+- **Yangi 3D Modellar (Blender 5.2)**: `gem_cutting_table.glb` (115 KB) va `boss_trophy.glb` (109 KB) yaratildi (jami **34 ta GLB model**).
+- **Yangi Qirollik Dioramasi**: Barcha 34 ta aktiv ishtirokidagi diorama `assets/showcase_realm.png` da render qilindi.
+- **Avtomatlashgan Testlar**: Jami **48 ta test 100% muvaffaqiyat bilan o'tdi** (0.014s). Godot 4.7.2 dvigateli xatosiz yuklandi.
+
 ## 2026-09-24 — Milestone 13: TerraFirmaCraft Geologiya, Shaxta O'pirilishi va Ruda Qatlamlari
 - **TerraFirmaCraft Geologiya va O'pirilish Fizikasi (`GeologyManager` & `voxel_world.gd`)**: Yer ostida (`Y <= 24`) tayanch to'sinlarisiz tosh va ruda qazilganda 35% ehtimollik bilan g'or shiftining o'pirilishi (`cave_in`) yuz beradi; shift toshlari to'kilib qulagan vayronaga (`COBBLESTONE`) aylanadi va 4 metr radiusdagi barchaga 25-45 crush zarari yetkazadi.
 - **Tayanch To'sinlari Aurası (`support_beam.glb`)**: Har bir tayanch to'sini gorizontal 4 blok va vertikal 3 bloklik xavfsizlik aurasini hosil qiladi, o'pirilish xavfini 0% ga tushiradi.

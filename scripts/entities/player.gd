@@ -9,6 +9,8 @@ const TripHammer = preload("res://scripts/world/trip_hammer.gd")
 const CompostBin = preload("res://scripts/world/compost_bin.gd")
 const CuttingBoard = preload("res://scripts/world/cutting_board.gd")
 const MineCart = preload("res://scripts/world/mine_cart.gd")
+const GemCuttingTable = preload("res://scripts/world/gem_cutting_table.gd")
+const ApotheosisManager = preload("res://scripts/magic/apotheosis_manager.gd")
 
 ## First-Person Monarch Controller.
 ## Follows the Single Persistent Monarch Paradigm: No dynasty, no permadeath;
@@ -377,6 +379,17 @@ func _handle_secondary_action() -> void:
 			emit_signal("hotbar_slot_changed", 0, target_item)
 			return
 		
+	# 3.2. Apotheosis Gem Socketing onto primary weapon / tool (slot 0)
+	if item.get("type") == "gem" and item.get("count", 0) > 0:
+		var target_item = hotbar[0]
+		if target_item.get("type") in ["tool", "weapon", "bow"] or target_item.get("tool_type") in ["sword", "axe", "pickaxe", "bow"]:
+			var gem_id = item.get("gem_id", "ruby")
+			if ApotheosisManager.socket_gem(target_item, gem_id):
+				item["count"] -= 1
+				emit_signal("hotbar_slot_changed", active_slot, item)
+				emit_signal("hotbar_slot_changed", 0, target_item)
+				return
+		
 	if not raycast or not raycast.is_colliding():
 		return
 		
@@ -554,6 +567,26 @@ func _handle_secondary_action() -> void:
 			get_tree().current_scene.add_child(mc)
 			item["count"] -= 1
 			emit_signal("block_action_performed", "place_station", Vector3i(int(mc.position.x), int(mc.position.y), int(mc.position.z)), 0)
+			emit_signal("hotbar_slot_changed", active_slot, item)
+			return
+		elif "Gem Cutting" in item_name:
+			var gct = GemCuttingTable.new()
+			gct.supply_chain = supply_chain
+			gct.position = hit_point + hit_normal * 0.1
+			get_tree().current_scene.add_child(gct)
+			item["count"] -= 1
+			emit_signal("block_action_performed", "place_station", Vector3i(int(gct.position.x), int(gct.position.y), int(gct.position.z)), 0)
+			emit_signal("hotbar_slot_changed", active_slot, item)
+			return
+		elif "Trophy" in item_name:
+			var ws = Workstation.new(Workstation.StationType.WORKBENCH)
+			ws.custom_name = "Warlord's Conquest Trophy"
+			ws.position = hit_point + hit_normal * 0.1
+			get_tree().current_scene.add_child(ws)
+			if supply_chain:
+				supply_chain.place_trophy()
+			item["count"] -= 1
+			emit_signal("block_action_performed", "place_station", Vector3i(int(ws.position.x), int(ws.position.y), int(ws.position.z)), 0)
 			emit_signal("hotbar_slot_changed", active_slot, item)
 			return
 

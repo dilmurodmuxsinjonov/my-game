@@ -159,6 +159,12 @@ def build_diorama():
     # 27. Brass Miner's Safety Lantern illuminating the mine shaft
     import_asset("mining_lantern.glb", (-3.2, 0.3, 0.0), rot_z=-15, scale=0.90)
 
+    # 28. Apotheosis Lapidary Gem Cutting Table near enchanter
+    import_asset("gem_cutting_table.glb", (-1.4, -3.2, 0.0), rot_z=-10, scale=0.95)
+
+    # 29. Golden Horned Warlord Conquest Trophy Plinth
+    import_asset("boss_trophy.glb", (2.2, 1.2, 0.0), rot_z=140, scale=0.90)
+
     # Render output path
     output_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "assets"))
     output_path = os.path.join(output_dir, "showcase_realm.png")
