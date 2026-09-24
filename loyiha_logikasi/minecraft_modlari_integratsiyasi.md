@@ -25,6 +25,19 @@ MineColonies — shahar boshqaruvi va avtonom NPC simulyatsiyasining eng yetakch
   - **Usta (Journeyman)**: Tezlik 1.5x, asboblar kamroq eskiradi.
   - **Bosh Usta (Master)**: Tezlik 2.2x, qo'shimcha nodir mahsulotlar yaratish imkoniyati (+15% sifat).
 
+### 1.4. Shahar Kengashi (Town Hall), Qirollik Xazinasi (Treasury Vault) va Garnizon Soqchilar Posti (Guard Post) — [Milestone 17 da to'liq integratsiya qilindi]
+- **Shahar Kengashi va Hududiy Chegaralar (`town_hall.gd`, `town_hall_desk.glb`)**:
+  - Koloniya markazi va hududiy boshqaruv yadrosi. Qishloq darajalari:
+    - *Hamlet (Qishloqcha)*: 32m radius, 8 nafar fuqaro chegarasi.
+    - *Village (Qishloq)*: 48m radius, 20 nafar fuqaro chegarasi.
+    - *Township (Shaharcha)*: 64m radius, 45 nafar fuqaro chegarasi.
+    - *Royal City (Qirollik Shahri)*: 96m radius, 100 nafar fuqaro chegarasi.
+  - Fuqarolarni ro'yxatga olish, turar-joy hajmi chegaralari va avtomatlashtirilgan kasbiy taqsimot.
+- **Qirollik Xazinaxonasi (`treasury_vault.gd`, `treasury_vault.glb`)**:
+  - Oltin va kumush tangalar xazinasi. Kunlik feodal soliqlarni yig'ish, fuqarolar kayfiyatiga (morale) ta'sir, garnizon soqchilarining maoshi to'lovi va bayram subsidiyalari. Agar xazina soqchilar maoshini to'lay olmasa, garnizon ish tashlaydi (mudofaa 50% ga pasayadi).
+- **Garnizon Soqchilar Posti (`guard_post.gd`, `guard_post.glb`)**:
+  - 16 metr mudofaa radiusi, halberd va qalqonli soqchilar saflanish bonusi (+15 mudofaa balli har bir soqchi uchun) va bosqinchi banditlar yaqinlashganda ogohlantirish signali.
+
 ---
 
 ## 2. TERRAFIRMACRAFT (TFC) — Realistik Geologiya, Metallurgiya va Fasllar

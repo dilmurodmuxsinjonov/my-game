@@ -87,7 +87,10 @@ var inventory: Dictionary = {
 	"gold_coins": 50,
 	"conveyor_belt": 0,
 	"chute": 0,
-	"mechanical_press": 0
+	"mechanical_press": 0,
+	"town_hall_desk": 0,
+	"treasury_vault": 0,
+	"guard_post": 0
 }
 
 func salt_meat(amount: int) -> bool:
@@ -309,6 +312,36 @@ func stamp_iron_sheets(amount: int = 1) -> bool:
 	elif inventory.get("iron_ingots", 0) >= amount:
 		consume_resource("iron_ingots", amount)
 		add_resource("iron_sheet", amount)
+		return true
+	return false
+
+func craft_town_hall_desk(amount: int = 1) -> bool:
+	var wood_needed = amount * 6
+	var iron_needed = amount * 2
+	if inventory.get("planks", 0) >= wood_needed and inventory.get("iron_ingots", 0) >= iron_needed:
+		consume_resource("planks", wood_needed)
+		consume_resource("iron_ingots", iron_needed)
+		add_resource("town_hall_desk", amount)
+		return true
+	return false
+
+func craft_treasury_vault(amount: int = 1) -> bool:
+	var stone_needed = amount * 8
+	var iron_needed = amount * 4
+	if inventory.get("stone", 0) >= stone_needed and inventory.get("iron_ingots", 0) >= iron_needed:
+		consume_resource("stone", stone_needed)
+		consume_resource("iron_ingots", iron_needed)
+		add_resource("treasury_vault", amount)
+		return true
+	return false
+
+func craft_guard_post(amount: int = 1) -> bool:
+	var wood_needed = amount * 4
+	var iron_needed = amount * 2
+	if inventory.get("logs", 0) >= wood_needed and inventory.get("iron_ingots", 0) >= iron_needed:
+		consume_resource("logs", wood_needed)
+		consume_resource("iron_ingots", iron_needed)
+		add_resource("guard_post", amount)
 		return true
 	return false
 
