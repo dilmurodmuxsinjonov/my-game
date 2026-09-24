@@ -69,7 +69,19 @@ var inventory: Dictionary = {
 	"topaz": 0,
 	"deep_gem": 0,
 	"boss_trophy": 0,
-	"gem_cutting_table": 0
+	"gem_cutting_table": 0,
+	"charcoal": 0,
+	"iron_bloom": 0,
+	"wrought_iron_ingot": 0,
+	"tin_ore": 2,
+	"tin_ingot": 0,
+	"bronze_ingot": 0,
+	"ceramic_mold": 2,
+	"cast_bronze_blade": 0,
+	"cast_bronze_pickaxe": 0,
+	"bloomery": 0,
+	"charcoal_pit": 0,
+	"crucible": 0
 }
 
 func salt_meat(amount: int) -> bool:
@@ -189,6 +201,62 @@ func place_trophy() -> bool:
 	if consume_resource("boss_trophy", 1):
 		morale = minf(100.0, morale + 10.0)
 		morale_updated.emit(morale)
+		return true
+	return false
+
+func craft_bloomery(amount: int = 1) -> bool:
+	var stone_needed = amount * 8
+	var iron_needed = amount * 2
+	if inventory.get("stone", 0) >= stone_needed and inventory.get("iron_ingots", 0) >= iron_needed:
+		consume_resource("stone", stone_needed)
+		consume_resource("iron_ingots", iron_needed)
+		add_resource("bloomery", amount)
+		return true
+	return false
+
+func craft_charcoal_pit(amount: int = 1) -> bool:
+	var logs_needed = amount * 4
+	if inventory.get("logs", 0) >= logs_needed:
+		consume_resource("logs", logs_needed)
+		add_resource("charcoal_pit", amount)
+		return true
+	return false
+
+func craft_crucible(amount: int = 1) -> bool:
+	var stone_needed = amount * 4
+	if inventory.get("stone", 0) >= stone_needed:
+		consume_resource("stone", stone_needed)
+		add_resource("crucible", amount)
+		return true
+	return false
+
+func smelt_iron_bloom(batches: int = 1) -> bool:
+	var ore_needed = batches * 2
+	var fuel_needed = batches * 2
+	if inventory.get("iron_ore", 0) >= ore_needed and inventory.get("charcoal", 0) >= fuel_needed:
+		consume_resource("iron_ore", ore_needed)
+		consume_resource("charcoal", fuel_needed)
+		add_resource("iron_bloom", batches)
+		return true
+	return false
+
+func refine_bloom_on_anvil(batches: int = 1) -> bool:
+	if inventory.get("iron_bloom", 0) >= batches:
+		consume_resource("iron_bloom", batches)
+		add_resource("wrought_iron_ingot", batches)
+		return true
+	return false
+
+func cast_bronze_tool(mold_type: String) -> bool:
+	if inventory.get("copper_ingot", 0) >= 7 and inventory.get("tin_ingot", 0) >= 1 and inventory.get("ceramic_mold", 0) >= 1:
+		consume_resource("copper_ingot", 7)
+		consume_resource("tin_ingot", 1)
+		if mold_type == "sword_blade":
+			add_resource("cast_bronze_blade", 1)
+		elif mold_type == "pickaxe_head":
+			add_resource("cast_bronze_pickaxe", 1)
+		else:
+			add_resource("bronze_ingot", 8)
 		return true
 	return false
 

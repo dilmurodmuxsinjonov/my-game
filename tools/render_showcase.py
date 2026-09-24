@@ -165,6 +165,15 @@ def build_diorama():
     # 29. Golden Horned Warlord Conquest Trophy Plinth
     import_asset("boss_trophy.glb", (2.2, 1.2, 0.0), rot_z=140, scale=0.90)
 
+    # 30. TerraFirmaCraft Refractory Shaft Bloomery Smelting Furnace
+    import_asset("bloomery.glb", (-2.6, 0.5, 0.0), rot_z=25, scale=0.90)
+
+    # 31. TerraFirmaCraft Earthen Sealed Pyrolysis Charcoal Pit
+    import_asset("charcoal_pit.glb", (-4.6, -2.6, 0.0), rot_z=-15, scale=0.95)
+
+    # 32. TerraFirmaCraft Refractory Ceramic Crucible with Molten Bronze
+    import_asset("crucible.glb", (0.8, -2.6, 0.0), rot_z=45, scale=0.90)
+
     # Render output path
     output_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "assets"))
     output_path = os.path.join(output_dir, "showcase_realm.png")

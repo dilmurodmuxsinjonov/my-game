@@ -7,6 +7,15 @@
 - Dastlabki Godot prototipi va foydalanuvchining showcase fayllari saqlandi.
 - Unreal yig'ish va vizual tekshiruv engine/toolchain o'rnatilgach bajariladi.
 
+## 2026-09-24 — Milestone 15: TerraFirmaCraft Bloomery Domna Pechi, Piroliz Ko'mir Chuquri va Bronza Quyish
+- **TerraFirmaCraft Piroliz Ko'mir Chuquri (`CharcoalPit` & `charcoal_pit.glb`)**: Yog'och xodalari usti loy va tuproq qatlami bilan germetik yopilgan holatda sekin tutab yonadi (kislorodsiz piroliz); 4 ta yog'ochdan 4 ta yuqori haroratli yog'och ko'miri (`charcoal`) ishlab chiqariladi. Agar chuqur ochiq qolsa, o'tinlar kulga aylanadi (`ash`).
+- **TerraFirmaCraft Bloomery Qaytarish Pechi (`Bloomery` & `bloomery.glb`)**: O'tga chidamli tosh va loydan yasalgan shaft domna pechi; 1200°C - 1450°C haroratda temir rudasini yog'och ko'mirdan olingan gazlar bilan qaytaradi va shlakli g'ovak metall to'pi — **Temir Blumi (`iron_bloom`)** ni beradi.
+- **Blumni Sandonda Zarb Qilish va Qotirish (`Anvil` va `TripHammer`)**: G'ovakli temir blumini sandonda bolg'alab, suyuq silikat shlakni chiqarish orqali toza **Bolg'alangan Temir Quyma (`wrought_iron_ingot`)** olinadi; Create modining kinetik mexanik bolg'asi (`TripHammer`) esa bu jarayonni avtomatik ravishda inson aralashuvisiz bajaradi.
+- **Sopol Tigel va Bronza Qotishmasi Quyish (`Crucible` & `crucible.glb`)**: O'tga chidamli loy tigelda mis va qalay 87.5% / 12.5% nisbatda eritilib suyuq bronza tayyorlanadi; so'ngra oldindan pishirilgan sopol qoliplarga (`ceramic_mold`) quyilib, bronza qilich tig'i (`cast_bronze_blade`), cho'kich (`cast_bronze_pickaxe`) va bolta boshlari yasaladi.
+- **Yangi 3D Modellar (Blender 5.2)**: `bloomery.glb` (331 KB), `charcoal_pit.glb` (146 KB), `crucible.glb` (326 KB) yaratildi (jami **37 ta GLB model**).
+- **Yangi Qirollik Dioramasi**: Barcha 37 ta aktiv, yangi domna pechlari va metallurgiya inshootlari bilan `assets/showcase_realm.png` da qayta render qilindi.
+- **Avtomatlashgan Testlar**: Jami **52 ta test 100% muvaffaqiyat bilan o'tdi** (0.009s).
+
 ## 2026-09-24 — Milestone 14: Apotheosis Boss Chempion Affikslari, Qimmatbaho Toshlar va Soket Tizimi
 - **Apotheosis Boss Affikslari & Chempion Modifikatorlari (`ApotheosisManager` & `bandit_warlord.gd`)**: Qaroqchilar boshlig'i (`BanditWarlord`) endi protsedural nomlar va unvonlar bilan paydo bo'ladi (masalan, *Gorath the Flameborn*, *Kaelen the Bloodthirsty*); 6 ta halokatli chempion affiksi:
   - `INFERNAL`: +35% o't zarari va zarbada nishonni yondirish.

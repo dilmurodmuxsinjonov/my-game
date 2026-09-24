@@ -11,6 +11,9 @@ const CuttingBoard = preload("res://scripts/world/cutting_board.gd")
 const MineCart = preload("res://scripts/world/mine_cart.gd")
 const GemCuttingTable = preload("res://scripts/world/gem_cutting_table.gd")
 const ApotheosisManager = preload("res://scripts/magic/apotheosis_manager.gd")
+const Bloomery = preload("res://scripts/world/bloomery.gd")
+const CharcoalPit = preload("res://scripts/world/charcoal_pit.gd")
+const Crucible = preload("res://scripts/world/crucible.gd")
 
 ## First-Person Monarch Controller.
 ## Follows the Single Persistent Monarch Paradigm: No dynasty, no permadeath;
@@ -587,6 +590,33 @@ func _handle_secondary_action() -> void:
 				supply_chain.place_trophy()
 			item["count"] -= 1
 			emit_signal("block_action_performed", "place_station", Vector3i(int(ws.position.x), int(ws.position.y), int(ws.position.z)), 0)
+			emit_signal("hotbar_slot_changed", active_slot, item)
+			return
+		elif "Bloomery" in item_name:
+			var bl = Bloomery.new()
+			bl.supply_chain = supply_chain
+			bl.position = hit_point + hit_normal * 0.1
+			get_tree().current_scene.add_child(bl)
+			item["count"] -= 1
+			emit_signal("block_action_performed", "place_station", Vector3i(int(bl.position.x), int(bl.position.y), int(bl.position.z)), 0)
+			emit_signal("hotbar_slot_changed", active_slot, item)
+			return
+		elif "Charcoal Pit" in item_name:
+			var cp = CharcoalPit.new()
+			cp.supply_chain = supply_chain
+			cp.position = hit_point + hit_normal * 0.1
+			get_tree().current_scene.add_child(cp)
+			item["count"] -= 1
+			emit_signal("block_action_performed", "place_station", Vector3i(int(cp.position.x), int(cp.position.y), int(cp.position.z)), 0)
+			emit_signal("hotbar_slot_changed", active_slot, item)
+			return
+		elif "Crucible" in item_name:
+			var cr = Crucible.new()
+			cr.supply_chain = supply_chain
+			cr.position = hit_point + hit_normal * 0.1
+			get_tree().current_scene.add_child(cr)
+			item["count"] -= 1
+			emit_signal("block_action_performed", "place_station", Vector3i(int(cr.position.x), int(cr.position.y), int(cr.position.z)), 0)
 			emit_signal("hotbar_slot_changed", active_slot, item)
 			return
 

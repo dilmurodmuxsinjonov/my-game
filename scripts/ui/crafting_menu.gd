@@ -238,6 +238,26 @@ const RECIPES: Dictionary = {
 			"name": "Cut Deep Gem (Lifesteal & Regen)",
 			"inputs": {"gems": 1},
 			"output": {"name": "Cut Deep Gem", "type": "gem", "gem_id": "deep_gem", "icon": "💎", "count": 1}
+		},
+		{
+			"name": "Refractory Bloomery Furnace",
+			"inputs": {"stone": 8, "iron_ingots": 2},
+			"output": {"name": "TFC Bloomery", "type": "placeable", "icon": "🔥", "count": 1}
+		},
+		{
+			"name": "Earthen Charcoal Burning Pit",
+			"inputs": {"logs": 4},
+			"output": {"name": "Charcoal Pit", "type": "placeable", "icon": "🪵", "count": 1}
+		},
+		{
+			"name": "Refractory Ceramic Crucible",
+			"inputs": {"stone": 4},
+			"output": {"name": "Ceramic Crucible", "type": "placeable", "icon": "🏺", "count": 1}
+		},
+		{
+			"name": "Ceramic Ingot Mold (x2)",
+			"inputs": {"stone": 2},
+			"output": {"name": "Ceramic Mold", "type": "item", "icon": "🧱", "count": 2}
 		}
 	],
 	"campfire": [
