@@ -258,6 +258,21 @@ const RECIPES: Dictionary = {
 			"name": "Ceramic Ingot Mold (x2)",
 			"inputs": {"stone": 2},
 			"output": {"name": "Ceramic Mold", "type": "item", "icon": "🧱", "count": 2}
+		},
+		{
+			"name": "Mechanical Conveyor Belt",
+			"inputs": {"iron_ingots": 1, "leather": 1},
+			"output": {"name": "Conveyor Belt", "type": "placeable", "icon": "⚙️", "count": 1}
+		},
+		{
+			"name": "Gravity Drop Chute",
+			"inputs": {"iron_ingots": 2},
+			"output": {"name": "Gravity Chute", "type": "placeable", "icon": "🔻", "count": 1}
+		},
+		{
+			"name": "Industrial Mechanical Press",
+			"inputs": {"iron_ingots": 4, "stone": 4},
+			"output": {"name": "Mechanical Press", "type": "placeable", "icon": "🪙", "count": 1}
 		}
 	],
 	"campfire": [

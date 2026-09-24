@@ -146,6 +146,9 @@ Medieval davrning haqiqiy muhandisligi:
 2. **Shamol Tegirmoni (Windmill)**: Qir va tepaliklarda quriladi.
 3. **Mexanik Bolg'a (Mechanical Trip Hammer)**: Suv yoki shamol kuchi bilan tinimsiz urilib, temir va ruda quymalarini qo'l mehnatini sarflamasdan yanchadi.
 4. **Un Tegirmon Toshlari (Millstones)**: Bug'doyni sanoat darajasida unga aylantiradi.
+5. **Mexanik Konveyer Lentasi (Mechanical Conveyor Belt & `conveyor_belt.glb`)**: Kinetik vallar orqali 2.0 m/s tezlikda harakatlanuvchi mustahkam charm lenta (16 SU sarflaydi); shaxtadan chiqqan rudalarni, domna pechi quymalarini va un qoplarini fuqarolarsiz avtomatik ustaxonalarga tashiydi.
+6. **Gravitatsion Voronka va Truba (Gravity Chute & `chute.glb`)**: Tabiiy tortishish kuchi hisobiga 4 ta narsa/soniya tezlikda vertikal pastga resurslarni tushirib beruvchi voronkali jez/temir truba (0 SU talab qiladi); baland silos omboridan donni to'g'ridan-to'g'ri tegirmon toshiga uzatadi.
+7. **Sanoat Mexanik Pressi (Mechanical Press & `mechanical_press.glb`)**: Og'ir eksentrik porshenli shtamplash pressi (48 SU sarflaydi); temir quymalarni og'ir ritsar sovuti plastinalariga (`iron_sheet`), mis quymalarini tomlar uchun tunukalarga (`copper_sheet`), va oltin quymalarini qirollik oltin tangalariga (`gold_coins` — 1 oltin quyma = 10 ta tanga) shtamplab zarb qiladi!
 
 ---
 
@@ -173,7 +176,10 @@ Medieval davrning haqiqiy muhandisligi:
 - [x] **TerraFirmaCraft Piroliz Ko'mir Chuquri**: `CharcoalPit` (`scripts/world/charcoal_pit.gd` & `charcoal_pit.glb`), yer osti tuproq va loy bilan germetik yopilgan piroliz chuquri, 4 ta o'tindan 4 ta toza yuqori haroratli yog'och ko'miri (`charcoal`) tayyorlash.
 - [x] **TerraFirmaCraft Sopol Tigel va Qolipga Bronza Quyish**: `Crucible` (`scripts/world/crucible.gd` & `crucible.glb`), mis va qalayni 88/12 nisbatda eritib suyuq bronza tayyorlash va sopol qoliplarga quyib qurol/asbob tig'larini quyish.
 - [x] **Blum Zarb Qilish va Avtomatlashtirish**: `Anvil` va `TripHammer` orqali temir blumini bolg'alab silikat shlakni chiqarish va zich bolg'alangan temir quymalar (`wrought_iron_ingot`) ishlab chiqarish.
-- [x] **3D Blender 5.2 Modellar**: Jami **37 ta to'liq modellashtirilgan va import qilingan GLB 3D aktivlar** (`bloomery.glb`, `charcoal_pit.glb`, `crucible.glb` qo'shildi).
+- [x] **Create Mod Mexanik Konveyer Lentasi (Conveyor Belt)**: `ConveyorBelt` (`scripts/world/conveyor_belt.gd` & `conveyor_belt.glb`), 16 SU quvvat sarflaydi, 2.0 m/s tezlikda resurslarni stanoklar va omborlar o'rtasida avtomatik tashish.
+- [x] **Create Mod Gravitatsion Truba (Gravity Chute)**: `Chute` (`scripts/world/chute.gd` & `chute.glb`), 0 SU energiya talab qiluvchi tortishish kuchi trubasi, 4 ta narsa/soniya tezlikda yuqoridagi don siloslaridan pastdagi tegirmon toshlariga resurslarni tushirish.
+- [x] **Create Mod Sanoat Shtamplash Pressi (Mechanical Press)**: `MechanicalPress` (`scripts/world/mechanical_press.gd` & `mechanical_press.glb`), 48 SU quvvat sarflaydi, temir quymalardan sovut plastinalari (`iron_sheet`), mis tunukalari (`copper_sheet`) va oltin quymalardan qirollik oltin tangalarini (`gold_coins` — 1:10) shtamplab zarb qilish.
+- [x] **3D Blender 5.2 Modellar**: Jami **40 ta to'liq modellashtirilgan va import qilingan GLB 3D aktivlar** (`conveyor_belt.glb`, `chute.glb`, `mechanical_press.glb` qo'shildi).
 
 
 

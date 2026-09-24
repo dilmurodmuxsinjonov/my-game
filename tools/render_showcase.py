@@ -174,6 +174,15 @@ def build_diorama():
     # 32. TerraFirmaCraft Refractory Ceramic Crucible with Molten Bronze
     import_asset("crucible.glb", (0.8, -2.6, 0.0), rot_z=45, scale=0.90)
 
+    # 33. Create-Style Mechanical Conveyor Belt
+    import_asset("conveyor_belt.glb", (1.6, 2.2, 0.0), rot_z=0, scale=0.90)
+
+    # 34. Create-Style Gravity Drop Chute
+    import_asset("chute.glb", (2.3, 3.4, 1.8), rot_z=20, scale=0.85)
+
+    # 35. Create-Style Kinetic Mechanical Stamping Press
+    import_asset("mechanical_press.glb", (-0.8, 3.2, 0.0), rot_z=-15, scale=0.90)
+
     # Render output path
     output_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "assets"))
     output_path = os.path.join(output_dir, "showcase_realm.png")

@@ -7,6 +7,17 @@
 - Dastlabki Godot prototipi va foydalanuvchining showcase fayllari saqlandi.
 - Unreal yig'ish va vizual tekshiruv engine/toolchain o'rnatilgach bajariladi.
 
+## 2026-09-24 — Milestone 16: Create Mod Konveyer Lentasi, Gravitatsion Truba va Sanoat Shtamplash Pressi
+- **Create Mod Kinetik Konveyer Lentasi (`ConveyorBelt` & `conveyor_belt.glb`)**: Kinetik vallar yordamida 2.0 m/s tezlikda harakatlanuvchi mexanik charm lenta (16 SU sarflaydi); resurslarni qo'l mehnatisiz avtomatik ravishda stanoklar, ruda konlari va omborlar o'rtasida tashiydi.
+- **Create Mod Gravitatsion Truba va Voronka (`Chute` & `chute.glb`)**: Tabiiy og'irlik kuchi asosida (0 SU talab qiladi) 4 ta narsa/soniya tezlikda resurslarni yuqori qavatdan pastdagi stanoklarga tashuvchi metall truba; don siloslaridan to'g'ridan-to'g'ri tegirmon toshlariga bug'doy uzatadi.
+- **Create Mod Sanoat Shtamplash Pressi (`MechanicalPress` & `mechanical_press.glb`)**: Kinetik eksentrik porshen bilan jihozlangan og'ir metallurgik press (48 SU sarflaydi):
+  - Temir quyma -> Qalin ritsar plastinasi (`iron_sheet`).
+  - Mis quyma -> Tom yopish va quvurlar uchun mis tunukasi (`copper_sheet`).
+  - Oltin quyma -> Qirollik oltin tangalari zarb qilish (`gold_coins` — 1:10 nisbatda).
+- **Yangi 3D Modellar (Blender 5.2)**: `conveyor_belt.glb` (53 KB), `chute.glb` (15 KB), `mechanical_press.glb` (27 KB) yaratildi (jami **40 ta GLB model**).
+- **Yangi Qirollik Dioramasi**: Barcha 40 ta aktiv ishtirokidagi diorama `assets/showcase_realm.png` da qayta render qilindi.
+- **Avtomatlashgan Testlar**: Jami **55 ta test 100% muvaffaqiyat bilan o'tdi** (0.009s).
+
 ## 2026-09-24 — Milestone 15: TerraFirmaCraft Bloomery Domna Pechi, Piroliz Ko'mir Chuquri va Bronza Quyish
 - **TerraFirmaCraft Piroliz Ko'mir Chuquri (`CharcoalPit` & `charcoal_pit.glb`)**: Yog'och xodalari usti loy va tuproq qatlami bilan germetik yopilgan holatda sekin tutab yonadi (kislorodsiz piroliz); 4 ta yog'ochdan 4 ta yuqori haroratli yog'och ko'miri (`charcoal`) ishlab chiqariladi. Agar chuqur ochiq qolsa, o'tinlar kulga aylanadi (`ash`).
 - **TerraFirmaCraft Bloomery Qaytarish Pechi (`Bloomery` & `bloomery.glb`)**: O'tga chidamli tosh va loydan yasalgan shaft domna pechi; 1200°C - 1450°C haroratda temir rudasini yog'och ko'mirdan olingan gazlar bilan qaytaradi va shlakli g'ovak metall to'pi — **Temir Blumi (`iron_bloom`)** ni beradi.

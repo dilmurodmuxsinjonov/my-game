@@ -81,7 +81,13 @@ var inventory: Dictionary = {
 	"cast_bronze_pickaxe": 0,
 	"bloomery": 0,
 	"charcoal_pit": 0,
-	"crucible": 0
+	"crucible": 0,
+	"iron_sheet": 0,
+	"copper_sheet": 0,
+	"gold_coins": 50,
+	"conveyor_belt": 0,
+	"chute": 0,
+	"mechanical_press": 0
 }
 
 func salt_meat(amount: int) -> bool:
@@ -257,6 +263,52 @@ func cast_bronze_tool(mold_type: String) -> bool:
 			add_resource("cast_bronze_pickaxe", 1)
 		else:
 			add_resource("bronze_ingot", 8)
+		return true
+	return false
+
+func craft_conveyor_belt(amount: int = 1) -> bool:
+	var iron_needed = amount * 1
+	var leather_needed = amount * 1
+	if inventory.get("iron_ingots", 0) >= iron_needed and inventory.get("leather", 0) >= leather_needed:
+		consume_resource("iron_ingots", iron_needed)
+		consume_resource("leather", leather_needed)
+		add_resource("conveyor_belt", amount)
+		return true
+	return false
+
+func craft_chute(amount: int = 1) -> bool:
+	var iron_needed = amount * 2
+	if inventory.get("iron_ingots", 0) >= iron_needed:
+		consume_resource("iron_ingots", iron_needed)
+		add_resource("chute", amount)
+		return true
+	return false
+
+func craft_mechanical_press(amount: int = 1) -> bool:
+	var iron_needed = amount * 4
+	var stone_needed = amount * 4
+	if inventory.get("iron_ingots", 0) >= iron_needed and inventory.get("stone", 0) >= stone_needed:
+		consume_resource("iron_ingots", iron_needed)
+		consume_resource("stone", stone_needed)
+		add_resource("mechanical_press", amount)
+		return true
+	return false
+
+func stamp_coins(amount: int = 1) -> bool:
+	if inventory.get("gold_ingot", 0) >= amount:
+		consume_resource("gold_ingot", amount)
+		add_resource("gold_coins", amount * 10)
+		return true
+	return false
+
+func stamp_iron_sheets(amount: int = 1) -> bool:
+	if inventory.get("wrought_iron_ingot", 0) >= amount:
+		consume_resource("wrought_iron_ingot", amount)
+		add_resource("iron_sheet", amount)
+		return true
+	elif inventory.get("iron_ingots", 0) >= amount:
+		consume_resource("iron_ingots", amount)
+		add_resource("iron_sheet", amount)
 		return true
 	return false
 
