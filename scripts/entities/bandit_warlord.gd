@@ -1,10 +1,12 @@
 class_name BanditWarlord
 extends CharacterBody3D
 
-## Feudal Raid Boss: Bandit Warlord.
+const ApotheosisManager = preload("res://scripts/magic/apotheosis_manager.gd")
+
+## Feudal Raid Boss: Bandit Warlord (Apotheosis Boss Affix System).
 ## High hit-point heavily armored raider chief wielding a massive battleaxe.
-## Guarantees dropping Legendary Runestone Affixes (Dragon's Breath, Vampiric Leech, Thunderstrike)
-## and refined steel ingots upon defeat.
+## Spawns with procedural Apotheosis modifiers (Infernal, Armored, Swift, Vampiric, Titan).
+## Guarantees dropping Legendary Runestone Affixes, Gemstones, and the Conquest Trophy.
 
 signal defeated(warlord: BanditWarlord, loot: Dictionary)
 signal attack_landed(warlord: BanditWarlord, target: Node3D, damage: float)
@@ -16,6 +18,11 @@ var attack_damage: float = 26.0
 var attack_range: float = 2.4
 var attack_cooldown: float = 1.8
 var attack_timer: float = 0.0
+
+var boss_affix_data: Dictionary = {}
+var armor_reduction: float = 0.0
+var lifesteal_percent: float = 0.0
+var warlord_title: String = "Bandit Warlord"
 
 var voxel_world: VoxelWorld
 var pathfinder: GridPathfinder3D
@@ -31,9 +38,20 @@ const GRAVITY: float = 16.0
 
 func _ready() -> void:
 	add_to_group("bandits")
+	_apply_apotheosis_modifiers()
 	_setup_visuals()
 	if voxel_world:
 		pathfinder = GridPathfinder3D.new(voxel_world)
+
+func _apply_apotheosis_modifiers() -> void:
+	boss_affix_data = ApotheosisManager.roll_boss_affixes(1)
+	warlord_title = boss_affix_data.get("title", "Bandit Warlord")
+	max_health *= boss_affix_data.get("hp_multiplier", 1.0)
+	health = max_health
+	move_speed *= boss_affix_data.get("speed_multiplier", 1.0)
+	attack_damage *= boss_affix_data.get("damage_multiplier", 1.0)
+	armor_reduction = boss_affix_data.get("armor_reduction", 0.0)
+	lifesteal_percent = boss_affix_data.get("lifesteal_percent", 0.0)
 
 func _setup_visuals() -> void:
 	collision_shape = CollisionShape3D.new()
@@ -52,7 +70,7 @@ func _setup_visuals() -> void:
 			add_child(inst)
 
 	health_bar_label = Label3D.new()
-	health_bar_label.text = "👑 Bandit Warlord (Boss)\n[ 160 / 160 ]"
+	health_bar_label.text = "👑 %s\n[ %d / %d ]" % [warlord_title, int(health), int(max_health)]
 	health_bar_label.position = Vector3(0, 2.4, 0)
 	health_bar_label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 	health_bar_label.font_size = 28
@@ -117,14 +135,19 @@ func _try_melee_strike(target: Node3D) -> void:
 		emit_signal("attack_landed", self, target, attack_damage)
 		if target.has_method("take_damage"):
 			target.take_damage(attack_damage)
+			if lifesteal_percent > 0.0:
+				health = minf(max_health, health + (attack_damage * lifesteal_percent))
+				if health_bar_label:
+					health_bar_label.text = "👑 %s\n[ %d / %d ]" % [warlord_title, int(health), int(max_health)]
 
 func take_damage(amount: float, knockback: Vector3 = Vector3.ZERO) -> void:
-	health = maxf(0.0, health - amount)
+	var actual_damage = amount * (1.0 - armor_reduction)
+	health = maxf(0.0, health - actual_damage)
 	velocity += knockback * 0.4 # High mass resistance
 	flash_timer = 0.2
 	
 	if health_bar_label:
-		health_bar_label.text = "👑 Bandit Warlord (Boss)\n[ %d / %d ]" % [int(health), int(max_health)]
+		health_bar_label.text = "👑 %s\n[ %d / %d ]" % [warlord_title, int(health), int(max_health)]
 		
 	if health <= 0.0:
 		_on_defeated()
@@ -138,12 +161,15 @@ func _on_defeated() -> void:
 		EnchantmentManager.AFFIX_FORTRESS_HEART
 	]
 	var dropped_affix = legendary_runes[randi() % legendary_runes.size()]
+	var dropped_gem = ApotheosisManager.cut_gem("gems")
 	
 	var loot = {
 		"coins": randi_range(25, 45),
 		"steel_ingot": randi_range(2, 4),
 		"blood_vial": 3,
-		"legendary_rune": dropped_affix
+		"legendary_rune": dropped_affix,
+		"boss_trophy": 1,
+		"cut_gem": dropped_gem
 	}
 	emit_signal("defeated", self, loot)
 	queue_free()

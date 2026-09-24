@@ -213,6 +213,31 @@ const RECIPES: Dictionary = {
 			"name": "Mining Rail Tracks (x16)",
 			"inputs": {"iron_ingots": 6, "planks": 1},
 			"output": {"name": "Mining Rail", "type": "block", "block_type": 24, "icon": "🛤️", "count": 16}
+		},
+		{
+			"name": "Lapidary Gem Cutting Table",
+			"inputs": {"planks": 4, "iron_ingots": 2, "stone": 1},
+			"output": {"name": "Gem Cutting Table", "type": "placeable", "icon": "💎", "count": 1}
+		},
+		{
+			"name": "Cut Ruby (Crit Damage)",
+			"inputs": {"gems": 1},
+			"output": {"name": "Cut Ruby", "type": "gem", "gem_id": "ruby", "icon": "🔴", "count": 1}
+		},
+		{
+			"name": "Cut Sapphire (Armor Piercing)",
+			"inputs": {"gems": 1},
+			"output": {"name": "Cut Sapphire", "type": "gem", "gem_id": "sapphire", "icon": "🔵", "count": 1}
+		},
+		{
+			"name": "Cut Topaz (Stamina Efficiency)",
+			"inputs": {"gems": 1},
+			"output": {"name": "Cut Topaz", "type": "gem", "gem_id": "topaz", "icon": "🟡", "count": 1}
+		},
+		{
+			"name": "Cut Deep Gem (Lifesteal & Regen)",
+			"inputs": {"gems": 1},
+			"output": {"name": "Cut Deep Gem", "type": "gem", "gem_id": "deep_gem", "icon": "💎", "count": 1}
 		}
 	],
 	"campfire": [

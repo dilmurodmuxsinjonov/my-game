@@ -150,7 +150,10 @@ Medieval davrning haqiqiy muhandisligi:
 - [x] **Farmer's Delight Organik Kompost Qutisi (Compost Bin)**: `CompostBin` (`scripts/world/compost_bin.gd` & `compost_bin.glb`), o'simlik va oziq-ovqat chiqindilaridan (4 ta chiqindi -> 1 ta o'g'it) boyitilgan qora tuproq (`rich_soil_compost`) o'g'iti ishlab chiqarish.
 - [x] **Farmer's Delight Almashlab Ekish va Tuproq Unumdorligi (Crop Rotation Engine)**: `CropManager` (`scripts/world/crop_manager.gd`), ko'p turli ekinlar (Bug'doy, Karam, Piyoz, Sabzi), boyitilgan tuproqda 2x unib chiqish, almashlab ekishda +25% tezlik va hosil bonusi, monomadaniyatli tuproq toliqishiga qarshi chora.
 - [x] **Farmer's Delight Oshxona Qirqish Taxtasi (Cutting Board)**: `CuttingBoard` (`scripts/world/cutting_board.gd` & `cutting_board.glb`), oshpazlik pichog'i bilan sabzavot va go'shtlarni maydalash (`sliced_cabbage`, `minced_beef`, `diced_onion`) hamda qozonda elita taomlar ("Rich Cabbage Stew", "Shepherd's Pie") pishirish.
-- [x] **3D Blender 5.2 Modellar**: Jami 29 ta to'liq modellashtirilgan va import qilingan GLB 3D aktivlar (`compost_bin.glb` va `cutting_board.glb` qo'shildi).
+- [x] **TerraFirmaCraft Geologiya va O'pirilish Fizikasi**: `GeologyManager` (`scripts/world/geology_manager.gd`), yer osti qulash fizikasi (`cave_in`), tayanch to'sinlari (`support_beam.glb`), geologik razvedka cho'kichi (`prospector_pick.glb`), yer osti vagonchasi (`mine_cart.glb`), kon relslari va xavfsizlik chirog'i (`mining_lantern.glb`).
+- [x] **Apotheosis Boss Affikslari & Chempion Modifikatorlari**: `ApotheosisManager` (`scripts/magic/apotheosis_manager.gd`), qaroqchilar boshlig'iga (`BanditWarlord`) protsedural nomlar va unvonlar berish, 6 ta o'limli affiks (`INFERNAL`, `ARMORED`, `SWIFT`, `VAMPIRIC`, `TEMPEST`, `TITAN`), maxsus zararlar va jarohat qaytarish (lifesteal).
+- [x] **Apotheosis Qimmatbaho Toshlarni Qirqish va Soket Tizimi (Lapidary & Sockets)**: `GemCuttingTable` (`scripts/world/gem_cutting_table.gd` & `gem_cutting_table.glb`), xom yoqut, sapfir, topaz va chuqurlik toshlarini qirqish, qurol va sovutlarga soket (slot) ochib toshlarni o'rnatish, yechib olish, hamda g'alaba kubogi (`boss_trophy.glb` - qirollik ma'naviyatiga +10).
+- [x] **3D Blender 5.2 Modellar**: Jami 34 ta to'liq modellashtirilgan va import qilingan GLB 3D aktivlar (`gem_cutting_table.glb` va `boss_trophy.glb` qo'shildi).
 
 
 
