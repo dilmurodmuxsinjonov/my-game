@@ -7,6 +7,15 @@
 - Dastlabki Godot prototipi va foydalanuvchining showcase fayllari saqlandi.
 - Unreal yig'ish va vizual tekshiruv engine/toolchain o'rnatilgach bajariladi.
 
+## 2026-09-24 — Milestone 12: Farmer's Delight Qishloq Xo'jaligi, Boy Tuproq va Oshpazlik Tizimi
+- **Farmer's Delight Kompost Qutisi (`CompostBin` & `compost_bin.glb`)**: Organik chiqindilar (chirigan ovqat, barglar, o'simlik qoldiqlari) dan 4 ta sarflab, 1 ta yuqori unumdor o'g'it (`rich_soil_compost`) tayyorlash stansiyasi.
+- **Ekinlar Almashlab Ekish va Dinamik Unumdorlik (`CropManager`)**: Bug'doy, karam, piyoz, sabzi ekinlarining to'liq hayotiy sikli. Boyitilgan tuproqda 2x tezroq o'sish; almashlab ekish rotatsiyasi (almashinish) +25% o'sish tezligi va +1 hosil bonusi; ketma-ket bir xil ekin ekish (monokultura) esa o'sishni 20% ga sekinlashtiradi va -1 hosil jarimasi beradi.
+- **Oshpazlik Kesish Taxtasi (`CuttingBoard` & `cutting_board.glb`)**: Oshxona satiri (cleaver) bilan ingredientlarni professional maydalash: Karam -> 2x To'g'ralgan karam (`sliced_cabbage`), Xom go'sht -> 2x Qiyma (`minced_beef`), Piyoz -> 2x To'g'ralgan piyoz (`diced_onion`).
+- **Gourmet Retseptlar (`SupplyChain`)**: Boyitilgan Karamli Sho'rva (`cabbage_stew`) va To'yimli Cho'pon Pirogi (`shepherd_pie`) pishirish logikasi.
+- **Yangi 3D Modellar (Blender 5.2)**: `compost_bin.glb` (46 KB) va `cutting_board.glb` (24 KB) yaratildi (jami 29 ta yuqori sifatli GLB model).
+- **Yangi Qirollik Dioramasi**: Barcha 29 ta aktiv ishtirokidagi diorama `assets/showcase_realm.png` da qayta render qilindi.
+- **Avtomatlashgan Testlar**: Jami 41 ta test 100% muvaffaqiyat bilan o'tdi. Godot 4.7.2 dvigateli xatosiz yuklandi.
+
 ## 2026-09-24 — Milestone 11: Create Mod Suv G'ildiragi, Mexanik Tegirmon va Sanoat Bolg'asi
 - **Create Mod Suv G'ildiragi (`WaterWheel` & `water_wheel.glb`)**: Daryo oqimi va flume kanallaridan 24 RPM va 256 SU (Stress Units) mexanik energiya ishlab chiqarish, 8 metr radiusdagi mashinalarga kinetik quvvat ulash.
 - **Mexanik Tegirmon Toshlari (`Millstone` & `millstone.glb`)**: 32 SU quvvat sarflaydi; aylanma granit toshlar orqali bug'doyni avtomatik ravishda 200% unumdorlikda (1 bug'doy -> 2 non) un va rasionga aylantiradi.

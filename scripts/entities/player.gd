@@ -6,6 +6,8 @@ const Anvil = preload("res://scripts/world/anvil.gd")
 const WaterWheel = preload("res://scripts/world/water_wheel.gd")
 const Millstone = preload("res://scripts/world/millstone.gd")
 const TripHammer = preload("res://scripts/world/trip_hammer.gd")
+const CompostBin = preload("res://scripts/world/compost_bin.gd")
+const CuttingBoard = preload("res://scripts/world/cutting_board.gd")
 
 ## First-Person Monarch Controller.
 ## Follows the Single Persistent Monarch Paradigm: No dynasty, no permadeath;
@@ -517,6 +519,24 @@ func _handle_secondary_action() -> void:
 			get_tree().current_scene.add_child(ws)
 			item["count"] -= 1
 			emit_signal("block_action_performed", "place_station", Vector3i(int(ws.position.x), int(ws.position.y), int(ws.position.z)), 0)
+			emit_signal("hotbar_slot_changed", active_slot, item)
+			return
+		elif "Compost Bin" in item_name:
+			var cb = CompostBin.new()
+			cb.supply_chain = supply_chain
+			cb.position = hit_point + hit_normal * 0.1
+			get_tree().current_scene.add_child(cb)
+			item["count"] -= 1
+			emit_signal("block_action_performed", "place_station", Vector3i(int(cb.position.x), int(cb.position.y), int(cb.position.z)), 0)
+			emit_signal("hotbar_slot_changed", active_slot, item)
+			return
+		elif "Cutting Board" in item_name:
+			var cb = CuttingBoard.new()
+			cb.supply_chain = supply_chain
+			cb.position = hit_point + hit_normal * 0.1
+			get_tree().current_scene.add_child(cb)
+			item["count"] -= 1
+			emit_signal("block_action_performed", "place_station", Vector3i(int(cb.position.x), int(cb.position.y), int(cb.position.z)), 0)
 			emit_signal("hotbar_slot_changed", active_slot, item)
 			return
 

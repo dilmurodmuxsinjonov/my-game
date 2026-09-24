@@ -188,6 +188,16 @@ const RECIPES: Dictionary = {
 			"name": "Industrial Trip Hammer",
 			"inputs": {"logs": 6, "stone": 4, "iron_ingots": 3},
 			"output": {"name": "Industrial Trip Hammer", "type": "placeable", "icon": "🔨", "count": 1}
+		},
+		{
+			"name": "Organic Compost Bin",
+			"inputs": {"logs": 4, "planks": 2},
+			"output": {"name": "Compost Bin", "type": "placeable", "icon": "🌱", "count": 1}
+		},
+		{
+			"name": "Butcher's Cutting Board",
+			"inputs": {"logs": 2, "iron_ingots": 1},
+			"output": {"name": "Cutting Board", "type": "placeable", "icon": "🔪", "count": 1}
 		}
 	],
 	"campfire": [
@@ -205,6 +215,16 @@ const RECIPES: Dictionary = {
 			"name": "Salt-Cured Meat",
 			"inputs": {"meat": 1, "rock_salt": 1},
 			"output": {"name": "Salt-Cured Meat", "type": "food", "nutrition": 45.0, "warmth_bonus": 10.0, "icon": "🥓", "count": 1}
+		},
+		{
+			"name": "Rich Cabbage & Beef Stew (x2)",
+			"inputs": {"sliced_cabbage": 1, "minced_beef": 1, "diced_onion": 1},
+			"output": {"name": "Rich Cabbage Stew", "type": "food", "nutrition": 50.0, "warmth_bonus": 25.0, "icon": "🍲", "count": 2}
+		},
+		{
+			"name": "Monarch's Shepherd Pie (x2)",
+			"inputs": {"minced_beef": 1, "diced_onion": 1, "bread": 1},
+			"output": {"name": "Shepherd's Pie", "type": "food", "nutrition": 65.0, "warmth_bonus": 30.0, "icon": "🥧", "count": 2}
 		}
 	],
 	"furnace": [
