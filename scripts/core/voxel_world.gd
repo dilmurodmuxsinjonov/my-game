@@ -1,11 +1,14 @@
 class_name VoxelWorld
 extends Node3D
 
+const GeologyManager = preload("res://scripts/world/geology_manager.gd")
+
 ## Manages 3D voxel terrain generation using FastNoiseLite, chunk streaming,
 ## world-space block modifications (mining/placing), and multi-chunk boundary meshing.
 
 signal block_mined(world_pos: Vector3i, block_type: int)
 signal block_placed(world_pos: Vector3i, block_type: int)
+signal cave_in_occurred(origin: Vector3i, affected_blocks: Array[Vector3i], damage: float)
 
 @export var world_size_chunks: Vector2i = Vector2i(4, 4) # 4x4 chunks = 64x64 blocks
 @export var terrain_seed: int = 1337
@@ -16,6 +19,7 @@ var chunks: Dictionary = {} # Vector2i -> VoxelChunk
 var noise: FastNoiseLite
 var tree_noise: FastNoiseLite
 var ore_noise: FastNoiseLite
+var geology_manager: GeologyManager = GeologyManager.new()
 
 func _ready() -> void:
 	_init_noise()
@@ -82,8 +86,12 @@ func _generate_chunk_terrain(chunk: VoxelChunk, cpos: Vector2i) -> void:
 						chunk.set_block(lx, ly, lz, VoxelChunk.BlockType.DEEP_GEM_ORE)
 					elif ly < 8 and ore_sample > 0.42:
 						chunk.set_block(lx, ly, lz, VoxelChunk.BlockType.GOLD_ORE)
+					elif ly >= 4 and ly < 10 and ore_sample > 0.44:
+						chunk.set_block(lx, ly, lz, VoxelChunk.BlockType.SILVER_ORE)
 					elif ly < 15 and ore_sample > 0.35:
 						chunk.set_block(lx, ly, lz, VoxelChunk.BlockType.IRON_ORE)
+					elif ly >= 10 and ly < 18 and ore_sample > 0.38:
+						chunk.set_block(lx, ly, lz, VoxelChunk.BlockType.ROCK_SALT_ORE)
 					elif ly < 20 and ore_sample > 0.30:
 						chunk.set_block(lx, ly, lz, VoxelChunk.BlockType.COPPER_ORE)
 					elif ly < 25 and ore_sample > 0.25:
@@ -185,9 +193,23 @@ func mine_block(hit_point: Vector3, normal: Vector3) -> Dictionary:
 	if old_type != VoxelChunk.BlockType.AIR:
 		set_block_world(target_pos, VoxelChunk.BlockType.AIR, true)
 		emit_signal("block_mined", target_pos, old_type)
-		return {"success": true, "pos": target_pos, "type": old_type}
+		
+		# Check structural stability and cave-in risk (TerraFirmaCraft mechanics)
+		var stability = geology_manager.check_mining_stability(self, target_pos, old_type)
+		if stability.get("collapsed", false):
+			emit_signal("cave_in_occurred", target_pos, stability["affected_blocks"], stability["damage"])
+			
+		return {
+			"success": true,
+			"pos": target_pos,
+			"type": old_type,
+			"stability": stability
+		}
 		
 	return {"success": false, "pos": target_pos, "type": VoxelChunk.BlockType.AIR}
+
+func tap_rock_with_prospector_pick(world_pos: Vector3i) -> Dictionary:
+	return geology_manager.prospect_area(self, world_pos, 12)
 
 func place_block(hit_point: Vector3, normal: Vector3, block_type: int) -> Dictionary:
 	# Step outward into the air space along the normal

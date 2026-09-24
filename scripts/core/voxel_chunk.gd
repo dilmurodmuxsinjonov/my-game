@@ -31,7 +31,10 @@ enum BlockType {
 	DEEP_GEM_ORE = 18,
 	WOODEN_PALISADE = 19,
 	STONE_BATTLEMENT = 20,
-	WOODEN_GATE = 21
+	WOODEN_GATE = 21,
+	ROCK_SALT_ORE = 22,
+	SILVER_ORE = 23,
+	MINING_RAIL = 24
 }
 
 # Block properties
@@ -57,7 +60,10 @@ const BLOCK_HARDNESS: Dictionary = {
 	BlockType.DEEP_GEM_ORE: 3.5,
 	BlockType.WOODEN_PALISADE: 2.5,
 	BlockType.STONE_BATTLEMENT: 3.0,
-	BlockType.WOODEN_GATE: 1.8
+	BlockType.WOODEN_GATE: 1.8,
+	BlockType.ROCK_SALT_ORE: 1.6,
+	BlockType.SILVER_ORE: 2.6,
+	BlockType.MINING_RAIL: 1.0
 }
 
 # Chunk grid coordinate (e.g. (0,0), (1,0))
@@ -104,10 +110,10 @@ func set_block(x: int, y: int, z: int, type: int) -> void:
 		is_dirty = true
 
 func is_solid(type: int) -> bool:
-	return type != BlockType.AIR and type != BlockType.WATER and type != BlockType.WHEAT_CROP
+	return type != BlockType.AIR and type != BlockType.WATER and type != BlockType.WHEAT_CROP and type != BlockType.MINING_RAIL
 
 func is_transparent(type: int) -> bool:
-	return type == BlockType.AIR or type == BlockType.WATER or type == BlockType.LEAVES or type == BlockType.GLASS or type == BlockType.WHEAT_CROP
+	return type == BlockType.AIR or type == BlockType.WATER or type == BlockType.LEAVES or type == BlockType.GLASS or type == BlockType.WHEAT_CROP or type == BlockType.MINING_RAIL
 
 func build_mesh() -> void:
 	var surface_tool = SurfaceTool.new()
@@ -214,4 +220,7 @@ func _get_block_color(type: int) -> Color:
 		BlockType.WOODEN_PALISADE: return Color(0.32, 0.18, 0.08)
 		BlockType.STONE_BATTLEMENT: return Color(0.50, 0.50, 0.52)
 		BlockType.WOODEN_GATE: return Color(0.45, 0.28, 0.14)
+		BlockType.ROCK_SALT_ORE: return Color(0.92, 0.85, 0.85)
+		BlockType.SILVER_ORE: return Color(0.82, 0.85, 0.92)
+		BlockType.MINING_RAIL: return Color(0.40, 0.32, 0.22)
 		_: return Color(0.9, 0.9, 0.9)

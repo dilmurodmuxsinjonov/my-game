@@ -8,6 +8,7 @@ const Millstone = preload("res://scripts/world/millstone.gd")
 const TripHammer = preload("res://scripts/world/trip_hammer.gd")
 const CompostBin = preload("res://scripts/world/compost_bin.gd")
 const CuttingBoard = preload("res://scripts/world/cutting_board.gd")
+const MineCart = preload("res://scripts/world/mine_cart.gd")
 
 ## First-Person Monarch Controller.
 ## Follows the Single Persistent Monarch Paradigm: No dynasty, no permadeath;
@@ -383,6 +384,14 @@ func _handle_secondary_action() -> void:
 	var hit_point = raycast.get_collision_point()
 	var hit_normal = raycast.get_collision_normal()
 	
+	# 3.5. Prospector's Pick rock face examination (TerraFirmaCraft)
+	if item.get("tool_type") == "prospector_pick" and voxel_world:
+		var center = hit_point - hit_normal * 0.4
+		var target_pos = Vector3i(int(floor(center.x)), int(floor(center.y)), int(floor(center.z)))
+		var prospect_result = voxel_world.tap_rock_with_prospector_pick(target_pos)
+		emit_signal("block_action_performed", "prospect", target_pos, 0)
+		return
+
 	# 4. Farmland hoe tilling
 	if item.get("tool_type") == "hoe" and voxel_world:
 		var center = hit_point - hit_normal * 0.4
@@ -539,6 +548,14 @@ func _handle_secondary_action() -> void:
 			emit_signal("block_action_performed", "place_station", Vector3i(int(cb.position.x), int(cb.position.y), int(cb.position.z)), 0)
 			emit_signal("hotbar_slot_changed", active_slot, item)
 			return
+		elif "Mine Cart" in item_name or "Minecart" in item_name:
+			var mc = MineCart.new()
+			mc.position = hit_point + hit_normal * 0.1
+			get_tree().current_scene.add_child(mc)
+			item["count"] -= 1
+			emit_signal("block_action_performed", "place_station", Vector3i(int(mc.position.x), int(mc.position.y), int(mc.position.z)), 0)
+			emit_signal("hotbar_slot_changed", active_slot, item)
+			return
 
 		var st_type = item.get("station_type", Workstation.StationType.CAMPFIRE)
 		if "Furnace" in item_name:
@@ -597,6 +614,10 @@ func _add_resource_from_mined_block(block_type: int) -> void:
 			supply_chain.add_resource("stone_bricks", 1)
 		VoxelChunk.BlockType.SUPPORT_BEAM:
 			supply_chain.add_resource("support_beam", 1)
+		VoxelChunk.BlockType.ROCK_SALT_ORE:
+			supply_chain.add_resource("rock_salt", 2)
+		VoxelChunk.BlockType.SILVER_ORE:
+			supply_chain.add_resource("silver_ore", 1)
 		VoxelChunk.BlockType.WOODEN_PALISADE:
 			supply_chain.add_resource("palisade", 1)
 		VoxelChunk.BlockType.STONE_BATTLEMENT:
