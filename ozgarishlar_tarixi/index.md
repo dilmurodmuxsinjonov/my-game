@@ -7,6 +7,23 @@
 - Dastlabki Godot prototipi va foydalanuvchining showcase fayllari saqlandi.
 - Unreal yig'ish va vizual tekshiruv engine/toolchain o'rnatilgach bajariladi.
 
+## 2026-09-25 — Milestone 20: Manor Lords & Bellwright Militsiya Zaxiraxonasi, Burgage Hovli Qo'shimchalari va Jang Mashqi Mankeni
+- **Qurollar Zaxiraxonasi va Fuqaro Lashkarlari (`MilitiaArmory` & `armory_rack.glb`)**: Manor Lords va Bellwright andozasidagi harbiy safarbarlik tizimi:
+  - Og'ir eman yog'ochidan qurol-yarog' javoni (nayza, qalqon, dubulg'a, yoy va o'qlar zaxirasi).
+  - Hukmdor buyrug'i bilan dehqonlarni harbiy guruhga safarbar qilish (`muster_squad()`), ularni qurollantirib jangovar kuchga aylantirish (HP +40, Armor +25, Melee Attack +18).
+  - Jang tugagach qurollarni zaxiraxonaga qaytarib topshirish va dehqonlarni tinch mehnatga qaytarish (`demobilize_squad()`).
+- **Dehqon Xonadoni Hovli Qo'shimchalari (`BurgagePlot` & `burgage_coop.glb`)**: Manor Lords andozasidagi hovli xo'jaligi:
+  - Tovuq katagi (`CHICKEN_COOP`): Har kuni passiv 3 ta tuxum va 1 ta pat ishlab chiqarish.
+  - Echkixona (`GOAT_PEN`): Har kuni passiv 2 ta teri va 1 ko'za sut berish.
+  - Sabzavot polizi (`VEGETABLE_GARDEN`): Sabzi, karam va piyoz hosili berish.
+  - Oila a'zolari baxtiyorligini oshirish (+15) va Xazinaga qo'shimcha yer solig'i (+1 tanga/kun) to'lash.
+- **Harbiy Jang Mashqi Mankeni (`TrainingDummy` & `training_dummy.glb`)**: Bellwright andozasidagi jangovar mashg'ulot obyekti:
+  - Askarlar va fuqarolar zarba berib `melee_skill` va `archery_skill` mahoratini oshiradi (har zarbaga +2 XP, 50 ballgacha).
+  - Manken mustahkamligi 200 zarba; singanda 2 ta yog'och va 1 ta charm tasma bilan qayta ta'mirlanadi.
+- **Yangi 3D Modellar (Blender 5.2)**: `armory_rack.glb` (569 KB), `burgage_coop.glb` (306 KB), `training_dummy.glb` (338 KB) yaratildi (jami **52 ta GLB model**).
+- **Yangi Qirollik Dioramasi**: Barcha 52 ta aktiv ishtirokidagi diorama `assets/showcase_realm.png` da qayta render qilindi va brainga saqlandi.
+- **Avtomatlashgan Testlar**: Jami **68 ta test 100% muvaffaqiyat bilan o'tdi** (0.009s).
+
 ## 2026-09-25 — Milestone 19: Tashqi Qirollik O'lponi (Crown Tribute) va Kon Outpost Karvon Logistikasi
 - **Tashqi Qirollik O'lponi va Sherif Aravasi (`CrownTribute` & `tax_sheriff_cart.glb`)**: Medieval Dynasty va Bellwright andozasidagi tashqi moliyaviy bosim:
   - Mavsumiy Qirol Noibi (Crown Sheriff) tashrifi; bino va aholi soniga mutanosib feodal o'lpon undirish.

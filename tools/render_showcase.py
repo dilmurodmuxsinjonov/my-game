@@ -210,6 +210,15 @@ def build_diorama():
     # 44. Sanctified Ceremonial Stone Funeral Pyre
     import_asset("funeral_pyre.glb", (-1.2, -4.2, 0.0), rot_z=15, scale=0.90)
 
+    # 45. Militia Armory Heavy Timber Weapon Rack
+    import_asset("armory_rack.glb", (4.2, -0.6, 0.0), rot_z=-45, scale=0.90)
+
+    # 46. Manor Lords Style Peasant Burgage Backyard Chicken Coop
+    import_asset("burgage_coop.glb", (-3.8, -2.8, 0.0), rot_z=15, scale=0.88)
+
+    # 47. Bellwright Combat Training Practice Dummy
+    import_asset("training_dummy.glb", (3.2, 1.8, 0.0), rot_z=-80, scale=0.92)
+
     # Render output path
     output_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "assets"))
     output_path = os.path.join(output_dir, "showcase_realm.png")

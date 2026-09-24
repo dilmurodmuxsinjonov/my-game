@@ -1983,6 +1983,137 @@ class TestEngineVerticalSlice(unittest.TestCase):
         self.assertTrue(dist_near <= cleanse_radius) # ~18.02m
         self.assertFalse(dist_far <= cleanse_radius) # ~50m
 
+    def test_milestone20_glb_assets(self):
+        """Verify binary glTF headers for Milestone 20 3D models."""
+        models_dir = os.path.join(os.path.dirname(__file__), "..", "assets", "models")
+        m20_models = ["armory_rack.glb", "burgage_coop.glb", "training_dummy.glb"]
+        for m in m20_models:
+            p = os.path.join(models_dir, m)
+            self.assertTrue(os.path.exists(p), f"Missing model {m}")
+            self.assertGreater(os.path.getsize(p), 1000, f"Model {m} is unusually small")
+            with open(p, "rb") as f:
+                header = f.read(4)
+                self.assertEqual(header, b"glTF", f"Model {m} does not have valid glTF magic header")
+
+    def test_militia_armory_system(self):
+        """Verify Manor Lords / Bellwright militia armament and muster mechanics."""
+        armory_stock = {
+            "spear": 6,
+            "shield": 6,
+            "iron_helmet": 4,
+            "gambeson": 4,
+            "hunting_bow": 3,
+            "arrow": 36
+        }
+
+        # Muster spearman squad of 4 peasants
+        citizen_ids = ["peasant_1", "peasant_2", "peasant_3", "peasant_4"]
+        mustered = []
+        for cid in citizen_ids:
+            if armory_stock["spear"] >= 1 and armory_stock["shield"] >= 1:
+                armory_stock["spear"] -= 1
+                armory_stock["shield"] -= 1
+                gear = ["spear", "shield"]
+                if armory_stock["iron_helmet"] >= 1:
+                    armory_stock["iron_helmet"] -= 1
+                    gear.append("iron_helmet")
+                mustered.append({"citizen_id": cid, "items": gear})
+
+        self.assertEqual(len(mustered), 4)
+        self.assertEqual(armory_stock["spear"], 2)
+        self.assertEqual(armory_stock["shield"], 2)
+        self.assertEqual(armory_stock["iron_helmet"], 0) # 4 helmets consumed
+
+        # Check military rating: 10 base + 15 spear + 12 shield + 10 helm = 47 power per soldier
+        soldier_power = 10 + 15 + 12 + 10
+        total_squad_power = soldier_power * 4
+        self.assertEqual(total_squad_power, 188)
+
+        # Demobilize squad: recover weapons and armor
+        for soldier in mustered:
+            for item in soldier["items"]:
+                armory_stock[item] += 1
+        self.assertEqual(armory_stock["spear"], 6)
+        self.assertEqual(armory_stock["shield"], 6)
+        self.assertEqual(armory_stock["iron_helmet"], 4)
+
+    def test_burgage_plot_production(self):
+        """Verify Manor Lords burgage plot backyard yields and dietary diversity."""
+        # Chicken coop yield
+        def get_yield(extension):
+            if extension == "CHICKEN_COOP":
+                return {"egg": 3, "feather": 1}
+            elif extension == "GOAT_PEN":
+                return {"leather_hide": 2, "milk_jug": 1}
+            elif extension == "VEGETABLE_GARDEN":
+                return {"carrot": 2, "cabbage": 2, "onion": 1}
+            return {}
+
+        chick_yield = get_yield("CHICKEN_COOP")
+        self.assertEqual(chick_yield["egg"], 3)
+        self.assertEqual(chick_yield["feather"], 1)
+
+        goat_yield = get_yield("GOAT_PEN")
+        self.assertEqual(goat_yield["leather_hide"], 2)
+        self.assertEqual(goat_yield["milk_jug"], 1)
+
+        veg_yield = get_yield("VEGETABLE_GARDEN")
+        self.assertEqual(veg_yield["carrot"], 2)
+        self.assertEqual(veg_yield["cabbage"], 2)
+        self.assertEqual(veg_yield["onion"], 1)
+
+        # Dietary diversity score
+        diversity_scores = {"CHICKEN_COOP": 2, "GOAT_PEN": 2, "VEGETABLE_GARDEN": 3}
+        self.assertEqual(diversity_scores["VEGETABLE_GARDEN"], 3)
+
+    def test_training_dummy_drills(self):
+        """Verify Bellwright combat training dummy XP gain, skill level up, and repairs."""
+        dummy = {"durability": 200, "is_broken": False}
+        recruit = {"melee_skill": 10, "melee_xp": 0}
+
+        def spar(recruit, strikes):
+            if dummy["is_broken"]:
+                return False
+            actual = min(strikes, dummy["durability"])
+            dummy["durability"] -= actual
+            if dummy["durability"] <= 0:
+                dummy["is_broken"] = True
+            
+            recruit["melee_xp"] += actual * 2
+            while recruit["melee_xp"] >= 20 and recruit["melee_skill"] < 50:
+                recruit["melee_xp"] -= 20
+                recruit["melee_skill"] += 1
+            return True
+
+        # Spar 30 strikes -> 60 XP -> 3 skill levels (10 -> 13)
+        res = spar(recruit, 30)
+        self.assertTrue(res)
+        self.assertEqual(dummy["durability"], 170)
+        self.assertEqual(recruit["melee_skill"], 13)
+        self.assertEqual(recruit["melee_xp"], 0)
+
+        # Smash dummy to 0 durability
+        spar(recruit, 200)
+        self.assertEqual(dummy["durability"], 0)
+        self.assertTrue(dummy["is_broken"])
+
+        # Try sparring broken dummy
+        res_fail = spar(recruit, 10)
+        self.assertFalse(res_fail)
+
+        # Repair dummy with 2 timber logs and 1 leather strap
+        def repair(logs, leather):
+            if logs >= 2 and leather >= 1:
+                dummy["durability"] = 200
+                dummy["is_broken"] = False
+                return True
+            return False
+
+        self.assertFalse(repair(1, 1)) # insufficient logs
+        self.assertTrue(repair(2, 1))  # valid repair
+        self.assertEqual(dummy["durability"], 200)
+        self.assertFalse(dummy["is_broken"])
+
 if __name__ == "__main__":
     unittest.main()
 

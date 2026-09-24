@@ -100,7 +100,18 @@ var inventory: Dictionary = {
 	"iron_block": 0,
 	"outpost_banner": 0,
 	"tax_sheriff_cart": 0,
-	"funeral_pyre": 0
+	"funeral_pyre": 0,
+	"armory_rack": 0,
+	"burgage_coop": 0,
+	"training_dummy": 0,
+	"spear": 12,
+	"shield": 12,
+	"iron_helmet": 8,
+	"gambeson": 8,
+	"egg": 0,
+	"feather": 0,
+	"leather_hide": 0,
+	"milk_jug": 0
 }
 
 func salt_meat(amount: int) -> bool:
