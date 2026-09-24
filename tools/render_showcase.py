@@ -123,6 +123,27 @@ def build_diorama():
     # 18. TerraFirmaCraft Timber Smoke Rack near campfire
     import_asset("smoke_rack.glb", (-1.2, 1.2, 0.0), rot_z=-55, scale=0.9)
 
+    # 19. Water flume / canal stream for Water Wheel
+    bpy.ops.mesh.primitive_plane_add(size=1.0, location=(4.2, 3.5, 0.02))
+    flume = bpy.context.active_object
+    flume.scale = (2.2, 7.0, 1.0)
+    mat_flume = bpy.data.materials.new("CanalWater")
+    mat_flume.use_nodes = True
+    f_bsdf = mat_flume.node_tree.nodes.get("Principled BSDF")
+    if f_bsdf:
+        f_bsdf.inputs["Base Color"].default_value = (0.16, 0.44, 0.76, 1.0)
+        f_bsdf.inputs["Roughness"].default_value = 0.1
+    flume.data.materials.append(mat_flume)
+
+    # 20. Create-Style Kinetic Water Wheel turning along the flume
+    import_asset("water_wheel.glb", (4.2, 3.5, 0.0), rot_z=90, scale=0.85)
+
+    # 21. Create-Style Mechanical Millstone in milling shed area
+    import_asset("millstone.glb", (2.3, 3.4, 0.0), rot_z=20, scale=0.95)
+
+    # 22. Industrial Cam-Driven Trip Hammer pounding iron ore
+    import_asset("trip_hammer.glb", (0.5, 3.5, 0.0), rot_z=10, scale=0.90)
+
     # Render output path
     output_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "assets"))
     output_path = os.path.join(output_dir, "showcase_realm.png")
