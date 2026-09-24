@@ -238,3 +238,31 @@ Medieval davrning haqiqiy muhandisligi:
 - **Yechim (`FuneralPyre` & `funeral_pyre.glb`)**:
   - Tosh platformali marosim o'chog'i. Jasadlar o'tin bilan birga muqaddas olovda yondiriladi.
   - Sanitariya tozalanadi, epidemiya xavfi yo'qoladi, marhumlar ehtirom qilingani uchun aholi ruhiyatiga +10 morale beriladi va Qonli Oyda zombi tirilishi xavfi 0% ga tushiriladi.
+
+---
+
+## 9. Manor Lords & Bellwright Integratsiyasi — Fuqaro Lashkarlari, Qurollar Zaxiraxonasi va Hovli Qo'shimchalari (Milestone 20)
+
+### 9.1. Qurollar Zaxiraxonasi va Fuqarolarni Safarbar Qilish (Militia Armory) — [Manor Lords / Bellwright]
+- **Muammo**: Bosqin paytida oddiy dehqonlar himoyasiz qolib o'lib ketadi yoki jangga qo'shilmaydi.
+- **Yechim (`MilitiaArmory` & `armory_rack.glb`)**:
+  - Og'ir eman yog'ochidan yasalgan qurol-yarog' ustuni (`armory_rack`). Nayzalar, qalqonlar, temir dubulg'alar va yoylar zaxiralanadi.
+  - `muster_squad()`: Hukmdor xavf tug'ilganda fuqarolarni zudlik bilan harbiy xizmatga chaqiradi. Fuqarolar ombordan nayza, qalqon va dubulg'a olib qurollanadi (HP +40, Armor +25, Attack +18).
+  - `demobilize_squad()`: Jangdan so'ng askarlar qurollarini armoryga qaytarib topshiradi va o'z ishlariga qaytadi. Omon qolgan faxriylar shahar ruhiyatini oshiradi.
+
+### 9.2. Dehqon Xonadoni Hovli Qo'shimchalari (Burgage Plot Extensions) — [Manor Lords]
+- **Muammo**: Shahar uylari faqat yotoqxona vazifasini o'taydi, oilalar mustaqil oziq-ovqat ishlab chiqarmaydi.
+- **Yechim (`BurgagePlot` & `burgage_coop.glb`)**:
+  - Har bir dehqon xonadoni o'z hovlisiga maxsus ishlab chiqarish tarmog'ini o'rnatishi mumkin:
+    - `CHICKEN_COOP`: Har kuni passiv 3 ta yangi tuxum va 1 ta pat beradi.
+    - `GOAT_PEN`: Har kuni passiv 2 ta teri va 1 ko'za yangi sut beradi.
+    - `VEGETABLE_GARDEN`: Sabzi, karam va piyoz hosili beradi.
+  - Ratsion xilma-xilligi (+15 oilaviy baxt) va Qirollik g'aznasiga qo'shimcha yer solig'i (+1 tanga/kun) ta'minlanadi.
+
+### 9.3. Harbiy Jang Mashqi Mankeni (Combat Training Dummy) — [Bellwright / Kingdom Come]
+- **Muammo**: Harbiy tajribasi bo'lmagan yangi askarlar jang maydonida tez sarosimaga tushadi va zarba bera olmaydi.
+- **Yechim (`TrainingDummy` & `training_dummy.glb`)**:
+  - Somon bilan to'ldirilgan va temir dubulg'a kiydirilgan yog'och manken (`training_dummy.glb`).
+  - Askar va fuqarolar qilich, nayza yoki kamon bilan mankenga zarba berib `melee_skill` yoki `archery_skill` mahoratini 50 ballgacha (Veteran Levy darajasi) oshiradi.
+  - Manken mustahkamligi 200 zarba; eskiganda 2 ta yog'och va 1 ta charm tasma bilan qayta ta'mirlanadi.
+

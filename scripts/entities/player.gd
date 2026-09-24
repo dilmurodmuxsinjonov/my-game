@@ -25,6 +25,9 @@ const CastingBasin = preload("res://scripts/world/casting_basin.gd")
 const CastingTable = preload("res://scripts/world/casting_table.gd")
 const Outpost = preload("res://scripts/world/outpost.gd")
 const FuneralPyre = preload("res://scripts/world/funeral_pyre.gd")
+const MilitiaArmory = preload("res://scripts/world/militia_armory.gd")
+const BurgagePlot = preload("res://scripts/world/burgage_plot.gd")
+const TrainingDummy = preload("res://scripts/world/training_dummy.gd")
 
 ## First-Person Monarch Controller.
 ## Follows the Single Persistent Monarch Paradigm: No dynasty, no permadeath;
@@ -727,6 +730,30 @@ func _handle_secondary_action() -> void:
 			get_tree().current_scene.add_child(fp)
 			item["count"] -= 1
 			emit_signal("block_action_performed", "place_station", Vector3i(int(fp.position.x), int(fp.position.y), int(fp.position.z)), 0)
+			emit_signal("hotbar_slot_changed", active_slot, item)
+			return
+		elif "Armory" in item_name:
+			var ma = MilitiaArmory.new()
+			ma.position = hit_point + hit_normal * 0.1
+			get_tree().current_scene.add_child(ma)
+			item["count"] -= 1
+			emit_signal("block_action_performed", "place_station", Vector3i(int(ma.position.x), int(ma.position.y), int(ma.position.z)), 0)
+			emit_signal("hotbar_slot_changed", active_slot, item)
+			return
+		elif "Burgage" in item_name or "Coop" in item_name:
+			var bp = BurgagePlot.new()
+			bp.position = hit_point + hit_normal * 0.1
+			get_tree().current_scene.add_child(bp)
+			item["count"] -= 1
+			emit_signal("block_action_performed", "place_station", Vector3i(int(bp.position.x), int(bp.position.y), int(bp.position.z)), 0)
+			emit_signal("hotbar_slot_changed", active_slot, item)
+			return
+		elif "Training Dummy" in item_name or "Dummy" in item_name:
+			var td = TrainingDummy.new()
+			td.position = hit_point + hit_normal * 0.1
+			get_tree().current_scene.add_child(td)
+			item["count"] -= 1
+			emit_signal("block_action_performed", "place_station", Vector3i(int(td.position.x), int(td.position.y), int(td.position.z)), 0)
 			emit_signal("hotbar_slot_changed", active_slot, item)
 			return
 

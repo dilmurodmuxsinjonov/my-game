@@ -318,6 +318,21 @@ const RECIPES: Dictionary = {
 			"name": "Sanctified Funeral Pyre",
 			"inputs": {"stone": 6, "logs": 4},
 			"output": {"name": "Funeral Pyre", "type": "placeable", "icon": "🔥", "count": 1}
+		},
+		{
+			"name": "Militia Armory Weapon Rack",
+			"inputs": {"logs": 6, "iron_ingots": 3},
+			"output": {"name": "Militia Armory", "type": "placeable", "icon": "🛡️", "count": 1}
+		},
+		{
+			"name": "Peasant Burgage Chicken Coop",
+			"inputs": {"logs": 4, "planks": 4},
+			"output": {"name": "Burgage Coop", "type": "placeable", "icon": "🐔", "count": 1}
+		},
+		{
+			"name": "Combat Training Dummy",
+			"inputs": {"logs": 3, "planks": 2, "leather_hide": 1},
+			"output": {"name": "Training Dummy", "type": "placeable", "icon": "🎯", "count": 1}
 		}
 	],
 	"campfire": [
