@@ -43,6 +43,8 @@ var inventory: Dictionary = {
 	"coal": 12,
 	"iron_ore": 6,
 	"copper_ore": 4,
+	"crushed_iron": 0,
+	"crushed_copper": 0,
 	"iron_ingots": 2,
 	"copper_ingot": 0,
 	"steel_ingot": 4,
@@ -60,6 +62,22 @@ func smoke_meat(amount: int) -> bool:
 	var wood_needed = maxi(1, int(ceil(float(amount) / 2.0)))
 	if consume_resource("meat", amount) and consume_resource("logs", wood_needed):
 		add_resource("smoked_meat", amount)
+		return true
+	return false
+
+func smelt_crushed_iron(amount: int = 1) -> bool:
+	if inventory.get("crushed_iron", 0) >= amount and inventory.get("coal", 0) >= amount:
+		consume_resource("crushed_iron", amount)
+		consume_resource("coal", amount)
+		add_resource("iron_ingots", amount * 2) # Double yield
+		return true
+	return false
+
+func smelt_crushed_copper(amount: int = 1) -> bool:
+	if inventory.get("crushed_copper", 0) >= amount and inventory.get("coal", 0) >= amount:
+		consume_resource("crushed_copper", amount)
+		consume_resource("coal", amount)
+		add_resource("copper_ingot", amount * 2) # Double yield
 		return true
 	return false
 

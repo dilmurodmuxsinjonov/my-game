@@ -1,8 +1,16 @@
 ; Engine configuration file.
 ; It's best edited using the editor UI and not directly,
-; but it can be read and edited directly.
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
 
 config_version=5
+
+[animation]
+
+compatibility/default_parent_skeleton_in_mesh_instance_3d=true
 
 [application]
 
@@ -10,7 +18,7 @@ config/name="Voxel Lord: Feudal Realm"
 config/description="First-person medieval voxel colony simulator for Steam."
 config/version="0.1.0-alpha"
 run/main_scene="res://scenes/main.tscn"
-config/features=PackedStringArray("4.3", "Forward Plus")
+config/features=PackedStringArray("4.7", "Forward Plus")
 config/icon="res://icon.svg"
 
 [display]
@@ -22,6 +30,5 @@ window/stretch/aspect="expand"
 
 [rendering]
 
-renderer/rendering_method="forward_plus"
 textures/vram_compression/import_etc2_astc=true
 anti_aliasing/quality/msaa_3d=2

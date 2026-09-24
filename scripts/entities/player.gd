@@ -3,6 +3,9 @@ extends CharacterBody3D
 
 const BlueprintConstruction = preload("res://scripts/world/blueprint_construction.gd")
 const Anvil = preload("res://scripts/world/anvil.gd")
+const WaterWheel = preload("res://scripts/world/water_wheel.gd")
+const Millstone = preload("res://scripts/world/millstone.gd")
+const TripHammer = preload("res://scripts/world/trip_hammer.gd")
 
 ## First-Person Monarch Controller.
 ## Follows the Single Persistent Monarch Paradigm: No dynasty, no permadeath;
@@ -478,6 +481,32 @@ func _handle_secondary_action() -> void:
 			get_tree().current_scene.add_child(an)
 			item["count"] -= 1
 			emit_signal("block_action_performed", "place_station", Vector3i(int(an.position.x), int(an.position.y), int(an.position.z)), 0)
+			emit_signal("hotbar_slot_changed", active_slot, item)
+			return
+		elif "Water Wheel" in item_name:
+			var ww = WaterWheel.new()
+			ww.position = hit_point + hit_normal * 0.1
+			get_tree().current_scene.add_child(ww)
+			item["count"] -= 1
+			emit_signal("block_action_performed", "place_station", Vector3i(int(ww.position.x), int(ww.position.y), int(ww.position.z)), 0)
+			emit_signal("hotbar_slot_changed", active_slot, item)
+			return
+		elif "Millstone" in item_name:
+			var ms = Millstone.new()
+			ms.supply_chain = supply_chain
+			ms.position = hit_point + hit_normal * 0.1
+			get_tree().current_scene.add_child(ms)
+			item["count"] -= 1
+			emit_signal("block_action_performed", "place_station", Vector3i(int(ms.position.x), int(ms.position.y), int(ms.position.z)), 0)
+			emit_signal("hotbar_slot_changed", active_slot, item)
+			return
+		elif "Trip Hammer" in item_name:
+			var th = TripHammer.new()
+			th.supply_chain = supply_chain
+			th.position = hit_point + hit_normal * 0.1
+			get_tree().current_scene.add_child(th)
+			item["count"] -= 1
+			emit_signal("block_action_performed", "place_station", Vector3i(int(th.position.x), int(th.position.y), int(th.position.z)), 0)
 			emit_signal("hotbar_slot_changed", active_slot, item)
 			return
 		elif "Smoke Rack" in item_name:

@@ -173,6 +173,21 @@ const RECIPES: Dictionary = {
 			"name": "Timber Smoke Rack",
 			"inputs": {"logs": 3},
 			"output": {"name": "Timber Smoke Rack", "type": "placeable", "icon": "🍖", "count": 1}
+		},
+		{
+			"name": "Kinetic Water Wheel",
+			"inputs": {"logs": 8, "planks": 6, "stone": 4},
+			"output": {"name": "Kinetic Water Wheel", "type": "placeable", "icon": "🌊", "count": 1}
+		},
+		{
+			"name": "Mechanical Millstone",
+			"inputs": {"stone": 6, "logs": 2, "iron_ingots": 1},
+			"output": {"name": "Mechanical Millstone", "type": "placeable", "icon": "⚙️", "count": 1}
+		},
+		{
+			"name": "Industrial Trip Hammer",
+			"inputs": {"logs": 6, "stone": 4, "iron_ingots": 3},
+			"output": {"name": "Industrial Trip Hammer", "type": "placeable", "icon": "🔨", "count": 1}
 		}
 	],
 	"campfire": [
@@ -199,9 +214,19 @@ const RECIPES: Dictionary = {
 			"output": {"name": "Iron Ingot", "type": "material", "icon": "🔩", "count": 1}
 		},
 		{
+			"name": "Smelt Crushed Iron (x2 Yield)",
+			"inputs": {"crushed_iron": 1, "coal": 1},
+			"output": {"name": "Iron Ingot", "type": "material", "icon": "🔩", "count": 2}
+		},
+		{
 			"name": "Smelt Copper Ingot",
 			"inputs": {"copper_ore": 1, "coal": 1},
 			"output": {"name": "Copper Ingot", "type": "material", "icon": "🪙", "count": 1}
+		},
+		{
+			"name": "Smelt Crushed Copper (x2 Yield)",
+			"inputs": {"crushed_copper": 1, "coal": 1},
+			"output": {"name": "Copper Ingot", "type": "material", "icon": "🪙", "count": 2}
 		},
 		{
 			"name": "Smelt Gold Ingot",
