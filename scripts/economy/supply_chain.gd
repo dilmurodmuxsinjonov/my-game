@@ -33,6 +33,14 @@ var inventory: Dictionary = {
 	"wheat": 20,
 	"bread": 50,
 	"meat": 15,
+	"cabbage": 10,
+	"onion": 8,
+	"carrot": 8,
+	"sliced_cabbage": 0,
+	"minced_beef": 0,
+	"diced_onion": 0,
+	"cabbage_stew": 0,
+	"shepherd_pie": 0,
 	"rock_salt": 10,
 	"cured_meat": 0,
 	"smoked_meat": 0,
@@ -78,6 +86,24 @@ func smelt_crushed_copper(amount: int = 1) -> bool:
 		consume_resource("crushed_copper", amount)
 		consume_resource("coal", amount)
 		add_resource("copper_ingot", amount * 2) # Double yield
+		return true
+	return false
+
+func cook_cabbage_stew(amount: int = 1) -> bool:
+	if inventory.get("sliced_cabbage", 0) >= amount and inventory.get("minced_beef", 0) >= amount and inventory.get("diced_onion", 0) >= amount:
+		consume_resource("sliced_cabbage", amount)
+		consume_resource("minced_beef", amount)
+		consume_resource("diced_onion", amount)
+		add_resource("cabbage_stew", amount * 2)
+		return true
+	return false
+
+func cook_shepherd_pie(amount: int = 1) -> bool:
+	if inventory.get("minced_beef", 0) >= amount and inventory.get("diced_onion", 0) >= amount and inventory.get("bread", 0) >= amount:
+		consume_resource("minced_beef", amount)
+		consume_resource("diced_onion", amount)
+		consume_resource("bread", amount)
+		add_resource("shepherd_pie", amount * 2)
 		return true
 	return false
 

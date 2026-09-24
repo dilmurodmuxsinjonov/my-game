@@ -144,6 +144,12 @@ def build_diorama():
     # 22. Industrial Cam-Driven Trip Hammer pounding iron ore
     import_asset("trip_hammer.glb", (0.5, 3.5, 0.0), rot_z=10, scale=0.90)
 
+    # 23. Farmer's Delight Organic Compost Bin near agricultural plots
+    import_asset("compost_bin.glb", (-2.8, -1.8, 0.0), rot_z=20, scale=0.90)
+
+    # 24. Farmer's Delight Butcher Cutting Board near hearth
+    import_asset("cutting_board.glb", (-0.3, 1.2, 0.0), rot_z=-30, scale=0.95)
+
     # Render output path
     output_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "assets"))
     output_path = os.path.join(output_dir, "showcase_realm.png")
