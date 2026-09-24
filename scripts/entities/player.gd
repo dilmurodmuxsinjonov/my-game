@@ -14,6 +14,9 @@ const ApotheosisManager = preload("res://scripts/magic/apotheosis_manager.gd")
 const Bloomery = preload("res://scripts/world/bloomery.gd")
 const CharcoalPit = preload("res://scripts/world/charcoal_pit.gd")
 const Crucible = preload("res://scripts/world/crucible.gd")
+const ConveyorBelt = preload("res://scripts/world/conveyor_belt.gd")
+const Chute = preload("res://scripts/world/chute.gd")
+const MechanicalPress = preload("res://scripts/world/mechanical_press.gd")
 
 ## First-Person Monarch Controller.
 ## Follows the Single Persistent Monarch Paradigm: No dynasty, no permadeath;
@@ -617,6 +620,33 @@ func _handle_secondary_action() -> void:
 			get_tree().current_scene.add_child(cr)
 			item["count"] -= 1
 			emit_signal("block_action_performed", "place_station", Vector3i(int(cr.position.x), int(cr.position.y), int(cr.position.z)), 0)
+			emit_signal("hotbar_slot_changed", active_slot, item)
+			return
+		elif "Conveyor Belt" in item_name:
+			var cb = ConveyorBelt.new()
+			cb.supply_chain = supply_chain
+			cb.position = hit_point + hit_normal * 0.1
+			get_tree().current_scene.add_child(cb)
+			item["count"] -= 1
+			emit_signal("block_action_performed", "place_station", Vector3i(int(cb.position.x), int(cb.position.y), int(cb.position.z)), 0)
+			emit_signal("hotbar_slot_changed", active_slot, item)
+			return
+		elif "Chute" in item_name:
+			var ch = Chute.new()
+			ch.supply_chain = supply_chain
+			ch.position = hit_point + hit_normal * 0.1
+			get_tree().current_scene.add_child(ch)
+			item["count"] -= 1
+			emit_signal("block_action_performed", "place_station", Vector3i(int(ch.position.x), int(ch.position.y), int(ch.position.z)), 0)
+			emit_signal("hotbar_slot_changed", active_slot, item)
+			return
+		elif "Mechanical Press" in item_name or "Stamping Press" in item_name:
+			var mp = MechanicalPress.new()
+			mp.supply_chain = supply_chain
+			mp.position = hit_point + hit_normal * 0.1
+			get_tree().current_scene.add_child(mp)
+			item["count"] -= 1
+			emit_signal("block_action_performed", "place_station", Vector3i(int(mp.position.x), int(mp.position.y), int(mp.position.z)), 0)
 			emit_signal("hotbar_slot_changed", active_slot, item)
 			return
 
