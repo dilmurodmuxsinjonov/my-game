@@ -58,6 +58,22 @@ TFC — tirik qolish va tabiiy qonuniyatlarning eng chuqur modidir. Undan olinga
   - **Dudlash (Smoking)**: Maxsus dudxona (`smoke_rack.glb`) yordamida eman yog'ochi bilan dudlash (5 barobar uzayadi).
   - **Yerto'la (Cellar)**: Yer ostidagi sovuq qorong'i xonalarda (`Y <= 22`, tosh tomli) saqlash (chirish tezligini 75% ga sekinlashtiradi).
 
+### 2.3. Bloomery Domna Pechi, Piroliz Ko'mir Chuquri va Qolipga Quyish (Bloomery, Charcoal Pit & Crucible Casting) — [Milestone 15 da to'liq integratsiya qilindi]
+- **Yopiq Piroliz Ko'mir Chuquri (`CharcoalPit` & `charcoal_pit.glb`)**:
+  - Haqiqiy o'rta asrlarda temirni oddiy o'tin bilan eritib bo'lmaydi (harorat yetmaydi). Maxsus yuqori kaloriyali yog'och ko'miri (`charcoal`) talab qilinadi (1450°C gacha yonadi).
+  - Yog'och xodalari yer osti chuquriga yoki tepalikka taxlanib, usti nam loy va tuproq qatlami bilan germetik yopiladi (`is_sealed = true`).
+  - Kislorodsiz sekin tutab yonish (piroliz) jarayonida 4 ta log yog'ochdan 4 ta sifatli toza ko'mir olinadi. Agar chuqur ochiq qolsa, barcha o'tin kulga aylanadi (`ash`).
+- **Bloomery Qaytarish Pechi (`Bloomery` & `bloomery.glb`)**:
+  - O'tga chidamli tosh va loydan qurilgan baland shaft pechi. Havoni majburiy puflagich (bellows) tuyere orqali kiritadi.
+  - 1200°C - 1450°C haroratda temir oksidlarini qaytarib, shlak bilan aralash g'ovakli metall to'pini — **Temir Blumi (`iron_bloom`)** ni hosil qiladi (2 ta temir rudasi + 2 ta ko'mir -> 1 ta temir blumi).
+- **Blumni Sandonda Zarb Qilish va Qotirish (`Anvil` va `TripHammer`)**:
+  - Qaynoq g'ovakli blumni sandonda og'ir bolg'a bilan tinimsiz urib, ichidagi suyuq silikat shlak siqib chiqariladi va zich, toza **Bolg'alangan Temir Quyma (`wrought_iron_ingot`)** olinadi.
+  - Create Mod ning avtomatik kinetik mexanik bolg'asi (`TripHammer`) esa bu jarayonni inson omilisiz avtomatlashtiradi!
+- **O'tga Chidamli Sopol Trogel va Qolipga Quyish (`Crucible` & `crucible.glb`)**:
+  - Rangli metallar (Mis va Qalay) nisbatan past haroratda eriydi.
+  - Sopol tigel pech ustiga qo'yiladi: 7 ta mis + 1 ta qalay qo'shilib, 8 ta suyuq bronza (`molten_bronze`) qotishmasi eritiladi (87.5% Cu, 12.5% Sn).
+  - So'ngra oldindan pishirilgan sopol qoliplarga (`ceramic_mold`) quyilib, to'g'ridan-to'g'ri bronza qilich tig'i (`cast_bronze_blade`), cho'kich boshi (`cast_bronze_pickaxe`) yoki bolta quyiladi.
+
 ---
 
 ## 3. TINKERS' CONSTRUCT — Modulli Qurol va Asboblar Tizimi
@@ -153,7 +169,11 @@ Medieval davrning haqiqiy muhandisligi:
 - [x] **TerraFirmaCraft Geologiya va O'pirilish Fizikasi**: `GeologyManager` (`scripts/world/geology_manager.gd`), yer osti qulash fizikasi (`cave_in`), tayanch to'sinlari (`support_beam.glb`), geologik razvedka cho'kichi (`prospector_pick.glb`), yer osti vagonchasi (`mine_cart.glb`), kon relslari va xavfsizlik chirog'i (`mining_lantern.glb`).
 - [x] **Apotheosis Boss Affikslari & Chempion Modifikatorlari**: `ApotheosisManager` (`scripts/magic/apotheosis_manager.gd`), qaroqchilar boshlig'iga (`BanditWarlord`) protsedural nomlar va unvonlar berish, 6 ta o'limli affiks (`INFERNAL`, `ARMORED`, `SWIFT`, `VAMPIRIC`, `TEMPEST`, `TITAN`), maxsus zararlar va jarohat qaytarish (lifesteal).
 - [x] **Apotheosis Qimmatbaho Toshlarni Qirqish va Soket Tizimi (Lapidary & Sockets)**: `GemCuttingTable` (`scripts/world/gem_cutting_table.gd` & `gem_cutting_table.glb`), xom yoqut, sapfir, topaz va chuqurlik toshlarini qirqish, qurol va sovutlarga soket (slot) ochib toshlarni o'rnatish, yechib olish, hamda g'alaba kubogi (`boss_trophy.glb` - qirollik ma'naviyatiga +10).
-- [x] **3D Blender 5.2 Modellar**: Jami 34 ta to'liq modellashtirilgan va import qilingan GLB 3D aktivlar (`gem_cutting_table.glb` va `boss_trophy.glb` qo'shildi).
+- [x] **TerraFirmaCraft Bloomery Domna Pechi**: `Bloomery` (`scripts/world/bloomery.gd` & `bloomery.glb`), 1200°C - 1450°C yuqori haroratli kimyoviy qaytarish pechi, temir rudasi va yog'och ko'miridan g'ovakli temir blumi (`iron_bloom`) ishlab chiqarish.
+- [x] **TerraFirmaCraft Piroliz Ko'mir Chuquri**: `CharcoalPit` (`scripts/world/charcoal_pit.gd` & `charcoal_pit.glb`), yer osti tuproq va loy bilan germetik yopilgan piroliz chuquri, 4 ta o'tindan 4 ta toza yuqori haroratli yog'och ko'miri (`charcoal`) tayyorlash.
+- [x] **TerraFirmaCraft Sopol Tigel va Qolipga Bronza Quyish**: `Crucible` (`scripts/world/crucible.gd` & `crucible.glb`), mis va qalayni 88/12 nisbatda eritib suyuq bronza tayyorlash va sopol qoliplarga quyib qurol/asbob tig'larini quyish.
+- [x] **Blum Zarb Qilish va Avtomatlashtirish**: `Anvil` va `TripHammer` orqali temir blumini bolg'alab silikat shlakni chiqarish va zich bolg'alangan temir quymalar (`wrought_iron_ingot`) ishlab chiqarish.
+- [x] **3D Blender 5.2 Modellar**: Jami **37 ta to'liq modellashtirilgan va import qilingan GLB 3D aktivlar** (`bloomery.glb`, `charcoal_pit.glb`, `crucible.glb` qo'shildi).
 
 
 

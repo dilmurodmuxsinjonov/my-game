@@ -32,6 +32,22 @@ const BLADE_COMPONENTS: Dictionary = {
 		"rune_potency": 1.5,
 		"icon": "✨",
 		"cost": {"gold_ingot": 2}
+	},
+	"bronze": {
+		"name": "Cast Bronze Blade",
+		"damage": 30.0,
+		"durability": 150,
+		"crit_chance": 0.08,
+		"icon": "🗡️",
+		"cost": {"bronze_ingot": 3}
+	},
+	"wrought_iron": {
+		"name": "Refined Wrought Iron Blade",
+		"damage": 38.0,
+		"durability": 180,
+		"crit_chance": 0.10,
+		"icon": "⚔️",
+		"cost": {"wrought_iron_ingot": 3}
 	}
 }
 
@@ -158,4 +174,17 @@ static func assemble_modular_weapon(blade_key: String, guard_key: String, handle
 		"parry_defense": parry,
 		"icon": "⚔️",
 		"count": 1
+	}
+
+static func refine_iron_bloom(bloom_count: int = 1) -> Dictionary:
+	## Mechanical hammer consolidation on anvil:
+	## Repeatedly strikes the porous, glowing bloom to hammer out liquid silicate slag,
+	## producing dense, grain-refined Wrought Iron Ingots.
+	if bloom_count <= 0:
+		return {"success": false, "wrought_iron_ingots": 0, "slag": 0, "message": "No iron blooms to refine."}
+	return {
+		"success": true,
+		"wrought_iron_ingots": bloom_count,
+		"slag": bloom_count,
+		"message": "Forged %d Wrought Iron Ingot(s) from consolidated bloom!" % bloom_count
 	}

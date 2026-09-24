@@ -84,7 +84,14 @@ func _perform_crush() -> void:
 	if not supply_chain:
 		return
 	
-	if supply_chain.inventory.get("iron_ore", 0) >= 1:
+	if supply_chain.inventory.get("iron_bloom", 0) >= 1:
+		supply_chain.consume_resource("iron_bloom", 1)
+		supply_chain.add_resource("wrought_iron_ingot", 1)
+		emit_signal("ore_crushed", "iron_bloom", "wrought_iron_ingot", "slag")
+		if status_label:
+			status_label.text = "🔨 Trip Hammer\n[ Refined Bloom -> Wrought Iron Ingot ]"
+			status_label.modulate = Color(0.3, 0.95, 0.6)
+	elif supply_chain.inventory.get("iron_ore", 0) >= 1:
 		supply_chain.consume_resource("iron_ore", 1)
 		supply_chain.add_resource("crushed_iron", 1)
 		
