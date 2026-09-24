@@ -31,17 +31,32 @@ MineColonies — shahar boshqaruvi va avtonom NPC simulyatsiyasining eng yetakch
 
 TFC — tirik qolish va tabiiy qonuniyatlarning eng chuqur modidir. Undan olingan qismlar:
 
-### 2.1. Shaxta Xavfsizligi va Geologik Qatlamlar (Cave-ins & Strata)
-- Tosh va ruda shiftlari havoda shunchaki muallaq osilib tura olmaydi.
-- Agar g'or yoki shaxta 4 blokdan kengroq qazilsa va tayanch to'sini (`Support Beam`) qo'yilmasa, o'pirilish (Cave-in) xavfi yuzaga keladi.
-- Rudalar chuqurlik qatlamlariga (Coal -> Copper -> Iron -> Gold -> Deep Gems) aniq ajratilgan.
+### 2.1. Shaxta Xavfsizligi va Geologik Qatlamlar (Cave-ins, Support Beams & Strata) — [Milestone 13 da to'liq integratsiya qilindi]
+- **O'pirilish va Qulash Fizikasi (`GeologyManager` & `voxel_world.gd`)**:
+  - Subterranean chuqurlikda (`Y <= 24`) strukturali tosh yoki rudalar qazilganda, agar 4 blok radiusda `SupportBeam` (tayanch to'sini) bo'lmasa, 35% ehtimollik bilan g'or shiftining o'pirilishi (`cave_in`) yuz beradi.
+  - Shift toshlari qulab yerga tushadi (`COBBLESTONE` vayronasi hosil bo'ladi) va 4 metr atrofidagi barcha jonivorlar hamda hukmdorga 25-45 crush zarari yetkazadi.
+  - Tayanch to'sini (`support_beam.glb`) gorizontal 4 blok va vertikal 3 bloklik to'liq xavfsizlik zonasini ta'minlaydi.
+- **Geologik Razvedka Asbobi (`ProspectorPick` & `prospector_pick.glb`)**:
+  - TerraFirmaCraft ning afsonaviy geolog cho'kichi. Tosh yuzasiga urilganda 12 bloklik sferik radiusdagi barcha rudalarni aniqlaydi va sezuvchanlik xabarlarini beradi:
+    - `NONE`: "Ushbu qatlamda rudalar topilmadi."
+    - `TRACES` (1-3 ruda): "Yaqin atrofda mis/temir izlari sezilmoqda."
+    - `SAMPLE` (4-8 ruda): "Istiqbolli ruda namunasi topildi."
+    - `RICH` (9-15 ruda): "Yaqin atrofda boy ruda tomiri joylashgan!"
+    - `MOTHERLODE` (16+ ruda): "Katta va serhosil ona kon (motherlode) topildi!"
+- **Yer Osti Ruda Vagonchasi (`MineCart` & `mine_cart.glb`)**:
+  - Og'ir rudalarni tashish uchun 30 ta slotli vagoncha. Shaxtyor va Kuryer (`HAULER`) fuqarolar tomonidan itariladi.
+  - Kon relslari (`mining_rail`) ustida 2.5 barobar tezroq harakatlanadi (`RAIL_SPEED_MULTIPLIER = 2.5`).
+- **Geologik Qatlamlar va Minerallar**:
+  - Yuqori Cho'kindi Qatlam (`Y >= 20`): Ko'mir (`coal`), Tosh tuzi (`rock_salt`).
+  - O'rta Metamorfik Qatlam (`Y >= 10`): Temir (`iron`), Kumush (`silver`), Mis (`copper`).
+  - Chuqur Magmatik Qatlam (`Y < 10`): Oltin (`gold`), Qimmatbaho yoqut va zumradlar (`gems`).
 
-### 2.2. Oziq-ovqat Saqlanishi va Chirish (Food Preservation & Spoilage)
+### 2.2. Oziq-ovqat Saqlanishi va Chirish (Food Preservation & Spoilage) — [Milestone 10 da to'liq integratsiya qilindi]
 - Go'sht, sut va pishirilgan taomlar yozda ochiq havoda 3-4 kunda ayniydi.
 - **Saqlash usullari**:
-  - **Tuzlash (Curing/Salting)**: Savdo karvonidan olingan tosh tuz bilan go'shtni tuzlash (saqlash muddati 30 kunga uzayadi).
-  - **Dudlash (Smoking)**: Gulxan yoki maxsus dudxonada dudlash.
-  - **Yerto'la (Cellar)**: Yer ostidagi sovuq qorong'i xonalarda saqlash (chirash tezligini 70% ga sekinlashtiradi).
+  - **Tuzlash (Curing/Salting)**: Konlardan olingan tosh tuz (`rock_salt`) bilan go'shtni tuzlash (saqlash muddati 8 barobar uzayadi).
+  - **Dudlash (Smoking)**: Maxsus dudxona (`smoke_rack.glb`) yordamida eman yog'ochi bilan dudlash (5 barobar uzayadi).
+  - **Yerto'la (Cellar)**: Yer ostidagi sovuq qorong'i xonalarda (`Y <= 22`, tosh tomli) saqlash (chirish tezligini 75% ga sekinlashtiradi).
 
 ---
 

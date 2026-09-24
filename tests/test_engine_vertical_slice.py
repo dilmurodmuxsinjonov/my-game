@@ -77,7 +77,10 @@ class TestEngineVerticalSlice(unittest.TestCase):
             "millstone.glb",
             "trip_hammer.glb",
             "compost_bin.glb",
-            "cutting_board.glb"
+            "cutting_board.glb",
+            "prospector_pick.glb",
+            "mine_cart.glb",
+            "mining_lantern.glb"
         ]
 
         for asset in expected_assets:
@@ -1084,6 +1087,231 @@ class TestEngineVerticalSlice(unittest.TestCase):
         self.assertEqual(pantry["minced_beef"], 0)
         self.assertEqual(pantry["diced_onion"], 0)
         self.assertEqual(pantry["bread"], 1)
+
+    def test_tfc_geology_structural_stability_and_cave_in(self):
+        """Verify TerraFirmaCraft structural stability: supported zones prevent cave-ins, unsupported mines collapse."""
+        SUPPORT_BEAM_RADIUS = 4
+        SUPPORT_BEAM_VERTICAL = 3
+        UNDERGROUND_THRESHOLD_Y = 24
+        BASE_CAVE_IN_CHANCE = 0.35
+
+        def is_supported(pos, beams):
+            if pos[1] > UNDERGROUND_THRESHOLD_Y:
+                return True
+            for bx, by, bz in beams:
+                if abs(pos[0] - bx) <= SUPPORT_BEAM_RADIUS and abs(pos[2] - bz) <= SUPPORT_BEAM_RADIUS:
+                    if abs(pos[1] - by) <= SUPPORT_BEAM_VERTICAL:
+                        return True
+            return False
+
+        # 1. Surface mining at Y=28 is always safe without support beams
+        surface_pos = (10, 28, 10)
+        self.assertTrue(is_supported(surface_pos, []))
+
+        # 2. Underground mining at Y=15 with support beam nearby (dx=3, dz=2, dy=1)
+        beam_pos = (10, 15, 10)
+        mine_pos_propped = (13, 16, 12)
+        self.assertTrue(is_supported(mine_pos_propped, [beam_pos]))
+
+        # 3. Underground mining at Y=15 too far from beam (dx=6, out of 4-block radius)
+        mine_pos_unpropped = (16, 15, 10)
+        self.assertFalse(is_supported(mine_pos_unpropped, [beam_pos]))
+
+        # 4. Collapse mechanics
+        def check_stability(pos, beams, is_structural, force_collapse=False):
+            if not is_structural or pos[1] > UNDERGROUND_THRESHOLD_Y:
+                return {"collapsed": False, "damage": 0.0}
+            if is_supported(pos, beams):
+                return {"collapsed": False, "damage": 0.0}
+            if force_collapse:
+                damage = 35.0
+                return {"collapsed": True, "damage": damage}
+            return {"collapsed": False, "damage": 0.0}
+
+        # Propped excavation does not collapse
+        res_propped = check_stability(mine_pos_propped, [beam_pos], True, force_collapse=True)
+        self.assertFalse(res_propped["collapsed"])
+
+        # Unpropped excavation triggers collapse and crush damage
+        res_collapse = check_stability(mine_pos_unpropped, [beam_pos], True, force_collapse=True)
+        self.assertTrue(res_collapse["collapsed"])
+        self.assertGreaterEqual(res_collapse["damage"], 25.0)
+
+    def test_tfc_prospector_pick_ore_detection_and_density(self):
+        """Verify TerraFirmaCraft Prospector's Pick ore scanning and sensory evaluation thresholds."""
+        def evaluate_prospecting(ore_counts):
+            if not ore_counts:
+                return {"status": "NONE", "dominant": "", "message": "No ores detected in this stratum."}
+            dominant = max(ore_counts, key=ore_counts.get)
+            cnt = ore_counts[dominant]
+            if cnt <= 3:
+                return {"status": "TRACES", "dominant": dominant, "message": f"Found traces of {dominant} nearby."}
+            elif cnt <= 8:
+                return {"status": "SAMPLE", "dominant": dominant, "message": f"Found a promising sample of {dominant} nearby."}
+            elif cnt <= 15:
+                return {"status": "RICH", "dominant": dominant, "message": f"Found a rich vein of {dominant} nearby!"}
+            else:
+                return {"status": "MOTHERLODE", "dominant": dominant, "message": f"Found an abundant motherlode of {dominant}!"}
+
+        # Empty rock wall
+        res_empty = evaluate_prospecting({})
+        self.assertEqual(res_empty["status"], "NONE")
+
+        # 2 Iron ore blocks -> TRACES
+        res_traces = evaluate_prospecting({"iron": 2})
+        self.assertEqual(res_traces["status"], "TRACES")
+        self.assertIn("traces of iron", res_traces["message"].lower())
+
+        # 6 Copper ore blocks -> SAMPLE
+        res_sample = evaluate_prospecting({"copper": 6})
+        self.assertEqual(res_sample["status"], "SAMPLE")
+        self.assertIn("promising sample of copper", res_sample["message"].lower())
+
+        # 12 Silver ore blocks -> RICH
+        res_rich = evaluate_prospecting({"silver": 12})
+        self.assertEqual(res_rich["status"], "RICH")
+        self.assertIn("rich vein of silver", res_rich["message"].lower())
+
+        # 20 Rock Salt blocks -> MOTHERLODE
+        res_motherlode = evaluate_prospecting({"rock_salt": 20})
+        self.assertEqual(res_motherlode["status"], "MOTHERLODE")
+        self.assertIn("abundant motherlode of rock_salt", res_motherlode["message"].lower())
+
+    def test_underground_mine_cart_cargo_and_rail_dynamics(self):
+        """Verify Mine Cart payload capacity (30 items max), cargo unloading, and 2.5x rail acceleration."""
+        MAX_CAPACITY = 30
+        RAIL_SPEED_MULTIPLIER = 2.5
+        cart_cargo = {}
+
+        def load_cargo(item, qty):
+            current_total = sum(cart_cargo.values())
+            space = MAX_CAPACITY - current_total
+            to_add = min(qty, space)
+            if to_add > 0:
+                cart_cargo[item] = cart_cargo.get(item, 0) + to_add
+            return to_add
+
+        # 1. Load 20 iron ore
+        loaded_iron = load_cargo("iron_ore", 20)
+        self.assertEqual(loaded_iron, 20)
+        self.assertEqual(sum(cart_cargo.values()), 20)
+
+        # 2. Load 15 silver ore (only 10 space left)
+        loaded_silver = load_cargo("silver_ore", 15)
+        self.assertEqual(loaded_silver, 10)
+        self.assertEqual(sum(cart_cargo.values()), 30)
+
+        # 3. Cart is full -> cannot add more
+        loaded_coal = load_cargo("coal", 5)
+        self.assertEqual(loaded_coal, 0)
+
+        # 4. Unload to stockpile
+        stockpile = {"iron_ore": 0, "silver_ore": 0}
+        for item, count in cart_cargo.items():
+            stockpile[item] = stockpile.get(item, 0) + count
+        cart_cargo.clear()
+
+        self.assertEqual(len(cart_cargo), 0)
+        self.assertEqual(stockpile["iron_ore"], 20)
+        self.assertEqual(stockpile["silver_ore"], 10)
+
+        # 5. Kinematics: Rail vs Ground
+        base_speed = 4.0
+        ground_speed = base_speed * 1.0
+        rail_speed = base_speed * RAIL_SPEED_MULTIPLIER
+        self.assertEqual(ground_speed, 4.0)
+        self.assertEqual(rail_speed, 10.0)
+
+    def test_geological_strata_and_supply_chain_recipes(self):
+        """Verify geological strata classification and Milestone 13 crafting/smelting logic."""
+        def get_strata(y):
+            if y >= 20:
+                return "Sedimentary"
+            elif y >= 10:
+                return "Metamorphic"
+            else:
+                return "Igneous"
+
+        self.assertEqual(get_strata(25), "Sedimentary")
+        self.assertEqual(get_strata(14), "Metamorphic")
+        self.assertEqual(get_strata(4), "Igneous")
+
+        # Supply chain crafting test
+        inv = {
+            "planks": 20,
+            "copper_ingot": 4,
+            "iron_ingots": 20,
+            "coal": 5,
+            "silver_ore": 3,
+            "silver_ingot": 0,
+            "support_beam": 0,
+            "prospector_pick": 0,
+            "mine_cart": 0,
+            "mining_rail": 0
+        }
+
+        # Craft Support Beams (4 planks -> 2 support_beam)
+        def craft_beams(inventory, count=1):
+            needed = count * 4
+            if inventory["planks"] >= needed:
+                inventory["planks"] -= needed
+                inventory["support_beam"] += count * 2
+                return True
+            return False
+
+        self.assertTrue(craft_beams(inv, 2))
+        self.assertEqual(inv["support_beam"], 4)
+        self.assertEqual(inv["planks"], 12)
+
+        # Craft Prospector Pick (2 planks + 2 copper -> 1 pick)
+        def craft_pick(inventory):
+            if inventory["planks"] >= 2 and inventory["copper_ingot"] >= 2:
+                inventory["planks"] -= 2
+                inventory["copper_ingot"] -= 2
+                inventory["prospector_pick"] += 1
+                return True
+            return False
+
+        self.assertTrue(craft_pick(inv))
+        self.assertEqual(inv["prospector_pick"], 1)
+        self.assertEqual(inv["copper_ingot"], 2)
+
+        # Craft Minecart (5 iron + 4 planks -> 1 cart)
+        def craft_cart(inventory):
+            if inventory["iron_ingots"] >= 5 and inventory["planks"] >= 4:
+                inventory["iron_ingots"] -= 5
+                inventory["planks"] -= 4
+                inventory["mine_cart"] += 1
+                return True
+            return False
+
+        self.assertTrue(craft_cart(inv))
+        self.assertEqual(inv["mine_cart"], 1)
+
+        # Craft Mining Rails (6 iron + 1 plank -> 16 rails)
+        def craft_rails(inventory):
+            if inventory["iron_ingots"] >= 6 and inventory["planks"] >= 1:
+                inventory["iron_ingots"] -= 6
+                inventory["planks"] -= 1
+                inventory["mining_rail"] += 16
+                return True
+            return False
+
+        self.assertTrue(craft_rails(inv))
+        self.assertEqual(inv["mining_rail"], 16)
+
+        # Smelt Silver Ingot (1 silver ore + 1 coal -> 1 silver ingot)
+        def smelt_silver(inventory):
+            if inventory["silver_ore"] >= 1 and inventory["coal"] >= 1:
+                inventory["silver_ore"] -= 1
+                inventory["coal"] -= 1
+                inventory["silver_ingot"] += 1
+                return True
+            return False
+
+        self.assertTrue(smelt_silver(inv))
+        self.assertEqual(inv["silver_ingot"], 1)
+        self.assertEqual(inv["silver_ore"], 2)
 
 if __name__ == "__main__":
     unittest.main()

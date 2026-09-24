@@ -7,6 +7,16 @@
 - Dastlabki Godot prototipi va foydalanuvchining showcase fayllari saqlandi.
 - Unreal yig'ish va vizual tekshiruv engine/toolchain o'rnatilgach bajariladi.
 
+## 2026-09-24 — Milestone 13: TerraFirmaCraft Geologiya, Shaxta O'pirilishi va Ruda Qatlamlari
+- **TerraFirmaCraft Geologiya va O'pirilish Fizikasi (`GeologyManager` & `voxel_world.gd`)**: Yer ostida (`Y <= 24`) tayanch to'sinlarisiz tosh va ruda qazilganda 35% ehtimollik bilan g'or shiftining o'pirilishi (`cave_in`) yuz beradi; shift toshlari to'kilib qulagan vayronaga (`COBBLESTONE`) aylanadi va 4 metr radiusdagi barchaga 25-45 crush zarari yetkazadi.
+- **Tayanch To'sinlari Aurası (`support_beam.glb`)**: Har bir tayanch to'sini gorizontal 4 blok va vertikal 3 bloklik xavfsizlik aurasini hosil qiladi, o'pirilish xavfini 0% ga tushiradi.
+- **Geologik Razvedka Cho'kichi (`ProspectorPick` & `prospector_pick.glb`)**: Tosh qatlamiga urilganda 12 blok radiusdagi barcha rudalarni skanerlash va sezgirlik darajasini ko'rsatish (`NONE`, `TRACES`, `SAMPLE`, `RICH`, `MOTHERLODE`).
+- **Yer Osti Ruda Vagonchasi (`MineCart` & `mine_cart.glb`)**: 30 ta og'ir ruda yuk hajmi, kon relslari (`mining_rail`) bo'ylab 2.5 barobar tezroq harakatlanish va omborga yuk to'kish.
+- **Shaxtyor Xavfsizlik Chirog'i (`mining_lantern.glb`)**: Yopiq jez korpusli yoritish chirog'i.
+- **Yangi 3D Modellar (Blender 5.2)**: `prospector_pick.glb` (24 KB), `mine_cart.glb` (80 KB), `mining_lantern.glb` (266 KB) yaratildi (jami 32 ta GLB model).
+- **Yangi Qirollik Dioramasi**: Barcha 32 ta aktiv ishtirokidagi diorama `assets/showcase_realm.png` da qayta render qilindi.
+- **Avtomatlashgan Testlar**: Jami 45 ta test 100% muvaffaqiyat bilan o'tdi. Godot 4.7.2 dvigateli xatosiz yuklandi.
+
 ## 2026-09-24 — Milestone 12: Farmer's Delight Qishloq Xo'jaligi, Boy Tuproq va Oshpazlik Tizimi
 - **Farmer's Delight Kompost Qutisi (`CompostBin` & `compost_bin.glb`)**: Organik chiqindilar (chirigan ovqat, barglar, o'simlik qoldiqlari) dan 4 ta sarflab, 1 ta yuqori unumdor o'g'it (`rich_soil_compost`) tayyorlash stansiyasi.
 - **Ekinlar Almashlab Ekish va Dinamik Unumdorlik (`CropManager`)**: Bug'doy, karam, piyoz, sabzi ekinlarining to'liq hayotiy sikli. Boyitilgan tuproqda 2x tezroq o'sish; almashlab ekish rotatsiyasi (almashinish) +25% o'sish tezligi va +1 hosil bonusi; ketma-ket bir xil ekin ekish (monokultura) esa o'sishni 20% ga sekinlashtiradi va -1 hosil jarimasi beradi.

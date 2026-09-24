@@ -150,6 +150,15 @@ def build_diorama():
     # 24. Farmer's Delight Butcher Cutting Board near hearth
     import_asset("cutting_board.glb", (-0.3, 1.2, 0.0), rot_z=-30, scale=0.95)
 
+    # 25. TerraFirmaCraft Heavy Ore Minecart near mine entrance
+    import_asset("mine_cart.glb", (-3.6, -0.4, 0.0), rot_z=45, scale=0.95)
+
+    # 26. Geologist Prospector's Pick propped near support beam
+    import_asset("prospector_pick.glb", (-4.0, -0.2, 0.40), rot_z=60, scale=1.0)
+
+    # 27. Brass Miner's Safety Lantern illuminating the mine shaft
+    import_asset("mining_lantern.glb", (-3.2, 0.3, 0.0), rot_z=-15, scale=0.90)
+
     # Render output path
     output_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "assets"))
     output_path = os.path.join(output_dir, "showcase_realm.png")

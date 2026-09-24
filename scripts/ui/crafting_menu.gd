@@ -198,6 +198,21 @@ const RECIPES: Dictionary = {
 			"name": "Butcher's Cutting Board",
 			"inputs": {"logs": 2, "iron_ingots": 1},
 			"output": {"name": "Cutting Board", "type": "placeable", "icon": "🔪", "count": 1}
+		},
+		{
+			"name": "Geologist's Prospector Pick",
+			"inputs": {"logs": 2, "copper_ingot": 2},
+			"output": {"name": "Prospector Pick", "type": "tool", "tool_type": "prospector_pick", "icon": "⛏️", "count": 1}
+		},
+		{
+			"name": "Underground Ore Minecart",
+			"inputs": {"iron_ingots": 5, "planks": 4},
+			"output": {"name": "Mine Cart", "type": "placeable", "icon": "🛒", "count": 1}
+		},
+		{
+			"name": "Mining Rail Tracks (x16)",
+			"inputs": {"iron_ingots": 6, "planks": 1},
+			"output": {"name": "Mining Rail", "type": "block", "block_type": 24, "icon": "🛤️", "count": 16}
 		}
 	],
 	"campfire": [
@@ -262,6 +277,11 @@ const RECIPES: Dictionary = {
 			"name": "Forge Steel Ingot",
 			"inputs": {"iron_ore": 2, "coal": 3},
 			"output": {"name": "Steel Ingot", "type": "material", "icon": "⚔️", "count": 1}
+		},
+		{
+			"name": "Smelt Silver Ingot",
+			"inputs": {"silver_ore": 1, "coal": 1},
+			"output": {"name": "Silver Ingot", "type": "material", "icon": "🪙", "count": 1}
 		}
 	],
 	"enchanter": [

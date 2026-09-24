@@ -57,7 +57,13 @@ var inventory: Dictionary = {
 	"copper_ingot": 0,
 	"steel_ingot": 4,
 	"tools": 10,
-	"weapons": 5
+	"weapons": 5,
+	"silver_ore": 0,
+	"silver_ingot": 0,
+	"support_beam": 4,
+	"prospector_pick": 1,
+	"mine_cart": 0,
+	"mining_rail": 0
 }
 
 func salt_meat(amount: int) -> bool:
@@ -104,6 +110,53 @@ func cook_shepherd_pie(amount: int = 1) -> bool:
 		consume_resource("diced_onion", amount)
 		consume_resource("bread", amount)
 		add_resource("shepherd_pie", amount * 2)
+		return true
+	return false
+
+func craft_support_beams(amount: int = 1) -> bool:
+	var wood_needed = amount * 4
+	if inventory.get("planks", 0) >= wood_needed:
+		consume_resource("planks", wood_needed)
+		add_resource("support_beam", amount * 2)
+		return true
+	return false
+
+func craft_prospector_pick(amount: int = 1) -> bool:
+	if inventory.get("planks", 0) >= (amount * 2) and (inventory.get("copper_ingot", 0) >= (amount * 2) or inventory.get("iron_ingots", 0) >= (amount * 2)):
+		consume_resource("planks", amount * 2)
+		if inventory.get("copper_ingot", 0) >= (amount * 2):
+			consume_resource("copper_ingot", amount * 2)
+		else:
+			consume_resource("iron_ingots", amount * 2)
+		add_resource("prospector_pick", amount)
+		return true
+	return false
+
+func craft_mine_cart(amount: int = 1) -> bool:
+	var iron_needed = amount * 5
+	var wood_needed = amount * 4
+	if inventory.get("iron_ingots", 0) >= iron_needed and inventory.get("planks", 0) >= wood_needed:
+		consume_resource("iron_ingots", iron_needed)
+		consume_resource("planks", wood_needed)
+		add_resource("mine_cart", amount)
+		return true
+	return false
+
+func craft_mining_rails(amount: int = 1) -> bool:
+	var iron_needed = amount * 6
+	var wood_needed = amount * 1
+	if inventory.get("iron_ingots", 0) >= iron_needed and inventory.get("planks", 0) >= wood_needed:
+		consume_resource("iron_ingots", iron_needed)
+		consume_resource("planks", wood_needed)
+		add_resource("mining_rail", amount * 16)
+		return true
+	return false
+
+func smelt_silver_ore(amount: int = 1) -> bool:
+	if inventory.get("silver_ore", 0) >= amount and inventory.get("coal", 0) >= amount:
+		consume_resource("silver_ore", amount)
+		consume_resource("coal", amount)
+		add_resource("silver_ingot", amount)
 		return true
 	return false
 
