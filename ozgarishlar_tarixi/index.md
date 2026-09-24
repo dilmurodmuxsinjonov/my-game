@@ -7,6 +7,21 @@
 - Dastlabki Godot prototipi va foydalanuvchining showcase fayllari saqlandi.
 - Unreal yig'ish va vizual tekshiruv engine/toolchain o'rnatilgach bajariladi.
 
+## 2026-09-25 — Milestone 17: MineColonies Shahar Kengashi, Qirollik Xazinasi va Garnizon Soqchilar Posti
+- **MineColonies Shahar Kengashi (`TownHall` & `town_hall_desk.glb`)**: Koloniya ma'muriy markazi va hududiy chegaralar yadrosi:
+  - 4 ta rivojlanish bosqichi: Hamlet (32m radius, 8 aholi) -> Village (48m radius, 20 aholi) -> Township (64m radius, 45 aholi) -> Royal City (96m radius, 100 aholi).
+  - Fuqarolar reyestri, turar-joy kvotalari va kasb taqsimoti boshqaruvi.
+- **Qirollik Xazinasi Xazinaxonasi (`TreasuryVault` & `treasury_vault.glb`)**: Kuchaytirilgan temir tasmali xazina qutisi:
+  - Har kunlik feodal soliq yig'ish (soliq stavkasiga qarab aholi kayfiyatiga (morale) ta'sir: past soliq ma'naviyatni oshiradi, yuqori soliq norozilik keltirib chiqaradi).
+  - Garnizon harbiylari va soqchilarning kunlik oylik maoshi to'lovi; agar xazina bo'shasa, garnizon soqchilari ish tashlaydi va mudofaa 50% ga zaiflashadi.
+  - Bayram subsidiyalari: 50 ta oltin sarflab shahar bayrami o'tkazish orqali butun aholiga +20 morale bonusi taqdim etiladi.
+- **Garnizon Soqchilar Posti (`GuardPost` & `guard_post.glb`)**: Halberdlar va qalqonlar raki bilan jihozlangan mudofaa stansiyasi:
+  - 16 metr mudofaa radiusi va soqchilar saflanish bonusi (+15 mudofaa balli har bir navbatchi soqchi uchun).
+  - Qaroqchilar va bosqinchilar yaqinlashganda avtomatik jangovar xavf signali chalinishi.
+- **Yangi 3D Modellar (Blender 5.2)**: `town_hall_desk.glb` (30 KB), `treasury_vault.glb` (148 KB), `guard_post.glb` (33 KB) yaratildi (jami **43 ta GLB model**).
+- **Yangi Qirollik Dioramasi**: Barcha 43 ta aktiv ishtirokidagi diorama `assets/showcase_realm.png` da qayta render qilindi va brainga saqlandi.
+- **Avtomatlashgan Testlar**: Jami **58 ta test 100% muvaffaqiyat bilan o'tdi** (0.007s).
+
 ## 2026-09-24 — Milestone 16: Create Mod Konveyer Lentasi, Gravitatsion Truba va Sanoat Shtamplash Pressi
 - **Create Mod Kinetik Konveyer Lentasi (`ConveyorBelt` & `conveyor_belt.glb`)**: Kinetik vallar yordamida 2.0 m/s tezlikda harakatlanuvchi mexanik charm lenta (16 SU sarflaydi); resurslarni qo'l mehnatisiz avtomatik ravishda stanoklar, ruda konlari va omborlar o'rtasida tashiydi.
 - **Create Mod Gravitatsion Truba va Voronka (`Chute` & `chute.glb`)**: Tabiiy og'irlik kuchi asosida (0 SU talab qiladi) 4 ta narsa/soniya tezlikda resurslarni yuqori qavatdan pastdagi stanoklarga tashuvchi metall truba; don siloslaridan to'g'ridan-to'g'ri tegirmon toshlariga bug'doy uzatadi.

@@ -183,6 +183,15 @@ def build_diorama():
     # 35. Create-Style Kinetic Mechanical Stamping Press
     import_asset("mechanical_press.glb", (-0.8, 3.2, 0.0), rot_z=-15, scale=0.90)
 
+    # 36. MineColonies Settlement Town Hall Master Registry Desk
+    import_asset("town_hall_desk.glb", (-2.2, -0.8, 0.0), rot_z=35, scale=0.95)
+
+    # 37. Royal Treasury Coinage Strongbox & Bullion Vault
+    import_asset("treasury_vault.glb", (1.6, -3.1, 0.0), rot_z=-25, scale=0.95)
+
+    # 38. Garrison Sentry Guard Post with Halberd & Shield Rack
+    import_asset("guard_post.glb", (3.8, 0.6, 0.0), rot_z=-70, scale=0.90)
+
     # Render output path
     output_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "assets"))
     output_path = os.path.join(output_dir, "showcase_realm.png")

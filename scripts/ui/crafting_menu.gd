@@ -273,6 +273,21 @@ const RECIPES: Dictionary = {
 			"name": "Industrial Mechanical Press",
 			"inputs": {"iron_ingots": 4, "stone": 4},
 			"output": {"name": "Mechanical Press", "type": "placeable", "icon": "🪙", "count": 1}
+		},
+		{
+			"name": "Town Hall Magistrate Desk",
+			"inputs": {"planks": 6, "iron_ingots": 2},
+			"output": {"name": "Town Hall Desk", "type": "placeable", "icon": "🏛️", "count": 1}
+		},
+		{
+			"name": "Royal Treasury Strongbox Vault",
+			"inputs": {"stone": 8, "iron_ingots": 4},
+			"output": {"name": "Treasury Vault", "type": "placeable", "icon": "🪙", "count": 1}
+		},
+		{
+			"name": "Garrison Sentry Post & Weapon Rack",
+			"inputs": {"logs": 4, "iron_ingots": 2},
+			"output": {"name": "Guard Post", "type": "placeable", "icon": "🛡️", "count": 1}
 		}
 	],
 	"campfire": [

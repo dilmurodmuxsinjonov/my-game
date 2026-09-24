@@ -17,6 +17,9 @@ const Crucible = preload("res://scripts/world/crucible.gd")
 const ConveyorBelt = preload("res://scripts/world/conveyor_belt.gd")
 const Chute = preload("res://scripts/world/chute.gd")
 const MechanicalPress = preload("res://scripts/world/mechanical_press.gd")
+const TownHall = preload("res://scripts/world/town_hall.gd")
+const TreasuryVault = preload("res://scripts/world/treasury_vault.gd")
+const GuardPost = preload("res://scripts/world/guard_post.gd")
 
 ## First-Person Monarch Controller.
 ## Follows the Single Persistent Monarch Paradigm: No dynasty, no permadeath;
@@ -647,6 +650,33 @@ func _handle_secondary_action() -> void:
 			get_tree().current_scene.add_child(mp)
 			item["count"] -= 1
 			emit_signal("block_action_performed", "place_station", Vector3i(int(mp.position.x), int(mp.position.y), int(mp.position.z)), 0)
+			emit_signal("hotbar_slot_changed", active_slot, item)
+			return
+		elif "Town Hall" in item_name:
+			var th = TownHall.new()
+			th.supply_chain = supply_chain
+			th.position = hit_point + hit_normal * 0.1
+			get_tree().current_scene.add_child(th)
+			item["count"] -= 1
+			emit_signal("block_action_performed", "place_station", Vector3i(int(th.position.x), int(th.position.y), int(th.position.z)), 0)
+			emit_signal("hotbar_slot_changed", active_slot, item)
+			return
+		elif "Treasury Vault" in item_name or "Treasury" in item_name:
+			var tv = TreasuryVault.new()
+			tv.supply_chain = supply_chain
+			tv.position = hit_point + hit_normal * 0.1
+			get_tree().current_scene.add_child(tv)
+			item["count"] -= 1
+			emit_signal("block_action_performed", "place_station", Vector3i(int(tv.position.x), int(tv.position.y), int(tv.position.z)), 0)
+			emit_signal("hotbar_slot_changed", active_slot, item)
+			return
+		elif "Guard Post" in item_name or "Sentry Post" in item_name:
+			var gp = GuardPost.new()
+			gp.supply_chain = supply_chain
+			gp.position = hit_point + hit_normal * 0.1
+			get_tree().current_scene.add_child(gp)
+			item["count"] -= 1
+			emit_signal("block_action_performed", "place_station", Vector3i(int(gp.position.x), int(gp.position.y), int(gp.position.z)), 0)
 			emit_signal("hotbar_slot_changed", active_slot, item)
 			return
 
