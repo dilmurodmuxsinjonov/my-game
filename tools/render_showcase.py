@@ -192,6 +192,15 @@ def build_diorama():
     # 38. Garrison Sentry Guard Post with Halberd & Shield Rack
     import_asset("guard_post.glb", (3.8, 0.6, 0.0), rot_z=-70, scale=0.90)
 
+    # 39. Tinkers' Construct Seared Smeltery Controller Multiblock
+    import_asset("smeltery_controller.glb", (-3.2, 1.8, 0.0), rot_z=20, scale=0.95)
+
+    # 40. Tinkers' Seared Casting Basin for Solid Metal Blocks
+    import_asset("casting_basin.glb", (-2.4, 2.3, 0.0), rot_z=-15, scale=0.95)
+
+    # 41. Tinkers' Seared Tool Casting Table with Clay Mold
+    import_asset("casting_table.glb", (-1.6, 2.1, 0.0), rot_z=30, scale=0.95)
+
     # Render output path
     output_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "assets"))
     output_path = os.path.join(output_dir, "showcase_realm.png")

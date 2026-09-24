@@ -20,6 +20,9 @@ const MechanicalPress = preload("res://scripts/world/mechanical_press.gd")
 const TownHall = preload("res://scripts/world/town_hall.gd")
 const TreasuryVault = preload("res://scripts/world/treasury_vault.gd")
 const GuardPost = preload("res://scripts/world/guard_post.gd")
+const SmelteryController = preload("res://scripts/world/smeltery_controller.gd")
+const CastingBasin = preload("res://scripts/world/casting_basin.gd")
+const CastingTable = preload("res://scripts/world/casting_table.gd")
 
 ## First-Person Monarch Controller.
 ## Follows the Single Persistent Monarch Paradigm: No dynasty, no permadeath;
@@ -677,6 +680,33 @@ func _handle_secondary_action() -> void:
 			get_tree().current_scene.add_child(gp)
 			item["count"] -= 1
 			emit_signal("block_action_performed", "place_station", Vector3i(int(gp.position.x), int(gp.position.y), int(gp.position.z)), 0)
+			emit_signal("hotbar_slot_changed", active_slot, item)
+			return
+		elif "Smeltery" in item_name:
+			var sc = SmelteryController.new()
+			sc.supply_chain = supply_chain
+			sc.position = hit_point + hit_normal * 0.1
+			get_tree().current_scene.add_child(sc)
+			item["count"] -= 1
+			emit_signal("block_action_performed", "place_station", Vector3i(int(sc.position.x), int(sc.position.y), int(sc.position.z)), 0)
+			emit_signal("hotbar_slot_changed", active_slot, item)
+			return
+		elif "Casting Basin" in item_name:
+			var cb_basin = CastingBasin.new()
+			cb_basin.supply_chain = supply_chain
+			cb_basin.position = hit_point + hit_normal * 0.1
+			get_tree().current_scene.add_child(cb_basin)
+			item["count"] -= 1
+			emit_signal("block_action_performed", "place_station", Vector3i(int(cb_basin.position.x), int(cb_basin.position.y), int(cb_basin.position.z)), 0)
+			emit_signal("hotbar_slot_changed", active_slot, item)
+			return
+		elif "Casting Table" in item_name:
+			var ct = CastingTable.new()
+			ct.supply_chain = supply_chain
+			ct.position = hit_point + hit_normal * 0.1
+			get_tree().current_scene.add_child(ct)
+			item["count"] -= 1
+			emit_signal("block_action_performed", "place_station", Vector3i(int(ct.position.x), int(ct.position.y), int(ct.position.z)), 0)
 			emit_signal("hotbar_slot_changed", active_slot, item)
 			return
 
