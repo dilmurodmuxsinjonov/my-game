@@ -30,6 +30,8 @@ const BurgagePlot = preload("res://scripts/world/burgage_plot.gd")
 const TrainingDummy = preload("res://scripts/world/training_dummy.gd")
 const ApothecaryBench = preload("res://scripts/world/apothecary_bench.gd")
 const InfirmaryBed = preload("res://scripts/world/infirmary_bed.gd")
+const ApiaryBeehive = preload("res://scripts/world/apiary_beehive.gd")
+const MeadFermenter = preload("res://scripts/world/mead_fermenter.gd")
 
 ## First-Person Monarch Controller.
 ## Follows the Single Persistent Monarch Paradigm: No dynasty, no permadeath;
@@ -774,6 +776,24 @@ func _handle_secondary_action() -> void:
 			get_tree().current_scene.add_child(ib)
 			item["count"] -= 1
 			emit_signal("block_action_performed", "place_station", Vector3i(int(ib.position.x), int(ib.position.y), int(ib.position.z)), 0)
+			emit_signal("hotbar_slot_changed", active_slot, item)
+			return
+		elif "Beehive" in item_name:
+			var bh = ApiaryBeehive.new()
+			bh.supply_chain = supply_chain
+			bh.position = hit_point + hit_normal * 0.1
+			get_tree().current_scene.add_child(bh)
+			item["count"] -= 1
+			emit_signal("block_action_performed", "place_station", Vector3i(int(bh.position.x), int(bh.position.y), int(bh.position.z)), 0)
+			emit_signal("hotbar_slot_changed", active_slot, item)
+			return
+		elif "Mead" in item_name or "Fermenter" in item_name:
+			var mf = MeadFermenter.new()
+			mf.supply_chain = supply_chain
+			mf.position = hit_point + hit_normal * 0.1
+			get_tree().current_scene.add_child(mf)
+			item["count"] -= 1
+			emit_signal("block_action_performed", "place_station", Vector3i(int(mf.position.x), int(mf.position.y), int(mf.position.z)), 0)
 			emit_signal("hotbar_slot_changed", active_slot, item)
 			return
 
