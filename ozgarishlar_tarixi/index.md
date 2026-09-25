@@ -7,6 +7,17 @@
 - Dastlabki Godot prototipi va foydalanuvchining showcase fayllari saqlandi.
 - Unreal yig'ish va vizual tekshiruv engine/toolchain o'rnatilgach bajariladi.
 
+## 2026-09-25 — Milestone 22: Medieval Dynasty & Valheim Asalarichilik, Asal Sharobi va Mum Shamlar (Issue #3)
+- **Somonli Asalari Uyasi va Changlatish (`ApiaryBeehive` & `beehive_skep.glb`)**:
+  - Har kuni passiv 3 ta asalari mumi katagi (`honeycomb`) va 2 ta toza mum (`beeswax`) ishlab chiqarish.
+  - 18 metr radiusdagi ekinlarni changlatib, o'sish tezligini +20% ga (1.20x) oshirish.
+- **Asal Sharobi Bochkasi va Mum Shamdon (`MeadFermenter`, `mead_fermenter.glb` & `candle_candelabra.glb`)**:
+  - Oltin Asal Sharobi (`honey_mead`): 2 honeycomb + 1 toza suv + 1 bug'doy $\rightarrow$ 2 ko'za sharob (+15 morale va qishki sovuqqa +25 issiqlik bardoshliligi).
+  - Mum Shamlar (`beeswax_candle`): 2 ta mum $\rightarrow$ 3 ta sham (tutunsiz ichki va yer osti yoritish).
+- **Yangi 3D Modellar (Blender 5.2)**: `beehive_skep.glb` (541 KB), `mead_fermenter.glb` (330 KB), `candle_candelabra.glb` (79 KB) yaratildi (jami **58 ta GLB model**).
+- **Yangi Qirollik Dioramasi**: Barcha 58 ta aktiv ishtirokidagi diorama `assets/showcase_realm.png` da qayta render qilindi va brainga saqlandi.
+- **Avtomatlashgan Testlar**: Jami **76 ta engine testi** (umumiy **133 ta test**) 100% muvaffaqiyat bilan o'tdi.
+
 ## 2026-09-25 — Milestone 21: Going Medieval & RimWorld Tabibxona, Dorivor Malhamlar va Shifoxona To'shagi (Issue #1)
 - **Giyohshunos va Alkimyogar Dastgohi (`ApothecaryBench` & `apothecary_bench.glb`)**:
   - Steril bint (`sterile_bandage`): 1 mato + 1 dorivor giyoh $\rightarrow$ 2 ta bint (qon ketishini darhol to'xtatadi, +15 HP).

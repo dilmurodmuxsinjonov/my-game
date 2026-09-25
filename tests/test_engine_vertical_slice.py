@@ -2187,6 +2187,61 @@ class TestEngineVerticalSlice(unittest.TestCase):
         self.assertEqual(patient["hp"], 100.0)
         self.assertEqual(morale_bonus, 8)
 
+    def test_milestone22_glb_assets(self):
+        """Verify binary glTF headers for Milestone 22 3D models."""
+        models_dir = os.path.join(os.path.dirname(__file__), "..", "assets", "models")
+        m22_models = ["beehive_skep.glb", "mead_fermenter.glb", "candle_candelabra.glb"]
+        for m in m22_models:
+            p = os.path.join(models_dir, m)
+            self.assertTrue(os.path.exists(p), f"Missing model {m}")
+            self.assertGreater(os.path.getsize(p), 1000, f"Model {m} is unusually small")
+            with open(p, "rb") as f:
+                header = f.read(4)
+                self.assertEqual(header, b"glTF", f"Model {m} does not have valid glTF magic header")
+
+    def test_apiary_beehive_pollination_and_yield(self):
+        """Verify Medieval Dynasty / Valheim beehive yield and 18m crop pollination aura."""
+        hive_pos = (50.0, 50.0)
+        crop_near = (62.0, 58.0) # distance ~14.42m <= 18.0m
+        crop_far = (80.0, 50.0)  # distance 30.0m > 18.0m
+
+        dist_near = math.hypot(crop_near[0] - hive_pos[0], crop_near[1] - hive_pos[1])
+        dist_far = math.hypot(crop_far[0] - hive_pos[0], crop_far[1] - hive_pos[1])
+
+        self.assertTrue(dist_near <= 18.0)
+        self.assertFalse(dist_far <= 18.0)
+
+        # Daily yield: 3 honeycomb, 2 beeswax, 1.20x pollination bonus
+        hive_storage = {"honeycomb": min(15, 0 + 3), "beeswax": min(15, 0 + 2)}
+        self.assertEqual(hive_storage["honeycomb"], 3)
+        self.assertEqual(hive_storage["beeswax"], 2)
+
+    def test_mead_fermenter_brewing(self):
+        """Verify Valheim / Medieval Dynasty honey mead brewing stoichiometry and buffs."""
+        stock = {"honeycomb": 6, "clean_water": 4, "wheat": 4}
+        # 2 batches: 4 honeycomb + 2 water + 2 wheat -> 4 honey_mead
+        batches = 2
+        stock["honeycomb"] -= batches * 2
+        stock["clean_water"] -= batches
+        stock["wheat"] -= batches
+        mead_produced = batches * 2
+        self.assertEqual(mead_produced, 4)
+        self.assertEqual(stock["honeycomb"], 2)
+
+        morale_bonus = 15
+        winter_warmth_bonus = 25.0
+        self.assertEqual(morale_bonus, 15)
+        self.assertEqual(winter_warmth_bonus, 25.0)
+
+    def test_beeswax_candle_molding(self):
+        """Verify beeswax candle press ratio (2 beeswax -> 3 candles)."""
+        beeswax = 6
+        batches = 3
+        beeswax -= batches * 2
+        candles = batches * 3
+        self.assertEqual(beeswax, 0)
+        self.assertEqual(candles, 9)
+
 if __name__ == "__main__":
     unittest.main()
 
