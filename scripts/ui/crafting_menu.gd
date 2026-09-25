@@ -333,6 +333,21 @@ const RECIPES: Dictionary = {
 			"name": "Combat Training Dummy",
 			"inputs": {"logs": 3, "planks": 2, "leather_hide": 1},
 			"output": {"name": "Training Dummy", "type": "placeable", "icon": "🎯", "count": 1}
+		},
+		{
+			"name": "Apothecary Herbalist Bench",
+			"inputs": {"planks": 6, "stone": 2, "copper_ingot": 1},
+			"output": {"name": "Apothecary Bench", "type": "placeable", "icon": "⚗️", "count": 1}
+		},
+		{
+			"name": "Infirmary Recovery Bed",
+			"inputs": {"planks": 4, "fine_fabric": 2},
+			"output": {"name": "Infirmary Bed", "type": "placeable", "icon": "🛏️", "count": 1}
+		},
+		{
+			"name": "Apothecary Medicine Chest",
+			"inputs": {"planks": 3, "iron_ingots": 1},
+			"output": {"name": "Medicine Chest", "type": "placeable", "icon": "🧰", "count": 1}
 		}
 	],
 	"campfire": [
