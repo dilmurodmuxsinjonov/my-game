@@ -111,7 +111,14 @@ var inventory: Dictionary = {
 	"egg": 0,
 	"feather": 0,
 	"leather_hide": 0,
-	"milk_jug": 0
+	"milk_jug": 0,
+	"apothecary_bench": 0,
+	"infirmary_bed": 0,
+	"medicine_chest": 0,
+	"medicinal_herbs": 16,
+	"sterile_bandage": 4,
+	"herbal_poultice": 2,
+	"plague_antidote": 1
 }
 
 func salt_meat(amount: int) -> bool:
