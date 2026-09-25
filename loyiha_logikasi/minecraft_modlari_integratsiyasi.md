@@ -266,3 +266,23 @@ Medieval davrning haqiqiy muhandisligi:
   - Askar va fuqarolar qilich, nayza yoki kamon bilan mankenga zarba berib `melee_skill` yoki `archery_skill` mahoratini 50 ballgacha (Veteran Levy darajasi) oshiradi.
   - Manken mustahkamligi 200 zarba; eskiganda 2 ta yog'och va 1 ta charm tasma bilan qayta ta'mirlanadi.
 
+---
+
+## 10. Going Medieval & RimWorld Integratsiyasi — Tabibxona, Malhamlar va Jarrohlik To'shagi (Milestone 21)
+
+### 10.1. Giyohshunos va Alkimyogar Dastgohi (Apothecary Bench) — [Going Medieval / RimWorld]
+- **Muammo**: Jangdan yaralanib qaytgan askarlar qon ketishi yoki yiringli infeksiya tufayli halok bo'ladi.
+- **Yechim (`ApothecaryBench` & `apothecary_bench.glb`)**:
+  - Tosh hovoncha, alembik kolba va dorivor giyohlar osilgan dastgoh (`apothecary_bench.glb`).
+  - **Steril bint (`sterile_bandage`)**: 1 mato + 1 giyoh $\rightarrow$ 2 ta bint (qon ketishini darhol to'xtatadi, +15 HP).
+  - **Dorivor malham (`herbal_poultice`)**: 2 giyoh + 1 toza suv $\rightarrow$ 1 ta malham (yiringli yara infeksiyasini davolaydi, +30 HP).
+  - **Vabo ziddizahari (`plague_antidote`)**: 3 giyoh + 1 sarimsoq $\rightarrow$ 1 ta ziddizahar (og'ir kasallik va infeksiyani bir zumda yo'qotadi, +45 HP).
+
+### 10.2. Shifoxona Jarrohlik To'shagi va Dori Qutisi (Infirmary Bed & Medicine Chest) — [RimWorld]
+- **Muammo**: Oddiy uyda yotgan yaradorlar juda sekin sog'ayadi va infeksiya kuchayib ketadi.
+- **Yechim (`InfirmaryBed`, `infirmary_bed.glb` & `medicine_chest.glb`)**:
+  - Toza choyshabli shifoxona to'shagi (`infirmary_bed.glb`) va dori-darmon qutisi (`medicine_chest.glb`).
+  - Tabib nazorati ostida sog'ayish tezligi daqiqasiga 4.0 HP gacha oshadi.
+  - Bemor to'liq sog'ayib chiqqanda tibbiy g'amxo'rlik uchun aholi ruhiyatiga +8 morale qo'shiladi.
+
+

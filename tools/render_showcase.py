@@ -219,6 +219,15 @@ def build_diorama():
     # 47. Bellwright Combat Training Practice Dummy
     import_asset("training_dummy.glb", (3.2, 1.8, 0.0), rot_z=-80, scale=0.92)
 
+    # 48. Going Medieval Apothecary Herbalist & Alchemist Bench
+    import_asset("apothecary_bench.glb", (-4.5, -1.6, 0.0), rot_z=30, scale=0.90)
+
+    # 49. RimWorld Style Infirmary Hospital Recovery Bed
+    import_asset("infirmary_bed.glb", (-4.6, -0.2, 0.0), rot_z=10, scale=0.88)
+
+    # 50. Apothecary Medicine Chest with Bandages & Poultices
+    import_asset("medicine_chest.glb", (-4.1, -0.9, 0.0), rot_z=-20, scale=0.92)
+
     # Render output path
     output_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "assets"))
     output_path = os.path.join(output_dir, "showcase_realm.png")

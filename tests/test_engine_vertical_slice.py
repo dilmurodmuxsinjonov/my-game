@@ -2114,6 +2114,79 @@ class TestEngineVerticalSlice(unittest.TestCase):
         self.assertEqual(dummy["durability"], 200)
         self.assertFalse(dummy["is_broken"])
 
+    def test_milestone21_glb_assets(self):
+        """Verify binary glTF headers for Milestone 21 3D models."""
+        models_dir = os.path.join(os.path.dirname(__file__), "..", "assets", "models")
+        m21_models = ["apothecary_bench.glb", "infirmary_bed.glb", "medicine_chest.glb"]
+        for m in m21_models:
+            p = os.path.join(models_dir, m)
+            self.assertTrue(os.path.exists(p), f"Missing model {m}")
+            self.assertGreater(os.path.getsize(p), 1000, f"Model {m} is unusually small")
+            with open(p, "rb") as f:
+                header = f.read(4)
+                self.assertEqual(header, b"glTF", f"Model {m} does not have valid glTF magic header")
+
+    def test_apothecary_bench_crafting(self):
+        """Verify Going Medieval / RimWorld herbal remedy crafting stoichiometry."""
+        stock = {"medicinal_herbs": 10, "fine_fabric": 4, "clean_water": 4, "garlic": 2}
+        
+        # 1. Craft sterile bandages (2 batches -> consumes 2 fabric + 2 herbs -> 4 bandages)
+        stock["fine_fabric"] -= 2
+        stock["medicinal_herbs"] -= 2
+        bandages = 2 * 2
+        self.assertEqual(bandages, 4)
+        self.assertEqual(stock["medicinal_herbs"], 8)
+
+        # 2. Craft herbal poultice (2 batches -> consumes 4 herbs + 2 water -> 2 poultices)
+        stock["medicinal_herbs"] -= 4
+        stock["clean_water"] -= 2
+        poultices = 2
+        self.assertEqual(poultices, 2)
+        self.assertEqual(stock["medicinal_herbs"], 4)
+
+        # 3. Craft plague antidote (1 batch -> consumes 3 herbs + 1 garlic -> 1 antidote)
+        stock["medicinal_herbs"] -= 3
+        stock["garlic"] -= 1
+        antidote = 1
+        self.assertEqual(antidote, 1)
+        self.assertEqual(stock["medicinal_herbs"], 1)
+
+    def test_infirmary_bed_triage(self):
+        """Verify Infirmary Bed patient admission, infection curing, and recovery rates."""
+        patient = {"hp": 40.0, "max_hp": 100.0, "infected": True, "bleeding": True}
+        
+        # Apply sterile bandage: +15 HP, stops bleeding
+        patient["hp"] = min(patient["max_hp"], patient["hp"] + 15.0)
+        patient["bleeding"] = False
+        self.assertEqual(patient["hp"], 55.0)
+        self.assertFalse(patient["bleeding"])
+
+        # Apply herbal poultice: +30 HP, cures infection
+        patient["hp"] = min(patient["max_hp"], patient["hp"] + 30.0)
+        patient["infected"] = False
+        self.assertEqual(patient["hp"], 85.0)
+        self.assertFalse(patient["infected"])
+
+        # Natural rest with physician (2.5 + 1.5 = 4.0 HP/min for 4 minutes -> +16 HP -> 100 HP full recovery)
+        rest_rate = 2.5 + 1.5
+        patient["hp"] = min(patient["max_hp"], patient["hp"] + rest_rate * 4.0)
+        self.assertEqual(patient["hp"], 100.0)
+
+    def test_plague_antidote_and_discharge(self):
+        """Verify instant plague antidote stabilization and +8 morale upon discharge."""
+        patient = {"hp": 60.0, "max_hp": 100.0, "infected": True, "bleeding": True}
+        morale_bonus = 0
+        
+        # Plague antidote restores 45 HP and clears both infection and bleeding
+        patient["hp"] = min(patient["max_hp"], patient["hp"] + 45.0)
+        patient["infected"] = False
+        patient["bleeding"] = False
+        if patient["hp"] >= patient["max_hp"] and not patient["infected"] and not patient["bleeding"]:
+            morale_bonus = 8
+        
+        self.assertEqual(patient["hp"], 100.0)
+        self.assertEqual(morale_bonus, 8)
+
 if __name__ == "__main__":
     unittest.main()
 

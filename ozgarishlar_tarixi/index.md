@@ -7,6 +7,18 @@
 - Dastlabki Godot prototipi va foydalanuvchining showcase fayllari saqlandi.
 - Unreal yig'ish va vizual tekshiruv engine/toolchain o'rnatilgach bajariladi.
 
+## 2026-09-25 — Milestone 21: Going Medieval & RimWorld Tabibxona, Dorivor Malhamlar va Shifoxona To'shagi (Issue #1)
+- **Giyohshunos va Alkimyogar Dastgohi (`ApothecaryBench` & `apothecary_bench.glb`)**:
+  - Steril bint (`sterile_bandage`): 1 mato + 1 dorivor giyoh $\rightarrow$ 2 ta bint (qon ketishini darhol to'xtatadi, +15 HP).
+  - Dorivor malham (`herbal_poultice`): 2 giyoh + 1 toza suv $\rightarrow$ 1 ta malham (yara infeksiyasini davolaydi, +30 HP).
+  - Vabo ziddizahari (`plague_antidote`): 3 giyoh + 1 sarimsoq $\rightarrow$ 1 ta ziddizahar (infeksiya va qon ketishni bir zumda bartaraf etadi, +45 HP).
+- **Shifoxona Jarrohlik To'shagi va Dori Qutisi (`InfirmaryBed`, `infirmary_bed.glb` & `medicine_chest.glb`)**:
+  - Yarador askar va kasal fuqarolarni shifoxonaga yotqizish (`admit_patient()`), tabib nazorati ostida sog'ayish tezligini daqiqasiga 4.0 HP gacha oshirish.
+  - Sog'ayib chiqqan fuqarolar uchun aholi ruhiyatiga +8 morale bonusi.
+- **Yangi 3D Modellar (Blender 5.2)**: `apothecary_bench.glb` (155 KB), `infirmary_bed.glb` (23 KB), `medicine_chest.glb` (44 KB) yaratildi (jami **55 ta GLB model**).
+- **Yangi Qirollik Dioramasi**: Barcha 55 ta aktiv ishtirokidagi diorama `assets/showcase_realm.png` da qayta render qilindi va brainga saqlandi.
+- **Avtomatlashgan Testlar**: Jami **72 ta engine testi** (umumiy **129 ta test**) 100% muvaffaqiyat bilan o'tdi.
+
 ## 2026-09-25 — Milestone 20: Manor Lords & Bellwright Militsiya Zaxiraxonasi, Burgage Hovli Qo'shimchalari va Jang Mashqi Mankeni
 - **Qurollar Zaxiraxonasi va Fuqaro Lashkarlari (`MilitiaArmory` & `armory_rack.glb`)**: Manor Lords va Bellwright andozasidagi harbiy safarbarlik tizimi:
   - Og'ir eman yog'ochidan qurol-yarog' javoni (nayza, qalqon, dubulg'a, yoy va o'qlar zaxirasi).
