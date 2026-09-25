@@ -285,4 +285,21 @@ Medieval davrning haqiqiy muhandisligi:
   - Tabib nazorati ostida sog'ayish tezligi daqiqasiga 4.0 HP gacha oshadi.
   - Bemor to'liq sog'ayib chiqqanda tibbiy g'amxo'rlik uchun aholi ruhiyatiga +8 morale qo'shiladi.
 
+---
+
+## 11. Medieval Dynasty & Valheim Integratsiyasi — Asalarichilik, Asal Sharobi va Mum Shamlar (Milestone 22)
+
+### 11.1. Somonli Asalari Uyasi va Ekinlarni Changlatish (Apiary Beehive) — [Medieval Dynasty / Valheim]
+- **Muammo**: Ekinlar faqat o'g'it bilan cheklanib qolgan va qishki yorug'lik hamda asal mahsulotlari manbai yo'q.
+- **Yechim (`ApiaryBeehive` & `beehive_skep.glb`)**:
+  - Har kuni passiv ravishda 3 ta **Asalari mumi katagi (`honeycomb`)** va 2 ta **Toza mum (`beeswax`)** beradi.
+  - **Changlatish aurasi (18m radius)**: Uya atrofidagi barcha ekinlarning o'sish tezligini avtomatik ravishda **+20% ga (1.20x)** oshiradi.
+
+### 11.2. Asal Sharobi Bochkasi va Mum Shamdonlar (Mead Fermenter & Candelabra) — [Valheim]
+- **Muammo**: Qahraton qishda fuqarolar sovuqdan aziyat chekadi, shaxtalar va qasr xonalarini tutunsiz yoritish vositasi kerak.
+- **Yechim (`MeadFermenter`, `mead_fermenter.glb` & `candle_candelabra.glb`)**:
+  - **Oltin Asal Sharobi (`honey_mead`)**: 2 ta honeycomb + 1 toza suv + 1 bug'doy $\rightarrow$ 2 ko'za asal sharobi (Aholiga +15 morale va qishki sovuqqa +25.0 issiqlik bardoshliligi beradi).
+  - **Mum Shamlar (`beeswax_candle`)**: 2 ta mum $\rightarrow$ 3 ta sham (`candle_candelabra.glb` orqali qasr va yer osti shaxtalarini yoritadi).
+
+
 

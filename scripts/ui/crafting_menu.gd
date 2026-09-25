@@ -348,6 +348,21 @@ const RECIPES: Dictionary = {
 			"name": "Apothecary Medicine Chest",
 			"inputs": {"planks": 3, "iron_ingots": 1},
 			"output": {"name": "Medicine Chest", "type": "placeable", "icon": "🧰", "count": 1}
+		},
+		{
+			"name": "Woven Straw Beehive Skep",
+			"inputs": {"logs": 3, "wheat": 4},
+			"output": {"name": "Beehive Skep", "type": "placeable", "icon": "🐝", "count": 1}
+		},
+		{
+			"name": "Mead Fermentation Barrel",
+			"inputs": {"planks": 6, "iron_ingots": 2},
+			"output": {"name": "Mead Fermenter", "type": "placeable", "icon": "🍺", "count": 1}
+		},
+		{
+			"name": "Wrought-Iron Beeswax Candelabra",
+			"inputs": {"iron_ingots": 2, "beeswax": 3},
+			"output": {"name": "Candle Candelabra", "type": "placeable", "icon": "🕯️", "count": 1}
 		}
 	],
 	"campfire": [

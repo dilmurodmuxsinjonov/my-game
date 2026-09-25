@@ -228,6 +228,15 @@ def build_diorama():
     # 50. Apothecary Medicine Chest with Bandages & Poultices
     import_asset("medicine_chest.glb", (-4.1, -0.9, 0.0), rot_z=-20, scale=0.92)
 
+    # 51. Medieval Dynasty Woven Straw Beehive Skep
+    import_asset("beehive_skep.glb", (-3.4, -3.6, 0.0), rot_z=25, scale=0.90)
+
+    # 52. Valheim Style Mead Fermentation Barrel
+    import_asset("mead_fermenter.glb", (-2.2, -3.8, 0.0), rot_z=-15, scale=0.90)
+
+    # 53. Wrought-Iron Beeswax Candelabra
+    import_asset("candle_candelabra.glb", (-0.4, -3.5, 0.0), rot_z=10, scale=0.92)
+
     # Render output path
     output_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "assets"))
     output_path = os.path.join(output_dir, "showcase_realm.png")
