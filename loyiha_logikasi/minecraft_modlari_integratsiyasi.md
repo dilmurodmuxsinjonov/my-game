@@ -354,6 +354,38 @@ Medieval davrning haqiqiy muhandisligi:
   - Harorat $5^\circ\text{C}$ dan pastga tushganda mollar o'tlay olmaydi va har bir hayvon kuniga 1 ta zaxira somon iste'mol qiladi.
   - Agar oxur bo'shab qolsa, ogohlantirish signali chalinadi va chorva ochlikdan nobud bo'la boshlaydi.
 
+---
+
+## 14. Ko'p Biomli Voksel Olam, Qaroqchilar Turlari va Relyef Harakati Fizikasi (Milestone 25)
+
+### 14.1. Relyef Balandligi, Daryo Vodiylari va 3D Simplex G'orlar (`BiomeManager`, `VoxelWorld`)
+- **Muammo**: Bir xil tekis voksel olam o'yin jarayonini zerikarli qiladi va qidiruv (exploration) qiziqishini so'ndiradi.
+- **Yechim (`BiomeManager` & `VoxelWorld`)**:
+  - Namlik (moisture) va harorat (temperature) ko'rsatkichlari bo'yicha 4 xil tabiiy biom:
+    - **Plains (Yashil tekislik)**: Qishloq xo'jaligi va bug'doyzorlar uchun unumdor tuproq ($Y \approx 10$).
+    - **Deep Forest (Qorong'i qalin o'rmon)**: Qurilish uchun eman va qarag'ay xodalariga boy hudud ($Y \approx 12$).
+    - **Highlands (Baland tog'lar va qoyalar)**: Tosh, granit va ruda qazib olish uchun tog'li qiyaliklar ($Y > 18$).
+    - **River Valley (Dengiz sathidan past daryo vodiysi)**: Suv tegirmonlari va baliqchilik uchun daryo ($Y < 6$), qirg'og'ida qum bloklari.
+  - **3D Simplex Cave Carving**: 3D shovqin funksiyasi orqali tog'lar ostida tabiiy chuqur g'orlar va yerosti yo'laklari o'yiladi (noise > 0.65 bo'shliq hosil qiladi).
+
+### 14.2. Qaroqchilar Jangovar Turlari va Istehkomlar (`BanditArchetype`, `BanditCamp`, `bandit_tent.glb`, `spiked_barricade.glb`, `loot_chest.glb`)
+- **Muammo**: Bir xil statsga ega dushmanlar taktik jangni oddiy chertish (hack-and-slash) ga aylantirib qo'yadi.
+- **Yechim**:
+  - **Qalqonchi (`Shieldbearer`)**: Katta temir qalqon bilan saf tortadi; frontal hujumlarning 75% ini bloklaydi, kamon o'qlarini esa 90% qaytaradi. Orqadan va yonboshdan zarba berish talab qilinadi.
+  - **O'qchi Mergan (`Raider Archer`)**: 15–25m masofadan ballistik o'q yog'diradi. O'yinchi yaqinlashganda (<6m) chekinish (kiting retreat) manevrini bajaradi.
+  - **Berserker (`Raider Berserker`)**: Qattiq po'lat boltalar bilan qurollangan; 6 metr masofadan sakrab hujum qiladi, +50% tezlik va 24 ball og'ir zirh teshar (armor-piercing) zarar beradi.
+  - **Qaroqchilar Qarorgohi (`bandit_tent.glb`)**: Bosqinchilar markaziy qarorgohi.
+  - **Tikanli Yog'och Barrikada (`spiked_barricade.glb`)**: Yugurib kelib urilgan hujumchilarga 20 ball aks-zarar beradi.
+  - **O'lja Sandig'i (`loot_chest.glb`)**: Qarorgoh tozalanganda ochiladigan sandiq: oltin tangalar, temir quymalar va oziq-ovqat zaxirasi.
+
+### 14.3. Relyefga Bog'liq Harakatlanish va To'dalanish (Boids) Ajralishi (`GridPathfinder3D`)
+- **Muammo**: Birliklar bitta nuqtada bir-birining ichiga kirib ketishi (unit stacking) va yo'llardan foydalanmasligi.
+- **Yechim (`GridPathfinder3D`)**:
+  - **Tosh To'shalgan Yo'llar (`paved road`)**: +20% tezlik bonusi (1.20x) berib, qishloq ichidagi logistikani tezlashtiradi.
+  - **Daryo va Suv Havzalari**: 50% suzish qarshiligi (0.50x sekinlashuv).
+  - **Flocking Boids Separation**: Yaqin turgan jangchilar o'rtasida 1.2m radiusda itaruvchi kuch vektori hisoblanib, birliklarning tabiiy saf tortishi ta'minlanadi.
+
+
 
 
 
