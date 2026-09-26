@@ -478,6 +478,36 @@ Medieval davrning haqiqiy muhandisligi:
   - **Ruhiyat va Qo'rquv Balansi**: Yorug'likda ruhiyat tiklanadi (+1.5/sek); qop-qorong'uda esa ruhiyat pasayadi (-2.0/sek). Ruhiyat 25% dan tushganda `Fear Debuff` (-30% jangovar aniqlik va qochish xavfi) faollashadi.
   - Topilgan barcha relikviyalar qasr xazinasiga olib kelinib, feodal boylik va texnologiyalarga almashtiriladi.
 
+---
+
+## 18. Manor Lords & Bellwright Integratsiyasi — Yo'l To'shash Tizimi, Ko'cha Chiroqlari va Logistika Ko'rsatkichlari (Milestone 29)
+
+### 18.1. Bosqichma-bosqich Yo'l To'shash va Harakatlanish Bonusi (`RoadNetwork` & `paved_road_tile.glb`) — [Manor Lords]
+- **Muammo**: Loy va tuproq yo'llarda fuqarolar, g'ildirakli aravalar va og'ir yog'och tashuvchi xo'kizlar sekin harakatlanadi; natijada ishlab chiqarish zanjirlarida xomashyo yetishmasligi yuzaga keladi.
+- **Yechim (`RoadNetwork` & `paved_road_tile.glb`)**:
+  - Modular tosh qoplama plitkasi (`paved_road_tile.glb`), chekkalarida drenaj ariqchalari va mustahkam bordyurlar.
+  - **Yo'l Bosqichlari (Tiers)**:
+    - **Dirt Path** (Tuproq so'qmoq): +10% tezlik (1.10x), yo'l qidirish narxi 0.90x.
+    - **Gravel Road** (Shaqaltosh yo'l): +25% tezlik (1.25x), yo'l qidirish narxi 0.75x.
+    - **Cobblestone Paved** (Tosh to'shalgan shohona yo'l): +50% tezlik (1.50x), yo'l qidirish narxi 0.50x (sun'iy intellekt piyodalarni avtomatik tosh yo'lga yo'naltiradi).
+  - **Og'ir Aravalar Yeyilishi (Wear & Tear)**: Xo'kiz va yuk aravalari o'tganda yo'l asta-sekin yeyiladi; tosh yo'llar 2.4 barobar chidamli bo'lib, tosh quyish orqali ta'mirlanadi.
+
+### 18.2. Shahar Ko'cha Chirog'i va Tungi Xavfsizlik Aurasi (`StreetLamp` & `street_lamp.glb`) — [Going Medieval / Bellwright]
+- **Muammo**: Tunda aholi punktlari qorong'ilikka cho'madi; fuqarolar qo'rquv tufayli ko'chaga chiqmaydi, qaroqchilar va o'g'rilar omborxonalarga bemalol suqilib kiradi.
+- **Yechim (`StreetLamp` & `street_lamp.glb`)**:
+  - O'yma tosh poydevor ustidagi naqshinkor bolg'alangan temir ustun va shisha fonus (`street_lamp.glb`).
+  - **Avtomatlashgan Tungi Sensor**: Shom tushganda (18:00) avtomatik yonadi va tongda (06:00) o'chadi.
+  - **Ozuqa Moyi / Yog' Sarfi**: 1 birlik hayvon yog'i (`tallow` — ovchilikdan olinadi) 3 kechalik to'liq yorug'likni ta'minlaydi.
+  - **Jinoyatchilikka Qarshi Qalqon**: 9.0 metr yorug'lik radiusi ichidagi har qanday o'g'ri va pistirmachi qaroqchini fosh qiladi va qochishga majbur qiladi.
+
+### 18.3. Chorraha Ko'rsatkichi va Tranzit Koridori Ustuvorligi (`LogisticsWaypoint` & `road_signpost.glb`)
+- **Muammo**: Katta feodal shaharlarda kuryerlar va xachirlar chalkash yo'llarda adashib, uzoq aylanma yo'llar orqali resurs tashiydi.
+- **Yechim (`LogisticsWaypoint` & `road_signpost.glb`)**:
+  - Chorrahalarga o'rnatiladigan o'yma yog'och yo'l ko'rsatkichi (`road_signpost.glb`) — "Market Square", "Castle Keep", "Iron Mine" yo'nalishlari.
+  - **Magistral Koridor Bonusi**: Ustuvor belgilangan yo'nalish bo'ylab o'tuvchi kuryer va yuk tashuvchilar yuk ko'tarish hajmiga +15% unumdorlik bonusi oladi.
+  - **Harbiy Yig'ilish Nuqtasi (Muster Point)**: Xavf paytida fuqaro lashkarlari aynan shu chorrahaga to'planish signali beriladi.
+
+
 
 
 
