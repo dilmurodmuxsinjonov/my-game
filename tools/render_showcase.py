@@ -282,6 +282,15 @@ def build_diorama():
     # 68. Oak Bulk Water Storage Cask on Trestle Stand
     import_asset("water_cask.glb", (0.2, 2.2, 0.0), rot_z=40, scale=0.90)
 
+    # 69. Ancient Subterranean Stone Crypt Mausoleum Entrance
+    import_asset("crypt_entrance.glb", (-5.6, 4.6, 0.0), rot_z=-25, scale=0.75)
+
+    # 70. Carved Limestone Knight Effigy Sarcophagus
+    import_asset("stone_sarcophagus.glb", (-4.2, 4.8, 0.0), rot_z=20, scale=0.85)
+
+    # 71. Medieval Forged Iron Wall Torch Sconce
+    import_asset("wall_sconce.glb", (-3.2, 4.5, 0.0), rot_z=-60, scale=0.95)
+
     # Render output path
     output_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "assets"))
     output_path = os.path.join(output_dir, "showcase_realm.png")
