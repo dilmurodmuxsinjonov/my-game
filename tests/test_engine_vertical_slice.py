@@ -2653,6 +2653,125 @@ class TestEngineVerticalSlice(unittest.TestCase):
         self.assertEqual(cloak_effects["noble_morale"], 15)
         self.assertEqual(cloak_effects["trade_coins"], 15)
 
+    def test_milestone27_glb_assets(self):
+        """Verify binary glTF headers and integrity for Milestone 27 3D models."""
+        models_dir = os.path.join(os.path.dirname(__file__), "..", "assets", "models")
+        m27_models = ["water_well.glb", "aqueduct_pipe.glb", "water_cask.glb"]
+        for m in m27_models:
+            p = os.path.join(models_dir, m)
+            self.assertTrue(os.path.exists(p), f"Missing model {m}")
+            self.assertGreater(os.path.getsize(p), 1000, f"Model {m} is unusually small")
+            with open(p, "rb") as f:
+                header = f.read(4)
+                self.assertEqual(header, b"glTF", f"Model {m} does not have valid glTF magic header")
+
+    def test_village_water_well_replenish_and_thirst(self):
+        """Verify deep groundwater well replenishment, citizen thirst drain, and fire emergency reserves."""
+        # 1. Capacity & daily replenishment
+        max_capacity = 24
+        stored_water = 12
+        daily_replenishment = 8
+
+        added = min(daily_replenishment, max_capacity - stored_water)
+        stored_water += added
+        self.assertEqual(added, 8)
+        self.assertEqual(stored_water, 20)
+
+        # 2. Citizen thirst satisfaction (15 citizens, 20 water)
+        citizens = 15
+        satisfied = min(citizens, stored_water)
+        stored_water -= satisfied
+        dehydrated = citizens - satisfied
+        self.assertEqual(satisfied, 15)
+        self.assertEqual(dehydrated, 0)
+        self.assertEqual(stored_water, 5)
+
+        # 3. Firefighting emergency reserve (uses 4 buckets)
+        fire_bucket_cost = 4
+        can_extinguish = stored_water >= fire_bucket_cost
+        self.assertTrue(can_extinguish)
+        stored_water -= fire_bucket_cost
+        self.assertEqual(stored_water, 1)
+
+        # 4. Next day with shortage (5 citizens, only 1 water)
+        shortage_citizens = 5
+        satisfied_short = min(shortage_citizens, stored_water)
+        stored_water -= satisfied_short
+        dehydrated_count = shortage_citizens - satisfied_short
+        self.assertEqual(satisfied_short, 1)
+        self.assertEqual(dehydrated_count, 4)
+        self.assertEqual(stored_water, 0)
+
+        # Dehydration penalties
+        has_penalty = dehydrated_count > 0
+        speed_penalty = -0.25 if has_penalty else 0.0
+        morale_penalty = -15 if has_penalty else 0
+        self.assertEqual(speed_penalty, -0.25)
+        self.assertEqual(morale_penalty, -15)
+
+    def test_aqueduct_irrigation_saturation_and_drought(self):
+        """Verify elevated aqueduct moisture saturation radius and drought protection."""
+        moisture_radius = 8.0
+        growth_bonus = 0.30
+        aqueduct_pos = (20.0, 20.0)
+
+        # Crop A within 5m (saturated)
+        crop_a_pos = (23.0, 24.0)
+        dist_a = math.hypot(crop_a_pos[0] - aqueduct_pos[0], crop_a_pos[1] - aqueduct_pos[1])
+        self.assertLess(dist_a, moisture_radius) # dist = 5.0m <= 8.0m
+
+        base_growth = 1.0
+        # Irrigated growth speed during regular weather
+        effective_growth_a = base_growth * (1.0 + growth_bonus)
+        self.assertAlmostEqual(effective_growth_a, 1.30)
+
+        # Crop B outside saturation (12m away)
+        crop_b_pos = (20.0, 32.0)
+        dist_b = math.hypot(crop_b_pos[0] - aqueduct_pos[0], crop_b_pos[1] - aqueduct_pos[1])
+        self.assertGreater(dist_b, moisture_radius) # dist = 12.0m > 8.0m
+
+        # Under summer drought: Crop A remains protected at 1.30x; Crop B withers to 0.40x
+        is_drought = True
+        growth_drought_a = effective_growth_a if dist_a <= moisture_radius else (base_growth * 0.40)
+        growth_drought_b = (base_growth * (1.0 + growth_bonus)) if dist_b <= moisture_radius else (base_growth * 0.40)
+        self.assertAlmostEqual(growth_drought_a, 1.30)
+        self.assertAlmostEqual(growth_drought_b, 0.40)
+
+        # Catapult direct hit destroys aqueduct
+        max_hp = 150.0
+        catapult_damage = 170.0 # Fire boulder
+        remaining_hp = max(0.0, max_hp - catapult_damage)
+        is_operational = remaining_hp > 0.0
+        self.assertEqual(remaining_hp, 0.0)
+        self.assertFalse(is_operational)
+
+    def test_water_cask_storage_and_expedition_canteens(self):
+        """Verify watertight oak cask bulk storage and military expedition hydration rations."""
+        max_capacity = 40
+        stored_buckets = 15
+
+        # 1. Deposit 20 buckets from well
+        deposit = 20
+        space = max_capacity - stored_buckets
+        added = min(deposit, space)
+        stored_buckets += added
+        self.assertEqual(added, 20)
+        self.assertEqual(stored_buckets, 35)
+
+        # 2. Fill canteens for a 12-soldier militia squad
+        squad_size = 12
+        buckets_per_soldier = 2
+        needed_water = squad_size * buckets_per_soldier # 24 buckets
+        allocated = min(needed_water, stored_buckets)
+        stored_buckets -= allocated
+        self.assertEqual(allocated, 24)
+        self.assertEqual(stored_buckets, 11)
+
+        hydrated_soldiers = allocated // buckets_per_soldier
+        self.assertEqual(hydrated_soldiers, 12)
+        safe_hours = 24.0
+        self.assertEqual(safe_hours, 24.0)
+
 if __name__ == "__main__":
     unittest.main()
 

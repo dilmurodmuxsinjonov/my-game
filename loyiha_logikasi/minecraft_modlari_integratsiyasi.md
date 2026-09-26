@@ -421,6 +421,33 @@ Medieval davrning haqiqiy muhandisligi:
     - 3 ta ishlov berilgan mo'yna + 1 ta jun kiyim $\rightarrow$ 1 ta mo'ynali chopon.
     - **Effektlari**: +50.0 sovuqqa bardoshlilik (har qanday qor bo'roniga 100% immunitet), zodagonlar ruhiyatiga +15 baxtiyorlik va savdogar karvonlariga 15 oltin tanga qiymatida sotish salohiyati!
 
+---
+
+## 16. Medieval Dynasty & Going Medieval Integratsiyasi — Qishloq Suv Qudug'i, Akveduk Sug'orish va O't O'chirish Logistikasi (Milestone 27)
+
+### 16.1. Tosh Quduq va Aholi Chanqog'i Mexanikasi (`WaterWell` & `water_well.glb`) — [Medieval Dynasty / RimWorld]
+- **Muammo**: Shaharcha o'sib borishi bilan aholi ichimlik suvisiz qolib, chanqoqlik va gipohidratsiya tufayli ish unumdorligi pasayadi; shuningdek yog'och binolar yong'inga qarshi himoyasiz qoladi.
+- **Yechim (`WaterWell` & `water_well.glb`)**:
+  - Daryo toshlaridan terilgan, yog'och shingilli soyabon va chig'irli quduq (`water_well.glb`).
+  - Yerosti suv qatlamidan har kuni avtomatik 8 chelak toza ichimlik suvi (`potable_water`) to'ldiradi (maksimal sig'im 24 chelak).
+  - Har bir fuqaro kuniga 1 chelak suv iste'mol qiladi. Suv yetishmasa `Dehydrated` holati beriladi: -25% mehnat tezligi va -15 ruhiyat (morale) jarimasi.
+  - **Yong'in O'chirish Zaxirasi**: Bino olov olganda quduqdan 4 chelak suv olinib, yong'in o'chiriladi.
+
+### 16.2. Rim Me'morchiligi Akveduk Sug'orish Tizimi (`AqueductIrrigation` & `aqueduct_pipe.glb`) — [Going Medieval]
+- **Muammo**: Daryodan uzoqda joylashgan unumdor dasht ekinzorlari yozgi qurg'oqchilikda (drought) 60% hosil yo'qotadi va quriydi.
+- **Yechim (`AqueductIrrigation` & `aqueduct_pipe.glb`)**:
+  - Tosh ustunli arka va yuqori suv o'zani bo'ylab oqadigan akveduk kanali (`aqueduct_pipe.glb`).
+  - Daryo vodiysidan suv olib, har bir segment atrofida 8 metrlik to'liq namlik aurasini ta'minlaydi.
+  - **Hosil Bonusi**: Sug'orilgan ekinlar +30% (1.30x) tezroq o'sadi va yozgi qurg'oqchilik qovjirashidan 100% himoyalanadi.
+  - Mustahkamlik: 150 HP (yong'inga mutlaqo chidamli, qamal toshlari zarbasidan sinishi mumkin).
+
+### 16.3. Zaxira Suv Bochkasi va Harbiy Suv Idishlari (`WaterCask` & `water_cask.glb`)
+- **Muammo**: Uzoq masofali harbiy yurishlar va og'ir yog'och tashuvchi xo'kiz karvonlari qishloq qudug'idan uzoqlashganda chanqab zaiflashadi.
+- **Yechim (`WaterCask` & `water_cask.glb`)**:
+  - Maxsus yog'och taglikdagi, jez jo'mrakli 40 chelak sig'imli eman bochka (`water_cask.glb`).
+  - Askar va kuryerlar uchun charm suv idishlari (`hydration_canteen`): Har bir jangchiga 2 chelak zaxira berilib, 24 soatlik to'liq chanqoq immuniteti bilan ta'minlanadi.
+
+
 
 
 
