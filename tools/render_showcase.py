@@ -309,6 +309,15 @@ def build_diorama():
     # 77. Vaulted Brick Dome Baker's Bread Oven
     import_asset("baker_oven.glb", (-1.6, -1.8, 0.0), rot_z=35, scale=0.88)
 
+    # 78. Forged Brass Rooster Weather Vane
+    import_asset("weather_vane.glb", (3.6, 0.5, 0.0), rot_z=45, scale=0.92)
+
+    # 79. Wall-Mounted Mercury Barometer & Torricelli Station
+    import_asset("barometer_station.glb", (-0.9, -2.2, 0.0), rot_z=-15, scale=0.88)
+
+    # 80. Gothic Structural Flying Buttress & Load-Bearing Masonry Pier
+    import_asset("masonry_buttress.glb", (5.2, -0.6, 0.0), rot_z=-60, scale=0.85)
+
     # Render output path
     output_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "assets"))
     output_path = os.path.join(output_dir, "showcase_realm.png")
