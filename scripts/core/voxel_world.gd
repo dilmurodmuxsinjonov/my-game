@@ -2,6 +2,7 @@ class_name VoxelWorld
 extends Node3D
 
 const GeologyManager = preload("res://scripts/world/geology_manager.gd")
+const BiomeManager = preload("res://scripts/world/biome_manager.gd")
 
 ## Manages 3D voxel terrain generation using FastNoiseLite, chunk streaming,
 ## world-space block modifications (mining/placing), and multi-chunk boundary meshing.
@@ -20,6 +21,7 @@ var noise: FastNoiseLite
 var tree_noise: FastNoiseLite
 var ore_noise: FastNoiseLite
 var geology_manager: GeologyManager = GeologyManager.new()
+var biome_manager: BiomeManager = null
 
 func _ready() -> void:
 	_init_noise()
@@ -41,6 +43,8 @@ func _init_noise() -> void:
 	ore_noise = FastNoiseLite.new()
 	ore_noise.seed = terrain_seed + 202
 	ore_noise.frequency = 0.08
+
+	biome_manager = BiomeManager.new(terrain_seed)
 
 func generate_world() -> void:
 	# Step 1: Instantiate chunks and populate block arrays
@@ -69,17 +73,27 @@ func _generate_chunk_terrain(chunk: VoxelChunk, cpos: Vector2i) -> void:
 			var wx = start_x + lx
 			var wz = start_z + lz
 			
-			var n = noise.get_noise_2d(float(wx), float(wz))
-			var surface_y = clampi(int(base_height + n * height_scale), 2, VoxelChunk.CHUNK_SIZE_Y - 8)
+			var biome = biome_manager.get_biome(wx, wz) if biome_manager else BiomeManager.BiomeType.PLAINS
+			var surface_y = biome_manager.calculate_surface_height(wx, wz, base_height) if biome_manager else clampi(int(base_height + noise.get_noise_2d(float(wx), float(wz)) * height_scale), 2, VoxelChunk.CHUNK_SIZE_Y - 8)
+			var surface_block = biome_manager.get_surface_block(biome, surface_y) if biome_manager else VoxelChunk.BlockType.GRASS
 			
 			for ly in range(VoxelChunk.CHUNK_SIZE_Y):
 				if ly > surface_y:
-					chunk.set_block(lx, ly, lz, VoxelChunk.BlockType.AIR)
+					# Water bodies & rivers at sea level
+					if ly <= BiomeManager.SEA_LEVEL:
+						chunk.set_block(lx, ly, lz, VoxelChunk.BlockType.WATER)
+					else:
+						chunk.set_block(lx, ly, lz, VoxelChunk.BlockType.AIR)
 				elif ly == surface_y:
-					chunk.set_block(lx, ly, lz, VoxelChunk.BlockType.GRASS)
+					chunk.set_block(lx, ly, lz, surface_block)
 				elif ly >= surface_y - 2:
 					chunk.set_block(lx, ly, lz, VoxelChunk.BlockType.DIRT)
 				else:
+					# 3D Subterranean Cave Carving
+					if biome_manager and biome_manager.is_cave_air(wx, ly, wz, surface_y):
+						chunk.set_block(lx, ly, lz, VoxelChunk.BlockType.AIR)
+						continue
+						
 					# Underground geological strata & mineral deposits
 					var ore_sample = ore_noise.get_noise_3d(float(wx), float(ly), float(wz))
 					if ly < 5 and ore_sample > 0.48:
@@ -133,7 +147,7 @@ func get_surface_height(world_x: int, world_z: int) -> int:
 	var max_y = VoxelChunk.CHUNK_SIZE_Y - 1
 	for y in range(max_y, -1, -1):
 		var b = get_block_world(Vector3i(world_x, y, world_z))
-		if b != VoxelChunk.BlockType.AIR and b != VoxelChunk.BlockType.LEAVES:
+		if b != VoxelChunk.BlockType.AIR and b != VoxelChunk.BlockType.LEAVES and b != VoxelChunk.BlockType.WATER:
 			return y
 	return 0
 

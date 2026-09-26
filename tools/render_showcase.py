@@ -255,6 +255,15 @@ def build_diorama():
     # 59. Livestock Feeding Trough & Winter Silage Manger
     import_asset("feeding_trough.glb", (-3.6, 2.8, 0.0), rot_z=10, scale=0.88)
 
+    # 60. Bandit Raider Command Tent (Outpost Encampment)
+    import_asset("bandit_tent.glb", (5.2, -3.8, 0.0), rot_z=-65, scale=0.85)
+
+    # 61. Spiked Timber Barricade Defensive Obstacle
+    import_asset("spiked_barricade.glb", (3.4, -3.8, 0.0), rot_z=20, scale=0.90)
+
+    # 62. Raider Plunder Iron-Banded Loot Chest
+    import_asset("loot_chest.glb", (4.5, -4.6, 0.0), rot_z=-35, scale=0.92)
+
     # Render output path
     output_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "assets"))
     output_path = os.path.join(output_dir, "showcase_realm.png")

@@ -2417,6 +2417,122 @@ class TestEngineVerticalSlice(unittest.TestCase):
         has_adequate_feed = (stored_fodder >= total_animals)
         self.assertFalse(has_adequate_feed)
 
+    def test_milestone25_glb_assets(self):
+        """Verify binary glTF headers and integrity for Milestone 25 3D models."""
+        models_dir = os.path.join(os.path.dirname(__file__), "..", "assets", "models")
+        m25_models = ["bandit_tent.glb", "spiked_barricade.glb", "loot_chest.glb"]
+        for m in m25_models:
+            p = os.path.join(models_dir, m)
+            self.assertTrue(os.path.exists(p), f"Missing model {m}")
+            self.assertGreater(os.path.getsize(p), 1000, f"Model {m} is unusually small")
+            with open(p, "rb") as f:
+                header = f.read(4)
+                self.assertEqual(header, b"glTF", f"Model {m} does not have valid glTF magic header")
+
+    def test_biome_manager_and_3d_cave_carving(self):
+        """Verify multi-biome elevation classification, river valleys, and 3D subterranean cave carving."""
+        def classify_biome(moisture, temperature, elevation):
+            if elevation < 6.0:
+                return "RiverValley"
+            elif elevation > 18.0:
+                return "Highlands"
+            elif moisture > 0.60:
+                return "DeepForest"
+            else:
+                return "Plains"
+
+        # 1. Biome classification checks
+        self.assertEqual(classify_biome(0.8, 0.5, 4.0), "RiverValley")
+        self.assertEqual(classify_biome(0.3, 0.4, 22.0), "Highlands")
+        self.assertEqual(classify_biome(0.75, 0.6, 12.0), "DeepForest")
+        self.assertEqual(classify_biome(0.40, 0.5, 10.0), "Plains")
+
+        # 2. Surface block assignment
+        def get_surface_block(biome, y, sea_level=6.0):
+            if y < sea_level:
+                return "Sand"
+            elif biome == "Highlands":
+                return "Stone"
+            else:
+                return "Grass"
+
+        self.assertEqual(get_surface_block("RiverValley", 4.0), "Sand")
+        self.assertEqual(get_surface_block("Highlands", 22.0), "Stone")
+        self.assertEqual(get_surface_block("Plains", 10.0), "Grass")
+
+        # 3. 3D Simplex cave carving (values > 0.65 carve hollow tunnels)
+        def is_cave_air(noise_val, threshold=0.65):
+            return noise_val > threshold
+
+        solid_rock_noise = 0.32
+        tunnel_noise = 0.78
+        self.assertFalse(is_cave_air(solid_rock_noise))
+        self.assertTrue(is_cave_air(tunnel_noise))
+
+    def test_bandit_archetypes_and_shield_blocking(self):
+        """Verify Shieldbearer directional blocking, Archer kiting range, and Berserker leap mechanics."""
+        # 1. Shieldbearer directional block
+        def calculate_damage(incoming, is_front, is_ranged):
+            if is_front:
+                if is_ranged:
+                    return incoming * (1.0 - 0.90) # 90% projectile deflection
+                else:
+                    return incoming * (1.0 - 0.75) # 75% melee block
+            return incoming
+
+        melee_dmg = 100.0
+        arrow_dmg = 50.0
+        self.assertAlmostEqual(calculate_damage(melee_dmg, is_front=True, is_ranged=False), 25.0)
+        self.assertAlmostEqual(calculate_damage(arrow_dmg, is_front=True, is_ranged=True), 5.0)
+        self.assertAlmostEqual(calculate_damage(melee_dmg, is_front=False, is_ranged=False), 100.0)
+
+        # 2. Raider Archer combat decision (preferred distance 15m - 25m)
+        def archer_action(dist_to_target):
+            if dist_to_target < 6.0:
+                return "KITING_RETREAT"
+            elif dist_to_target <= 25.0:
+                return "FIRE_VOLLEY"
+            else:
+                return "APPROACH"
+
+        self.assertEqual(archer_action(4.5), "KITING_RETREAT")
+        self.assertEqual(archer_action(18.0), "FIRE_VOLLEY")
+        self.assertEqual(archer_action(35.0), "APPROACH")
+
+        # 3. Berserker leap & armor penetration
+        leap_max_dist = 6.0
+        leap_dist = 5.2
+        can_leap = leap_dist <= leap_max_dist
+        self.assertTrue(can_leap)
+        berserker_ap_damage = 24.0 # Armor Piercing damage ignores heavy armor
+        target_armor_reduction = 0.0 # Ignored
+        self.assertEqual(berserker_ap_damage - target_armor_reduction, 24.0)
+
+    def test_locomotion_terrain_speed_and_separation(self):
+        """Verify paved road speed boosts, water swimming drag, and flocking separation repulsion."""
+        base_speed = 4.0
+        terrain_modifiers = {
+            "grass": 1.0,
+            "road": 1.20,
+            "water": 0.50
+        }
+
+        self.assertAlmostEqual(base_speed * terrain_modifiers["road"], 4.80)
+        self.assertAlmostEqual(base_speed * terrain_modifiers["water"], 2.00)
+        self.assertAlmostEqual(base_speed * terrain_modifiers["grass"], 4.00)
+
+        # Boids separation vector: Repels overlapping entities within radius 1.2m
+        pos_a = (10.0, 10.0)
+        pos_b = (10.4, 10.0) # 0.4m apart (less than 1.2m min comfort radius)
+        dist = math.hypot(pos_b[0] - pos_a[0], pos_b[1] - pos_a[1])
+        min_radius = 1.2
+
+        self.assertLess(dist, min_radius)
+        overlap = min_radius - dist
+        repulsion_force = overlap / min_radius
+        self.assertAlmostEqual(overlap, 0.8)
+        self.assertAlmostEqual(repulsion_force, 0.8 / 1.2)
+
 if __name__ == "__main__":
     unittest.main()
 

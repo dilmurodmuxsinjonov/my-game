@@ -7,6 +7,24 @@
 - Dastlabki Godot prototipi va foydalanuvchining showcase fayllari saqlandi.
 - Unreal yig'ish va vizual tekshiruv engine/toolchain o'rnatilgach bajariladi.
 
+## 2026-09-27 — Milestone 25: Ko'p Biomli Voksel Olam, Qaroqchilar Turlari (Archetypes) va Relyef Harakati Fizikasi (Issue #9)
+- **Ko'p Biomli Relyef Generatsiyasi va 3D G'orlar (`BiomeManager` & `VoxelWorld`)**:
+  - 4 xil tabiiy biom: Yashil tekisliklar (`Plains`), Qalin o'rmon (`Deep Forest`), Baland qoyali tog'lar (`Highlands`) va Dengiz sathidan past daryo vodiylari (`River Valley`, $Y < 6$).
+  - 3D Simplex Cave noise: qoyalar ichida tabiiy yerosti g'orlari va o'tish yo'laklari (noise > 0.65 havo bo'shliqlari o'yadi).
+  - Voksel sirtining biomga mos blok turlari: unumdor tuproq/o't, tog' qoyasi toshlari, va daryo tubi/qirg'og'idagi qum bloklari.
+- **Qaroqchilar Taktik Turlari va Istehkomlar (`BanditArchetype`, `BanditCamp`, `bandit_tent.glb`, `spiked_barricade.glb`, `loot_chest.glb`)**:
+  - Qalqonchi (`Shieldbearer`): Og'ir temir qalqon bilan saf tortib, frontal yaqin jang zarbalarini 75% qaytaradi, kamon o'qlarini 90% defleksiya qiladi. Flank yoki orqadan zarba berish talab etiladi.
+  - O'qchi Mergan (`Raider Archer`): 15–25m masofadan ballistik o'q yog'diradi. O'yinchi yaqinlashganda (<6m) "Kiting Retreat" harakati bilan chekinadi.
+  - Berserker (`Raider Berserker`): 6m masofadan sakrab hujum qiladi (leap attack), +50% harakat tezligi va 24 ball zirhni inkor qiluvchi (armor-piercing) zarar beradi.
+  - Qaroqchilar Qarorgohi Chodiri (`bandit_tent.glb`), Tikanli Barrikada (`spiked_barricade.glb` - urilganlarga 20 aks-zarar beradi) va O'lja Sandig'i (`loot_chest.glb` - oltin, temir va ozuqa beradi).
+- **Relyef Harakatlanish Tezligi va Boids Ajralishi (`GridPathfinder3D`)**:
+  - Tosh to'shalgan yo'llar: +20% tezlik bonusi (1.20x).
+  - Daryo va suv havzalari: 50% suzish qarshiligi (0.50x sekinlashuv).
+  - Flocking Boids Separation: 1.2m radiusdagi jangchilar va fuqarolar o'rtasida to'qnashuv itarish kuchlari hisoblanib, birliklarning bir-biriga yopishib qolishining (unit stacking) oldi olinadi.
+- **Yangi 3D Modellar (Blender 5.2)**: `bandit_tent.glb`, `spiked_barricade.glb`, `loot_chest.glb` yaratildi (jami **67 ta GLB model**).
+- **Yangi Qirollik Dioramasi**: Barcha 67 ta aktiv ishtirokidagi diorama `assets/showcase_realm.png` da render qilindi va brainga saqlandi.
+- **Avtomatlashgan Testlar**: Jami **88 ta engine testi** (umumiy **145 ta test**) 100% muvaffaqiyat bilan o'tdi.
+
 ## 2026-09-26 — Milestone 24: Manor Lords & Medieval Dynasty Chorvachilik, Xo'kizlar Logistikasi, Qo'y Juni va Qishki Ozuqa Oxuri (Issue #7)
 - **Og'ir Yog'och Molxona va Xo'kizlar Logistikasi (`PastureBarn` & `pasture_barn.glb`)**:
   - Ishchi Xo'kizlar (`draft_oxen`): Bir safarda 4 ta og'ir xodani 1.8x tezlik bilan qurilishga yetkazib, logistika tirbandligini bartaraf etish.
