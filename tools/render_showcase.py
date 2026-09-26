@@ -300,6 +300,15 @@ def build_diorama():
     # 74. Carved Timber Crossroads Logistics Signpost
     import_asset("road_signpost.glb", (0.8, -0.5, 0.0), rot_z=25, scale=0.92)
 
+    # 75. Medieval Stone Windmill & Sail Blades
+    import_asset("stone_windmill.glb", (4.5, -0.2, 0.0), rot_z=-65, scale=0.72)
+
+    # 76. Elevated Moisture-Sealed Flour Silo
+    import_asset("flour_silo.glb", (3.4, -1.2, 0.0), rot_z=20, scale=0.82)
+
+    # 77. Vaulted Brick Dome Baker's Bread Oven
+    import_asset("baker_oven.glb", (-1.6, -1.8, 0.0), rot_z=35, scale=0.88)
+
     # Render output path
     output_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "assets"))
     output_path = os.path.join(output_dir, "showcase_realm.png")

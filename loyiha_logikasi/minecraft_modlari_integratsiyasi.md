@@ -507,6 +507,36 @@ Medieval davrning haqiqiy muhandisligi:
   - **Magistral Koridor Bonusi**: Ustuvor belgilangan yo'nalish bo'ylab o'tuvchi kuryer va yuk tashuvchilar yuk ko'tarish hajmiga +15% unumdorlik bonusi oladi.
   - **Harbiy Yig'ilish Nuqtasi (Muster Point)**: Xavf paytida fuqaro lashkarlari aynan shu chorrahaga to'planish signali beriladi.
 
+---
+
+## 19. Medieval Dynasty & Farmer's Delight Integratsiyasi — Tosh Shamol Tegirmoni, Un Silosi va Nonvoyxona (Milestone 30)
+
+### 19.1. Kinetik Shamol Tegirmoni (`StoneWindmill` & `stone_windmill.glb`) — [Medieval Dynasty / Create]
+- **Muammo**: Daryo oqimidan uzoqdagi tepalik qishloqlarida suv g'ildiragi qurib bo'lmaydi va bug'doyni qo'lda yanchish behuda ishchi kuchini sarflaydi.
+- **Yechim (`StoneWindmill` & `stone_windmill.glb`)**:
+  - Konussimon tosh minorali, yog'och shingilli aylanuvchi tomi va 4 ta tuval parrakli shamol tegirmoni (`stone_windmill.glb`).
+  - **Atmosfera Shamol Kuchini Hisoblash**: Balandlik ($Y > 10$) va bo'ronli ob-havoga qarab shamol tezligi 0.5x dan 1.8x gacha o'zgaradi.
+  - **Kinetik Quvvat Ishlab Chiqarish**: Bazaviy 384 Stress Units (SU) quvvat beradi.
+  - **200% Un Hosildorligi**: 1 bug'doy $\rightarrow$ 2 qop toza un (`wheat_flour`), qo'l tegirmoniga nisbatan 3 barobar tezroq yanchiladi.
+
+### 19.2. Ko'tarilgan Namlikdan Himoyalangan Un Donxonasi (`FlourSilo` & `flour_silo.glb`)
+- **Muammo**: Yanchilgan un qoplari oddiy yerto'la yoki omborxona polida zax tortib, mog'orlaydi va hasharotlar (weevil) tushishi oqibatida 40-50% yo'qotiladi.
+- **Yechim (`FlourSilo` & `flour_silo.glb`)**:
+  - Yer sathidan 1 metr ko'tarilgan 4 ta mustahkam tirgakli, temir chambarakli yog'och bochka va shifer tomli donxona (`flour_silo.glb`).
+  - **Sig'im**: 120 qop un.
+  - **Mog'or va Chirishga Qarshi Himoya**: Germetik qopqoq tufayli tabiiy namlik ta'siridagi chirishni 85% ga kamaytiradi.
+  - **Gravitatsion Pastki Jo'mrak**: Aravalar va nonvoylar unni to'g'ridan-to'g'ri tagidagi voronka orqali bir lahzada to'ldirib oladi.
+
+### 19.3. Gumbazli Qizil G'ishtli Nonvoyxona Pechi va Shohona Nonlar (`BakerOven` & `baker_oven.glb`) — [Farmer's Delight / Manor Lords]
+- **Muammo**: Xom ekinlar yoki oddiy bo'tqalar aholi ochligini to'liq qondirolmaydi, charchoqni ketkazmaydi va qirollik ma'naviyatiga bonus bermaydi.
+- **Yechim (`BakerOven` & `baker_oven.glb`)**:
+  - Tosh poydevorli, gumbazsimon qizil g'ishtli non pechi, qizigan cho'g'li o'choq va nonvoy kuragi (`baker_oven.glb`).
+  - **Termal Akkumulyatsiya (220°C)**: O'tin bilan qizdiriladi; harorat 180°C dan oshganda non pishirish boshlanadi.
+  - **Non Pishirish Retseptlari**:
+    - **Qora Javdar Noni (`rye_bread`)**: 2 un + 1 suv $\rightarrow$ 3 ta to'yimli non (+45 to'qlik, +10 mehnat energiyasi).
+    - **Shohona Shirin Briyosh (`royal_brioche`)**: 2 un + 1 sut + 1 asal $\rightarrow$ 3 ta elita non (+70 to'qlik, +15 qirollik ruhiyati).
+
+
 
 
 
