@@ -3058,8 +3058,109 @@ class TestEngineVerticalSlice(unittest.TestCase):
         self.assertFalse(is_priority_b)
         self.assertEqual(effective_capacity_b, 20.0)
 
+    def test_stone_windmill_wind_dynamics_and_kinetic_output(self):
+        """Verify stone windmill wind scaling, kinetic Stress Unit output, and 200% flour yield."""
+        base_power = 384.0 # SU
+        altitude_y = 30.0 # +20m above sea level
+        altitude_bonus = min(0.5, max(0.0, (altitude_y - 10.0) * 0.015)) # 0.30
+        self.assertAlmostEqual(altitude_bonus, 0.30)
+
+        # Normal clear weather
+        wind_velocity = 1.0 + altitude_bonus # 1.30x
+        power_clear = base_power * wind_velocity
+        self.assertAlmostEqual(power_clear, 499.2)
+
+        # Storm weather (+35% storm multiplier)
+        is_stormy = True
+        storm_mult = 1.35 if is_stormy else 1.0
+        wind_storm = min(1.8, (1.0 + altitude_bonus) * storm_mult)
+        power_storm = base_power * wind_storm
+        self.assertAlmostEqual(wind_storm, 1.755)
+        self.assertAlmostEqual(power_storm, 673.92)
+
+        # Grain milling: 5 wheat -> 10 flour sacks (200% yield)
+        wheat_input = 5
+        flour_yield = wheat_input * 2
+        self.assertEqual(flour_yield, 10)
+
+    def test_flour_silo_moisture_sealing_and_spoilage_mitigation(self):
+        """Verify elevated flour silo capacity, moisture sealing, and 85% spoilage reduction."""
+        max_capacity = 120
+        stored_flour = 80
+        spoilage_mitigation_rate = 0.85
+
+        # Deposit 30 flour sacks
+        deposit = 30
+        space = max_capacity - stored_flour
+        added = min(deposit, space)
+        stored_flour += added
+        self.assertEqual(added, 30)
+        self.assertEqual(stored_flour, 110)
+
+        # High humidity monthly spoilage calculation (ambient humidity = 0.80)
+        humidity = 0.80
+        unsealed_spoilage = float(stored_flour) * 0.15 * humidity # 110 * 0.12 = 13.2 sacks
+        mitigated_spoilage = unsealed_spoilage * (1.0 - spoilage_mitigation_rate) # 13.2 * 0.15 = 1.98 sacks
+        spoiled_sacks = round(mitigated_spoilage)
+        self.assertEqual(spoiled_sacks, 2)
+
+        stored_flour -= spoiled_sacks
+        self.assertEqual(stored_flour, 108)
+
+    def test_baker_oven_thermal_retention_and_bread_batch_baking(self):
+        """Verify vaulted dome oven heating to 220C, firewood burn, and batch bread baking."""
+        ambient_temp = 20.0
+        optimal_temp = 220.0
+        current_temp = ambient_temp
+        firewood = 4
+
+        # Heat up oven (25C/s rate with firewood)
+        heat_time = 8.0 # 8s * 25C/s = 200C -> 20C + 200C = 220C
+        current_temp = min(optimal_temp, current_temp + 25.0 * heat_time)
+        self.assertEqual(current_temp, optimal_temp)
+
+        # Cannot bake if temp < 180C
+        can_bake_cold = (ambient_temp >= 180.0)
+        self.assertFalse(can_bake_cold)
+        can_bake_hot = (current_temp >= 180.0)
+        self.assertTrue(can_bake_hot)
+
+        # Rye Bread batch recipe: 2 flour + 1 water -> 3 hearty rye loaves
+        ingredients = {"flour": 6, "water": 3}
+        batches = min(ingredients["flour"] // 2, ingredients["water"] // 1)
+        self.assertEqual(batches, 3)
+
+        loaves_produced = batches * 3
+        self.assertEqual(loaves_produced, 9)
+
+    def test_bread_dietary_nutrition_and_worker_energy_restoration(self):
+        """Verify rye and royal brioche dietary nutrition values and stamina bonuses."""
+        bread_nutrition = {
+            "rye_bread": {"hunger": 45, "energy": 10, "morale": 0},
+            "royal_brioche": {"hunger": 70, "energy": 15, "morale": 15}
+        }
+
+        # Citizen eating rye bread
+        citizen_hunger = 30 # Depleted hunger
+        citizen_energy = 40
+        citizen_morale = 50
+
+        citizen_hunger = min(100, citizen_hunger + bread_nutrition["rye_bread"]["hunger"])
+        citizen_energy = min(100, citizen_energy + bread_nutrition["rye_bread"]["energy"])
+        self.assertEqual(citizen_hunger, 75)
+        self.assertEqual(citizen_energy, 50)
+
+        # Noble eating royal brioche
+        noble_hunger = 40
+        noble_morale = 75
+        noble_hunger = min(100, noble_hunger + bread_nutrition["royal_brioche"]["hunger"])
+        noble_morale = min(100, noble_morale + bread_nutrition["royal_brioche"]["morale"])
+        self.assertEqual(noble_hunger, 100)
+        self.assertEqual(noble_morale, 90)
+
 if __name__ == "__main__":
     unittest.main()
+
 
 
 

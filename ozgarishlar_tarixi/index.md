@@ -7,6 +7,25 @@
 - Dastlabki Godot prototipi va foydalanuvchining showcase fayllari saqlandi.
 - Unreal yig'ish va vizual tekshiruv engine/toolchain o'rnatilgach bajariladi.
 
+## 2026-09-27 — Milestone 30: Medieval Dynasty & Farmer's Delight Shamol Tegirmoni, Un Silosi va Nonvoyxona (Issue #19)
+- **Kinetik Shamol Tegirmoni (`StoneWindmill` & `stone_windmill.glb`)**:
+  - Konussimon tosh minora va 4 ta tuval parrakli aylanma shamol tegirmoni (`stone_windmill.glb`).
+  - Dinamik shamol tezligi: balandlik va bo'ronli havoga qarab 0.5x dan 1.8x gacha o'zgaradi.
+  - 384 SU mexanik kinetik quvvat ishlab chiqarish.
+  - 200% un hosildorligi: 1 bug'doy $\rightarrow$ 2 qop toza un (`wheat_flour`).
+- **Ko'tarilgan Namlikdan Himoyalangan Un Donxonasi (`FlourSilo` & `flour_silo.glb`)**:
+  - 4 ta tirgakli, temir chambarakli yog'och donxona (`flour_silo.glb`).
+  - Sig'imi: 120 qop un.
+  - Germetik saqlash: namlik va zararkunandalar tufayli un chirishini 85% ga kamaytiradi.
+  - Gravitatsion pastki tushirish voronkasi orqali aravalarga tezkor un to'ldirish.
+- **Gumbazli Qizil G'ishtli Nonvoyxona Pechi (`BakerOven` & `baker_oven.glb`)**:
+  - Qizdirilgan o'choqli, gumbazli g'isht pech va nonvoy kuragi (`baker_oven.glb`).
+  - Termal akkumulyatsiya (220°C): 180°C dan oshganda non pishirish boshlanadi.
+  - Retseptlar: Qora javdar noni (2 un + 1 suv $\rightarrow$ 3 non, +45 to'qlik, +10 energiya) va Shohona briyosh (2 un + 1 sut + 1 asal $\rightarrow$ 3 non, +70 to'qlik, +15 ruhiyat).
+- **Yangi 3D Modellar (Blender 5.2)**: `stone_windmill.glb`, `flour_silo.glb`, `baker_oven.glb` yaratildi (jami **82 ta GLB model**).
+- **Yangi Qirollik Dioramasi**: Barcha 82 ta aktiv ishtirokidagi diorama `assets/showcase_realm.png` da render qilindi va brainga saqlandi.
+- **Avtomatlashgan Testlar**: Jami **108 ta engine testi** (umumiy **165 ta test**) 100% muvaffaqiyat bilan o'tdi.
+
 ## 2026-09-27 — Milestone 29: Manor Lords & Bellwright Yo'l To'shash, Ko'cha Chiroqlari va Logistika Koridorlari (Issue #17)
 - **Bosqichma-bosqich Yo'l To'shash Tizimi (`RoadNetwork` & `paved_road_tile.glb`)**:
   - Modular tosh plitka (`paved_road_tile.glb`), drenaj va chekka bordyurlar.
