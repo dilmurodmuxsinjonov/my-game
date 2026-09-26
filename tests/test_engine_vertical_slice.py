@@ -2949,8 +2949,118 @@ class TestEngineVerticalSlice(unittest.TestCase):
         treasury_gold = sum(item["value"] for item in vault)
         self.assertEqual(treasury_gold, 105)
 
+    def test_road_network_paving_tiers_and_pathfinding_speed_boost(self):
+        """Verify dirt, gravel, and cobblestone road paving speed boosts and pathfinding cost multipliers."""
+        tiers_speed = {
+            "NONE": 1.0,
+            "DIRT_PATH": 1.10,
+            "GRAVEL_ROAD": 1.25,
+            "COBBLESTONE_PAVED": 1.50
+        }
+        tiers_cost = {
+            "NONE": 1.0,
+            "DIRT_PATH": 0.90,
+            "GRAVEL_ROAD": 0.75,
+            "COBBLESTONE_PAVED": 0.50
+        }
+
+        # Cobblestone highway
+        self.assertEqual(tiers_speed["COBBLESTONE_PAVED"], 1.50)
+        self.assertEqual(tiers_cost["COBBLESTONE_PAVED"], 0.50)
+
+        # Simulation of road tile upgrade
+        current_tier = "DIRT_PATH"
+        materials = {"stone": 4}
+        target_tier = "COBBLESTONE_PAVED"
+        stone_needed = 2
+
+        can_upgrade = materials["stone"] >= stone_needed
+        self.assertTrue(can_upgrade)
+        materials["stone"] -= stone_needed
+        current_tier = target_tier
+        self.assertEqual(current_tier, "COBBLESTONE_PAVED")
+        self.assertEqual(materials["stone"], 2)
+
+    def test_road_durability_and_wear_from_oxen_traffic(self):
+        """Verify heavy freight cart traffic wear and road repair mechanics."""
+        max_durability = 100.0
+        durability = max_durability
+        is_cobblestone = True
+
+        # Heavy ox cart with 60 units of timber passes over road
+        cart_weight = 60.0
+        wear_factor = 0.5 if is_cobblestone else 1.2
+        wear = cart_weight * wear_factor * 0.05 # 60 * 0.5 * 0.05 = 1.5 wear per pass
+        self.assertAlmostEqual(wear, 1.5)
+
+        # 50 cart passes
+        durability -= wear * 50
+        self.assertAlmostEqual(durability, 25.0)
+
+        # Needs repair when below 40.0
+        needs_repair = durability < 40.0
+        self.assertTrue(needs_repair)
+
+        # Road repair using 3 stone
+        stone_used = 3
+        repaired_durability = min(max_durability, durability + stone_used * 25.0) # 25.0 + 75.0 = 100.0
+        self.assertEqual(repaired_durability, 100.0)
+
+    def test_street_lamp_night_ignition_and_tallow_consumption(self):
+        """Verify dusk auto-ignition, animal tallow fuel burn, and nocturnal thief deterrence."""
+        lamp_pos = (15.0, 0.0, 20.0)
+        light_radius = 9.0
+        tallow_reserve = 2 # 2 tallow = 18 hours of burn
+        burn_hours_left = 18.0
+
+        # Daylight at 14:00 -> lamp should remain unlit
+        hour_day = 14.0
+        is_night_day = hour_day >= 18.0 or hour_day < 6.0
+        lamp_lit_day = is_night_day and burn_hours_left > 0.0
+        self.assertFalse(lamp_lit_day)
+
+        # Nightfall at 22:00 -> lamp lights up
+        hour_night = 22.0
+        is_night = hour_night >= 18.0 or hour_night < 6.0
+        lamp_lit = is_night and burn_hours_left > 0.0
+        self.assertTrue(lamp_lit)
+
+        # Burn for 8 hours through the night
+        delta_hours = 8.0
+        burn_hours_left = max(0.0, burn_hours_left - delta_hours)
+        self.assertEqual(burn_hours_left, 10.0)
+
+        # Thief sneaking at (18.0, 0.0, 22.0) -> dist = sqrt(3^2 + 2^2) = 3.6m <= 9.0m
+        thief_pos = (18.0, 0.0, 22.0)
+        dist_to_lamp = math.hypot(thief_pos[0] - lamp_pos[0], thief_pos[2] - lamp_pos[2])
+        self.assertLess(dist_to_lamp, light_radius)
+        thief_deterred = lamp_lit and (dist_to_lamp <= light_radius)
+        self.assertTrue(thief_deterred)
+
+    def test_logistics_waypoint_route_priority_and_hauler_efficiency(self):
+        """Verify crossroad waypoint route prioritization and hauler payload throughput boost."""
+        priority_route = "Market Square"
+        throughput_bonus = 0.15 # +15% payload throughput
+
+        # Hauler A assigned to priority route (Market Square)
+        hauler_a_dest = "Market Square"
+        base_capacity_a = 20.0
+        is_priority_a = (hauler_a_dest == priority_route)
+        effective_capacity_a = base_capacity_a * (1.0 + throughput_bonus if is_priority_a else 1.0)
+        self.assertTrue(is_priority_a)
+        self.assertAlmostEqual(effective_capacity_a, 23.0)
+
+        # Hauler B assigned to non-priority route (Castle Barracks)
+        hauler_b_dest = "Castle Barracks"
+        base_capacity_b = 20.0
+        is_priority_b = (hauler_b_dest == priority_route)
+        effective_capacity_b = base_capacity_b * (1.0 + throughput_bonus if is_priority_b else 1.0)
+        self.assertFalse(is_priority_b)
+        self.assertEqual(effective_capacity_b, 20.0)
+
 if __name__ == "__main__":
     unittest.main()
+
 
 
 

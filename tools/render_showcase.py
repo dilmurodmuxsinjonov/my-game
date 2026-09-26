@@ -291,6 +291,15 @@ def build_diorama():
     # 71. Medieval Forged Iron Wall Torch Sconce
     import_asset("wall_sconce.glb", (-3.2, 4.5, 0.0), rot_z=-60, scale=0.95)
 
+    # 72. Weathered Cobblestone Paved Road Tile
+    import_asset("paved_road_tile.glb", (1.6, -0.6, 0.0), rot_z=15, scale=0.95)
+
+    # 73. Forged Iron Medieval Street Lamppost
+    import_asset("street_lamp.glb", (2.2, 0.6, 0.0), rot_z=-30, scale=0.90)
+
+    # 74. Carved Timber Crossroads Logistics Signpost
+    import_asset("road_signpost.glb", (0.8, -0.5, 0.0), rot_z=25, scale=0.92)
+
     # Render output path
     output_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "assets"))
     output_path = os.path.join(output_dir, "showcase_realm.png")

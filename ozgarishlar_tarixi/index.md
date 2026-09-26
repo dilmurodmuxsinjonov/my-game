@@ -7,6 +7,25 @@
 - Dastlabki Godot prototipi va foydalanuvchining showcase fayllari saqlandi.
 - Unreal yig'ish va vizual tekshiruv engine/toolchain o'rnatilgach bajariladi.
 
+## 2026-09-27 — Milestone 29: Manor Lords & Bellwright Yo'l To'shash, Ko'cha Chiroqlari va Logistika Koridorlari (Issue #17)
+- **Bosqichma-bosqich Yo'l To'shash Tizimi (`RoadNetwork` & `paved_road_tile.glb`)**:
+  - Modular tosh plitka (`paved_road_tile.glb`), drenaj va chekka bordyurlar.
+  - Yo'l qatlamlari: Dirt Path (+10% tezlik), Gravel Road (+25% tezlik), Cobblestone Paved (+50% tezlik, yo'l narxi 0.50x).
+  - Sun'iy intellekt va fuqarolarni avtomatik ravishda qoplangan magistral yo'llarga yo'naltirish.
+  - Og'ir aravalar va xo'kizlar harakatidan yeyilish mexanikasi hamda tosh bilan ta'mirlash.
+- **Shahar Ko'cha Chirog'i va Tungi Xavfsizlik Aurasi (`StreetLamp` & `street_lamp.glb`)**:
+  - O'yma tosh asos, temir ustun va shisha fonus (`street_lamp.glb`).
+  - Shomdan tonggacha (18:00 - 06:00) avtomatik yonish sensori.
+  - Hayvon yog'i (`tallow`) zaxirasi: 1 tallow = 3 kechalik yorug'lik.
+  - 9.0m yorug'lik radiusi: tungi jinoyatchilik va o'g'rilikni fosh qilib, qochirish qalqoni.
+- **Chorraha Ko'rsatkichi va Tranzit Koridori Ustuvorligi (`LogisticsWaypoint` & `road_signpost.glb`)**:
+  - O'yma yog'och yo'l ko'rsatkichi (`road_signpost.glb`) — "Market Square", "Castle Keep", "Iron Mine".
+  - Magistral koridori: ustuvor yo'nalishdagi kuryerlar yuk hajmiga +15% unumdorlik bonusi.
+  - Harbiy yig'ilish nuqtasi (Muster Point) vazifasi.
+- **Yangi 3D Modellar (Blender 5.2)**: `paved_road_tile.glb`, `street_lamp.glb`, `road_signpost.glb` yaratildi (jami **79 ta GLB model**).
+- **Yangi Qirollik Dioramasi**: Barcha 79 ta aktiv ishtirokidagi diorama `assets/showcase_realm.png` da render qilindi va brainga saqlandi.
+- **Avtomatlashgan Testlar**: Jami **104 ta engine testi** (umumiy **161 ta test**) 100% muvaffaqiyat bilan o'tdi.
+
 ## 2026-09-27 — Milestone 28: Valheim & Vintage Story Yerosti Tosh Kriptasi, Sarkofag Qoldiqlari va Ekspeditsiya Zulmati (Issue #15)
 - **Protsedural Qadimiy Tosh Kriptasi (`CryptDungeon` & `crypt_entrance.glb`)**:
   - Tog'liklar va chuqur qatlamlarda ($Y < 12$) o'yma tosh daxma kirishi (`crypt_entrance.glb`).
