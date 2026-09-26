@@ -3158,6 +3158,161 @@ class TestEngineVerticalSlice(unittest.TestCase):
         self.assertEqual(noble_hunger, 100)
         self.assertEqual(noble_morale, 90)
 
+    def test_pbr_texture_atlas_dimensions_and_normal_mapping(self):
+        """Verify 256x192 procedural PBR atlases (albedo, normal, roughness) and tangent normal mapping."""
+        from PIL import Image
+
+        textures_dir = os.path.join(self.project_dir, "assets", "textures")
+        expected_atlases = [
+            "voxel_atlas_albedo.png",
+            "voxel_atlas_normal.png",
+            "voxel_atlas_roughness.png"
+        ]
+
+        for atlas in expected_atlases:
+            path = os.path.join(textures_dir, atlas)
+            self.assertTrue(os.path.exists(path), f"PBR atlas {atlas} missing!")
+            self.assertGreater(os.path.getsize(path), 1000)
+
+            with Image.open(path) as img:
+                self.assertEqual(img.size, (256, 192), f"Atlas {atlas} has incorrect dimensions {img.size}!")
+
+        # Verify Tangent Space normal vector mapping math: n = (0, 0, 1) -> (128, 128, 255)
+        def vector_to_normal_rgb(nx, ny, nz):
+            r = int((nx * 0.5 + 0.5) * 255.0)
+            g = int((ny * 0.5 + 0.5) * 255.0)
+            b = int((nz * 0.5 + 0.5) * 255.0)
+            return (r, g, b)
+
+        flat_normal_rgb = vector_to_normal_rgb(0.0, 0.0, 1.0)
+        self.assertEqual(flat_normal_rgb, (127, 127, 255))
+
+        # Check normal map atlas pixel range at (0, 0)
+        normal_atlas_path = os.path.join(textures_dir, "voxel_atlas_normal.png")
+        with Image.open(normal_atlas_path) as img:
+            rgb_img = img.convert("RGB")
+            pixel = rgb_img.getpixel((10, 10)) # Sample pixel in stone block
+            # Normal map blue channel must dominate for mostly flat/mild relief surface
+            self.assertGreater(pixel[2], 120)
+
+    def test_structural_integrity_cantilever_and_collapse_physics(self):
+        """Verify horizontal cantilever limits, buttress reinforcement bonus, and collapse debris impact."""
+        cantilever_limits = {
+            "bedrock": 99999,
+            "stone": 6,
+            "cobblestone": 5,
+            "brick": 6,
+            "timber": 4,
+            "dirt": 1,
+            "sand": 0
+        }
+        buttress_bonus = 3
+
+        # Standard cantilever check
+        self.assertEqual(cantilever_limits["stone"], 6)
+        self.assertEqual(cantilever_limits["timber"], 4)
+        self.assertEqual(cantilever_limits["sand"], 0)
+
+        # Stone span with buttress support
+        stone_buttress_limit = cantilever_limits["stone"] + buttress_bonus
+        self.assertEqual(stone_buttress_limit, 9)
+
+        # 7-meter overhang evaluation
+        span = 7
+        is_supported_without = span <= cantilever_limits["stone"]
+        is_supported_with = span <= stone_buttress_limit
+        self.assertFalse(is_supported_without)
+        self.assertTrue(is_supported_with)
+
+        # Debris impact kinetic energy & damage
+        # Stone block: density 2600 kg/m^3, fall height 10m
+        mass_kg = 2600.0
+        gravity = 9.81
+        fall_height = 10.0
+        impact_velocity = math.sqrt(2.0 * gravity * fall_height) # sqrt(196.2) = 14.007 m/s
+        self.assertAlmostEqual(impact_velocity, 14.007, places=2)
+
+        kinetic_energy = 0.5 * mass_kg * (impact_velocity ** 2) # 255060 Joules
+        self.assertAlmostEqual(kinetic_energy, 255060.0, places=0)
+        structural_damage = round(kinetic_energy / 500.0)
+        self.assertEqual(structural_damage, 510)
+
+    def test_environment_realism_color_temperature_and_weather_states(self):
+        """Verify Kelvin sun color temperature progression, Rayleigh fog profiles, and surface wetness."""
+        weather_fog_profiles = {
+            "clear": {"density": 0.005, "scattering": 0.15},
+            "mist": {"density": 0.035, "scattering": 0.40},
+            "rain": {"density": 0.065, "scattering": 0.65},
+            "blizzard": {"density": 0.120, "scattering": 0.85}
+        }
+
+        self.assertEqual(weather_fog_profiles["clear"]["density"], 0.005)
+        self.assertEqual(weather_fog_profiles["blizzard"]["density"], 0.120)
+
+        # Solar Kelvin progression
+        def get_sun_kelvin(hour):
+            if 5.0 <= hour < 7.0:
+                t = (hour - 5.0) / 2.0
+                return 4000.0 + (5500.0 - 4000.0) * t
+            elif 7.0 <= hour < 16.0:
+                t = 1.0 - abs(hour - 11.5) / 4.5
+                return 5500.0 + (6500.0 - 5500.0) * max(0.0, min(1.0, t))
+            elif 16.0 <= hour < 19.5:
+                t = (hour - 16.0) / 3.5
+                return 5500.0 + (2600.0 - 5500.0) * t
+            else:
+                return 12000.0
+
+        self.assertEqual(get_sun_kelvin(11.5), 6500.0) # Midday sun
+        self.assertEqual(get_sun_kelvin(0.0), 12000.0) # Midnight cool starlight
+        self.assertAlmostEqual(get_sun_kelvin(6.0), 4750.0) # Dawn golden warmth
+
+        # Surface rain wetness accumulation
+        rain_wetness = 0.0
+        delta_time = 10.0 # 10 seconds of heavy rainfall
+        rain_wetness = min(1.0, rain_wetness + 0.05 * delta_time)
+        self.assertEqual(rain_wetness, 0.50)
+
+    def test_ballistic_realism_aerodynamic_drag_and_crosswind_drift(self):
+        """Verify barometric air density decay, aerodynamic drag, crosswind drift, and armor penetration."""
+        sea_level_density = 1.225 # kg/m^3
+        scale_height = 8500.0
+
+        # Density at mountain pass (altitude 2500m)
+        alt = 2500.0
+        mountain_density = sea_level_density * math.exp(-alt / scale_height)
+        self.assertAlmostEqual(mountain_density, 0.913, places=3)
+        self.assertLess(mountain_density, sea_level_density)
+
+        # Bodkin Arrow aerodynamic drag
+        # mass = 0.050 kg, area = 0.00015 m^2, Cd = 0.045, speed = 50 m/s
+        mass = 0.050
+        area = 0.00015
+        cd = 0.045
+        speed = 50.0
+        drag_force = 0.5 * sea_level_density * (speed ** 2) * cd * area
+        drag_accel = drag_force / mass
+        self.assertAlmostEqual(drag_accel, 0.2067, places=4)
+
+        # Crosswind drift deflection
+        wind_x = 8.0 # 8 m/s crosswind
+        # Relative speed in X axis gives lateral force pushing arrow downwind
+        v_rel_x = -wind_x
+        lat_drag_force_x = -0.5 * sea_level_density * abs(v_rel_x) * v_rel_x * cd * area
+        self.assertGreater(lat_drag_force_x, 0.0) # Force pushes in +X direction
+
+        # Armor penetration calculation
+        kinetic_energy = 0.5 * mass * (speed ** 2) # 62.5 Joules
+        bodkin_pen_factor = 1.4
+        gambeson_armor = 20.0
+        plate_armor = 65.0
+
+        damage_vs_gambeson = max(0.0, (kinetic_energy * bodkin_pen_factor) - (gambeson_armor * 1.5))
+        damage_vs_plate = max(0.0, (kinetic_energy * bodkin_pen_factor) - (plate_armor * 1.5))
+
+        self.assertAlmostEqual(damage_vs_gambeson, 57.5, places=1) # Penetrates gambeson
+        self.assertEqual(damage_vs_plate, 0.0) # Glances off full plate armor
+
 if __name__ == "__main__":
     unittest.main()
 

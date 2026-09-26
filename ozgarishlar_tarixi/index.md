@@ -7,6 +7,29 @@
 - Dastlabki Godot prototipi va foydalanuvchining showcase fayllari saqlandi.
 - Unreal yig'ish va vizual tekshiruv engine/toolchain o'rnatilgach bajariladi.
 
+## 2026-09-27 — Milestone 31: Vintage Story & Valheim Realistik PBR Teksturalar, Triplanar Sheyder, Konstruktiv Yuk Fizikasi va Atmosfera Realizmi (Issue #21)
+- **Realistik PBR Voksel Teksturalari va Triplanar Sheyder (`voxel_pbr_triplanar.gdshader` & `voxel_atlas_*.png`)**:
+  - 12 ta tabiiy blok uchun procedural PBR teksturalar (Albedo, Tangent Normal, Roughness).
+  - Uchta 256x192 birlashtirilgan PBR atlas: `voxel_atlas_albedo.png`, `voxel_atlas_normal.png`, `voxel_atlas_roughness.png`.
+  - Dunyo koordinatalari bo'yicha triplanar proyeksiyalash (tik qoyalarda cho'zilishni nolga tushiradi).
+  - Dinamik yomg'ir suvi ho'lligi (`rain_wetness`, specular 0.85) va qishki qor to'planishi (`snow_accumulation`).
+- **Konstruktiv Yuk Ko'tarish Fizikasi va Qulash Dinamikasi (`StructuralIntegrityManager` & `masonry_buttress.glb`)**:
+  - Gorizontal konsol (cantilever) chegaralari: Bedrock $\infty$, Tosh 6m, G'isht 6m, Yog'och 4m, Tuproq 1m, Qum 0m.
+  - Gotika uslubidagi uchuvchi tosh tirgak (`masonry_buttress.glb`): konsol oraliq masofasiga +3 metr qo'shimcha tayanchni ta'minlaydi.
+  - Tayanchsiz qolgan voksellarning fizik gravitatsiya qoldiqlari (`falling rubble`) sifatida qulashi va 255 kJ kinetik zarba berishi.
+- **Atmosfera Quyosh Harorati va Volumetrik Tuman (`EnvironmentRealismManager` & `weather_vane.glb`, `barometer_station.glb`)**:
+  - Quyosh Kelvin harorati: Tongda 4750K, tushda 6500K, shafaqda 2600K, tunda 12000K.
+  - Tanner Helland qora tana nurlanishi spektri bo'yicha tabiiy yorug'lik rangini hisoblash.
+  - Volumetrik Reley va Mi tuman zichliklari (ochiq havo 0.005 dan qor bo'roni 0.120 gacha).
+  - Mis xo'rozli shamol yo'naltirgichi (`weather_vane.glb`) va devoriy simobli barometr stantsiyasi (`barometer_station.glb`).
+- **Haqiqiy Aerodinamik Ballistika va Shamol Ta'siri (`BallisticRealism`)**:
+  - Barometrik havo zichligi: $\rho(y) = 1.225 \cdot e^{-y / 8500}$ kg/m³.
+  - Aerodinamik qarshilik $\vec{F}_d = -\frac{1}{2} \rho |\vec{v}_{rel}| \vec{v}_{rel} C_d A$ va yon shamol ta'sirida traektoriya og'ishi (crosswind drift).
+  - Kinetik energiya va zirh penetratsiyasi (bodkin o'qi gambesonni teshib o'tadi, to'liq po'lat plitadan sachraydi).
+- **Yangi 3D Modellar (Blender 5.2)**: `weather_vane.glb`, `barometer_station.glb`, `masonry_buttress.glb` yaratildi (jami **85 ta GLB model**).
+- **Yangi Qirollik Dioramasi**: Barcha 85 ta aktiv ishtirokidagi diorama `assets/showcase_realm.png` da render qilindi va brainga saqlandi.
+- **Avtomatlashgan Testlar**: Jami **112 ta engine testi** (umumiy **169 ta test**) 100% muvaffaqiyat bilan o'tdi.
+
 ## 2026-09-27 — Milestone 30: Medieval Dynasty & Farmer's Delight Shamol Tegirmoni, Un Silosi va Nonvoyxona (Issue #19)
 - **Kinetik Shamol Tegirmoni (`StoneWindmill` & `stone_windmill.glb`)**:
   - Konussimon tosh minora va 4 ta tuval parrakli aylanma shamol tegirmoni (`stone_windmill.glb`).

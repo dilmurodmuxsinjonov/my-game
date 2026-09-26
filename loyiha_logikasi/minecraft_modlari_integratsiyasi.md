@@ -536,6 +536,65 @@ Medieval davrning haqiqiy muhandisligi:
     - **Qora Javdar Noni (`rye_bread`)**: 2 un + 1 suv $\rightarrow$ 3 ta to'yimli non (+45 to'qlik, +10 mehnat energiyasi).
     - **Shohona Shirin Briyosh (`royal_brioche`)**: 2 un + 1 sut + 1 asal $\rightarrow$ 3 ta elita non (+70 to'qlik, +15 qirollik ruhiyati).
 
+---
+
+## 20. Vintage Story, Valheim & Teardown Integratsiyasi — Realistik PBR Teksturalar, Triplanar Sheyder, Konstruktiv Yuk Fizikasi va Atmosfera Realizmi (Milestone 31)
+
+### 20.1. Ko'p Qatlamli PBR Voksel Teksturalari va Triplanar Sheyder (`voxel_pbr_triplanar.gdshader`) — [Vintage Story]
+- **Muammo**: Standart UV proyeksiyasi tik qoyalar, g'orlar va vertikal voksel devorlarida teksturani cho'zib, xunuk va sun'iy ko'rinish beradi; shuningdek bitta oddiy albedo xaritasi zamonaviy yorug'lik effektlarini qo'llab-quvvatlamaydi.
+- **Yechim (`voxel_pbr_triplanar.gdshader` & `voxel_atlas_*.png`)**:
+  - **12 ta Tabiiy Blok Uchun PBR Tekstura To'plami**: Stone, dirt, grass_top, grass_side, oak_log, oak_planks, cobblestone, brick, sand, water, iron_ore, gold_ore.
+  - **Uchta 256x192 PBR Atlasi**:
+    - `voxel_atlas_albedo.png` — Tabiiy rang va mikro-rang o'zgarishlari.
+    - `voxel_atlas_normal.png` — Tangent-space relef sirtlari ($\frac{\partial h}{\partial x}, \frac{\partial h}{\partial y}$ gradientli normallar).
+    - `voxel_atlas_roughness.png` — Yaltiroqlik va mikrog'adir-budurlik koeffitsientlari.
+  - **Triplanar Proyeksiya**: Dunyo koordinatalari bo'yicha $X, Y, Z$ tekisliklariga proyeksiyalanadi va devor burchaklarida $N^4$ darajali vaznlar bilan silliq birlashtiriladi (zero UV distortion).
+  - **Dinamik Yomg'ir Ho'lligi (`rain_wetness`)**: Yomg'ir paytida sirt qorayadi, roughness 0.08 gacha pasayadi va ko'lmak yaltiroqligi (specular 0.85) paydo bo'ladi.
+  - **Qishki Qor Qoplami (`snow_accumulation`)**: Qor bo'ronida tepaga qaragan yuzalarga ($N_y > 0.6$) tabiiy qor qatlami yotqiziladi.
+
+### 20.2. Konstruktiv Yuk Ko'tarish Fizikasi va Qulash Dinamikasi (`StructuralIntegrityManager` & `masonry_buttress.glb`) — [Valheim / 7 Days to Die]
+- **Muammo**: Minecraft uslubidagi havoda muallaq turuvchi tosh va tuproq bloklari o'yin realizmini yo'qotadi va qal'a qamallarining strategik chuqurligini cheklaydi.
+- **Yechim (`StructuralIntegrityManager` & `masonry_buttress.glb`)**:
+  - **Gorizontal Konsol (Cantilever) Chegaralari**:
+    - Poydevor / Bedrock: Cheksiz ($\infty$).
+    - Temir blok: 8 metr.
+    - Tosh va g'isht: 6 metr.
+    - Qoplama tosh (`cobblestone`): 5 metr.
+    - Yog'och va taxta: 4 metr.
+    - Tuproq: 1 metr.
+    - Qum: 0 metr (darhol o'piriladi).
+  - **Gotika Uslubidagi Uchuvchi Tirgak (`masonry_buttress.glb`)**:
+    - Og'ir tosh devorlar va peshtoqlar yoniga o'rnatilgan gotik tirgak maksimal gorizontal oraliqqa **+3 metr** qo'shimcha mustahkamlik beradi (tosh konsol 6m dan 9m gacha uzayadi).
+  - **BFS Barqarorlik Tahlili va Voksel Qulashi**:
+    - Poydevor tayanchi uzilgan bloklar darhol kinetik gravitatsiya bo'lagi (`falling rubble`) ga aylanadi.
+    - Qulagan 2600 kg tosh bloki 10 metr balandlikdan 14.0 m/s tezlikda tushib, 255 kJ kinetik energiya bilan pastdagi inshootlar va dushmanlarga halokatli zarba beradi.
+
+### 20.3. Atmosfera Quyosh Harorati va Volumetrik Tuman (`EnvironmentRealismManager` & `weather_vane.glb`, `barometer_station.glb`) — [Vintage Story]
+- **Muammo**: O'yinda kunduz va kecha faqat oddiy yorug'lik intensivligi bilan ifodalanadi, haqiqiy quyosh spektri va havo bosimi o'zgarishlari hisobga olinmaydi.
+- **Yechim (`EnvironmentRealismManager` & Fixturalar)**:
+  - **Quyosh Kelvin Harorati Grafigi (Tanner Helland Algoritmi)**:
+    - Tong (06:00): 4750K (iliq oltin nurlar).
+    - Tush (12:00): 6500K (neytral oppoq quyosh).
+    - Botish (18:00): 2600-3400K (qizg'ish-sariq shafaq).
+    - Yarim tun (00:00): 12000K (sovuq ko'kish yulduz va oy shu'lasi).
+  - **Volumetrik Reley Tumani**:
+    - Ochiq havo (`clear`): zichlik 0.005, tarqalish 0.15.
+    - Tuman (`mist`): zichlik 0.035, tarqalish 0.40.
+    - Yomg'ir (`rain`): zichlik 0.065, tarqalish 0.65.
+    - Qor bo'roni (`blizzard`): zichlik 0.120, tarqalish 0.85.
+  - **Mis Xo'rozli Shamol Yo'naltirgichi (`weather_vane.glb`)**: Shamol vektori va shamol tezligini vizual ko'rsatadi.
+  - **Devorga O'rnatiladigan Simobli Barometr (`barometer_station.glb`)**: Atmosfera bosimining pasayishini kuzatib, 3 soat oldin bo'ron xavfidan ogohlantiradi.
+
+### 20.4. Haqiqiy Aerodinamik Ballistika va Shamol Ta'siri (`BallisticRealism`) — [Mount & Blade / ArmA]
+- **Muammo**: Kamon va arbalet o'qlari tekis parabolik traektoriya bo'ylab uchadi, havo qarshiligi, balandlik va shamol ta'siri hisoblanmaydi.
+- **Yechim (`BallisticRealism`)**:
+  - **Barometrik Havo Zichligi**: $\rho(y) = 1.225 \cdot e^{-y / 8500}$ kg/m³ (tog' cho'qqisida havo siyraklashib, o'q uzoqroq masofaga uchadi).
+  - **Aerodinamik Qarshilik**: $\vec{F}_d = -\frac{1}{2} \rho |\vec{v}_{rel}| \vec{v}_{rel} C_d A$.
+  - **Yon Shamol Ta'siri (Crosswind Drift)**: Shamol vektori hisobiga o'q o'z yo'nalishidan og'adi.
+  - **Kinetik Zirh Teshib O'tish**:
+    - Bodkin o'qi 50 m/s tezlikda 62.5 J kinetik energiya va 1.4x penetratsiya koeffitsienti bilan mato kamzulni (gambeson, 20 armor) teshib o'tadi, lekin to'liq po'lat sovutdan (65 armor) aks etib sachrab ketadi.
+
+
 
 
 
