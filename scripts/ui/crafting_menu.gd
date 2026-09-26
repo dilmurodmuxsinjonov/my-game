@@ -363,6 +363,26 @@ const RECIPES: Dictionary = {
 			"name": "Wrought-Iron Beeswax Candelabra",
 			"inputs": {"iron_ingots": 2, "beeswax": 3},
 			"output": {"name": "Candle Candelabra", "type": "placeable", "icon": "🕯️", "count": 1}
+		},
+		{
+			"name": "Mangonel Siege Catapult",
+			"inputs": {"logs": 12, "iron_ingots": 6, "stone": 8},
+			"output": {"name": "Catapult", "type": "placeable", "icon": "☄️", "count": 1}
+		},
+		{
+			"name": "Boiling Pitch Cauldron",
+			"inputs": {"iron_ingots": 6, "stone": 4, "coal": 4},
+			"output": {"name": "Pitch Cauldron", "type": "placeable", "icon": "🛢️", "count": 1}
+		},
+		{
+			"name": "Spiked Portcullis Gate",
+			"inputs": {"iron_ingots": 8, "logs": 6, "stone": 4},
+			"output": {"name": "Portcullis Gate", "type": "placeable", "icon": "⛩️", "count": 1}
+		},
+		{
+			"name": "Incendiary Fire Boulder (x2)",
+			"inputs": {"stone": 4, "coal": 2},
+			"output": {"name": "Fire Boulder", "type": "ammo", "icon": "🔥", "count": 2}
 		}
 	],
 	"campfire": [

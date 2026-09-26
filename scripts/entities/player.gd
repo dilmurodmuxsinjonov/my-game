@@ -32,6 +32,9 @@ const ApothecaryBench = preload("res://scripts/world/apothecary_bench.gd")
 const InfirmaryBed = preload("res://scripts/world/infirmary_bed.gd")
 const ApiaryBeehive = preload("res://scripts/world/apiary_beehive.gd")
 const MeadFermenter = preload("res://scripts/world/mead_fermenter.gd")
+const SiegeEngine = preload("res://scripts/combat/siege_engine.gd")
+const PitchCauldron = preload("res://scripts/combat/pitch_cauldron.gd")
+const PortcullisGate = preload("res://scripts/world/portcullis_gate.gd")
 
 ## First-Person Monarch Controller.
 ## Follows the Single Persistent Monarch Paradigm: No dynasty, no permadeath;

@@ -237,6 +237,15 @@ def build_diorama():
     # 53. Wrought-Iron Beeswax Candelabra
     import_asset("candle_candelabra.glb", (-0.4, -3.5, 0.0), rot_z=10, scale=0.92)
 
+    # 54. Stronghold / Bannerlord Mangonel Siege Catapult
+    import_asset("catapult.glb", (4.8, 2.6, 0.0), rot_z=-115, scale=0.85)
+
+    # 55. Gatehouse Boiling Pitch Defensive Cauldron
+    import_asset("pitch_cauldron.glb", (-0.6, 3.5, 0.0), rot_z=45, scale=0.90)
+
+    # 56. Fortified Castle Spiked Portcullis Gateway
+    import_asset("portcullis_gate.glb", (-2.0, 3.8, 0.0), rot_z=20, scale=0.85)
+
     # Render output path
     output_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "assets"))
     output_path = os.path.join(output_dir, "showcase_realm.png")

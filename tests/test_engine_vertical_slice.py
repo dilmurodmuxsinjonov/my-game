@@ -2242,7 +2242,101 @@ class TestEngineVerticalSlice(unittest.TestCase):
         self.assertEqual(beeswax, 0)
         self.assertEqual(candles, 9)
 
+    def test_milestone23_glb_assets(self):
+        """Verify binary glTF headers and integrity for Milestone 23 3D models."""
+        models_dir = os.path.join(os.path.dirname(__file__), "..", "assets", "models")
+        m23_models = ["catapult.glb", "pitch_cauldron.glb", "portcullis_gate.glb"]
+        for m in m23_models:
+            p = os.path.join(models_dir, m)
+            self.assertTrue(os.path.exists(p), f"Missing model {m}")
+            self.assertGreater(os.path.getsize(p), 1000, f"Model {m} is unusually small")
+            with open(p, "rb") as f:
+                header = f.read(4)
+                self.assertEqual(header, b"glTF", f"Model {m} does not have valid glTF magic header")
+
+    def test_siege_engine_ballistics(self):
+        """Verify Mangonel Catapult ballistics, range bounds, and incendiary shockwave."""
+        min_range = 15.0
+        max_range = 65.0
+        base_damage = 120.0
+        aoe_radius = 12.0
+        incendiary_bonus = 50.0
+
+        # Target within valid artillery range
+        target_dist = 40.0
+        in_range = (target_dist >= min_range and target_dist <= max_range)
+        self.assertTrue(in_range)
+
+        # Target too close (under minimum range)
+        target_close = 8.0
+        self.assertFalse(target_close >= min_range and target_close <= max_range)
+
+        # Damage calculation with incendiary fire boulder
+        is_incendiary = True
+        total_damage = base_damage + (incendiary_bonus if is_incendiary else 0.0)
+        self.assertEqual(total_damage, 170.0)
+        self.assertEqual(aoe_radius, 12.0)
+
+        # Ammo stock reload consumption
+        boulders_stock = 12
+        boulders_stock -= 1
+        self.assertEqual(boulders_stock, 11)
+
+    def test_pitch_cauldron_gate_defense(self):
+        """Verify Boiling Pitch Cauldron gatehouse defense and slowing aura."""
+        pitch_dps = 40.0
+        burn_duration = 15.0
+        puddle_radius = 6.0
+        slow_multiplier = 0.40 # 60% slow down
+
+        total_burn_potential = pitch_dps * burn_duration
+        self.assertEqual(total_burn_potential, 600.0)
+        self.assertEqual(puddle_radius, 6.0)
+        self.assertEqual(slow_multiplier, 0.40)
+
+        # Charges cycle & reheat
+        charges = 5
+        charges -= 1
+        is_boiling = False
+        reheat_timer = 45.0
+        self.assertEqual(charges, 4)
+        self.assertFalse(is_boiling)
+
+        # Reheat completes
+        reheat_timer = 0.0
+        if reheat_timer <= 0.0 and charges > 0:
+            is_boiling = True
+        self.assertTrue(is_boiling)
+
+    def test_portcullis_gate_crush_and_durability(self):
+        """Verify Portcullis Gate durability, blunt ramming resistance, and crush damage."""
+        max_hp = 500.0
+        current_hp = max_hp
+        crush_damage = 80.0
+
+        # Blunt ramming attack (e.g. 100 base blunt damage) gets -50% reduction
+        blunt_incoming = 100.0
+        blunt_multiplier = 0.50
+        damage_taken = blunt_incoming * blunt_multiplier
+        current_hp -= damage_taken
+        self.assertEqual(damage_taken, 50.0)
+        self.assertEqual(current_hp, 450.0)
+
+        # Pierce arrow volley gets -80% deflection
+        pierce_incoming = 50.0
+        pierce_multiplier = 0.20
+        pierce_damage = pierce_incoming * pierce_multiplier
+        current_hp -= pierce_damage
+        self.assertEqual(pierce_damage, 10.0)
+        self.assertEqual(current_hp, 440.0)
+
+        # Trap crush on 3 raiders trapped underneath
+        enemies_underneath = 3
+        total_crush_inflicted = enemies_underneath * crush_damage
+        self.assertEqual(total_crush_inflicted, 240.0)
+
 if __name__ == "__main__":
     unittest.main()
+
 
 

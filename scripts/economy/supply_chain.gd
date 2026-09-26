@@ -125,7 +125,11 @@ var inventory: Dictionary = {
 	"honeycomb": 6,
 	"beeswax": 4,
 	"honey_mead": 0,
-	"beeswax_candle": 0
+	"beeswax_candle": 0,
+	"catapult": 0,
+	"pitch_cauldron": 0,
+	"portcullis_gate": 0,
+	"fire_boulder": 4
 }
 
 func salt_meat(amount: int) -> bool:
