@@ -385,6 +385,43 @@ Medieval davrning haqiqiy muhandisligi:
   - **Daryo va Suv Havzalari**: 50% suzish qarshiligi (0.50x sekinlashuv).
   - **Flocking Boids Separation**: Yaqin turgan jangchilar o'rtasida 1.2m radiusda itaruvchi kuch vektori hisoblanib, birliklarning tabiiy saf tortishi ta'minlanadi.
 
+---
+
+## 15. Medieval Dynasty & Bellwright Integratsiyasi — Ovchilik Kulbasi, Eman Po'stlog'i Teri Oshlash va Mo'yna Quritish Dastgohi (Milestone 26)
+
+### 15.1. Qalin O'rmon Ovchilik Kulbasi va Yovvoyi Jonivorlar Ekolgiyasi (`HuntingLodge` & `hunting_lodge.glb`)
+- **Muammo**: Yangi paydo bo'lgan o'rmon va tog'li biomlarda yovvoyi kiyiklar, qoplonlar va yovvoyi cho'chqalar (boars) mavjud bo'lsada, qishloq faqat dehqonchilik va qoramolga bog'lanib qolishi.
+- **Yechim (`HuntingLodge` & `hunting_lodge.glb`)**:
+  - Eman va qarag'ay xodalaridan qurilgan, kiyik shoxi bilan bezatilgan ovchilik kulbasi (`hunting_lodge.glb`).
+  - Kulbaga 3 tagacha malakali ovchi tayinlanadi.
+  - Biom ekologiyasi multiplikatori:
+    - **Deep Forest**: 1.5x kiyik va cho'chqa ovi mahsuldorligi.
+    - **Highlands**: 1.2x tog' echkilari va bo'rilar ovi.
+    - **Plains / River Valley**: 0.8x - 1.0x standart ov.
+  - **Kamonchilar Boshpanasi (`archery_blind`)**: Ovchilar hosildorligini +35% ga oshiradi va yovvoyi cho'chqalarning qonli hujumi xavfini 15% dan 3% ga (80% ga kamaytirish) tushiradi.
+  - Kunlik hosil: To'yimli kiyik go'shti (`raw_venison`), xom terilar (`raw_hide`), hayvon yog'i (`tallow` - sham va sovun uchun) va mayin quyon/tulki mo'ynasi (`raw_pelt`).
+
+### 15.2. Eman Po'stlog'i Teri Oshlash Qadog'i (`TanneryVat` & `tannery_vat.glb`) — [Medieval Dynasty / Vintage Story]
+- **Muammo**: Oddiy xom terilar tezda chiriydi va ulardan mustahkam harbiy sovutlar yoki og'ir arava egar-jabduqlari yasab bo'lmaydi.
+- **Yechim (`TanneryVat` & `tannery_vat.glb`)**:
+  - Temir chambaraklar bilan mustahkamlangan eman bochkasi va yog'och qirish dastgohi (`tannery_vat.glb`).
+  - O'tinchi o'rmondan eman po'stlog'i (`oak_bark` — tabiiy tannin) yig'adi.
+  - Oshlash formulasi: 2 ta xom teri + 1 ta eman po'stlog'i + 1 chelak suv $\rightarrow$ 2 ta mustahkam oshlangan qattiq charm (`cured_leather`).
+  - **Feodal Hunarmandchilik Ehtiyojlari**:
+    - **Gambeson / Charm Sovut**: 4 ta oshlangan charm + 2 ta jun.
+    - **Xo'kiz Jabdug'i (`ox_harness`)**: 3 ta charm + 2 ta temir quyma (og'ir xodalarni tortish uchun).
+    - **Mergan Sadoqi (Quiver)**: 2 ta charm.
+
+### 15.3. Mo'yna Quritish Dastgohi va Qishki Mo'ynali Qimmatbaho Chopon (`FurDryingRack` & `fur_drying_rack.glb`)
+- **Muammo**: Qahraton qishda oddiy jun kiyimlar ham kuchli qor bo'ronlaridan (blizzard) to'liq asray olmaydi va qishloqda yuqori tabaqa zodagonlar uchun eksport mahsuloti yetishmaydi.
+- **Yechim (`FurDryingRack` & `fur_drying_rack.glb`)**:
+  - 4 ta mo'yna sig'imli A-simon yog'och quritish ramkasi (`fur_drying_rack.glb`).
+  - Xom mo'ynalar 20 soniya davomida tortilib quritiladi va mayin ishlov berilgan mo'yna (`cured_fur`) ga aylanadi.
+  - **Mo'ynali Qishki Shohona Chopon (`fur_cloak`)**:
+    - 3 ta ishlov berilgan mo'yna + 1 ta jun kiyim $\rightarrow$ 1 ta mo'ynali chopon.
+    - **Effektlari**: +50.0 sovuqqa bardoshlilik (har qanday qor bo'roniga 100% immunitet), zodagonlar ruhiyatiga +15 baxtiyorlik va savdogar karvonlariga 15 oltin tanga qiymatida sotish salohiyati!
+
+
 
 
 

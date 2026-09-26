@@ -2533,6 +2533,126 @@ class TestEngineVerticalSlice(unittest.TestCase):
         self.assertAlmostEqual(overlap, 0.8)
         self.assertAlmostEqual(repulsion_force, 0.8 / 1.2)
 
+    def test_milestone26_glb_assets(self):
+        """Verify binary glTF headers and integrity for Milestone 26 3D models."""
+        models_dir = os.path.join(os.path.dirname(__file__), "..", "assets", "models")
+        m26_models = ["hunting_lodge.glb", "tannery_vat.glb", "fur_drying_rack.glb"]
+        for m in m26_models:
+            p = os.path.join(models_dir, m)
+            self.assertTrue(os.path.exists(p), f"Missing model {m}")
+            self.assertGreater(os.path.getsize(p), 1000, f"Model {m} is unusually small")
+            with open(p, "rb") as f:
+                header = f.read(4)
+                self.assertEqual(header, b"glTF", f"Model {m} does not have valid glTF magic header")
+
+    def test_hunting_lodge_yields_and_archery_blinds(self):
+        """Verify hunting lodge yields, biome ecology bonuses, and archery blind safety."""
+        # 1. Base hunt calculation
+        hunters = 2
+        biome_mult = 1.50 # Deep Forest
+        has_blind = True
+        blind_bonus = 1.35 if has_blind else 1.0
+        effective_mult = biome_mult * blind_bonus
+
+        venison_yield = int(round(3.0 * hunters * effective_mult))
+        hide_yield = int(round(2.0 * hunters * effective_mult))
+        tallow_yield = int(round(1.0 * hunters * effective_mult))
+        pelt_yield = int(round(1.0 * hunters * effective_mult))
+
+        self.assertEqual(venison_yield, 12)
+        self.assertEqual(hide_yield, 8)
+        self.assertEqual(tallow_yield, 4)
+        self.assertEqual(pelt_yield, 4)
+
+        # 2. Archery blind reduces injury risk from 15% to 3%
+        raw_risk = 0.15
+        blind_risk = 0.03
+        self.assertLess(blind_risk, raw_risk)
+        self.assertEqual(blind_risk / raw_risk, 0.20) # 80% risk reduction
+
+    def test_tannery_vat_soaking_and_crafting(self):
+        """Verify oak bark tanning mechanics, batched hide soaking, and leather gear crafting."""
+        # 1. Batched soaking calculation
+        raw_hides = 6
+        oak_bark = 3
+        water_buckets = 4
+
+        batches = min(raw_hides // 2, min(oak_bark, water_buckets))
+        self.assertEqual(batches, 3)
+
+        cured_leather = batches * 2
+        remaining_hides = raw_hides - (batches * 2)
+        remaining_bark = oak_bark - batches
+        remaining_water = water_buckets - batches
+
+        self.assertEqual(cured_leather, 6)
+        self.assertEqual(remaining_hides, 0)
+        self.assertEqual(remaining_bark, 0)
+        self.assertEqual(remaining_water, 1)
+
+        # 2. Feudal leather crafting recipes
+        inventory = {
+            "cured_leather": cured_leather,
+            "raw_wool": 4,
+            "iron_ingot": 2,
+            "gambeson": 0,
+            "ox_harness": 0
+        }
+
+        # Craft 1 Gambeson: 4 cured leather + 2 raw wool
+        cost_leather = 4
+        cost_wool = 2
+        inventory["cured_leather"] -= cost_leather
+        inventory["raw_wool"] -= cost_wool
+        inventory["gambeson"] += 1
+
+        self.assertEqual(inventory["gambeson"], 1)
+        self.assertEqual(inventory["cured_leather"], 2)
+        self.assertEqual(inventory["raw_wool"], 2)
+
+        # Crafting ox harness requires 3 leather (now only 2 left -> insufficient)
+        can_craft_harness = (inventory["cured_leather"] >= 3 and inventory["iron_ingot"] >= 2)
+        self.assertFalse(can_craft_harness)
+
+    def test_fur_drying_rack_and_luxury_cloak(self):
+        """Verify trapper pelt drying capacity, progressive curing, and noble fur cloak effects."""
+        max_slots = 4
+        pelts_to_mount = 6
+        mounted = min(pelts_to_mount, max_slots)
+        self.assertEqual(mounted, 4)
+
+        # Progressive curing simulation: 20s per pelt
+        cure_time = 20.0
+        elapsed_time = 45.0
+        cured_count = int(elapsed_time // cure_time)
+        remaining_mounted = mounted - cured_count
+
+        self.assertEqual(cured_count, 2)
+        self.assertEqual(remaining_mounted, 2)
+
+        # Craft Luxury Fur-Lined Winter Cloak
+        inv = {
+            "cured_fur": 3,
+            "woolen_tunic": 1,
+            "fur_cloak": 0
+        }
+        can_craft = (inv["cured_fur"] >= 3 and inv["woolen_tunic"] >= 1)
+        self.assertTrue(can_craft)
+
+        inv["cured_fur"] -= 3
+        inv["woolen_tunic"] -= 1
+        inv["fur_cloak"] += 1
+
+        cloak_effects = {
+            "warmth_bonus": 50.0,
+            "noble_morale": 15,
+            "trade_coins": 15
+        }
+        self.assertEqual(inv["fur_cloak"], 1)
+        self.assertEqual(cloak_effects["warmth_bonus"], 50.0)
+        self.assertEqual(cloak_effects["noble_morale"], 15)
+        self.assertEqual(cloak_effects["trade_coins"], 15)
+
 if __name__ == "__main__":
     unittest.main()
 

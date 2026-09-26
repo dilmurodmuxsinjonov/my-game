@@ -264,6 +264,15 @@ def build_diorama():
     # 62. Raider Plunder Iron-Banded Loot Chest
     import_asset("loot_chest.glb", (4.5, -4.6, 0.0), rot_z=-35, scale=0.92)
 
+    # 63. Medieval Forest Hunting Lodge Outpost
+    import_asset("hunting_lodge.glb", (-5.6, -2.6, 0.0), rot_z=35, scale=0.75)
+
+    # 64. Oak Bark Leather Tannery Soaking Vat & Scraping Beam
+    import_asset("tannery_vat.glb", (-2.2, -4.8, 0.0), rot_z=-20, scale=0.88)
+
+    # 65. Fur Trapper's Timber Drying Rack
+    import_asset("fur_drying_rack.glb", (-3.4, -4.8, 0.0), rot_z=15, scale=0.90)
+
     # Render output path
     output_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "assets"))
     output_path = os.path.join(output_dir, "showcase_realm.png")
