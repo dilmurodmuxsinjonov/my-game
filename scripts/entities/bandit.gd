@@ -1,12 +1,16 @@
 class_name Bandit
 extends CharacterBody3D
 
+const BanditArchetype = preload("res://scripts/entities/bandit_archetype.gd")
+
 ## Feudal Bandit Raider.
 ## Navigates via 3D Grid Pathfinder, raids kingdom stockpiles, and engages in melee combat with player and guards.
 
 signal defeated(bandit: Bandit, loot: Dictionary)
 signal attack_landed(bandit: Bandit, target: Node3D, damage: float)
+signal attack_blocked(bandit: Bandit, mitigated: float)
 
+var archetype: BanditArchetype = BanditArchetype.new()
 var max_health: float = 60.0
 var health: float = 60.0
 var move_speed: float = 3.6
@@ -75,8 +79,15 @@ func _setup_visuals() -> void:
 	flash_material.emission_energy_multiplier = 2.0
 	
 	# 3D Health Bar
+	var cfg = archetype.get_config()
+	max_health = cfg["max_health"]
+	health = max_health
+	move_speed = cfg["move_speed"]
+	attack_damage = cfg["attack_damage"]
+	attack_range = cfg["attack_range"]
+
 	health_bar_label = Label3D.new()
-	health_bar_label.text = "☠️ Bandit Raider [60/60]"
+	health_bar_label.text = "☠️ %s [%d/%d]" % [cfg["title"], int(health), int(max_health)]
 	health_bar_label.position = Vector3(0, 2.05, 0)
 	health_bar_label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 	health_bar_label.font_size = 24
@@ -155,19 +166,26 @@ func _perform_attack() -> void:
 		target_entity.take_damage(attack_damage)
 		emit_signal("attack_landed", self, target_entity, attack_damage)
 
-func take_damage(amount: float, knockback: Vector3 = Vector3.ZERO) -> void:
-	health = maxf(0.0, health - amount)
+func take_damage(amount: float, knockback: Vector3 = Vector3.ZERO, is_frontal: bool = true, is_piercing: bool = false) -> void:
+	var mit = archetype.calculate_damage_taken(amount, is_frontal, is_piercing)
+	var final_amount = mit["damage"]
+	if mit["was_blocked"]:
+		emit_signal("attack_blocked", self, mit["mitigated"])
+
+	health = maxf(0.0, health - final_amount)
 	if health_bar_label:
-		health_bar_label.text = "☠️ Bandit Raider [%d/%d]" % [int(health), int(max_health)]
+		var cfg = archetype.get_config()
+		health_bar_label.text = "☠️ %s [%d/%d]" % [cfg["title"], int(health), int(max_health)]
 		
 	# Damage flash
 	flash_timer = 0.15
 	if model_mesh:
 		model_mesh.material_override = flash_material
 		
-	# Apply knockback
+	# Apply knockback (mitigated if shield blocked)
 	if knockback != Vector3.ZERO:
-		velocity += knockback * 5.0
+		var kb_scale = 1.5 if mit["was_blocked"] else 5.0
+		velocity += knockback * kb_scale
 		
 	if health <= 0.0:
 		_die()

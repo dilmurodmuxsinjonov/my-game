@@ -157,3 +157,28 @@ func _reconstruct_path(came_from: Dictionary, current: Vector3i) -> Array[Vector
 	path.append(Vector3(cur.x + 0.5, cur.y, cur.z + 0.5))
 	path.reverse()
 	return path
+
+func get_terrain_speed_multiplier(world_pos: Vector3i) -> float:
+	if not voxel_world:
+		return 1.0
+	var floor_type = voxel_world.get_block_world(world_pos + Vector3i.DOWN)
+	match floor_type:
+		VoxelChunk.BlockType.COBBLESTONE, VoxelChunk.BlockType.PLANKS, VoxelChunk.BlockType.STONE_BRICKS:
+			return 1.20 # Paved road velocity boost (+20%)
+		VoxelChunk.BlockType.WATER:
+			return 0.50 # Water wading / swimming drag (-50%)
+		VoxelChunk.BlockType.FARMLAND:
+			return 0.90 # Tilled soil slight friction
+		_:
+			return 1.00
+
+func calculate_separation_offset(current_pos: Vector3, neighbor_positions: Array[Vector3], min_dist: float = 1.2) -> Vector3:
+	var separation = Vector3.ZERO
+	for other_pos in neighbor_positions:
+		var d = current_pos.distance_to(other_pos)
+		if d > 0.001 and d < min_dist:
+			var push_dir = (current_pos - other_pos).normalized()
+			var force = (min_dist - d) / min_dist
+			separation += push_dir * force
+	return separation
+
