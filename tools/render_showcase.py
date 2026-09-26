@@ -246,6 +246,15 @@ def build_diorama():
     # 56. Fortified Castle Spiked Portcullis Gateway
     import_asset("portcullis_gate.glb", (-2.0, 3.8, 0.0), rot_z=20, scale=0.85)
 
+    # 57. Manor Lords / Medieval Dynasty Timber Pasture Barn & Oxen Stalls
+    import_asset("pasture_barn.glb", (-5.2, 0.8, 0.0), rot_z=25, scale=0.75)
+
+    # 58. Medieval Wattle Sheepfold Pasture & Shearing Enclosure
+    import_asset("sheep_pen.glb", (-4.8, 3.2, 0.0), rot_z=-15, scale=0.80)
+
+    # 59. Livestock Feeding Trough & Winter Silage Manger
+    import_asset("feeding_trough.glb", (-3.6, 2.8, 0.0), rot_z=10, scale=0.88)
+
     # Render output path
     output_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "assets"))
     output_path = os.path.join(output_dir, "showcase_realm.png")

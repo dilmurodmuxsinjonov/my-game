@@ -329,6 +329,32 @@ Medieval davrning haqiqiy muhandisligi:
   - 500 mustahkamlik balli (HP): devorbuzar va bolg'a zarbalariga qarshi -50% chidamlilik (blunt resistance), kamon o'qlariga -80% qaytarish defleksiyasi.
   - **Tuzoq ezish zarari (Trap Crush)**: Darvoza tepadan pastga tashlanganda, ostida qolgan barcha bosqinchilarga 80 ball crushing zarbasi beriladi.
 
+---
+
+## 13. Manor Lords & Medieval Dynasty Integratsiyasi — Chorvachilik, Og'ir Xo'kizlar Logistikasi, Qo'y Juni va Qishki Ozuqa Oxuri (Milestone 24)
+
+### 13.1. Og'ir Yog'och Molxona va Xo'kizlar Logistikasi (`PastureBarn` & `pasture_barn.glb`) — [Manor Lords / Medieval Dynasty]
+- **Muammo**: Katta qasrlar va soborlar qurilishida uzoq o'rmonlardan og'ir yog'och xodalarini qo'lda tashish kolonistlar ish unumdorligini falaj qiladi.
+- **Yechim (`PastureBarn` & `pasture_barn.glb`)**:
+  - Somon boloxonali, eman ustunli molxona va hayvonlar bo'lmasi (`pasture_barn.glb`).
+  - **Ishchi Xo'kizlar (`draft_oxen`)**: Xo'kizga bo'yinturuq bog'lab, bir safarda birdaniga 4 ta og'ir yog'och xodasini 1.8x tezlik bilan qurilish maydoniga yetkazadi.
+  - **Sog'in Sigirlar (`dairy_cows`)**: Har kuni ozuqa bilan ta'minlanganda 4 ko'za yangi sut (`milk_jug`) ishlab chiqaradi. Ozuqa bo'lmaganda mahsuldorlik 0 ga tushadi.
+
+### 13.2. Qo'yxona va Qishki Jun Kiyim To'qish (`SheepPasture` & `sheep_pen.glb`) — [Going Medieval / Medieval Dynasty]
+- **Muammo**: Qahraton qishda va qor bo'ronlarida fuqarolar gipotermiya (muzlash) tufayli kasal bo'lib o'ladi.
+- **Yechim (`SheepPasture` & `sheep_pen.glb`)**:
+  - Chipta to'siqli qo'y qo'rasi, boshpana va jun qirqish kursisi (`sheep_pen.glb`).
+  - Har 2 kunda qo'ylardan 8 ta toza qo'y juni (`raw_wool`) qirqib olinadi.
+  - **Issiq Jun Nimcha (`woolen_tunic`)**: 2 ta jun $\rightarrow$ 1 ta qalin jun nimcha. Qishki sovuqqa +35.0 issiqlik bardoshliligi beradi va aholi kayfiyatiga +10 baxtiyorlik (morale) qo'shadi.
+
+### 13.3. Qishki Ozuqa Oxuri va Ochlikdan Qirilib Ketish (`FeedingTrough` & `feeding_trough.glb`) — [RimWorld / Medieval Dynasty]
+- **Muammo**: Qishda yer yuzasini qor qoplaganda yaylovlardagi yashil o't muzlaydi va hayvonlar ochiq havoda oziqlana olmaydi.
+- **Yechim (`FeedingTrough` & `feeding_trough.glb`)**:
+  - 40 birlik somon va silos sig'imiga ega qalin yog'och oxur (`feeding_trough.glb`).
+  - Harorat $5^\circ\text{C}$ dan pastga tushganda mollar o'tlay olmaydi va har bir hayvon kuniga 1 ta zaxira somon iste'mol qiladi.
+  - Agar oxur bo'shab qolsa, ogohlantirish signali chalinadi va chorva ochlikdan nobud bo'la boshlaydi.
+
+
 
 
 
