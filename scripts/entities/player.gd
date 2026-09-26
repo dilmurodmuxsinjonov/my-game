@@ -35,6 +35,9 @@ const MeadFermenter = preload("res://scripts/world/mead_fermenter.gd")
 const SiegeEngine = preload("res://scripts/combat/siege_engine.gd")
 const PitchCauldron = preload("res://scripts/combat/pitch_cauldron.gd")
 const PortcullisGate = preload("res://scripts/world/portcullis_gate.gd")
+const PastureBarn = preload("res://scripts/world/pasture_barn.gd")
+const SheepPasture = preload("res://scripts/world/sheep_pasture.gd")
+const FeedingTrough = preload("res://scripts/world/feeding_trough.gd")
 
 ## First-Person Monarch Controller.
 ## Follows the Single Persistent Monarch Paradigm: No dynasty, no permadeath;

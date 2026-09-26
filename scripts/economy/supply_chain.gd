@@ -129,7 +129,13 @@ var inventory: Dictionary = {
 	"catapult": 0,
 	"pitch_cauldron": 0,
 	"portcullis_gate": 0,
-	"fire_boulder": 4
+	"fire_boulder": 4,
+	"pasture_barn": 0,
+	"sheep_pen": 0,
+	"feeding_trough": 0,
+	"raw_wool": 8,
+	"woolen_tunic": 0,
+	"hay_fodder": 20
 }
 
 func salt_meat(amount: int) -> bool:

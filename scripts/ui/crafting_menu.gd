@@ -383,6 +383,26 @@ const RECIPES: Dictionary = {
 			"name": "Incendiary Fire Boulder (x2)",
 			"inputs": {"stone": 4, "coal": 2},
 			"output": {"name": "Fire Boulder", "type": "ammo", "icon": "🔥", "count": 2}
+		},
+		{
+			"name": "Timber Pasture Barn",
+			"inputs": {"logs": 12, "planks": 8, "stone": 4},
+			"output": {"name": "Pasture Barn", "type": "placeable", "icon": "🛖", "count": 1}
+		},
+		{
+			"name": "Wattle Sheepfold Pen",
+			"inputs": {"logs": 6, "planks": 4},
+			"output": {"name": "Sheep Pen", "type": "placeable", "icon": "🐑", "count": 1}
+		},
+		{
+			"name": "Livestock Feeding Trough",
+			"inputs": {"logs": 4, "iron_ingots": 1},
+			"output": {"name": "Feeding Trough", "type": "placeable", "icon": "🪵", "count": 1}
+		},
+		{
+			"name": "Warm Woolen Tunic",
+			"inputs": {"raw_wool": 2},
+			"output": {"name": "Woolen Tunic", "type": "armor", "warmth": 35.0, "icon": "🧥", "count": 1}
 		}
 	],
 	"campfire": [

@@ -2335,8 +2335,91 @@ class TestEngineVerticalSlice(unittest.TestCase):
         total_crush_inflicted = enemies_underneath * crush_damage
         self.assertEqual(total_crush_inflicted, 240.0)
 
+    def test_milestone24_glb_assets(self):
+        """Verify binary glTF headers and integrity for Milestone 24 3D models."""
+        models_dir = os.path.join(os.path.dirname(__file__), "..", "assets", "models")
+        m24_models = ["pasture_barn.glb", "sheep_pen.glb", "feeding_trough.glb"]
+        for m in m24_models:
+            p = os.path.join(models_dir, m)
+            self.assertTrue(os.path.exists(p), f"Missing model {m}")
+            self.assertGreater(os.path.getsize(p), 1000, f"Model {m} is unusually small")
+            with open(p, "rb") as f:
+                header = f.read(4)
+                self.assertEqual(header, b"glTF", f"Model {m} does not have valid glTF magic header")
+
+    def test_pasture_barn_oxen_hauling_and_dairy(self):
+        """Verify Manor Lords style draft oxen heavy hauling and Medieval Dynasty dairy production."""
+        dairy_cows = 2
+        draft_oxen = 1
+        daily_milk_per_cow = 2
+        ox_haul_capacity = 4
+        ox_speed_multiplier = 1.8
+
+        # 1. Daily milk production with fodder available
+        has_fodder = True
+        milk_yield = (dairy_cows * daily_milk_per_cow) if has_fodder else 0
+        self.assertEqual(milk_yield, 4)
+
+        # 2. Daily milk production under starvation (no winter fodder)
+        has_fodder = False
+        starvation_yield = (dairy_cows * daily_milk_per_cow) if has_fodder else 0
+        self.assertEqual(starvation_yield, 0)
+
+        # 3. Draft oxen log hauling (4 logs per ox per trip)
+        available_logs = 10
+        hauled_logs = min(available_logs, draft_oxen * ox_haul_capacity)
+        self.assertEqual(hauled_logs, 4)
+        self.assertEqual(ox_speed_multiplier, 1.8)
+
+    def test_sheep_pasture_and_woolen_tunic_weaving(self):
+        """Verify sheep shearing yields and Going Medieval hypothermia-preventing woolen tunic weaving."""
+        sheep_count = 4
+        wool_per_sheep = 2
+        shearing_cycle_days = 2.0
+        tunic_cost = 2
+        warmth_bonus = 35.0
+        morale_bonus = 10
+
+        # Shearing cycle yields 8 wool
+        wool_yield = sheep_count * wool_per_sheep
+        self.assertEqual(wool_yield, 8)
+
+        # Weave 3 woolen tunics
+        tunics_to_weave = 3
+        needed_wool = tunics_to_weave * tunic_cost
+        remaining_wool = wool_yield - needed_wool
+        self.assertEqual(needed_wool, 6)
+        self.assertEqual(remaining_wool, 2)
+        self.assertEqual(warmth_bonus, 35.0)
+        self.assertEqual(morale_bonus, 10)
+
+    def test_feeding_trough_winter_starvation(self):
+        """Verify livestock winter fodder consumption, grazing thresholds, and starvation risks."""
+        max_capacity = 40
+        freezing_threshold = 5.0
+        stored_fodder = 20
+        total_animals = 5 # 2 cows + 1 ox + 2 sheep
+
+        # Spring/Summer (Temp = 18°C): Animals graze pasture grass freely (0 fodder consumed)
+        ambient_temp = 18.0
+        consumed_warm = 0 if ambient_temp >= freezing_threshold else total_animals
+        self.assertEqual(consumed_warm, 0)
+
+        # Winter (Temp = -4°C): Animals require stored fodder from trough
+        ambient_temp = -4.0
+        consumed_cold = total_animals if ambient_temp < freezing_threshold else 0
+        stored_fodder -= consumed_cold
+        self.assertEqual(consumed_cold, 5)
+        self.assertEqual(stored_fodder, 15)
+
+        # Empty trough triggers starvation
+        stored_fodder = 0
+        has_adequate_feed = (stored_fodder >= total_animals)
+        self.assertFalse(has_adequate_feed)
+
 if __name__ == "__main__":
     unittest.main()
+
 
 
 

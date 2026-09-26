@@ -7,6 +7,19 @@
 - Dastlabki Godot prototipi va foydalanuvchining showcase fayllari saqlandi.
 - Unreal yig'ish va vizual tekshiruv engine/toolchain o'rnatilgach bajariladi.
 
+## 2026-09-26 — Milestone 24: Manor Lords & Medieval Dynasty Chorvachilik, Xo'kizlar Logistikasi, Qo'y Juni va Qishki Ozuqa Oxuri (Issue #7)
+- **Og'ir Yog'och Molxona va Xo'kizlar Logistikasi (`PastureBarn` & `pasture_barn.glb`)**:
+  - Ishchi Xo'kizlar (`draft_oxen`): Bir safarda 4 ta og'ir xodani 1.8x tezlik bilan qurilishga yetkazib, logistika tirbandligini bartaraf etish.
+  - Sog'in Sigirlar (`dairy_cows`): Kuniga 4 ko'za yangi sut (`milk_jug`) sog'ib olish.
+- **Qo'yxona va Qishki Jun Kiyim To'qish (`SheepPasture` & `sheep_pen.glb`)**:
+  - Qo'ylardan har 2 kunda 8 ta toza qo'y juni (`raw_wool`) qirqish.
+  - Qalin Jun Nimcha (`woolen_tunic`): 2 ta jun $\rightarrow$ 1 ta nimcha (+35 qishki sovuqqa bardoshlilik va +10 baxtiyorlik).
+- **Qishki Ozuqa Oxuri va Muzlash Mexanikasi (`FeedingTrough` & `feeding_trough.glb`)**:
+  - 40 birlik somon/silos sig'imli oxur; havo harorati $5^\circ\text{C}$ dan tushganda mollarni qishki ozuqa bilan ta'minlash.
+- **Yangi 3D Modellar (Blender 5.2)**: `pasture_barn.glb`, `sheep_pen.glb`, `feeding_trough.glb` yaratildi (jami **64 ta GLB model**).
+- **Yangi Qirollik Dioramasi**: Barcha 64 ta aktiv ishtirokidagi diorama `assets/showcase_realm.png` da render qilindi va brainga saqlandi.
+- **Avtomatlashgan Testlar**: Jami **84 ta engine testi** (umumiy **141 ta test**) 100% muvaffaqiyat bilan o'tdi.
+
 ## 2026-09-26 — Milestone 23: Stronghold & Mount & Blade II Qasr Qamal Mudofaasi, Mangonel Katapultasi, Qaynoq Smola Qozoni va O'tkir Panjara Darvoza (Issue #5)
 - **Mangonel Katapultasi va Yong'inli Toshlar (`SiegeEngine` & `catapult.glb`)**:
   - 15m dan 65m gacha ballistik masofada dushman saflarini o'qqa tutish.
