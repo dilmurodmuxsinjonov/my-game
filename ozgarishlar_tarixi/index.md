@@ -7,6 +7,22 @@
 - Dastlabki Godot prototipi va foydalanuvchining showcase fayllari saqlandi.
 - Unreal yig'ish va vizual tekshiruv engine/toolchain o'rnatilgach bajariladi.
 
+## 2026-09-26 — Milestone 23: Stronghold & Mount & Blade II Qasr Qamal Mudofaasi, Mangonel Katapultasi, Qaynoq Smola Qozoni va O'tkir Panjara Darvoza (Issue #5)
+- **Mangonel Katapultasi va Yong'inli Toshlar (`SiegeEngine` & `catapult.glb`)**:
+  - 15m dan 65m gacha ballistik masofada dushman saflarini o'qqa tutish.
+  - 120 ball to'g'ridan-to'g'ri zarba va 12 metr radiusdagi zarba to'lqini.
+  - Olovli tosh (`fire_boulder`): +50 qo'shimcha yong'in zarbasi (jami 170 ball).
+- **Qaynoq Qora Smola Qozoni (`PitchCauldron` & `pitch_cauldron.glb`)**:
+  - Darvoza arki mudofaasi: 6 metr radiusda 15 soniya davomida 40 DPS (jami 600 zarba salohiyati) olov ko'lmagi.
+  - Raqiblar harakat tezligini 60% ga (0.40x) sekinlashtirish.
+  - 5 ta zaryad zaxirasi va 45 soniyalik qayta qaynash sikli.
+- **Mustahkam O'tkir Temir Panjara Darvoza (`PortcullisGate` & `portcullis_gate.glb`)**:
+  - 500 mustahkamlik HP, devorbuzar va bolg'a zarbalariga -50% chidamlilik, o'q-yoylarga -80% defleksiya.
+  - Tuzoq ezish (Trap Crush): Darvoza tushirilganda ostidagi bosqinchilarga 80 crushing zarbasi beradi.
+- **Yangi 3D Modellar (Blender 5.2)**: `catapult.glb` (450 KB), `pitch_cauldron.glb` (331 KB), `portcullis_gate.glb` (211 KB) yaratildi (jami **61 ta GLB model**).
+- **Yangi Qirollik Dioramasi**: Barcha 61 ta aktiv ishtirokidagi diorama `assets/showcase_realm.png` da render qilindi va brainga saqlandi.
+- **Avtomatlashgan Testlar**: Jami **80 ta engine testi** (umumiy **137 ta test**) 100% muvaffaqiyat bilan o'tdi.
+
 ## 2026-09-25 — Milestone 22: Medieval Dynasty & Valheim Asalarichilik, Asal Sharobi va Mum Shamlar (Issue #3)
 - **Somonli Asalari Uyasi va Changlatish (`ApiaryBeehive` & `beehive_skep.glb`)**:
   - Har kuni passiv 3 ta asalari mumi katagi (`honeycomb`) va 2 ta toza mum (`beeswax`) ishlab chiqarish.

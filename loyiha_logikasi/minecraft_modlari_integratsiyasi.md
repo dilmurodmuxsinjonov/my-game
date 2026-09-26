@@ -301,5 +301,34 @@ Medieval davrning haqiqiy muhandisligi:
   - **Oltin Asal Sharobi (`honey_mead`)**: 2 ta honeycomb + 1 toza suv + 1 bug'doy $\rightarrow$ 2 ko'za asal sharobi (Aholiga +15 morale va qishki sovuqqa +25.0 issiqlik bardoshliligi beradi).
   - **Mum Shamlar (`beeswax_candle`)**: 2 ta mum $\rightarrow$ 3 ta sham (`candle_candelabra.glb` orqali qasr va yer osti shaxtalarini yoritadi).
 
+---
+
+## 12. Stronghold & Mount & Blade II: Bannerlord Integratsiyasi — Qasr Mudofaasi, Mangonel Katapultasi, Qaynoq Smola Qozoni va O'tkir Panjara Darvoza (Milestone 23)
+
+### 12.1. Mangonel Katapultasi va Yong'inli Toshlar (`SiegeEngine` & `catapult.glb`) — [Stronghold / Mount & Blade II]
+- **Muammo**: Dushman daryo narigi tomonida yoki uzoq masofada tosh devorlar ortida to'planib qolganida o'q-yoy yetib bormaydi.
+- **Yechim (`SiegeEngine` & `catapult.glb`)**:
+  - Qattiq eman xodalaridan yasalgan, og'ir qarshi toshli Mangonel artilleriyasi (`catapult.glb`).
+  - Masofa chegarasi: 15 metrdan 65 metrgacha ballistik traektoriya.
+  - Asosiy tosh zarbasi: 120 ball to'g'ridan-to'g'ri maydalovchi zarar va 12 metr radiusdagi zarba to'lqini.
+  - **Olovli tosh (`fire_boulder`)**: +50 yong'in zarari qo'shilib, umumiy zarba 170 ballga yetadi va yog'och istehkomlarni kul qiladi.
+
+### 12.2. Qaynoq Qora Smola (Pitch) Qozoni (`PitchCauldron` & `pitch_cauldron.glb`) — [Stronghold "Pour Oil!"]
+- **Muammo**: Dushman piyodalari qasr darvozasi tagiga to'planib, devorni buzishga uringanda yuqoridan ularni to'xtatish qiyin bo'ladi.
+- **Yechim (`PitchCauldron` & `pitch_cauldron.glb`)**:
+  - Darvoza arki yoki devor bo'g'ziga o'rnatilgan cho'yan qozon (`pitch_cauldron.glb`).
+  - Qozondan quyilgan yonuvchi qora smola pastda 6 metrlik qaynoq ko'lmak hosil qiladi:
+    - 15 soniya davomida har soniyada 40 DPS olov zarari (jami 600 ball zarba salohiyati).
+    - Raqiblar harakatlanish tezligini 60% ga (0.40x) sekinlashtiruvchi to'siq effekti.
+  - 5 marta quyish zaxirasi; har to'kilishdan so'ng 45 soniyada qayta qaynaydi.
+
+### 12.3. Mustahkam O'tkir Temir Panjara Darvoza (Portcullis Gate) (`PortcullisGate` & `portcullis_gate.glb`) — [Mount & Blade II / Stronghold Gatehouse]
+- **Muammo**: Oddiy yog'och darvozalar devorbuzar rammalar zarbasiga dosh bera olmay tez sinadi.
+- **Yechim (`PortcullisGate` & `portcullis_gate.glb`)**:
+  - Temir uchi o'tkirlangan qalin eman panjarasi va yuk ko'tarish richagi/chig'iri (`portcullis_gate.glb`).
+  - 500 mustahkamlik balli (HP): devorbuzar va bolg'a zarbalariga qarshi -50% chidamlilik (blunt resistance), kamon o'qlariga -80% qaytarish defleksiyasi.
+  - **Tuzoq ezish zarari (Trap Crush)**: Darvoza tepadan pastga tashlanganda, ostida qolgan barcha bosqinchilarga 80 ball crushing zarbasi beriladi.
+
+
 
 
