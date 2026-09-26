@@ -7,6 +7,21 @@
 - Dastlabki Godot prototipi va foydalanuvchining showcase fayllari saqlandi.
 - Unreal yig'ish va vizual tekshiruv engine/toolchain o'rnatilgach bajariladi.
 
+## 2026-09-27 — Milestone 26: Medieval Dynasty & Bellwright Ovchilik Kulbasi, Eman Po'stlog'i Teri Oshlash va Mo'yna Quritish Dastgohi (Issue #11)
+- **O'rmon va Tog' Ovchilik Kulbasi (`HuntingLodge` & `hunting_lodge.glb`)**:
+  - Malakali ovchilar tayinlash (3 tagacha); Deep Forest (1.5x) va Highlands (1.2x) biomlarida yovvoyi kiyik va cho'chqa ovi mahsuldorligi.
+  - Kamonchilar Boshpanasi (`archery_blind`): Hosildorlikka +35% bonus va yovvoyi hayvonlar hujumi jarohatini 15% dan 3% ga tushirish.
+  - Kunlik hosil: To'yimli kiyik go'shti (`raw_venison`), xom teri (`raw_hide`), hayvon yog'i (`tallow`) va xom mo'yna (`raw_pelt`).
+- **Eman Po'stlog'i Teri Oshlash Qadog'i (`TanneryVat` & `tannery_vat.glb`)**:
+  - 2 xom teri + 1 eman po'stlog'i (`oak_bark` tannin) + 1 chelak suv $\rightarrow$ 2 mustahkam oshlangan charm (`cured_leather`).
+  - Feodal hunarmandchilik: Gambeson sovuti (4 charm + 2 jun), Ishchi xo'kiz jabdug'i (3 charm + 2 temir quyma) va mergan sadoqi.
+- **Mo'yna Quritish Dastgohi va Shohona Chopon (`FurDryingRack` & `fur_drying_rack.glb`)**:
+  - A-simon quritish ramkasida xom mo'ynalarni tortib quritish (20 soniya per pelt $\rightarrow$ `cured_fur`).
+  - Qishki Shohona Mo'ynali Chopon (`fur_cloak`): 3 cured fur + 1 woolen tunic (+50 sovuqqa bardoshlilik, +15 zodagonlar baxtiyorligi va 15 oltin tanga bozor narxi).
+- **Yangi 3D Modellar (Blender 5.2)**: `hunting_lodge.glb`, `tannery_vat.glb`, `fur_drying_rack.glb` yaratildi (jami **70 ta GLB model**).
+- **Yangi Qirollik Dioramasi**: Barcha 70 ta aktiv ishtirokidagi diorama `assets/showcase_realm.png` da render qilindi va brainga saqlandi.
+- **Avtomatlashgan Testlar**: Jami **92 ta engine testi** (umumiy **149 ta test**) 100% muvaffaqiyat bilan o'tdi.
+
 ## 2026-09-27 — Milestone 25: Ko'p Biomli Voksel Olam, Qaroqchilar Turlari (Archetypes) va Relyef Harakati Fizikasi (Issue #9)
 - **Ko'p Biomli Relyef Generatsiyasi va 3D G'orlar (`BiomeManager` & `VoxelWorld`)**:
   - 4 xil tabiiy biom: Yashil tekisliklar (`Plains`), Qalin o'rmon (`Deep Forest`), Baland qoyali tog'lar (`Highlands`) va Dengiz sathidan past daryo vodiylari (`River Valley`, $Y < 6$).
