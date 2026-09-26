@@ -447,6 +447,38 @@ Medieval davrning haqiqiy muhandisligi:
   - Maxsus yog'och taglikdagi, jez jo'mrakli 40 chelak sig'imli eman bochka (`water_cask.glb`).
   - Askar va kuryerlar uchun charm suv idishlari (`hydration_canteen`): Har bir jangchiga 2 chelak zaxira berilib, 24 soatlik to'liq chanqoq immuniteti bilan ta'minlanadi.
 
+---
+
+## 17. Valheim & Vintage Story Integratsiyasi — Yerosti Qadimiy Kriptasi, Sarkofag Qoldiqlari va Zulmat Labirintlari (Milestone 28)
+
+### 17.1. Protsedural Qadimiy Tosh Kriptasi (`CryptDungeon` & `crypt_entrance.glb`) — [Valheim / Minecraft]
+- **Muammo**: Er usti dunyosi to'liq o'rganilgach, o'yinchida xazina qidirish, unutilgan texnologiyalarni topish va xavfli yerosti labirintlariga sho'ng'ish (dungeon delving) ehtiyoji yuzaga keladi.
+- **Yechim (`CryptDungeon` & `crypt_entrance.glb`)**:
+  - Tog'lik hududlar (Highlands) etagida va chuqur g'orlarda ($Y < 12$) qadimiy o'yma tosh peshtoqli, zanglagan panjarali daxma kirishi (`crypt_entrance.glb`).
+  - Protsedural ko'p xonali tuzilma: Kirish vestibyuli, ustunli galereyalar, qopqonli yo'laklar va shohona dafn xonalari (`Burial Chamber`).
+  - Yerosti optik tuman va to'liq zulmat okluziyasi (0.05 ambient light).
+  - Sarkofaglar bezovta qilinganda daxma qo'riqchilari (`CryptSkeletonKnight`, `CryptDraugr`) uyg'onishi va pistirma hujumlari.
+
+### 17.2. O'yma Ohaktosh Sarkofagi va Qadimiy Yodgorliklar (`AncientSarcophagus` & `stone_sarcophagus.glb`) — [Vintage Story]
+- **Muammo**: Standart yog'och sandiqlardan oddiy resurslar chiqishi yerosti ekspeditsiyalarining qiymatini pasaytiradi; daxmalar o'ziga xos qadimiy sirlarga ega bo'lishi kerak.
+- **Yechim (`AncientSarcophagus` & `stone_sarcophagus.glb`)**:
+  - Ustida ritsarning tosh qiyofasi o'yilgan og'ir ohaktosh sarkofag (`stone_sarcophagus.glb`).
+  - **Lom bilan ochish mexanikasi (`prying`)**: Og'ir tosh qopqoqni qo'lda surish 12%/sek, temir lom (`iron_crowbar`) bilan esa 2.2x tezlikda (26.4%/sek) ochiladi.
+  - **Qopqonlar**: Zaharli nayzalar (`POISON_DARTS` - 25 zarar) yoki shiftdan tosh yog'ilishi; o'g'rilik mahorati (Rogue skill >= 40) orqali zararsizlantiriladi.
+  - **Nodir Yodgorliklar (Relics)**:
+    - Qadimiy Damashq Po'lati Chizmasi (`ancient_steel_schematic` - 45 oltin, unutilgan metallurgiya texnologiyasi).
+    - Qirol Aldenning Muhrli Uzugi (`lost_king_signet` - 60 oltin, +20 qirollik nufuzi, vassallar bilan munosabatga +15 diplomatiya).
+    - Qadimiy Oltin Tangalar (`ancient_coins`).
+
+### 17.3. Temir Devor Mash'ali va Zulmat Qo'rquvi Nazorati (`DungeonCrawlerManager` & `wall_sconce.glb`)
+- **Muammo**: Chuqur yerostidagi cheksiz zulmat o'yinchi va soqchilar ruhiyatiga (sanity) salbiy ta'sir ko'rsatib, vahima va jangga layoqatsizlik keltirib chiqaradi.
+- **Yechim (`DungeonCrawlerManager` & `wall_sconce.glb`)**:
+  - Qadimiy daxma devorlariga o'rnatilgan temir mash'aldon (`wall_sconce.glb`).
+  - Mash'ala yoqilganda 7.5 metr radiusda iliq yorug'lik aurasini beradi (240 soniya yonish muddati).
+  - **Ruhiyat va Qo'rquv Balansi**: Yorug'likda ruhiyat tiklanadi (+1.5/sek); qop-qorong'uda esa ruhiyat pasayadi (-2.0/sek). Ruhiyat 25% dan tushganda `Fear Debuff` (-30% jangovar aniqlik va qochish xavfi) faollashadi.
+  - Topilgan barcha relikviyalar qasr xazinasiga olib kelinib, feodal boylik va texnologiyalarga almashtiriladi.
+
+
 
 
 

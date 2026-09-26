@@ -7,6 +7,25 @@
 - Dastlabki Godot prototipi va foydalanuvchining showcase fayllari saqlandi.
 - Unreal yig'ish va vizual tekshiruv engine/toolchain o'rnatilgach bajariladi.
 
+## 2026-09-27 — Milestone 28: Valheim & Vintage Story Yerosti Tosh Kriptasi, Sarkofag Qoldiqlari va Ekspeditsiya Zulmati (Issue #15)
+- **Protsedural Qadimiy Tosh Kriptasi (`CryptDungeon` & `crypt_entrance.glb`)**:
+  - Tog'liklar va chuqur qatlamlarda ($Y < 12$) o'yma tosh daxma kirishi (`crypt_entrance.glb`).
+  - Protsedural ko'p xonali tuzilma: Kirish vestibyuli, ustunli galereyalar va shohona dafn zallari.
+  - Yerosti to'liq zulmat okluziyasi (0.05 ambient light) va optik tuman zichligi (0.04 fog density).
+  - Sarkofaglar ochilganda daxma qo'riqchilari (`CryptSkeletonKnight`, `CryptDraugr`) ning uyg'onishi va pistirma hujumi.
+- **O'yma Ohaktosh Sarkofagi va Nodir Yodgorliklar (`AncientSarcophagus` & `stone_sarcophagus.glb`)**:
+  - Ustida ritsar qiyofasi o'yilgan og'ir ohaktosh sarkofag (`stone_sarcophagus.glb`).
+  - Lom bilan ochish (`prying`): Oddiy qo'lda 12%/s, temir lom bilan 2.2x tezlik (26.4%/s).
+  - Qopqonlar: Zaharli nayzalar (`POISON_DARTS` - 25 zarar), o'g'rilik mahorati (Rogue skill >= 40) orqali zararsizlantirish.
+  - Nodir yodgorliklar: Qadimiy Damashq Po'lati Chizmasi (45 oltin qiymat), Qirol Aldenning Muhrli Uzugi (+20 nufuz, +15 vassallar bilan aloqa) va qadimiy oltin tangalar.
+- **Temir Devor Mash'ali va Ekspeditsiya Ruhiyati (`DungeonCrawlerManager` & `wall_sconce.glb`)**:
+  - Forged iron devor mash'aldoni (`wall_sconce.glb`), 7.5m yorug'lik radiusi va 240s yonish muddati.
+  - Ruhiyat va qo'rquv: Zulmatda ruhiyat yo'qolishi (-2.0/s), 25% dan pasayganda `Fear Debuff` (-30% jangovar aniqlik va qochish xavfi). Mash'ala atrofida ruhiyatning tiklanishi (+1.5/s).
+  - Topilgan relikviyalarni qasr xazinasiga topshirish va daromadga aylantirish.
+- **Yangi 3D Modellar (Blender 5.2)**: `crypt_entrance.glb`, `stone_sarcophagus.glb`, `wall_sconce.glb` yaratildi (jami **76 ta GLB model**).
+- **Yangi Qirollik Dioramasi**: Barcha 76 ta aktiv ishtirokidagi diorama `assets/showcase_realm.png` da render qilindi va brainga saqlandi.
+- **Avtomatlashgan Testlar**: Jami **100 ta engine testi** (umumiy **157 ta test**) 100% muvaffaqiyat bilan o'tdi.
+
 ## 2026-09-27 — Milestone 27: Medieval Dynasty & Going Medieval Suv Logistikasi, Qishloq Qudug'i, Akveduk Sug'orish va O't O'chirish (Issue #13)
 - **Tosh Quduq va Aholi Chanqog'i Mexanikasi (`WaterWell` & `water_well.glb`)**:
   - Daryo toshlaridan terilgan, yog'och shingilli soyabon va chig'irli quduq (`water_well.glb`).
