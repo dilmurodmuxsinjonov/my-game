@@ -7,6 +7,24 @@
 - Dastlabki Godot prototipi va foydalanuvchining showcase fayllari saqlandi.
 - Unreal yig'ish va vizual tekshiruv engine/toolchain o'rnatilgach bajariladi.
 
+## 2026-09-27 — Milestone 27: Medieval Dynasty & Going Medieval Suv Logistikasi, Qishloq Qudug'i, Akveduk Sug'orish va O't O'chirish (Issue #13)
+- **Tosh Quduq va Aholi Chanqog'i Mexanikasi (`WaterWell` & `water_well.glb`)**:
+  - Daryo toshlaridan terilgan, yog'och shingilli soyabon va chig'irli quduq (`water_well.glb`).
+  - Yerosti suv qatlamidan har kuni avtomatik 8 chelak toza ichimlik suvi (`potable_water`) to'ldiradi (maksimal sig'im 24 chelak).
+  - Har bir fuqaro kuniga 1 chelak suv iste'mol qiladi. Suv yetishmasa `Dehydrated` holati beriladi: -25% mehnat tezligi va -15 ruhiyat (morale) jarimasi.
+  - Yong'in o'chirish zaxirasi: Bino olov olganda quduqdan 4 chelak suv olinib, yong'in o'chiriladi.
+- **Rim Me'morchiligi Akveduk Sug'orish Tizimi (`AqueductIrrigation` & `aqueduct_pipe.glb`)**:
+  - Tosh ustunli arka va yuqori suv o'zani bo'ylab oqadigan akveduk kanali (`aqueduct_pipe.glb`).
+  - Daryo vodiysidan suv olib, har bir segment atrofida 8 metrlik to'liq namlik aurasini ta'minlaydi.
+  - Hosil Bonusi: Sug'orilgan ekinlar +30% (1.30x) tezroq o'sadi va yozgi qurg'oqchilik qovjirashidan 100% himoyalanadi.
+  - Mustahkamlik: 150 HP (yong'inga mutlaqo chidamli, qamal toshlari zarbasidan sinishi mumkin).
+- **Zaxira Suv Bochkasi va Harbiy Suv Idishlari (`WaterCask` & `water_cask.glb`)**:
+  - Maxsus yog'och taglikdagi, jez jo'mrakli 40 chelak sig'imli eman bochka (`water_cask.glb`).
+  - Askar va kuryerlar uchun charm suv idishlari (`hydration_canteen`): Har bir jangchiga 2 chelak zaxira berilib, 24 soatlik to'liq chanqoq immuniteti bilan ta'minlanadi.
+- **Yangi 3D Modellar (Blender 5.2)**: `water_well.glb`, `aqueduct_pipe.glb`, `water_cask.glb` yaratildi (jami **73 ta GLB model**).
+- **Yangi Qirollik Dioramasi**: Barcha 73 ta aktiv ishtirokidagi diorama `assets/showcase_realm.png` da render qilindi va brainga saqlandi.
+- **Avtomatlashgan Testlar**: Jami **96 ta engine testi** (umumiy **153 ta test**) 100% muvaffaqiyat bilan o'tdi.
+
 ## 2026-09-27 — Milestone 26: Medieval Dynasty & Bellwright Ovchilik Kulbasi, Eman Po'stlog'i Teri Oshlash va Mo'yna Quritish Dastgohi (Issue #11)
 - **O'rmon va Tog' Ovchilik Kulbasi (`HuntingLodge` & `hunting_lodge.glb`)**:
   - Malakali ovchilar tayinlash (3 tagacha); Deep Forest (1.5x) va Highlands (1.2x) biomlarida yovvoyi kiyik va cho'chqa ovi mahsuldorligi.

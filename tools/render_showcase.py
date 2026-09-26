@@ -273,6 +273,15 @@ def build_diorama():
     # 65. Fur Trapper's Timber Drying Rack
     import_asset("fur_drying_rack.glb", (-3.4, -4.8, 0.0), rot_z=15, scale=0.90)
 
+    # 66. Deep Stone Village Water Well & Timber Canopy
+    import_asset("water_well.glb", (1.2, 1.8, 0.0), rot_z=15, scale=0.88)
+
+    # 67. Roman Masonry Elevated Aqueduct Irrigation Flume
+    import_asset("aqueduct_pipe.glb", (2.8, 3.8, 0.0), rot_z=-70, scale=0.85)
+
+    # 68. Oak Bulk Water Storage Cask on Trestle Stand
+    import_asset("water_cask.glb", (0.2, 2.2, 0.0), rot_z=40, scale=0.90)
+
     # Render output path
     output_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "assets"))
     output_path = os.path.join(output_dir, "showcase_realm.png")
