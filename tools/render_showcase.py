@@ -327,6 +327,15 @@ def build_diorama():
     # 83. Mechanical Friction Clutch & Throw Lever
     import_asset("mechanical_clutch.glb", (-2.0, -0.6, 0.0), rot_z=30, scale=0.92)
 
+    # 84. Castle Moat Drawbridge Winch Spool Drum & Ratchet
+    import_asset("drawbridge_winch.glb", (-0.6, 4.2, 0.0), rot_z=20, scale=0.88)
+
+    # 85. Heavy Oak Drawbridge Gateway Platform & Iron Pivot Lugs
+    import_asset("drawbridge_platform.glb", (-1.8, 4.6, 0.0), rot_z=-25, scale=0.80)
+
+    # 86. Deep Quarry Treadwheel Cargo Crane & Hoisting Derrick
+    import_asset("treadwheel_crane.glb", (4.6, 3.8, 0.0), rot_z=-90, scale=0.80)
+
     # Render output path
     output_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "assets"))
     output_path = os.path.join(output_dir, "showcase_realm.png")

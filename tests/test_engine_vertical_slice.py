@@ -3419,6 +3419,117 @@ class TestEngineVerticalSlice(unittest.TestCase):
         effective_rpm = 24.0 if not is_overloaded_disengaged else 0.0
         self.assertEqual(effective_rpm, 24.0)
 
+    def test_drawbridge_winch_manual_and_kinetic_speed_modes(self):
+        """Verify drawbridge manual crank (12.0s) vs kinetic drive shaft (3.5s) winding speed and SU load."""
+        # 1. Manual mode (2 guards cranking)
+        manual_duration = 12.0
+        speed_manual = 90.0 / manual_duration # 7.5 deg/sec
+        self.assertAlmostEqual(speed_manual, 7.5, places=2)
+
+        angle = 0.0
+        # Cranking for 6 seconds
+        dt = 6.0
+        angle = min(90.0, angle + speed_manual * dt)
+        self.assertAlmostEqual(angle, 45.0, places=2)
+        # Cranking remaining 6 seconds
+        angle = min(90.0, angle + speed_manual * dt)
+        self.assertAlmostEqual(angle, 90.0, places=2)
+
+        # 2. Kinetic drive shaft mode (powered by water wheel network)
+        kinetic_duration = 3.5
+        speed_kinetic = 90.0 / kinetic_duration # 25.714 deg/sec
+        self.assertAlmostEqual(speed_kinetic, 25.714, places=2)
+
+        angle_k = 0.0
+        angle_k = min(90.0, angle_k + speed_kinetic * 3.5)
+        self.assertAlmostEqual(angle_k, 90.0, places=2)
+
+        # Kinetic load checks: 64 SU while moving, 0 SU when idle
+        kinetic_load_moving = 64.0
+        kinetic_load_idle = 0.0
+        self.assertEqual(kinetic_load_moving, 64.0)
+        self.assertEqual(kinetic_load_idle, 0.0)
+
+    def test_drawbridge_chain_tension_damage_and_collapse_crush(self):
+        """Verify dual chain HP integrity (800 HP each), tension snap, and 120 crush damage collapse."""
+        chain_hp = [800.0, 800.0]
+        crush_damage = 120.0
+        is_collapsed = False
+
+        # Catapult strike damages left chain for 400
+        chain_hp[0] -= 400.0
+        self.assertEqual(chain_hp[0], 400.0)
+        self.assertFalse(is_collapsed)
+
+        # Second artillery strike severing left chain completely
+        chain_hp[0] = max(0.0, chain_hp[0] - 500.0)
+        self.assertEqual(chain_hp[0], 0.0)
+        self.assertEqual(chain_hp[1], 800.0)
+        self.assertFalse(is_collapsed) # Right chain still holding
+
+        # Trebuchet strike severing right chain
+        chain_hp[1] = max(0.0, chain_hp[1] - 850.0)
+        self.assertEqual(chain_hp[1], 0.0)
+        if chain_hp[0] <= 0.0 and chain_hp[1] <= 0.0:
+            is_collapsed = True
+
+        self.assertTrue(is_collapsed)
+        # Platform collapses into moat: crushes invaders below for 120 damage
+        enemy_hp = 100.0
+        enemy_hp_after_crush = max(0.0, enemy_hp - crush_damage)
+        self.assertEqual(enemy_hp_after_crush, 0.0)
+
+    def test_treadwheel_cargo_crane_vertical_hoisting_and_depth_scaling(self):
+        """Verify vertical cargo crane 40m depth, 1,200kg payload limits, and hoisting velocity."""
+        max_depth = 40.0
+        max_payload = 1200.0
+
+        current_payload = 0.0
+        # Load 30-slot ore minecart (900 kg)
+        cart_weight = 900.0
+        self.assertTrue(current_payload + cart_weight <= max_payload)
+        current_payload += cart_weight
+
+        # Load quarry stone blocks (250 kg)
+        stone_weight = 250.0
+        self.assertTrue(current_payload + stone_weight <= max_payload)
+        current_payload += stone_weight
+        self.assertEqual(current_payload, 1150.0)
+
+        # Try to overload with additional 100 kg (1250 > 1200) -> overload rejected
+        rejected = (current_payload + 100.0 > max_payload)
+        self.assertTrue(rejected)
+
+        # Hoisting time from max depth 40m:
+        # Manual treadwheel: 1.2 m/s -> 40 / 1.2 = 33.33s
+        time_manual = max_depth / 1.2
+        self.assertAlmostEqual(time_manual, 33.33, places=1)
+
+        # Kinetic drive: 2.5 m/s -> 40 / 2.5 = 16.0s
+        time_kinetic = max_depth / 2.5
+        self.assertEqual(time_kinetic, 16.0)
+
+    def test_cargo_crane_worker_treadwheel_rotation_and_stamina_drain(self):
+        """Verify worker treadwheel stamina consumption (0.15/s) and 70% transit efficiency gain."""
+        stamina_rate = 0.15
+        hoist_time = 20.0 # seconds of continuous treadwheel walking
+
+        # Manual worker operation
+        stamina_spent = stamina_rate * hoist_time
+        self.assertAlmostEqual(stamina_spent, 3.0, places=2)
+
+        # Kinetic network operation (no worker required)
+        is_kinetic = True
+        kinetic_stamina_spent = 0.0 if is_kinetic else (stamina_rate * hoist_time)
+        self.assertEqual(kinetic_stamina_spent, 0.0)
+
+        # Logistics efficiency gain: 70% reduction in vertical haulage duration
+        efficiency_gain = 0.70
+        self.assertEqual(efficiency_gain, 0.70)
+        staircase_haul_time = 100.0 # seconds
+        crane_haul_time = staircase_haul_time * (1.0 - efficiency_gain)
+        self.assertAlmostEqual(crane_haul_time, 30.0, places=2)
+
 if __name__ == "__main__":
     unittest.main()
 

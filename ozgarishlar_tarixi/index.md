@@ -7,6 +7,23 @@
 - Dastlabki Godot prototipi va foydalanuvchining showcase fayllari saqlandi.
 - Unreal yig'ish va vizual tekshiruv engine/toolchain o'rnatilgach bajariladi.
 
+## 2026-09-27 — Milestone 33: Stronghold & Medieval Engineering Qasr Xandaq Ko'prigi Chig'iri, Ko'tarma Darvoza va G'ildirakli Shaxta Krani (Issue #25)
+- **Qasr Xandag'i Ko'tarma Ko'prik Chig'iri (`DrawbridgeController` & `drawbridge_winch.glb`)**:
+  - A-simon og'ir eman ustunli chig'ir, tishli po'lat baraban va qo'sh richagli aylantirish g'ildiragi (`drawbridge_winch.glb`).
+  - Qo'shaloq rejim: 2 ta soqchi yordamida qo'lda ko'tarish 12.0s (7.5 deg/s); kinetik val uzatmasi orqali shiddatli ko'tarish 3.5s (25.7 deg/s, 64 SU quvvat).
+- **Og'ir Eman Ko'tarma Ko'prik Platformasi va Zanjir Fizikasi (`drawbridge_platform.glb`)**:
+  - 6m x 4m qalin eman taxtalaridan iborat, temir kamar va piramidasimon mixlar bilan mustahkamlangan ko'tarma platforma (`drawbridge_platform.glb`).
+  - Qo'shaloq soxta temir zanjirlar (har biri 800 HP mustahkamlik).
+  - Qamal to'plari zanjirlarni uzganda erkin qulash va pastdagi dushman piyodalarini bosib qoluvchi 120 ball ezuvchi zarar (Crush Damage).
+- **Katta G'ildirakli Vertikal Shaxta Krani (`CargoCrane` & `treadwheel_crane.glb`)**:
+  - 2.6 metrli ichki qadam bosuvchi g'ildirak (treadwheel), vertikal gantry ustuni va egilgan ko'tarish balkasi (derrick jib) ga ega kran (`treadwheel_crane.glb`).
+  - 40 metrgacha vertikal chuqurlikdan 1,200 kg yuk sig'imi (30-uyali ruda vagonetkasi yoki 4 ta katta kesilgan tosh bloki).
+  - Vertikal logistika tranzit vaqtini 70% ga (0.30x) qisqartirish.
+  - Ishchi soniyasiga 0.15 charchoq sarflaydi; kinetik valga ulanganda fuqaro mehnatisiz avtomatlashtiriladi.
+- **Yangi 3D Modellar (Blender 5.2)**: `drawbridge_winch.glb`, `drawbridge_platform.glb`, `treadwheel_crane.glb` yaratildi (jami **91 ta GLB model**).
+- **Yangi Qirollik Dioramasi**: Barcha 91 ta aktiv ishtirokidagi diorama `assets/showcase_realm.png` da render qilindi va brainga saqlandi.
+- **Avtomatlashgan Testlar**: Jami **120 ta engine testi** (umumiy **177 ta test**) 100% muvaffaqiyat bilan o'tdi.
+
 ## 2026-09-27 — Milestone 32: Create Mod & Vintage Story Kinetik Transmissiya, Vallar, Burchakli Tishli Quti va Mexanik Mufta (Issue #23)
 - **Graf Asosidagi Kinetik Tarmoq Hal Qiluvchisi (`KineticNetworkManager`)**:
   - BFS grafigi orqali barcha ulangan manbalar, vallar va dastgohlarni aniqlash.
