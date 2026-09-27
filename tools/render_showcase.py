@@ -318,6 +318,15 @@ def build_diorama():
     # 80. Gothic Structural Flying Buttress & Load-Bearing Masonry Pier
     import_asset("masonry_buttress.glb", (5.2, -0.6, 0.0), rot_z=-60, scale=0.85)
 
+    # 81. Linear Cast-Iron Transmission Drive Shaft
+    import_asset("drive_shaft.glb", (-2.8, -0.6, 0.0), rot_z=15, scale=0.95)
+
+    # 82. 90-Degree Miter Bevel Gearbox Housing
+    import_asset("bevel_gearbox.glb", (-3.6, -0.6, 0.0), rot_z=-20, scale=0.90)
+
+    # 83. Mechanical Friction Clutch & Throw Lever
+    import_asset("mechanical_clutch.glb", (-2.0, -0.6, 0.0), rot_z=30, scale=0.92)
+
     # Render output path
     output_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "assets"))
     output_path = os.path.join(output_dir, "showcase_realm.png")

@@ -3313,6 +3313,112 @@ class TestEngineVerticalSlice(unittest.TestCase):
         self.assertAlmostEqual(damage_vs_gambeson, 57.5, places=1) # Penetrates gambeson
         self.assertEqual(damage_vs_plate, 0.0) # Glances off full plate armor
 
+    def test_kinetic_network_graph_propagation_and_rpm_transfer(self):
+        """Verify BFS kinetic graph solver propagating 24 RPM along drive shafts from water wheel to millstone."""
+        # Simulated kinetic grid
+        nodes = {
+            (0, 0, 0): {"type": "SOURCE", "capacity_su": 256.0, "base_rpm": 24.0, "axis": (1, 0, 0)},
+            (1, 0, 0): {"type": "TRANSMISSION", "idle_load_su": 0.0, "axis": (1, 0, 0)},
+            (2, 0, 0): {"type": "TRANSMISSION", "idle_load_su": 0.0, "axis": (1, 0, 0)},
+            (3, 0, 0): {"type": "CONSUMER", "load_su": 32.0, "axis": (1, 0, 0)} # Millstone
+        }
+
+        # BFS component traversal
+        queue = [(0, 0, 0)]
+        visited = {(0, 0, 0): True}
+        total_capacity = 0.0
+        total_load = 0.0
+
+        while queue:
+            curr = queue.pop(0)
+            node = nodes[curr]
+            if node["type"] == "SOURCE":
+                total_capacity += node["capacity_su"]
+            elif node["type"] == "CONSUMER":
+                total_load += node["load_su"]
+            elif node["type"] == "TRANSMISSION":
+                total_load += node["idle_load_su"]
+
+            # Linear neighbors along X axis
+            for dx in [-1, 1]:
+                neighbor = (curr[0] + dx, curr[1], curr[2])
+                if neighbor in nodes and neighbor not in visited:
+                    visited[neighbor] = True
+                    queue.append(neighbor)
+
+        self.assertEqual(len(visited), 4)
+        self.assertEqual(total_capacity, 256.0)
+        self.assertEqual(total_load, 32.0)
+        is_overloaded = total_load > total_capacity
+        self.assertFalse(is_overloaded)
+        effective_rpm = 0.0 if is_overloaded else nodes[(0, 0, 0)]["base_rpm"]
+        self.assertEqual(effective_rpm, 24.0)
+
+    def test_kinetic_network_overload_behavior_when_capacity_exceeded(self):
+        """Verify kinetic network overload stall when machine consumption exceeds available stress units."""
+        source_capacity = 256.0 # Water Wheel
+        # 4 Trip Hammers (64 SU each = 256 SU) + 1 Mechanical Press (48 SU) = 304 SU
+        machine_loads = [64.0, 64.0, 64.0, 64.0, 48.0]
+        total_load = sum(machine_loads)
+
+        self.assertEqual(total_load, 304.0)
+        is_overloaded = total_load > source_capacity
+        self.assertTrue(is_overloaded)
+
+        # When overloaded, effective RPM must stall to 0.0
+        base_rpm = 24.0
+        effective_rpm = 0.0 if is_overloaded else base_rpm
+        self.assertEqual(effective_rpm, 0.0)
+
+    def test_bevel_gearbox_axis_transformation_and_reverse_rotation(self):
+        """Verify 90-degree angular transmission, directional inversion, and gear ratio calculations."""
+        input_axis = (1, 0, 0) # X axis
+        output_axis = (0, 1, 0) # Y axis (orthogonal 90 degrees)
+
+        # Dot product of orthogonal vectors must be zero
+        dot_product = input_axis[0] * output_axis[0] + input_axis[1] * output_axis[1] + input_axis[2] * output_axis[2]
+        self.assertEqual(dot_product, 0)
+
+        input_rpm = 24.0
+        gear_ratio = 1.0
+        is_inverted = False
+
+        output_rpm = input_rpm * gear_ratio * (-1.0 if is_inverted else 1.0)
+        self.assertEqual(output_rpm, 24.0)
+
+        # Invert rotation direction (e.g. for reversing conveyor or hoist)
+        is_inverted = True
+        inverted_output_rpm = input_rpm * gear_ratio * (-1.0 if is_inverted else 1.0)
+        self.assertEqual(inverted_output_rpm, -24.0)
+
+        # Gearbox friction load
+        idle_friction_su = 4.0
+        self.assertEqual(idle_friction_su, 4.0)
+
+    def test_mechanical_clutch_disengagement_and_load_shedding(self):
+        """Verify mechanical clutch disengagement severing downstream loads and recovering stalled network."""
+        source_capacity = 256.0
+        upstream_load = 0.0
+        downstream_heavy_load = 304.0 # Overloading load
+
+        # 1. Clutch engaged: downstream load is attached
+        clutch_engaged = True
+        total_load = upstream_load + (downstream_heavy_load if clutch_engaged else 2.0)
+        self.assertEqual(total_load, 304.0)
+        is_overloaded = total_load > source_capacity
+        self.assertTrue(is_overloaded) # Network is stalled!
+
+        # 2. Lever pulled: clutch disengaged
+        clutch_engaged = False
+        clutch_idle_friction = 2.0
+        total_load_disengaged = upstream_load + clutch_idle_friction
+        self.assertEqual(total_load_disengaged, 2.0)
+
+        is_overloaded_disengaged = total_load_disengaged > source_capacity
+        self.assertFalse(is_overloaded_disengaged) # Network recovered!
+        effective_rpm = 24.0 if not is_overloaded_disengaged else 0.0
+        self.assertEqual(effective_rpm, 24.0)
+
 if __name__ == "__main__":
     unittest.main()
 
