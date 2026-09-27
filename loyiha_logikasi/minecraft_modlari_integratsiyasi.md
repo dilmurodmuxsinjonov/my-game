@@ -625,6 +625,35 @@ Medieval davrning haqiqiy muhandisligi:
   - Richag tortilganda quvvat uzatish uziladi va pastki og'ir zanjir tarmoqdan ajratiladi.
   - Ortiqcha yuk tufayli to'xtab qolgan tarmoq mufta ajratilishi bilan darhol o'zini tiklaydi va asosiy magistral 24 RPM tezlikda aylanishda davom etadi.
 
+---
+
+## 22. Stronghold & Medieval Engineering Integratsiyasi — Qasr Xandaq Ko'prigi Chig'iri, Ko'tarma Darvoza va G'ildirakli Shaxta Krani (Milestone 33)
+
+### 22.1. Qasr Xandag'i Ko'tarma Ko'prik Chig'iri (`DrawbridgeController` & `drawbridge_winch.glb`) — [Stronghold / Medieval Engineering]
+- **Muammo**: Suvli xandaq ustidagi oddiy yog'och ko'priklar doimiy ochiq qolib, qamal paytida dushman qo'shinlari va devorbuzarlarning qal'a darvozasiga to'g'ridan-to'g'ri yetib kelishiga yo'l qo'yadi.
+- **Yechim (`DrawbridgeController` & `drawbridge_winch.glb`)**:
+  - A-simon qalin eman ustunli chig'ir, markazida tishli quyma temir baraban va ikki tomonlama qo'l richaglari (`drawbridge_winch.glb`).
+  - **Qo'shaloq Ish Rejimi (Dual Mode)**:
+    - **Qo'lda Ko'tarish (Manual Cranking)**: 2 ta qo'riqchi askar yordamida 12.0 soniyada to'liq ko'tariladi (7.5 deg/s).
+    - **Kinetik Val Uzatmasi (Kinetic Powered)**: Suv g'ildiragi yoki kinetik tarmoq valiga ulanganda atigi 3.5 soniyada shiddat bilan ko'tariladi (25.7 deg/s, 64 SU quvvat sarfi).
+
+### 22.2. Og'ir Eman Ko'tarma Ko'prik Platformasi va Zanjir Fizikasi (`drawbridge_platform.glb`) — [Stronghold]
+- **Tavsif**: 6m x 4m qalin eman taxtalaridan yasalgan, temir kamar va piramidasimon mixlar bilan mustahkamlangan ko'tarma platforma (`drawbridge_platform.glb`).
+- **Zanjir Zo'riqishi va Uzilishi**:
+  - Ikkita soxta temir zanjir (har biri 800 HP mustahkamlik).
+  - Agar katapulta yoki qamal qurollari ikkala zanjirni uzsa, ko'prik platformasi tortish kuchisiz xandaq ustiga qulab tushadi.
+  - **Qulash Halokati (Moat Crush)**: Ko'prik ostidagi botqoq yoki xandaqda turgan dushman piyodalarini bosib qolib, 120 ball ezuvchi zarar yetkazadi.
+
+### 22.3. Katta G'ildirakli Vertikal Shaxta Krani (`CargoCrane` & `treadwheel_crane.glb`) — [Medieval Engineers / Vintage Story]
+- **Muammo**: Chuqur yerosti shaxtalari va tosh konlaridan ruda va og'ir tosh bloklarini zinapoyalar orqali yelkada tashish konchilar vaqtini va charchoq energiyasini so'rib oladi.
+- **Yechim (`CargoCrane` & `treadwheel_crane.glb`)**:
+  - 2.6 metrli piyoda qadam bosuvchi ichki g'ildirak (treadwheel), baland vertikal ustun va egilgan ko'tarish balkasi (derrick jib) ga ega gigant yog'och kran (`treadwheel_crane.glb`).
+  - **Chuqur Shaxta Qamrovi**: 40 metrgacha vertikal chuqurlikka osilgan kanop arqon va og'ir temir changak.
+  - **Yuk Ko'tarish Quvvati**: 1,200 kg gacha yuk sig'imi (30-uyali tosh/ruda vagonetkasi yoki 4 ta katta kesilgan tosh bloki).
+  - **Tranzit Unumdorligi**: Zinapoyada tashishga nisbatan vertikal logistika vaqtini 70% ga (0.30x ga) qisqartiradi.
+  - **Charchoq Balansi**: Ichkarida qadam bosuvchi ishchi soniyasiga 0.15 charchoq (stamina) sarflaydi; agar kran kinetik valga ulansa, fuqaro mehnatisiz avtomatlashtiriladi.
+
+
 
 
 
