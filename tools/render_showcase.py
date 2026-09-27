@@ -363,9 +363,19 @@ def build_diorama():
     # 95. Geared Shaft Incline Capstan Hoist Winch
     import_asset("mining_capstan.glb", (-4.8, -0.6, 0.0), rot_z=15, scale=0.82)
 
+    # 96. Geared Narrow-Gauge Steam Mine Locomotive
+    import_asset("mine_locomotive.glb", (2.8, -1.8, 0.0), rot_z=-145, scale=0.85)
+
+    # 97. Turnout Rail Switch & Ground-Throw Stand
+    import_asset("rail_switch.glb", (1.6, -1.8, 0.0), rot_z=-145, scale=0.85)
+
+    # 98. Trackside Bottom-Dump Hopper Discharge Station
+    import_asset("hopper_unloader.glb", (0.2, -1.8, 0.0), rot_z=-145, scale=0.80)
+
     # Render output path
     output_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "assets"))
     output_path = os.path.join(output_dir, "showcase_realm.png")
+
     
     bpy.context.scene.render.filepath = output_path
     print(f"[RENDER] Rendering 3D showcase diorama to {output_path}...")

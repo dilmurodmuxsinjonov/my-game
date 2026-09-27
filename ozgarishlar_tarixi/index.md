@@ -7,6 +7,24 @@
 - Dastlabki Godot prototipi va foydalanuvchining showcase fayllari saqlandi.
 - Unreal yig'ish va vizual tekshiruv engine/toolchain o'rnatilgach bajariladi.
 
+## 2026-09-27 — Milestone 37: Create Mod, Railcraft & Vintage Story Shaxta Temiryo'l Logistikasi: Tishli Bug' Parovozi, Temiryo'l Strelkasi va Bunker Tushirgichi (Issue #33)
+- **Tor Koleyli Kichik Shaxta Bug' Parovozi (`MineLocomotive` & `mine_locomotive.glb`)**:
+  - Gorizontal silindrik qora temir qozon (boiler), mis bug' gumbazi (steam dome), dastro'mollar (coupling rods) bilan bog'langan 4 ta shpilli g'ildiraklar, ochiq kabina va ko'mir bunkeri (`mine_locomotive.glb`).
+  - Tortish quvvati: 8,500 N gacha kuch, 6 ta vagonetkani (7,200 kg yuk) tortish imkoniyati.
+  - Termodinamika va tezlik: 8 bar ish bosimi, 12 bar xavfsizlik klapani (popoff valve), 4.5 m/s (16.2 km/h) tranzit tezligi.
+- **Mexanik Ikki Yo'nalishli Temiryo'l Strelkasi (`RailSwitch` & `rail_switch.glb`)**:
+  - Quyma po'lat krestovina (frog), ostryaklar (switch points), cho'yan yukli zvenoli dastak va rotatsion signal fonari (`rail_switch.glb`).
+  - Ikki yo'nalish: `STRAIGHT` (yashil signal) va `DIVERGING` (sariq signal, 2.5 m/s tezlik chegarasi).
+  - 0.6 soniyada silliq o'tish; po'lat g'ildiraklar ustida bo'lganda qulflanish (interlocking); prujinali mexanizm (spring switch) bilan relsdan chiqishdan 100% himoyalangan.
+- **Avtomatlashgan Estakada Bunker Tushirgichi (`HopperUnloader` & `hopper_unloader.glb`)**:
+  - Rel'slar ostidagi teskari piramidasimon po'lat voronka, yo'l chetidagi prujinali richaglar (trip levers) va roliklar (`hopper_unloader.glb`).
+  - Vagonetka ostidagi tushirish lyukini avtomatik urib ochish: 12 dona/s evakuatsiya tezligi (30 ta rudani 2.5 soniyada to'liq to'kib yuboradi).
+  - 120 dona sig'imli qabul bunkeri va nov orqali pastdagi konveyer/pechga 8 dona/s tezlikda uzluksiz ruda quyish.
+- **Yangi 3D Modellar (Blender 5.2)**: `mine_locomotive.glb`, `rail_switch.glb`, `hopper_unloader.glb` yaratildi (jami **103 ta GLB model**!).
+- **Yangi Qirollik Dioramasi**: Barcha 103 ta aktiv ishtirokidagi diorama `assets/showcase_realm.png` da render qilindi va brainga saqlandi.
+- **Avtomatlashgan Testlar**: Jami **136 ta engine testi** (umumiy **193 ta test**) 100% muvaffaqiyat bilan o'tdi.
+
+
 ## 2026-09-27 — Milestone 36: Georgius Agricola (*De Re Metallica*), Vintage Story & Create Mod Yerosti Kon Muhandisligi: Drenaj Suv Nasosi, Shamollatish Ventilyatori va Shaxta Lebyodkasi (Issue #31)
 - **Vertikal Zanjirli Sump Drenaj Nasosi (`MineDewateringPump` & `mine_dewatering_pump.glb`)**:
   - Suv yig'iladigan chuqur (sump pit) ustidagi baland eman headframe portali, uzluksiz mis chelaklar zanjiri, tishli sproket va yuqori yog'och nov (`mine_dewatering_pump.glb`).

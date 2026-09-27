@@ -739,6 +739,36 @@ Medieval davrning haqiqiy muhandisligi:
     - *Qo'lda Aylantirish*: 4 kishilik konchilar brigadasi dastaklarni aylantirganda 0.35 m/s tezlikda ko'taradi.
   - **Avariyaga Qarshi Xavfsizlik**: Prujinali temir tishli qulf (pawl) uzatma to'xtaganda yukning pastga shiddat bilan qulashiga yo'l qo'ymaydi.
 
+---
+
+## 26. Create Mod, Railcraft & Vintage Story Integratsiyasi — Shaxta Temiryo'l Logistikasi: Tishli Bug' Parovozi, Temiryo'l Strelkasi va Bunker Tushirgichi (Milestone 37)
+
+### 26.1. Tor Koleyli Kichik Shaxta Bug' Parovozi (`MineLocomotive` & `mine_locomotive.glb`) — [Create Mod / Railcraft]
+- **Muammo**: Yerosti konlaridan qazib olingan og'ir ruda va ko'mirni yuzadagi domna pechlariga (Milestone 35) ot-aravalar yoki fuqarolar orqali tashish 10 ta ishchini doimiy band qilib, transport tezligini atigi 0.8 m/s bilan cheklaydi.
+- **Yechim (`MineLocomotive` & `mine_locomotive.glb`)**:
+  - Gorizontal silindrik qora temir qozon (boiler), mis bug' gumbazi (steam dome), yon dastro'mollari (side coupling rods) bilan bog'langan 4 ta shpilli g'ildiraklar, ochiq kabina va orqa ko'mir bunkeri.
+  - **Tortish Quvvati**: 8,500 N gacha tortish kuchini hosil qilib, 6 ta to'liq yuklangan bunker vagonetkalarini (jami 7,200 kg yukni) birvarakayiga torta oladi.
+  - **Bug' Dinamikasi**: Yog'och ko'miri (charcoal) va suv sarflab, 8 bar optimal ish bosimiga erishadi.
+  - **Avariya Klapani (Popoff Valve)**: 12 bar dan oshganda ortiqcha bug'ni avtomatik chiqarib, qozon portlashining oldini oladi.
+  - **Tranzit Tezligi**: 4.5 m/s (16.2 km/h) — inson tashishiga nisbatan 5.6 barobar tez logistika.
+
+### 26.2. Mexanik Ikki Yo'nalishli Temiryo'l Strelkasi (`RailSwitch` & `rail_switch.glb`) — [Railcraft / Create Mod]
+- **Muammo**: Poyezdlar magistral yo'ldan tushirish estakadasiga yoki ruda yuklash shoxobchasiga o'tishi uchun xavfsiz va boshqariladigan yo'l almashish mexanizmi talab etiladi.
+- **Yechim (`RailSwitch` & `rail_switch.glb`)**:
+  - Quyma po'lat krestovina (frog), harakatlanuvchi ostryak relslari (switch points), cho'yan yukli zvenoli dastak (counterweighted ground-throw lever) va aylanuvchi signal fonari.
+  - **Ikki Holat**: `STRAIGHT` (asosiy yo'nalish, yashil signal) va `DIVERGING` (tarmoq yo'li, sariq/qizil signal, 2.5 m/s tezlik cheklovi).
+  - **0.6s O'tish Vaqti**: Dastak tushirilganda relslar 0.6 soniyada ravon siljiydi.
+  - **Harakatlanish Xavfsizligi**: Poyezd g'ildiraklari strelka ustida bo'lganda (`is_occupied = true`) qulflanadi; prujinali mexanizm (`spring switch`) tufayli qarshi yo'ldan kelgan vagonlar relsdan chiqmasdan (derailment xavfisiz) o'tib keta oladi.
+
+### 26.3. Avtomatlashgan Estakada Bunker Tushirgichi (`HopperUnloader` & `hopper_unloader.glb`) — [Create Mod / Factorio]
+- **Muammo**: Har bir vagonetkadan 30 uyali ruda va ko'mirni qo'lda belkuraklab tushirish 40 soniya vaqt olib, butun poyezd logistika zanjirini to'xtatib qo'yadi.
+- **Yechim (`HopperUnloader` & `hopper_unloader.glb`)**:
+  - Rel'slar ostiga o'rnatilgan teskari piramidasimon qalin po'lat voronka, yo'l chetidagi prujinali richaglar (trip levers) va yo'naltiruvchi roliklar.
+  - **Avtomatik Pastki Qulfni Ochish**: Vagonetka unloader ostidan o'tayotganda rolik pastki lyukni urib ochadi.
+  - **12 dona/sekund Evakuatsiya**: 30 ta rudani atigi 2.5 soniyada to'liq qabul qilish bunkeriga to'kib yuboradi.
+  - **120 dona Sig'im va Nov Oqimi**: Sunken bunkerdan daqiqasiga 8 ta ruda tezligida konveyer lentasiga (Milestone 16) yoki to'g'ridan-to'g'ri domna pechi forzonkasiga (Milestone 35) uzluksiz quyiladi.
+
+
 
 
 

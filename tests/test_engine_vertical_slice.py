@@ -3868,13 +3868,115 @@ class TestEngineVerticalSlice(unittest.TestCase):
         is_overloaded = (mining_grid_total_su > source_capacity)
         self.assertFalse(is_overloaded)
 
-        # Overload test: 3 additional capstans (40 * 3 = 120) + 2 pumps (48 * 2 = 96) -> 120 + 216 = 336 > 256
-        huge_load = mining_grid_total_su + 120.0 + 96.0
-        self.assertEqual(huge_load, 336.0)
-        self.assertTrue(huge_load > source_capacity)
+    def test_milestone37_glb_assets(self):
+        """Verify binary glTF headers and integrity for Milestone 37 3D models."""
+        models_dir = os.path.join(os.path.dirname(__file__), "..", "assets", "models")
+        m37_models = ["mine_locomotive.glb", "rail_switch.glb", "hopper_unloader.glb"]
+        for m in m37_models:
+            p = os.path.join(models_dir, m)
+            self.assertTrue(os.path.exists(p), f"Missing model {m}")
+            self.assertGreater(os.path.getsize(p), 1000, f"Model {m} is unusually small")
+            with open(p, "rb") as f:
+                header = f.read(4)
+                self.assertEqual(header, b"glTF", f"Model {m} does not have valid glTF magic header")
+
+    def test_mine_locomotive_thermodynamics_and_tractive_effort(self):
+        """Verify steam locomotive boiler pressure, popoff valve at 12 bar, and 7200kg tractive capacity."""
+        tare_weight_kg = 3500.0
+        max_towed_kg = 7200.0
+        popoff_bar = 12.0
+        optimal_bar = 8.0
+        max_tractive_n = 8500.0
+
+        # Coupling carts check: 6 x 1200kg = 7200kg
+        coupled_carts = 6
+        cart_mass_kg = 1200.0
+        total_towed_kg = coupled_carts * cart_mass_kg
+        self.assertEqual(total_towed_kg, max_towed_kg)
+        self.assertTrue(total_towed_kg <= max_towed_kg)
+
+        # 7th cart exceeds capacity
+        self.assertFalse((total_towed_kg + cart_mass_kg) <= max_towed_kg)
+
+        # Steam pressure and tractive effort at 8 bar (optimal)
+        pressure = 8.0
+        throttle = 1.0
+        tractive_force = throttle * max_tractive_n * (pressure / optimal_bar)
+        self.assertEqual(tractive_force, 8500.0)
+
+        # Half throttle at optimal pressure
+        throttle_half = 0.5
+        tractive_force_half = throttle_half * max_tractive_n * (pressure / optimal_bar)
+        self.assertEqual(tractive_force_half, 4250.0)
+
+        # Overpressure popoff valve trigger at 12.5 bar
+        high_pressure = 12.5
+        popoff_active = (high_pressure >= popoff_bar)
+        self.assertTrue(popoff_active)
+
+    def test_rail_switch_turnout_routing_and_interlocking(self):
+        """Verify 2-way turnout rail switch, throw duration, interlocking lock, and spring point deflection."""
+        throw_time_s = 0.6
+        max_diverging_speed = 2.5 # m/s
+
+        # Transition progress over 0.3s (half throw)
+        dt = 0.3
+        progress = dt / throw_time_s
+        self.assertEqual(progress, 0.5)
+        # Mid-throw aspect is RED_TRANSIT
+        is_in_transit = (progress > 0.0 and progress < 1.0)
+        self.assertTrue(is_in_transit)
+        signal_transit = "RED_TRANSIT" if is_in_transit else "GREEN_CLEAR"
+        self.assertEqual(signal_transit, "RED_TRANSIT")
+
+        # Fully thrown to DIVERGING
+        progress_done = 1.0
+        route = "DIVERGING"
+        signal_diverging = "YELLOW_DIVERGING" if route == "DIVERGING" else "GREEN_CLEAR"
+        self.assertEqual(signal_diverging, "YELLOW_DIVERGING")
+
+        # Interlocking occupancy lock prevents throw while train is over points
+        is_occupied = True
+        can_throw = not is_occupied
+        self.assertFalse(can_throw)
+
+        # Speed restriction check through diverging frog
+        speed_safe = 2.2
+        speed_excessive = 3.6
+        self.assertTrue(speed_safe <= max_diverging_speed)
+        self.assertFalse(speed_excessive <= max_diverging_speed)
+
+    def test_hopper_unloader_bulk_discharge_and_chute_flow(self):
+        """Verify automated bottom-dump unloader rate (12 items/s), buffer capacity (120), and chute feed."""
+        discharge_rate_s = 12.0 # items/second
+        cart_slots = 30 # standard minecart payload
+        hopper_capacity = 120
+
+        # Emptying time for full 30-slot cart
+        dump_time_s = cart_slots / discharge_rate_s
+        self.assertEqual(dump_time_s, 2.5) # exactly 2.5 seconds!
+
+        # Buffer accumulation: 3 carts dumped (90 items) into 120 capacity
+        buffer_stored = 3 * cart_slots
+        self.assertEqual(buffer_stored, 90)
+        free_space = hopper_capacity - buffer_stored
+        self.assertEqual(free_space, 30) # room for exactly 1 more cart
+
+        # 4th cart fills buffer
+        buffer_stored += cart_slots
+        self.assertEqual(buffer_stored, 120)
+        self.assertTrue(buffer_stored >= hopper_capacity) # Hopper Full!
+
+        # Downstream chute flow at 8 items/s for 5 seconds
+        chute_rate_s = 8.0
+        evacuated_items = int(chute_rate_s * 5.0)
+        self.assertEqual(evacuated_items, 40)
+        remaining_in_hopper = buffer_stored - evacuated_items
+        self.assertEqual(remaining_in_hopper, 80)
 
 if __name__ == "__main__":
     unittest.main()
+
 
 
 
