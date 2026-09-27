@@ -680,8 +680,35 @@ Medieval davrning haqiqiy muhandisligi:
 - **Devorni Shturm Qilish**:
   - 6 ta askar tomonidan 0.6 m/s tezlikda qal'a devoriga surib keltiriladi.
   - Devorga yetib borganda 2.0 soniyada oldingi temir tirnoqli ko'prik pastga tashlanadi va devor parapetiga qadaladi.
-  - **Desant Bo'shatish**: Yuqori maydondagi 8 ta saralangan qilichboz jangchi soniyasiga 2 tadan (jami 4 soniyada) to'g'ridan-to'g'ri dushman devoriga yopirilib tushadi.
+  - **Desant Bo'shatish**: Yuqori maydondagi 8 ta saralangan qilichboz desantni 4 soniyada (2 troop/s) to'g'ridan-to'g'ri dushman devoriga yopirilib tushadi.
   - **O'q O'tmas Hording**: Minora ichidagi o'qchilar va shturmchilarga 70% o'qdan himoya aurasini ta'minlaydi.
+
+---
+
+## 24. Create Mod, TerraFirmaCraft & Vintage Story Integratsiyasi — Og'ir Metallurgiya Quymaxonasi: Mexanik Bosqon, Domna Forzonkasi va Kinetik Bolg'a (Milestone 35)
+
+### 24.1. Kinetik Ekssentrikli Mexanik Charm Bosqon (`MechanicalBellows` & `mechanical_bellows.glb`) — [Create Mod / Vintage Story]
+- **Muammo**: Domna pechlari va tigellarda qo'l bosqonlari orqali havo purkash 2 ta ishchini doimiy band qilib, haroratni faqat 1100°C darajada ushlab turadi; natijada yuqori sifatli po'lat va cho'yan eritib bo'lmaydi.
+- **Yechim (`MechanicalBellows` & `mechanical_bellows.glb`)**:
+  - Qo'shaloq garmonikasimon buklanuvchi charm kamera, eman ramka va orqa valga o'rnatilgan quyma temir ekssentrik kamshturgich (`mechanical_bellows.glb`).
+  - **Kinetik Quvvatga Ulanish**: 32 SU iste'mol qiladi (minimal 12 RPM talab etiladi).
+  - **Majburiy Havo Oqimi**: Soniyasiga 0.45 m³ siqilgan kuchli havo oqimi hosil qiladi.
+  - **Harorat Sakrashi (1550°C)**: O'choq haroratini 1100°C dan 1550°C gacha ko'tarib, yoqilg'i yonishini 2.5 barobar tezlashtiradi va Cho'yan (`pig_iron`), Yuqori Uglerodli Po'lat (`blister_steel`) va Tigel Qotishma Po'latlarini (`crucible_steel`) eritishni to'liq avtomatlashtiradi.
+
+### 24.2. Domna Pechi Mis Forzonkasi va Stexiometrik Klapan (`FurnaceTuyere` & `furnace_tuyere.glb`) — [TerraFirmaCraft]
+- **Tavsif**: Pech o'txonasi devorini teshib kiruvchi qizil mis naycha, suv bilan sovutiluvchi g'ilof, o'tga chidamli shomot gardishi va richagli kapalaksimon klapan (damper) (`furnace_tuyere.glb`).
+- **Kislorod Bosimini Boshqarish**:
+  - Havo klapani (0.75 - 0.92 oralig'ida) pech ichidagi yonish stexiometriyasini muvozanatlaydi.
+  - **+25% Metall Hosildorligi**: Metall oksidlanishi va shlakka aylanib behuda ketishining oldini oladi (hosil koeffitsienti 1.25x ga oshadi).
+  - Manometr ko'rsatkichi orqali pech bosimi doimiy monitoring qilinadi.
+
+### 24.3. Suv Quvvatli Katta Sanoat Tiltr-Bolg'asi (Helve Hammer) (`IndustrialTripHammer` & `industrial_trip_hammer.glb`) — [Create / Vintage Story / Medieval Engineers]
+- **Tavsif**: Katta quyma temir sandon, 800 kg li eman dastali og'ir po'lat bolg'a va 3 ta egri temir barmoqli aylanuvchi taqsimlash vali (`industrial_trip_hammer.glb`).
+- **Avtomatlashgan Temirchilik Kadensi**:
+  - 24 RPM tezlikda 3 ta barmoq har daqiqada 48 marta kuchli zarba (har 1.25 soniyada 450 Joul) beradi.
+  - **G'ovakli Doma Temirini Zichlash**: 4 zarbada qizigan g'ovakli temir quymasini (`iron_bloom`) sof temir zagotovkaga (`wrought_iron_billet`) aylantiradi.
+  - **Sovut Plitalari va Qurollar Yoyish**: 3 zarbada zagotovkani ikkita tekis temir plastinaga (`iron_plate`) yoyadi — qo'l temirchiligiga nisbatan 5 barobar tez va nol inson mehnati bilan!
+
 
 
 
