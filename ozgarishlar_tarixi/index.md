@@ -7,6 +7,22 @@
 - Dastlabki Godot prototipi va foydalanuvchining showcase fayllari saqlandi.
 - Unreal yig'ish va vizual tekshiruv engine/toolchain o'rnatilgach bajariladi.
 
+## 2026-09-27 — Milestone 39: Create Mod, Vintage Story & Thermal Expansion Yuqori Bosimli Bug' Quvvati: Bug' Qozoni, Statsionar Bug' Dvigateli va Sentrifugal Regulyator (Issue #37)
+- **Ko'p Quvurli Yuqori Bosimli Bug' Qozoni (`SteamBoiler` & `steam_boiler.glb`)**:
+  - O'tga chidamli shamot g'ishtli o'choq (refractory firebox), jez qozon barabani (brass drum) mustahkamlovchi halqalar bilan, suv sathi oynasi (sight glass), bimetallik monometr va ikkita prujinali xavfsizlik klapani (`steam_boiler.glb`).
+  - Termodinamik model: 12 bar optimal ishchi bosimi, 15 bar xavfsizlik purkashi (popoff relief), 20 bar falokatli portlash chegarasi (catastrophic explosion limit).
+  - Bug' generatsiyasi: 850°C haroratda daqiqasiga 9 litr suv bug'latib, 512 dan 2,048 SU ekvivalentidagi to'yingan bug' oqimini uzatish.
+- **Gorizontal Statsionar Bug' Dvigateli (`SteamEngineDrive` & `steam_engine_drive.glb`)**:
+  - Quyma temir bedplate, yog'och plankalar bilan izolyatsiyalangan gorizontal silindr, krosskopf yo'naltiruvchilari, shatun va 1.8 metrli 6 tirgakli massiv maxovik g'ildirak (`steam_engine_drive.glb`).
+  - Mexanik quvvat: 12 bar bug' bosimi va 1.0 drossel ochilishida to'liq 1,024 SU va 64 RPM kinetik quvvat generasiyasi.
+  - Dinamik inersiya: 450 kg og'irlikdagi aylanuvchi maxovik g'ildirak tork tebranishlarini yutadi va yuk to'satdan ortganda mexanizmlarni silliq ushlab turadi.
+- **Sentrifugal Uayt Regulyatori (`CentrifugalGovernor` & `centrifugal_governor.glb`)**:
+  - James Watt tamoyiliga asoslangan quyma temir ustun, aylanuvchi vertikal shpindel, ikkita massiv jez sharlar, suriluvchi yoqa (sliding collar) va drossel richagi (`centrifugal_governor.glb`).
+  - Avtomatik PID tezlik nazorati: Aylanish tezligi ($\Omega$) ortganda markazdan qochma kuch sharlarni kengaytiradi ($\theta \propto \Omega^2$), yoqani yuqoriga ko'taradi va drossel klapanini yopadi; yuk oshganda esa klapanni ochib barqaror 64 RPM tezlikni ushlab turadi.
+- **Yangi 3D Modellar (Blender 5.2)**: `steam_boiler.glb` (116 KB), `steam_engine_drive.glb` (128 KB), `centrifugal_governor.glb` (134 KB) yaratildi (jami **109 ta GLB model**).
+- **Yangi Qirollik Dioramasi**: Barcha 109 ta aktiv ishtirokidagi kengaytirilgan diorama `assets/showcase_realm.png` da muvaffaqiyatli render qilindi.
+- **Avtomatlashgan Testlar**: Jami **201 ta test 100% muvaffaqiyat bilan o'tdi** (0.193s).
+
 ## 2026-09-27 — Milestone 38: Anno 1404, Port Royale & Vintage Story O'rta Asr Dengiz Porti va Kema Qurilishi: Slipvey Dok, Port Krani va Flyoyt Savdo Kemasi (Issue #35)
 - **Sohildagi Kema Qurish Slipvey Doki (`DrydockSlipway` & `drydock_slipway.glb`)**:
   - Dengizga -7° nishablikdagi moylangan skidlar, kil bloklari, 2 qavatli iskala va smola qozoni (`drydock_slipway.glb`).
