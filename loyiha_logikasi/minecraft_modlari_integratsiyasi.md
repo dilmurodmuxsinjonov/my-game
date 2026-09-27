@@ -653,6 +653,37 @@ Medieval davrning haqiqiy muhandisligi:
   - **Tranzit Unumdorligi**: Zinapoyada tashishga nisbatan vertikal logistika vaqtini 70% ga (0.30x ga) qisqartiradi.
   - **Charchoq Balansi**: Ichkarida qadam bosuvchi ishchi soniyasiga 0.15 charchoq (stamina) sarflaydi; agar kran kinetik valga ulansa, fuqaro mehnatisiz avtomatlashtiriladi.
 
+---
+
+## 23. Stronghold & Mount & Blade II Integratsiyasi — Og'ir Qamal Qurollari: Gravitatsion Trebyushe, Zirhli Qo'chqor Boshli Devorbuzar va Hujum Minora Belfrisi (Milestone 34)
+
+### 23.1. Qarshi Toshli Gravitatsion Trebyushe (`TrebuchetSiege` & `trebuchet_siege.glb`) — [Stronghold Crusader / Age of Empires II]
+- **Muammo**: Katta tosh qal'a devorlari, mustahkam burchakli donjonlar va konsolli buttresslar oddiy katapultalar zarbasiga dosh berib, qamalni oylarga cho'zadi.
+- **Yechim (`TrebuchetSiege` & `trebuchet_siege.glb`)**:
+  - Uchburchakli mustahkam eman fermasi, bronza vkladishli po'lat markaziy val va 12 tonnalik tosh to'ldirilgan qarshi yuk qutisi (`trebuchet_siege.glb`).
+  - **Uzoq Masofali Ballistika**: 40 metrdan 140 metrgacha to'liq qamrov.
+  - **Zarba Snaryadlari**:
+    - **Og'ir Tosh Boulderi (`STONE_BOULDER`)**: 320 ball strukturaviy maydalovchi zarar va 8 metrlik zarba to'lqini.
+    - **Yonuvchi Qora Smola (`INCENDIARY_PITCH`)**: 240 to'g'ridan-to'g'ri zarar, 10 metr radiusda 10 soniyalik 12 DPS olovli alanga.
+    - **O'latli Qora Mol Murdasi (`COW_CARCASS`)**: Biologik urush — 15m radiusda o'lat buluti tarqatadi va garnizon ruhiyatiga -30 baxtiyorlik (morale) zarbasi beradi.
+  - **O'qlash Vaqti**: 3 muhandis yordamida qo'lda 15.0 soniya; kinetik valga ulanganda avtomatik 4.5 soniyada shay bo'ladi (80 SU quvvat).
+
+### 23.2. Zirhli G'ildirakli Qo'chqor Boshli Devorbuzar (`BatteringRam` & `battering_ram.glb`) — [Mount & Blade II: Bannerlord]
+- **Tavsif**: To'rtta soxta temir g'ildirak ustidagi, ho'l charm (rawhide) va temir tasmalar bilan qoplangan ikki nishabli yog'och boshpana (`battering_ram.glb`).
+- **Mayatnik Mexanikasi**: To'rtta quyma zanjirga osilgan qalin eman daraxti tanasi va uchi tojdor cho'yan qo'chqor kallagi.
+  - 4 ta jangchi tomonidan mayatnik kabi tebrantiriladi; har 3.2 soniyada 180 ball kinetik zarba beradi.
+  - Yog'och darvozalar va panjara temir eshiklarni (portcullis) bir necha zarbada parchaydi.
+- **Himoya Qalqoni**: Ho'l teri qoplamasi kamon va arbalet o'qlarining 80% ini qaytaradi va qaynoq smola olovini 50% ga so'ndiradi.
+
+### 23.3. Ko'chma Ko'p Qavatli Hujum Minorasi Belfri (`SiegeTower` & `siege_tower.glb`) — [Stronghold / Mount & Blade II]
+- **Tavsif**: 8 metr balandlikdagi 3 qavatli og'ir yog'och minora; old qismida o'qchi teshiklari (arrow slits) va tepasida shoxli qamal ko'prigi (corvus bridge) (`siege_tower.glb`).
+- **Devorni Shturm Qilish**:
+  - 6 ta askar tomonidan 0.6 m/s tezlikda qal'a devoriga surib keltiriladi.
+  - Devorga yetib borganda 2.0 soniyada oldingi temir tirnoqli ko'prik pastga tashlanadi va devor parapetiga qadaladi.
+  - **Desant Bo'shatish**: Yuqori maydondagi 8 ta saralangan qilichboz jangchi soniyasiga 2 tadan (jami 4 soniyada) to'g'ridan-to'g'ri dushman devoriga yopirilib tushadi.
+  - **O'q O'tmas Hording**: Minora ichidagi o'qchilar va shturmchilarga 70% o'qdan himoya aurasini ta'minlaydi.
+
+
 
 
 

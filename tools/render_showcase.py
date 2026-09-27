@@ -336,6 +336,15 @@ def build_diorama():
     # 86. Deep Quarry Treadwheel Cargo Crane & Hoisting Derrick
     import_asset("treadwheel_crane.glb", (4.6, 3.8, 0.0), rot_z=-90, scale=0.80)
 
+    # 87. Counterweight Trebuchet Heavy Siege Artillery
+    import_asset("trebuchet_siege.glb", (5.5, 1.2, 0.0), rot_z=-120, scale=0.75)
+
+    # 88. Armored Wheeled Battering Ram Penthouse
+    import_asset("battering_ram.glb", (3.8, 4.4, 0.0), rot_z=-60, scale=0.82)
+
+    # 89. Mobile Assault Belfry Siege Tower
+    import_asset("siege_tower.glb", (-3.6, 5.2, 0.0), rot_z=15, scale=0.72)
+
     # Render output path
     output_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "assets"))
     output_path = os.path.join(output_dir, "showcase_realm.png")
