@@ -131,21 +131,27 @@ def build_astronomical_clock():
     backplate.scale = (1.30, 0.48, 2.60)
     backplate.data.materials.append(mat_stone)
 
-    # Peaked Gothic Gable Arch Pediment
-    bpy.ops.mesh.primitive_cylinder_add(vertices=32, radius=0.80, depth=0.72, location=(0.0, 0.0, 2.85))
+    # Peaked Gothic Gable Arch Pediment (Recessed behind dial)
+    bpy.ops.mesh.primitive_cylinder_add(vertices=32, radius=0.62, depth=0.25, location=(0.0, -0.10, 3.15))
     arch = bpy.context.active_object
     arch.rotation_euler = (math.radians(90), 0, 0)
     arch.data.materials.append(mat_darkstone)
 
     # Trefoil / Tracery Gable Crown
-    bpy.ops.mesh.primitive_cone_add(radius1=0.85, radius2=0.0, depth=0.70, location=(0.0, 0.0, 3.55))
+    bpy.ops.mesh.primitive_cone_add(radius1=0.75, radius2=0.0, depth=0.65, location=(0.0, -0.05, 3.65))
     gable = bpy.context.active_object
-    gable.scale = (1.0, 0.5, 1.0)
+    gable.scale = (1.0, 0.45, 1.0)
     gable.data.materials.append(mat_stone)
+
+    # Decorative Gothic Cresting Ridge along Gable
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0.0, -0.05, 3.98))
+    ridge = bpy.context.active_object
+    ridge.scale = (0.20, 0.35, 0.08)
+    ridge.data.materials.append(mat_gold)
 
     # --- 2. Upper Astronomical Astrolabe Dial ---
     dial_center_z = 2.15
-    dial_y = 0.22
+    dial_y = 0.25
 
     # Lapis Lazuli Deep Sky Background Disc
     bpy.ops.mesh.primitive_cylinder_add(vertices=48, radius=0.58, depth=0.06, location=(0.0, dial_y, dial_center_z))

@@ -106,7 +106,7 @@ def render_observatory():
     # Celestial Orrery on right
     import_model("celestial_orrery.glb", loc=(2.2, 0.2, 0.0), rot_z=35, scale=0.9)
 
-    set_camera(location=(0.2, -6.5, 2.5), target=(0.1, 0.0, 1.3), lens=35)
+    set_camera(location=(0.0, -5.6, 2.1), target=(0.0, 0.0, 1.4), lens=38)
     render("showcase_observatory.png")
 
 # ============================================================
@@ -115,14 +115,14 @@ def render_observatory():
 def render_steam_power():
     setup_vignette_scene(sky_color=(0.52, 0.68, 0.90), ground_type="stone")
     
-    # Steam Boiler with brass straps on left
-    import_model("steam_boiler.glb", loc=(-2.2, 0.2, 0.0), rot_z=-25, scale=0.95)
+    # Steam Boiler with brass straps on left (rotated so firebox door and embers face camera)
+    import_model("steam_boiler.glb", loc=(-2.2, 0.1, 0.0), rot_z=-75, scale=0.95)
     # Stationary Steam Engine Drive with large flywheel in center
-    import_model("steam_engine_drive.glb", loc=(0.2, 0.0, 0.0), rot_z=15, scale=0.95)
+    import_model("steam_engine_drive.glb", loc=(0.2, 0.0, 0.0), rot_z=10, scale=0.95)
     # Centrifugal Flyball Governor on right
-    import_model("centrifugal_governor.glb", loc=(2.2, -0.4, 0.0), rot_z=-15, scale=1.0)
+    import_model("centrifugal_governor.glb", loc=(2.4, -0.3, 0.0), rot_z=-15, scale=1.0)
 
-    set_camera(location=(0.0, -6.5, 2.4), target=(0.0, 0.0, 1.1), lens=35)
+    set_camera(location=(0.1, -5.8, 2.2), target=(0.0, 0.0, 1.2), lens=36)
     render("showcase_steam_power.png")
 
 # ============================================================
@@ -132,9 +132,9 @@ def render_harbor():
     setup_vignette_scene(sky_color=(0.45, 0.70, 0.92), ground_type="water")
     
     # Quayside dock pier
-    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(0, -2.5, 0.2))
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=(-1.5, -2.5, 0.2))
     pier = bpy.context.active_object
-    pier.scale = (14.0, 5.0, 0.6)
+    pier.scale = (10.0, 5.0, 0.6)
     mat_pier = bpy.data.materials.new("PierStone")
     mat_pier.use_nodes = True
     bsdf = mat_pier.node_tree.nodes.get("Principled BSDF")
@@ -142,14 +142,14 @@ def render_harbor():
         bsdf.inputs["Base Color"].default_value = (0.42, 0.40, 0.38, 1.0)
     pier.data.materials.append(mat_pier)
 
-    # Drydock Slipway
-    import_model("drydock_slipway.glb", loc=(-4.0, 0.0, 0.2), rot_z=20, scale=0.85)
-    # Quayside Crane on dock
-    import_model("quayside_crane.glb", loc=(1.0, -1.0, 0.5), rot_z=-45, scale=0.9)
-    # Fluyt Cargo Ship floating in water
-    import_model("fluyt_cargo_ship.glb", loc=(-0.5, 4.2, 0.0), rot_z=-85, scale=0.85)
+    # Drydock Slipway on left
+    import_model("drydock_slipway.glb", loc=(-3.6, 0.0, 0.2), rot_z=20, scale=0.85)
+    # Quayside Crane on dock pier
+    import_model("quayside_crane.glb", loc=(-0.7, -1.0, 0.5), rot_z=-60, scale=0.85)
+    # Fluyt Cargo Ship floating in water beside the pier
+    import_model("fluyt_cargo_ship.glb", loc=(2.5, 1.2, 0.0), rot_z=-60, scale=0.85)
 
-    set_camera(location=(3.5, -8.0, 4.5), target=(-0.8, 1.2, 1.5), lens=34)
+    set_camera(location=(1.0, -7.5, 3.8), target=(0.0, 0.5, 1.5), lens=35)
     render("showcase_harbor_and_navy.png")
 
 # ============================================================
