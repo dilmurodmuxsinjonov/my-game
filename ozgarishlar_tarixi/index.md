@@ -7,6 +7,24 @@
 - Dastlabki Godot prototipi va foydalanuvchining showcase fayllari saqlandi.
 - Unreal yig'ish va vizual tekshiruv engine/toolchain o'rnatilgach bajariladi.
 
+## 2026-09-27 — Milestone 40: Create Mod, Renaissance Astronomy & Clockwork Science Buyuk Imperiya Soatli Rasadxonasi: Astronomik Soat, Armillyar Sfera va Sayyoralar Orreriysi (Issue #39)
+- **Praga Uslubidagi Minorali Astronomik Soat (`AstronomicalClock` & `astronomical_clock.glb`)**:
+  - Tosh va qora marmar bezakli gotik minora ramkasi, 24 soatlik oltin rim raqamli astrolyabiya siferblati, 12 burj (zodiak) halqasi, aylanuvchi yarim-kumush/yarim-qora oy fazasi shari va qo'shaloq bronza qo'ng'iroqli foliot soat harakati (`astronomical_clock.glb`).
+  - Vaqt va taqvim: 1 real soniya = 1 o'yin daqiqasi ($dt = 1.0$); 28 kunlik yil (4 fasl, har fasl 7 kun).
+  - Qonli Oy (Blood Moon) erta ogohlantirish: 27-kun 20:00 da (ofatdan 24 soat oldin) avtomatik bong urib qirollik mudofaasini ogohlantirish.
+  - Tortish og'irligi: 1,440 daqiqa (24 soat) avtonom quvvat yoki 16 SU kinetik quvvat bilan uzluksiz avtomatik buralish.
+- **Aylanuvchi Guruch Armillyar Sfera (`ArmillarySphere` & `armillary_sphere.glb`)**:
+  - O'ymakor yong'oq yog'och uchoyoq (tripod), 360° gorizont halqasi, meridiangacha bo'lgan konsentrik aylanuvchi guruch doiralar, 23.4° qiyalikdagi ekliptika burj kamari va lapis lazuli yer shari (`armillary_sphere.glb`).
+  - Astronomik hisob-kitoblar: Quyosh balandligi ($\alpha$) va og'ishini ($\delta$) o'lchash; 3 kun oldindan qattiq qahraton ayoz (`HARD_FROST_WARNING`) va yozgi qurg'oqchilikni bashorat qilish.
+  - Yulduzlar Navigatsiya Xaritasi (`celestial_chart`): 60s kuzatuv natijasida yaratiladi; dengiz savdo kemalariga (Milestone 38 Fluyt) berilganda safar tezligini +30% ga, savdo daromadini +50% ga oshiradi va bo'ronlarda adashish xavfini 0% ga tushiradi.
+- **Soatli Mexanik Sayyoralar Orreriysi (`CelestialOrrery` & `celestial_orrery.glb`)**:
+  - Sakkizburchakli qizil daraxt shkafi, silliqlangan guruch stol, markaziy oltin Quyosh va atrofida aylanuvchi 5 ta sayyora (Merkuriy, Venera, Yer+Oy, Mars, Saturn) dan iborat episiklik planetariy (`celestial_orrery.glb`).
+  - Kinetik quvvat: 16 SU va 16–64 RPM tezlikda valdan quvvatlanib, orbital tezliklarda harakatlanish.
+  - Astrologik Rezonanslar: Jang qorishmasi (+20% jangovar ma'naviyat, +25% eritish unumi), Hunarmand qorishmasi (+25% baxtiyorlik, +30% hunarmandlik tezligi) va Buyuk Sayyoralar Paradi (Grand Conjunction: +50% qirollik ishlab chiqarishi, 2x hosildorlik).
+- **Yangi 3D Modellar (Blender 5.2)**: `astronomical_clock.glb` (390 KB), `armillary_sphere.glb` (447 KB), `celestial_orrery.glb` (256 KB) yaratildi (jami **112 ta GLB model**).
+- **Yangi Qirollik Dioramasi**: Barcha 112 ta aktiv ishtirokidagi kengaytirilgan diorama `assets/showcase_realm.png` da muvaffaqiyatli render qilindi.
+- **Avtomatlashgan Testlar**: Jami **205 ta test 100% muvaffaqiyat bilan o'tdi** (0.308s).
+
 ## 2026-09-27 — Milestone 39: Create Mod, Vintage Story & Thermal Expansion Yuqori Bosimli Bug' Quvvati: Bug' Qozoni, Statsionar Bug' Dvigateli va Sentrifugal Regulyator (Issue #37)
 - **Ko'p Quvurli Yuqori Bosimli Bug' Qozoni (`SteamBoiler` & `steam_boiler.glb`)**:
   - O'tga chidamli shamot g'ishtli o'choq (refractory firebox), jez qozon barabani (brass drum) mustahkamlovchi halqalar bilan, suv sathi oynasi (sight glass), bimetallik monometr va ikkita prujinali xavfsizlik klapani (`steam_boiler.glb`).

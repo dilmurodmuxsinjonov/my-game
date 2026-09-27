@@ -826,6 +826,43 @@ Medieval davrning haqiqiy muhandisligi:
     - Tezlik tushsa ($RPM < 64$), sharlar pastga tushadi va bug' oqimini kengaytirib tezlikni yana aniq 64 RPM ga qaytaradi.
     - **Natija**: Inson aralashuvisiz zavodning barcha stanoklari mukammal barqaror tezlikda ishlaydi!
 
+---
+
+## 29. Create Mod, Renaissance Astronomy & Clockwork Science Integratsiyasi — Buyuk Imperiya Soatli Rasadxonasi, Armillyar Sfera va Sayyoralar Orreriysi (Milestone 40)
+
+### 29.1. Praga Uslubidagi Minorali Astronomik Soat (`AstronomicalClock` & `astronomical_clock.glb`) — [Prague Orloj / Create Mod]
+- **Muammo**: Feodal qirollikda dehqonlar, hunarmandlar va harbiylar uchun yagona aniq vaqt yo'q; fasllar almashinuvi, 28 kunlik quyosh/oy taqvimi va har 28 kunda sodir bo'ladigan xavfli Qonli Oy (Blood Moon) ofatiga oldindan tayyorgarlik ko'rish mexanizmi mavjud emas edi.
+- **Yechim (`AstronomicalClock` & `astronomical_clock.glb`)**:
+  - Tosh va qora marmar bezakli gotik minora korpusi, oltin hoshiyali 24 soatlik rim raqamli astrolyabiya siferblati, 12 burj (zodiak) halqasi, aylanuvchi yarim-kumush/yarim-qora oy fazasi shari va tepasida qo'shaloq bronza qo'ng'iroqlar bilan jihozlangan shpilli foliotli (verge and foliot) soat mexanizmi (`astronomical_clock.glb`).
+  - **Taqvim va Astronomik Sikl**:
+    - Har 1 real soniya = 1 o'yin daqiqasi ($dt = 1.0$).
+    - 28 kunlik to'liq feodal yil: 1-7 kunlar (Bahor), 8-14 kunlar (Yoz), 15-21 kunlar (Kuz), 22-28 kunlar (Qish).
+  - **Qonli Oy Erta Ogohlantirish Tizimi (Blood Moon Warning)**:
+    - 27-kun kechki 20:00 da (ofatdan 24 soat oldin) soat minorasi avtomatik ogohlantirish bongini uradi (`blood_moon_warning`), shahar garnizoni darvozalarni yopish va qamal qurollarini shay holatga keltirishga ulguradi.
+  - **Tortish Og'irligi va Kinetik Zaryad**:
+    - Qo'rg'oshin og'irlik toshlari (gravity counterweight) yordamida 24 soat avtonom ishlaydi yoki 16 SU kinetik valga ulanib uzluksiz avtomatik buraladi.
+
+### 29.2. Aylanuvchi Guruch Armillyar Sfera (`ArmillarySphere` & `armillary_sphere.glb`) — [Tycho Brahe / Renaissance Instruments]
+- **Muammo**: Dengiz savdo kemalari (Milestone 38 Fluyt) okeanda yo'nalishni yo'qotib bo'ronlarda adashadi; qishloq xo'jaligi esa to'satdan boshlanadigan qattiq ayoz va qurg'oqchiliklar oldida himoyasiz qoladi.
+- **Yechim (`ArmillarySphere` & `armillary_sphere.glb`)**:
+  - O'ymakor yong'oq yog'ochli uchoyoq (tripod), 360 darajali gorizont halqasi, meridiangacha bo'lgan konsentrik aylanuvchi guruch doiralar, 23.4° qiyalikdagi ekliptika burj kamari va markazida lapis lazuli yer shari joylashgan ilmiy asbob (`armillary_sphere.glb`).
+  - **Mavsumiy Ob-havo Prognozi**:
+    - Quyosh balandligi va og'ishini o'lchab, 3 kun oldindan qattiq qahraton ayozni (`HARD_FROST_WARNING`) yoki yozgi jazira qurg'oqchilikni (`DROUGHT_HEATWAVE_WARNING`) bashorat qiladi.
+  - **Dengiz Navigatsiya Xaritalari (`celestial_chart`)**:
+    - Olim/astronom tomonidan 60 soniya kuzatuv o'tkazilganda "Yulduzlar Navigatsiya Xaritasi" yoziladi.
+    - Xarita kemaga topshirilganda: safar tezligi +30% ga oshadi (300s $\to$ 230s), tashqi bozorlarda savdo foydasi +50% ga ko'tariladi va bo'ronlarda yo'nalishni yo'qotish xavfi 0% ga tushadi!
+
+### 29.3. Soatli Mexanik Sayyoralar Orreriysi (`CelestialOrrery` & `celestial_orrery.glb`) — [Clockwork Orrery / Create Mod]
+- **Muammo**: Shahar ma'naviyati va mahsuldorligini yagona markaziy ilmiy-texnik bino orqali davriy ravishda kuchaytiruvchi global garmoniya effekti yo'q edi.
+- **Yechim (`CelestialOrrery` & `celestial_orrery.glb`)**:
+  - Sakkizburchakli qizil daraxt (mahogany) shkafi, silliqlangan guruch yuqori stol, tishli g'ildiraklar kaskadi va markaziy oltin Quyosh atrofida aylanuvchi 5 ta sayyora (Merkuriy, Venera, Yer va uning Oyi, Mars, Saturn halqalari bilan) dan iborat kinetik orreriy (`celestial_orrery.glb`).
+  - **Kinetik Mexanika**: 16 SU quvvat va 16–64 RPM tezlik bilan valdan quvvatlanadi; episiklik uzatmalar orqali sayyoralarni o'z orbital tezliklarida aylantiradi.
+  - **Astrologik Rezonans va Qorishiq (Conjunctions)**:
+    - **Jang Rezonansi (Yer va Mars qorishmasi)**: Armiyaga +20% jangovar ma'naviyat va domna pechlarida temir/po'lat eritish tezligiga +25% unum beradi.
+    - **Hunarmand Rezonansi (Yer va Venera qorishmasi)**: Aholiga +25% baxtiyorlik va zargarlik/libos tikish tezligiga +30% bonus bag'ishlaydi.
+    - **Buyuk Sayyoralar Paradi (Grand Celestial Festival)**: Barcha 5 sayyora 35° burchak ostida saf tortganda qirollikda umumiy ishlab chiqarish +50% ga oshadi, dehqonlar esa 2 barobar ko'p hosil yig'ishtirib oladi!
+
+
 
 
 

@@ -390,6 +390,15 @@ def build_diorama():
     # 104. James Watt Flyball Centrifugal Speed Governor
     import_asset("centrifugal_governor.glb", (-0.4, 1.8, 0.0), rot_z=-15, scale=0.90)
 
+    # 105. Prague-Style Tower Astronomical Clock & Calendar Dial
+    import_asset("astronomical_clock.glb", (-2.2, 0.4, 0.0), rot_z=-20, scale=0.85)
+
+    # 106. Pivoting Brass Armillary Sphere Observatory Instrument
+    import_asset("armillary_sphere.glb", (-1.4, -0.6, 0.0), rot_z=15, scale=0.90)
+
+    # 107. Clockwork Celestial Orrery Planetarium
+    import_asset("celestial_orrery.glb", (0.8, -0.4, 0.0), rot_z=45, scale=0.85)
+
     # Render output path
     output_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "assets"))
     output_path = os.path.join(output_dir, "showcase_realm.png")
