@@ -7,6 +7,27 @@
 - Dastlabki Godot prototipi va foydalanuvchining showcase fayllari saqlandi.
 - Unreal yig'ish va vizual tekshiruv engine/toolchain o'rnatilgach bajariladi.
 
+## 2026-09-27 — Milestone 36: Georgius Agricola (*De Re Metallica*), Vintage Story & Create Mod Yerosti Kon Muhandisligi: Drenaj Suv Nasosi, Shamollatish Ventilyatori va Shaxta Lebyodkasi (Issue #31)
+- **Vertikal Zanjirli Sump Drenaj Nasosi (`MineDewateringPump` & `mine_dewatering_pump.glb`)**:
+  - Suv yig'iladigan chuqur (sump pit) ustidagi baland eman headframe portali, uzluksiz mis chelaklar zanjiri, tishli sproket va yuqori yog'och nov (`mine_dewatering_pump.glb`).
+  - Kinetik quvvat: 48 SU quvvat sarfi (minimal 16 RPM).
+  - Drenaj tezligi: daqiqasiga 150 litr suv chiqarish.
+  - Chuqur gorizontlar ($Y \le 16$) grunt sizishini (100 L/min) to'liq bartaraf etib, sof 50 L/min quritish sur'atini ta'minlaydi (`is_sump_dry = true`).
+- **Sentrifugali Markazdan Qochma Shaxta Ventilyatori (`MineVentilator` & `mine_ventilator.glb`)**:
+  - Shilliqqurt shaklidagi radial korpus (snail-shell casing), bronza turbina, havo so'ruvchi markaziy bo'g'iz va konus truba (`mine_ventilator.glb`).
+  - Kinetik quvvat: 32 SU quvvat va 20 RPM ish rejimi.
+  - Toza havo yetkazish: 24 metr radiusda soniyasiga 0.75 m³ toza havo oqimi.
+  - Zaharli va portlovchi gazlarni ($CH_4$, $CO_2$, $H_2S$) 95% ga kamaytirib, dimiqish va shaxta portlash xavfini bartaraf etadi.
+- **Og'ir Shaxta Tik Nishi Lebyodkasi (Mining Capstan Winch) (`MiningCapstan` & `mining_capstan.glb`)**:
+  - Vertikal eman baraban, pastki bronza konussimon tishli uzatma (bevel gear), xavfsizlik tishli ilmgichi (ratchet and pawl) va yo'naltiruvchi g'ildirak (`mining_capstan.glb`).
+  - Yuk ko'tarish quvvati: 30° nishablikda 1,500 kg (1.5 tonna) tosh va ruda yuklangan vagonetkalar.
+  - Ikki rejim: Kinetik drayv (40 SU bilan 1.0 m/s) yoki 4 kishilik konchi brigadasi bilan qo'lda aylantirish (0.35 m/s).
+  - Prujinali tishli qulf (pawl) bilan avariyaviy pastga qulash xavfidan 100% himoyalangan.
+- **Yangi 3D Modellar (Blender 5.2)**: `mine_dewatering_pump.glb`, `mine_ventilator.glb`, `mining_capstan.glb` yaratildi (**Yubiley 100 ta GLB model**!).
+- **Yangi Qirollik Dioramasi**: Barcha 100 ta aktiv ishtirokidagi diorama `assets/showcase_realm.png` da render qilindi va brainga saqlandi.
+- **Avtomatlashgan Testlar**: Jami **132 ta engine testi** (umumiy **189 ta test**) 100% muvaffaqiyat bilan o'tdi.
+
+
 ## 2026-09-27 — Milestone 35: Create Mod, TerraFirmaCraft & Vintage Story Og'ir Metallurgiya Quymaxonasi: Mexanik Bosqon, Domna Forzonkasi va Kinetik Bolg'a (Issue #29)
 - **Kinetik Ekssentrikli Mexanik Charm Bosqon (`MechanicalBellows` & `mechanical_bellows.glb`)**:
   - Qo'shaloq garmonikasimon buklanuvchi charm kamera, eman ramka va orqa valga o'rnatilgan quyma temir ekssentrik kamshturgich (`mechanical_bellows.glb`).

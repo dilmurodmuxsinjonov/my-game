@@ -354,6 +354,15 @@ def build_diorama():
     # 92. Heavy Water-Powered Camshaft Helve Tilt-Hammer
     import_asset("industrial_trip_hammer.glb", (1.4, 1.2, 0.0), rot_z=120, scale=0.80)
 
+    # 93. Chain-and-Bucket Mine Dewatering Pump
+    import_asset("mine_dewatering_pump.glb", (-4.2, 0.4, 0.0), rot_z=-20, scale=0.85)
+
+    # 94. Centrifugal Mine Air Impeller Fan
+    import_asset("mine_ventilator.glb", (-3.5, 1.2, 0.0), rot_z=35, scale=0.88)
+
+    # 95. Geared Shaft Incline Capstan Hoist Winch
+    import_asset("mining_capstan.glb", (-4.8, -0.6, 0.0), rot_z=15, scale=0.82)
+
     # Render output path
     output_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "assets"))
     output_path = os.path.join(output_dir, "showcase_realm.png")
