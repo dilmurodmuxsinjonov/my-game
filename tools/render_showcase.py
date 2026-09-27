@@ -345,6 +345,15 @@ def build_diorama():
     # 89. Mobile Assault Belfry Siege Tower
     import_asset("siege_tower.glb", (-3.6, 5.2, 0.0), rot_z=15, scale=0.72)
 
+    # 90. Cam-Driven Mechanical Leather Accordion Bellows
+    import_asset("mechanical_bellows.glb", (-2.8, 1.2, 0.0), rot_z=45, scale=0.85)
+
+    # 91. Blast Furnace Refractory Tuyere Air Injection Assembly
+    import_asset("furnace_tuyere.glb", (-2.0, 1.2, 0.0), rot_z=-35, scale=0.90)
+
+    # 92. Heavy Water-Powered Camshaft Helve Tilt-Hammer
+    import_asset("industrial_trip_hammer.glb", (1.4, 1.2, 0.0), rot_z=120, scale=0.80)
+
     # Render output path
     output_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "assets"))
     output_path = os.path.join(output_dir, "showcase_realm.png")

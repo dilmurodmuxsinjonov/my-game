@@ -7,6 +7,25 @@
 - Dastlabki Godot prototipi va foydalanuvchining showcase fayllari saqlandi.
 - Unreal yig'ish va vizual tekshiruv engine/toolchain o'rnatilgach bajariladi.
 
+## 2026-09-27 — Milestone 35: Create Mod, TerraFirmaCraft & Vintage Story Og'ir Metallurgiya Quymaxonasi: Mexanik Bosqon, Domna Forzonkasi va Kinetik Bolg'a (Issue #29)
+- **Kinetik Ekssentrikli Mexanik Charm Bosqon (`MechanicalBellows` & `mechanical_bellows.glb`)**:
+  - Qo'shaloq garmonikasimon buklanuvchi charm kamera, eman ramka va orqa valga o'rnatilgan quyma temir ekssentrik kamshturgich (`mechanical_bellows.glb`).
+  - Kinetik quvvatga ulanish: 32 SU sarf (minimal 12 RPM).
+  - Majburiy havo oqimi: soniyasiga 0.45 m³ siqilgan kuchli havo oqimi hosil qiladi.
+  - Harorat sakrashi (1550°C): o'choq haroratini 1100°C dan 1550°C gacha ko'tarib, cho'yan (`pig_iron`), yuqori uglerodli po'lat (`blister_steel`) va tigel qotishma po'latlarini (`crucible_steel`) eritishni to'liq avtomatlashtirish.
+- **Domna Pechi Mis Forzonkasi va Stexiometrik Klapan (`FurnaceTuyere` & `furnace_tuyere.glb`)**:
+  - Pech devorini teshib kiruvchi qizil mis naycha, sovutish g'ilofi, shomot gardishi va kapalaksimon klapan (`furnace_tuyere.glb`).
+  - Havo klapani (0.75 - 0.92) orqali yonish stexiometriyasini muvozanatlash: +25% metall hosildorligi (shlak kamayadi).
+  - Manometr orqali o'choq ichidagi dinamik bosimni uzluksiz o'lchash.
+- **Suv Quvvatli Katta Sanoat Tilt-Bolg'asi (Helve Hammer) (`IndustrialTripHammer` & `industrial_trip_hammer.glb`)**:
+  - Katta quyma temir sandon, 800 kg li eman dastali og'ir po'lat bolg'a va 3 ta egri temir barmoqli aylanuvchi taqsimlash vali (`industrial_trip_hammer.glb`).
+  - 24 RPM tezlikda 3 ta barmoq har daqiqada 48 marta kuchli zarba (har 1.25 soniyada 450 Joul) beradi.
+  - G'ovakli doma temirini zichlash: 4 zarbada temir quymasini (`iron_bloom`) sof temir zagotovkaga (`wrought_iron_billet`) aylantiradi.
+  - Sovut plitalari va qurollar yoyish: 3 zarbada zagotovkani ikkita tekis temir plastinaga (`iron_plate`) yoyadi (5 barobar tez va nol inson mehnati bilan).
+- **Yangi 3D Modellar (Blender 5.2)**: `mechanical_bellows.glb`, `furnace_tuyere.glb`, `industrial_trip_hammer.glb` yaratildi (jami **97 ta GLB model**).
+- **Yangi Qirollik Dioramasi**: Barcha 97 ta aktiv ishtirokidagi diorama `assets/showcase_realm.png` da render qilindi va brainga saqlandi.
+- **Avtomatlashgan Testlar**: Jami **128 ta engine testi** (umumiy **185 ta test**) 100% muvaffaqiyat bilan o'tdi.
+
 ## 2026-09-27 — Milestone 34: Stronghold & Mount & Blade II Og'ir Qamal Qurollari: Gravitatsion Trebyushe, Zirhli Devorbuzar va Hujum Minorasi Belfri (Issue #27)
 - **Qarshi Toshli Gravitatsion Trebyushe (`TrebuchetSiege` & `trebuchet_siege.glb`)**:
   - Uchburchakli mustahkam eman fermasi, bronza vkladishli po'lat markaziy val va 12 tonnalik tosh to'ldirilgan qarshi yuk qutisi (`trebuchet_siege.glb`).

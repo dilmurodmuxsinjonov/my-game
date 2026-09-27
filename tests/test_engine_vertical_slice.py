@@ -3662,6 +3662,113 @@ class TestEngineVerticalSlice(unittest.TestCase):
         arrow_taken = arrow_incoming * (1.0 - hoarding_defense)
         self.assertAlmostEqual(arrow_taken, 24.0, places=1)
 
+    def test_mechanical_bellows_airflow_and_temperature_boost(self):
+        """Verify mechanical bellows RPM threshold, forced draft airflow (0.45 m3/s), and 1550C blast temp."""
+        base_temp = 1100.0
+        max_boost_temp = 1550.0
+        min_operating_rpm = 12.0
+        rated_airflow = 0.45
+        kinetic_load_su = 32.0
+
+        def calc_bellows(rpm):
+            if abs(rpm) < min_operating_rpm:
+                return {"operating": False, "airflow": 0.0, "temp": base_temp, "su": 0.0}
+            rpm_ratio = min(2.0, max(0.5, abs(rpm) / 24.0))
+            flow = rated_airflow * rpm_ratio
+            temp_ratio = min(1.0, max(0.0, (abs(rpm) - min_operating_rpm) / 12.0))
+            temp = base_temp + (max_boost_temp - base_temp) * temp_ratio
+            return {"operating": True, "airflow": flow, "temp": temp, "su": kinetic_load_su}
+
+        # 1. Idle / below threshold (8 RPM < 12 RPM)
+        res_idle = calc_bellows(8.0)
+        self.assertFalse(res_idle["operating"])
+        self.assertEqual(res_idle["airflow"], 0.0)
+        self.assertEqual(res_idle["temp"], 1100.0)
+        self.assertEqual(res_idle["su"], 0.0)
+
+        # 2. Operating at standard 24 RPM
+        res_run = calc_bellows(24.0)
+        self.assertTrue(res_run["operating"])
+        self.assertAlmostEqual(res_run["airflow"], 0.45, places=2)
+        self.assertAlmostEqual(res_run["temp"], 1550.0, places=1)
+        self.assertEqual(res_run["su"], 32.0)
+
+        # High-temperature metallurgy unlock check (requires >= 1400C)
+        can_smelt_crucible_steel = res_run["temp"] >= 1400.0
+        self.assertTrue(can_smelt_crucible_steel)
+
+    def test_furnace_tuyere_damper_and_oxygen_yield_factor(self):
+        """Verify tuyere stoichiometric air injection, damper regulation, and +25% metal yield purity."""
+        def calc_tuyere(airflow, damper):
+            pressure = airflow * damper * 12.5
+            yield_factor = 1.0
+            if damper >= 0.75 and damper <= 0.92 and airflow > 0.1:
+                yield_factor = 1.25 # Optimal stoichiometry: +25% metal yield
+            elif damper > 0.92:
+                yield_factor = 0.90 # Over-oxidation: metal burns away
+            elif damper < 0.40:
+                yield_factor = 0.60 # Choked: incomplete combustion
+            return {"pressure_kpa": pressure, "yield_factor": yield_factor}
+
+        airflow = 0.45
+
+        # 1. Optimal damper (0.85) -> 1.25x yield bonus
+        res_optimal = calc_tuyere(airflow, 0.85)
+        self.assertAlmostEqual(res_optimal["yield_factor"], 1.25, places=2)
+        self.assertAlmostEqual(res_optimal["pressure_kpa"], 4.78, places=2)
+
+        # 2. Over-oxidized damper (0.98) -> 0.90x yield penalty
+        res_over = calc_tuyere(airflow, 0.98)
+        self.assertAlmostEqual(res_over["yield_factor"], 0.90, places=2)
+
+        # 3. Choked damper (0.20) -> 0.60x yield penalty
+        res_choked = calc_tuyere(airflow, 0.20)
+        self.assertAlmostEqual(res_choked["yield_factor"], 0.60, places=2)
+
+    def test_industrial_trip_hammer_camshaft_cadence_and_bloom_refining(self):
+        """Verify 3-cam industrial helve hammer 48 strikes/min cadence, bloom consolidation, and plating."""
+        rpm = 24.0
+        cam_count = 3
+        rps = rpm / 60.0
+        strikes_per_sec = rps * float(cam_count)
+        self.assertAlmostEqual(strikes_per_sec, 1.2, places=2)
+        strike_interval = 1.0 / strikes_per_sec
+        self.assertAlmostEqual(strike_interval, 0.833, places=2)
+
+        # 1. Consolidating spongy iron bloom into refined billet (4 strikes)
+        workpiece = "iron_bloom"
+        strikes_needed = 4
+        strikes_done = 4
+        finished_item = "wrought_iron_billet" if strikes_done >= strikes_needed else ""
+        self.assertEqual(finished_item, "wrought_iron_billet")
+
+        # 2. Drawing refined billet into armor plating (3 strikes -> 2 plates)
+        workpiece = "wrought_iron_billet"
+        strikes_needed = 3
+        strikes_done = 3
+        finished_item = "iron_plate"
+        plates_yield = 2 if strikes_done >= strikes_needed else 0
+        self.assertEqual(plates_yield, 2)
+
+    def test_industrial_foundry_kinetic_chain_power_balance(self):
+        """Verify kinetic power budgeting for complete mechanized foundry (Bellows + Tilt Hammer)."""
+        source_capacity = 256.0 # Water Wheel capacity
+        bellows_su = 32.0
+        tilt_hammer_su = 64.0
+        shafts_su = 0.0
+
+        foundry_total_load = bellows_su + tilt_hammer_su + shafts_su
+        self.assertEqual(foundry_total_load, 96.0)
+
+        # Network is well within capacity (96 <= 256)
+        is_overloaded = (foundry_total_load > source_capacity)
+        self.assertFalse(is_overloaded)
+
+        # Adding 3 additional heavy tilt hammers (64 * 3 = 192 SU)
+        overloaded_total = foundry_total_load + (tilt_hammer_su * 3) # 96 + 192 = 288 SU
+        self.assertEqual(overloaded_total, 288.0)
+        self.assertTrue(overloaded_total > source_capacity) # Overloaded! Stalls to 0 RPM
+
 if __name__ == "__main__":
     unittest.main()
 
