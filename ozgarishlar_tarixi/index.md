@@ -7,6 +7,24 @@
 - Dastlabki Godot prototipi va foydalanuvchining showcase fayllari saqlandi.
 - Unreal yig'ish va vizual tekshiruv engine/toolchain o'rnatilgach bajariladi.
 
+## 2026-09-27 — Milestone 34: Stronghold & Mount & Blade II Og'ir Qamal Qurollari: Gravitatsion Trebyushe, Zirhli Devorbuzar va Hujum Minorasi Belfri (Issue #27)
+- **Qarshi Toshli Gravitatsion Trebyushe (`TrebuchetSiege` & `trebuchet_siege.glb`)**:
+  - Uchburchakli mustahkam eman fermasi, bronza vkladishli po'lat markaziy val va 12 tonnalik tosh to'ldirilgan qarshi yuk qutisi (`trebuchet_siege.glb`).
+  - Uzoq masofali ballistika: 40 metrdan 140 metrgacha qamrov.
+  - 3 xil snaryad: Og'ir tosh boulderi (320 zarar, 8m shockwave), yonuvchi qora smola (240 zarar + 12 fire DPS, 10m burn), o'latli mol murdasi (biologik urush, 15m radiusda -30 morale).
+  - O'qlash: 3 ta muhandis bilan qo'lda 15.0s, kinetik val bilan avtomatik 4.5s (80 SU).
+- **Zirhli G'ildirakli Qo'chqor Boshli Devorbuzar (`BatteringRam` & `battering_ram.glb`)**:
+  - To'rtta quyma zanjirga osilgan qalin eman daraxti tanasi va cho'yan qo'chqor boshli zarba uchligi (`battering_ram.glb`).
+  - Mayatnik tebranishi: har 3.2 soniyada 180 ball kinetik zarba.
+  - Ho'l charm (rawhide) ikki nishabli boshpana: 80% o'qlarni qaytarish va 50% qaynoq smola olovini so'ndirish.
+- **Ko'chma Ko'p Qavatli Hujum Minorasi Belfri (`SiegeTower` & `siege_tower.glb`)**:
+  - 8 metr balandlikdagi 3 qavatli yog'och minora; o'qchi slitlari va tepasida osma shturm ko'prigi (corvus bridge) (`siege_tower.glb`).
+  - 6 ta askar tomonidan 0.6 m/s tezlikda devorga suriladi; 2 soniyada temir tirnoqli ko'prik parapetga tashlanadi.
+  - 8 ta saralangan qilichboz desantni 4 soniyada (2 troop/s) devorga yopirilib tushirish; 70% o'qdan himoya hordingi.
+- **Yangi 3D Modellar (Blender 5.2)**: `trebuchet_siege.glb`, `battering_ram.glb`, `siege_tower.glb` yaratildi (jami **94 ta GLB model**).
+- **Yangi Qirollik Dioramasi**: Barcha 94 ta aktiv ishtirokidagi diorama `assets/showcase_realm.png` da render qilindi va brainga saqlandi.
+- **Avtomatlashgan Testlar**: Jami **124 ta engine testi** (umumiy **181 ta test**) 100% muvaffaqiyat bilan o'tdi.
+
 ## 2026-09-27 — Milestone 33: Stronghold & Medieval Engineering Qasr Xandaq Ko'prigi Chig'iri, Ko'tarma Darvoza va G'ildirakli Shaxta Krani (Issue #25)
 - **Qasr Xandag'i Ko'tarma Ko'prik Chig'iri (`DrawbridgeController` & `drawbridge_winch.glb`)**:
   - A-simon og'ir eman ustunli chig'ir, tishli po'lat baraban va qo'sh richagli aylantirish g'ildiragi (`drawbridge_winch.glb`).

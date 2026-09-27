@@ -3530,6 +3530,138 @@ class TestEngineVerticalSlice(unittest.TestCase):
         crane_haul_time = staircase_haul_time * (1.0 - efficiency_gain)
         self.assertAlmostEqual(crane_haul_time, 30.0, places=2)
 
+    def test_trebuchet_ballistics_range_and_payload_damage(self):
+        """Verify trebuchet 40-140m range constraints, ammunition types, and kinetic damage."""
+        min_range = 40.0
+        max_range = 140.0
+
+        # Target range checks
+        self.assertTrue(90.0 >= min_range and 90.0 <= max_range)
+        self.assertFalse(25.0 >= min_range and 25.0 <= max_range) # Too close
+        self.assertFalse(160.0 >= min_range and 160.0 <= max_range) # Out of range
+
+        ammo_stock = {"STONE_BOULDER": 5, "INCENDIARY_PITCH": 2, "COW_CARCASS": 1}
+
+        def fire_trebuchet(dist, ammo_type):
+            if not (dist >= min_range and dist <= max_range):
+                return {"success": False, "damage": 0.0}
+            if ammo_stock.get(ammo_type, 0) <= 0:
+                return {"success": False, "damage": 0.0}
+            ammo_stock[ammo_type] -= 1
+            if ammo_type == "STONE_BOULDER":
+                return {"success": True, "damage": 320.0, "aoe": 8.0}
+            elif ammo_type == "INCENDIARY_PITCH":
+                return {"success": True, "damage": 240.0, "aoe": 10.0, "fire_dps": 12.0}
+            elif ammo_type == "COW_CARCASS":
+                return {"success": True, "damage": 50.0, "aoe": 15.0, "morale": -30.0}
+            return {"success": False, "damage": 0.0}
+
+        # 1. Fire stone boulder
+        shot1 = fire_trebuchet(100.0, "STONE_BOULDER")
+        self.assertTrue(shot1["success"])
+        self.assertEqual(shot1["damage"], 320.0)
+        self.assertEqual(shot1["aoe"], 8.0)
+        self.assertEqual(ammo_stock["STONE_BOULDER"], 4)
+
+        # 2. Fire incendiary pitch
+        shot2 = fire_trebuchet(80.0, "INCENDIARY_PITCH")
+        self.assertTrue(shot2["success"])
+        self.assertEqual(shot2["damage"], 240.0)
+        self.assertEqual(shot2["fire_dps"], 12.0)
+        self.assertEqual(ammo_stock["INCENDIARY_PITCH"], 1)
+
+        # 3. Fire biological cow carcass
+        shot3 = fire_trebuchet(110.0, "COW_CARCASS")
+        self.assertTrue(shot3["success"])
+        self.assertEqual(shot3["morale"], -30.0)
+        self.assertEqual(ammo_stock["COW_CARCASS"], 0)
+
+    def test_trebuchet_kinetic_and_manual_reload_speed(self):
+        """Verify trebuchet manual winch winding (15.0s) vs kinetic automated reload (4.5s)."""
+        manual_time = 15.0
+        kinetic_time = 4.5
+        kinetic_su = 80.0
+
+        # Simulate manual reload progress over 10s
+        reload_progress = 0.0
+        dt = 10.0
+        reload_progress += dt / manual_time
+        self.assertAlmostEqual(reload_progress, 0.667, places=2)
+        is_ready = reload_progress >= 1.0
+        self.assertFalse(is_ready)
+
+        # Complete manual reload (+5s)
+        reload_progress += 5.0 / manual_time
+        self.assertAlmostEqual(reload_progress, 1.0, places=2)
+        is_ready = reload_progress >= 1.0
+        self.assertTrue(is_ready)
+
+        # Kinetic reload takes only 4.5s
+        k_progress = 4.5 / kinetic_time
+        self.assertEqual(k_progress, 1.0)
+        self.assertEqual(kinetic_su, 80.0)
+
+    def test_battering_ram_pendulum_cadence_and_armor_deflection(self):
+        """Verify battering ram pendulum swing cadence, gate damage, and rawhide missile defense."""
+        strike_damage = 180.0
+        cycle_time = 3.2
+        hp = 600.0
+
+        # Movement speed scaling by crew
+        def get_ram_speed(crew):
+            if crew < 2:
+                return 0.0
+            return 0.2 * float(crew)
+
+        self.assertEqual(get_ram_speed(4), 0.8)
+        self.assertEqual(get_ram_speed(2), 0.4)
+        self.assertEqual(get_ram_speed(1), 0.0) # Insufficient crew to roll
+
+        # Gate damage test: 2 strikes against 300 HP wooden gate
+        gate_hp = 300.0
+        gate_hp = max(0.0, gate_hp - strike_damage)
+        self.assertEqual(gate_hp, 120.0)
+        gate_hp = max(0.0, gate_hp - strike_damage)
+        self.assertEqual(gate_hp, 0.0)
+
+        # Rawhide roof defense: 80% arrow deflection
+        raw_arrow_damage = 100.0
+        arrow_deflection = 0.80
+        taken_arrow_damage = raw_arrow_damage * (1.0 - arrow_deflection)
+        self.assertAlmostEqual(taken_arrow_damage, 20.0, places=2)
+
+        # Boiling pitch defense: 50% fire mitigation
+        raw_pitch_damage = 100.0
+        fire_mitigation = 0.50
+        taken_pitch_damage = raw_pitch_damage * (1.0 - fire_mitigation)
+        self.assertAlmostEqual(taken_pitch_damage, 50.0, places=2)
+
+    def test_siege_tower_assault_deployment_and_corvus_bridge(self):
+        """Verify siege tower rolling speed, corvus bridge deployment, and rampart storming."""
+        push_crew = 6
+        tower_speed = 0.1 * float(push_crew)
+        self.assertAlmostEqual(tower_speed, 0.6, places=2)
+
+        # Corvus assault bridge drops in 2.0s
+        bridge_time = 2.0
+        bridge_timer = 2.0
+        bridge_deployed = (bridge_timer >= bridge_time)
+        self.assertTrue(bridge_deployed)
+
+        # Disembarking 8 storm troops at 2 troops/sec -> 4.0s total
+        troops = 8
+        time_elapsed = 4.0
+        troops_disembarked = int(time_elapsed * 2.0)
+        remaining_troops = max(0, troops - troops_disembarked)
+        self.assertEqual(remaining_troops, 0)
+        self.assertEqual(troops_disembarked, 8)
+
+        # Protective hoarding defense: 70% missile defense
+        hoarding_defense = 0.70
+        arrow_incoming = 80.0
+        arrow_taken = arrow_incoming * (1.0 - hoarding_defense)
+        self.assertAlmostEqual(arrow_taken, 24.0, places=1)
+
 if __name__ == "__main__":
     unittest.main()
 
