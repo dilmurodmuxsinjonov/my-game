@@ -797,11 +797,35 @@ Medieval davrning haqiqiy muhandisligi:
   - Noksimon egri bortli (tumblehome), past cho'kishli mustahkam eman korpusi, baland kema orqa kasri (quarterdeck), to'g'ri to'rtburchakli asosiy yelkanlar, kosoy lotin yelkani (mizzen lateen) va buksprit.
   - **80 Slotli Katta Tryum**: Metall quymalar, to'qimachilik matolari, tuzlangan baliq va vino bochkalarini xavfsiz tashiydi.
   - **Yelkan Aerodinamikasi (Points of Sail)**:
-    - *Levintik (In irons, <35°)*: 0 tugun (shamolga qarshi yura olmaydi).
-    - *Beydevind (Close hauled, 35°-70°)*: 55% tezlik (3.6 tugun).
-    - *Galpvind (Beam reach, 70°-110°)*: 90% tezlik (5.85 tugun).
-    - *Bakshtag (Broad reach, 110°-155°)*: 100% maksimal tezlik (6.5 tugun / 3.34 m/s).
   - **Avtomatlashgan Savdo Marshrutlari**: Uy porti va tashqi bozorlar o'rtasida to'xtovsiz qatnab, har bir to'liq reysdan qirollik xazinasiga 120-150 oltin tanga sof daromad keltiradi.
+
+---
+
+## 28. Create Mod, Thermal Expansion & Vintage Story Integratsiyasi — Yuqori Bosimli Sanoat Bug' Energetikasi: Qozon, Statsionar Dvigatel va Uattning Markazdan Qochma Regulyatori (Milestone 39)
+
+### 28.1. Yuqori Bosimli Sanoat Bug' Qozoni (`SteamBoiler` & `steam_boiler.glb`) — [Create Mod / Thermal Expansion]
+- **Muammo**: Suv tegirmonlari daryoga bog'liq bo'lib, qurg'oqchilik yoki sovuq qishda muzlab qoladi; shamol tegirmonlari esa shamolsiz ob-havoda butun metallurgiya va kon sanoatini to'xtatib qo'yadi.
+- **Yechim (`SteamBoiler` & `steam_boiler.glb`)**:
+  - Shamot g'ishtli o'txona, guruch qoplamali va temir kamarlar bilan o'ralgan ko'p trubali silindrik bosim barabani, suv sathi ko'rsatkich shishasi (sight glass), manometr va qo'shaloq richagli xavfsizlik klapanlari (`popoff valves`).
+  - **Yuqori Bosim Parametrlari**: 12 bar optimal ish bosimi, 15 bar xavfsizlik klapani ochilishi (bug'ni chiqarib bosimni tushiradi), 20 bar halokatli portlash chegarasi (`boiler_exploded`).
+  - **Energiya Chiqishi**: Uzluksiz 512 SU dan 2,048 SU gacha kinetik quvvatga teng yuqori bosimli qizigan bug' oqimini ta'minlaydi.
+
+### 28.2. Gorizontal Statsionar Qo'shaloq Ta'sirli Bug' Dvigateli (`SteamEngineDrive` & `steam_engine_drive.glb`) — [Vintage Story / Create Mod]
+- **Muammo**: Katta quyma temir bolg'alar (Milestone 35), shamollatish ventilyatorlari (Milestone 36) va temiryo'l chig'irlari doimiy ulkan quvvat talab qiladi; barcha stanoklarni bitta markaziy kuchli valdan quvvatlantirish lozim.
+- **Yechim (`SteamEngineDrive` & `steam_engine_drive.glb`)**:
+  - Massiv quyma temir ramka, qimmatbaho yog'och qoplangan silindr, po'lat polzun (crosshead guide), shatun va 1.8 metr diametrli og'ir inersion maxovik (flywheel).
+  - **Kinetik Quvvat Quvvati**: 12 bar bug' bosimi va to'liq drosselda 64 RPM tezlikda **1,024 SU** sof aylanma mexanik quvvat ishlab chiqaradi!
+  - **Inersion Ravonlik**: 450 kg li maxovik yordamida porshen o'lik nuqtalarida ham kinetik val bir tekis, tebranishlarsiz va silkinishlarsiz aylanadi.
+
+### 28.3. Jeyms Uattning Markazdan Qochma Sharli Tezlik Regulyatori (`CentrifugalGovernor` & `centrifugal_governor.glb`) — [Industrial History / Create Mod]
+- **Muammo**: Katta fabrikada stanoklar yoqilganda yoki o'chirilganda dvigatel yuki keskin o'zgaradi: yuk kamaysa dvigatel haddan ziyod tez aylanib portlab ketadi (`overspeed`), yuk ko'payganda esa to'xtab qoladi (`stall`).
+- **Yechim (`CentrifugalGovernor` & `centrifugal_governor.glb`)**:
+  - Konussimon tishli uzatma bilan aylanuvchi vertikal shpindel, ikkita og'ir guruch shar (flyballs), siljuvchi mufta (sliding collar) va drossel kapalak klapaniga ulangan richag mexanizmi.
+  - **Avtomatik Mexanik Qayta Aloqa**:
+    - Aylanish tezligi oshsa ($RPM > 64$), markazdan qochma kuch sharlarni chetga itaradi ($15^\circ \to 75^\circ$), mufta yuqoriga ko'tariladi va bug' klapanini yopadi (drossel $1.0 \to 0.2$).
+    - Tezlik tushsa ($RPM < 64$), sharlar pastga tushadi va bug' oqimini kengaytirib tezlikni yana aniq 64 RPM ga qaytaradi.
+    - **Natija**: Inson aralashuvisiz zavodning barcha stanoklari mukammal barqaror tezlikda ishlaydi!
+
 
 
 

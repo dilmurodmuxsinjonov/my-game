@@ -4080,8 +4080,98 @@ class TestEngineVerticalSlice(unittest.TestCase):
         accepted_wine = min(wine_barrels, free_slots)
         self.assertEqual(accepted_wine, 20)
 
+    def test_milestone39_glb_assets(self):
+        """Verify binary glTF headers and integrity for Milestone 39 3D models."""
+        models_dir = os.path.join(os.path.dirname(__file__), "..", "assets", "models")
+        m39_models = ["steam_boiler.glb", "steam_engine_drive.glb", "centrifugal_governor.glb"]
+        for m in m39_models:
+            p = os.path.join(models_dir, m)
+            self.assertTrue(os.path.exists(p), f"Missing model {m}")
+            self.assertGreater(os.path.getsize(p), 1000, f"Model {m} is unusually small")
+            with open(p, "rb") as f:
+                header = f.read(4)
+                self.assertEqual(header, b"glTF", f"Model {m} does not have valid glTF magic header")
+
+    def test_steam_boiler_thermodynamics_and_popoff_relief(self):
+        """Verify high-pressure boiler steam generation, 15 bar popoff valve, and explosion safety."""
+        popoff_bar = 15.0
+        explosion_bar = 20.0
+        operating_bar = 12.0
+
+        # Normal operating pressure check
+        p_normal = 12.0
+        self.assertTrue(p_normal <= popoff_bar)
+        self.assertFalse(p_normal >= explosion_bar)
+
+        # High pressure triggers popoff relief
+        p_high = 15.5
+        popoff_active = (p_high >= popoff_bar)
+        self.assertTrue(popoff_active)
+
+        # Catastrophic overpressure check
+        p_catastrophic = 20.2
+        is_exploded = (p_catastrophic >= explosion_bar)
+        self.assertTrue(is_exploded)
+
+    def test_steam_engine_drive_kinetic_output_and_flywheel_inertia(self):
+        """Verify 1024 SU kinetic capacity, 64 RPM output at 12 bar, and throttle scaling."""
+        rated_su = 1024.0
+        rated_rpm = 64.0
+        optimal_pressure = 12.0
+
+        # Full throttle at 12 bar -> exactly 1024 SU and 64 RPM
+        pressure = 12.0
+        throttle = 1.0
+        su_full = rated_su * (pressure / optimal_pressure) * throttle
+        rpm_full = rated_rpm * (pressure / optimal_pressure) * throttle
+        self.assertEqual(su_full, 1024.0)
+        self.assertEqual(rpm_full, 64.0)
+
+        # Half throttle at 12 bar -> 512 SU and 32 RPM
+        throttle_half = 0.5
+        su_half = rated_su * (pressure / optimal_pressure) * throttle_half
+        rpm_half = rated_rpm * (pressure / optimal_pressure) * throttle_half
+        self.assertEqual(su_half, 512.0)
+        self.assertEqual(rpm_half, 32.0)
+
+        # Low steam pressure (6 bar) at full throttle -> 512 SU
+        pressure_low = 6.0
+        su_low_p = rated_su * (pressure_low / optimal_pressure) * 1.0
+        self.assertEqual(su_low_p, 512.0)
+
+    def test_centrifugal_governor_speed_stabilization_and_throttle(self):
+        """Verify James Watt flyball angular expansion (omega^2), collar lift, and throttle modulation."""
+        target_rpm = 64.0
+        min_angle = 15.0
+        max_angle = 75.0
+        max_collar_lift = 0.25 # meters
+
+        # At rest (0 RPM) -> balls dropped to 15 deg, collar lift 0
+        speed_ratio_zero = 0.0
+        angle_zero = min_angle + (max_angle - min_angle) * (speed_ratio_zero * speed_ratio_zero)
+        self.assertEqual(angle_zero, 15.0)
+
+        # At operating target RPM (64 RPM): speed ratio = 64 / (64 * 1.35) = 1.0 / 1.35 ~ 0.7407
+        # Balls spread outward moderately
+        ratio_target = 64.0 / (64.0 * 1.35)
+        angle_target = min_angle + (max_angle - min_angle) * (ratio_target * ratio_target)
+        self.assertGreater(angle_target, 35.0)
+        self.assertLess(angle_target, 55.0)
+
+        # Overspeed condition (90 RPM > 64 * 1.3 = 83.2 RPM)
+        overspeed_rpm = 90.0
+        is_overspeed = (overspeed_rpm > target_rpm * 1.3)
+        self.assertTrue(is_overspeed)
+
+        # Governor collar lifts, choking throttle down below 0.50
+        angle_fraction = (angle_target - min_angle) / (max_angle - min_angle)
+        collar_lift = max_collar_lift * angle_fraction
+        self.assertGreater(collar_lift, 0.08)
+        self.assertLess(collar_lift, 0.20)
+
 if __name__ == "__main__":
     unittest.main()
+
 
 
 

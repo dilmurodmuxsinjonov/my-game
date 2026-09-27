@@ -381,9 +381,19 @@ def build_diorama():
     # 101. Ocean-Going Fluyt Merchant Cargo Vessel
     import_asset("fluyt_cargo_ship.glb", (-5.6, 5.8, 0.0), rot_z=-35, scale=0.70)
 
+    # 102. High-Pressure Multi-Tube Steam Boiler
+    import_asset("steam_boiler.glb", (-1.2, 1.4, 0.0), rot_z=-30, scale=0.85)
+
+    # 103. Horizontal Stationary Double-Acting Steam Engine
+    import_asset("steam_engine_drive.glb", (0.2, 1.4, 0.0), rot_z=60, scale=0.80)
+
+    # 104. James Watt Flyball Centrifugal Speed Governor
+    import_asset("centrifugal_governor.glb", (-0.4, 1.8, 0.0), rot_z=-15, scale=0.90)
+
     # Render output path
     output_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "assets"))
     output_path = os.path.join(output_dir, "showcase_realm.png")
+
 
 
     
