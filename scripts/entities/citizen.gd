@@ -83,9 +83,11 @@ var wander_cooldown: float = 3.0
 var model_instance: Node3D
 var nameplate: Label3D
 var collision_shape: CollisionShape3D
+var metabolism: MetabolismComponent
 
 func _ready() -> void:
 	_setup_visuals()
+	_setup_metabolism()
 	if voxel_world:
 		pathfinder = GridPathfinder3D.new(voxel_world)
 
@@ -123,6 +125,41 @@ func _setup_visuals() -> void:
 	nameplate.font_size = 28
 	nameplate.modulate = Color(1.0, 0.95, 0.6)
 	add_child(nameplate)
+
+func _setup_metabolism() -> void:
+	if not metabolism:
+		metabolism = get_node_or_null("MetabolismComponent")
+	if not metabolism:
+		metabolism = MetabolismComponent.new()
+		metabolism.name = "MetabolismComponent"
+		metabolism.citizen = self
+		add_child(metabolism)
+	
+	if metabolism:
+		metabolism.deficiency_disease_triggered.connect(_on_deficiency_disease_triggered)
+		metabolism.deficiency_disease_cured.connect(_on_deficiency_disease_cured)
+		metabolism.citizen_collapsed.connect(_on_citizen_collapsed)
+
+func _on_deficiency_disease_triggered(disease_name: String, stage: int) -> void:
+	if nameplate:
+		nameplate.text = "%s\n[%s: STAGE %d]" % [citizen_name, disease_name.to_upper(), stage]
+		nameplate.modulate = Color(1.0, 0.4, 0.4)
+
+func _on_deficiency_disease_cured(disease_name: String) -> void:
+	if nameplate:
+		nameplate.text = "%s\n[%s]" % [citizen_name, _get_role_name(current_role)]
+		nameplate.modulate = Color(1.0, 0.95, 0.6)
+
+func _on_citizen_collapsed(reason: String) -> void:
+	if nameplate:
+		nameplate.text = "%s\n[COLLAPSED: %s]" % [citizen_name, reason]
+		nameplate.modulate = Color(1.0, 0.2, 0.2)
+	_transition_to(State.SLEEPING if current_state != State.DEFENDING else State.HEALING)
+
+func ingest_food(item_id: String, cal: float = -1.0, c: float = -1.0, p: float = -1.0, v: float = -1.0) -> void:
+	if metabolism:
+		metabolism.ingest_food(item_id, cal, c, p, v)
+	hunger = maxf(0.0, hunger - 40.0)
 
 func set_role(new_role: Role, work_target: Vector3 = Vector3.ZERO) -> void:
 	current_role = new_role
@@ -206,7 +243,8 @@ func _physics_process(delta: float) -> void:
 		State.WORKING:
 			velocity.x = 0
 			velocity.z = 0
-			state_timer += delta
+			var work_speed = metabolism.work_speed_mult if metabolism else 1.0
+			state_timer += delta * work_speed
 			if state_timer >= work_duration:
 				state_timer = 0.0
 				_complete_work_cycle()
@@ -231,6 +269,8 @@ func _physics_process(delta: float) -> void:
 			if state_timer >= 2.0:
 				state_timer = 0.0
 				hunger = maxf(0.0, hunger - 40.0)
+				if metabolism:
+					metabolism.ingest_food("food_bread")
 				_transition_to(State.IDLE if current_role == Role.UNASSIGNED else (State.DEFENDING if current_role == Role.GUARD else State.MOVING_TO_WORK))
 				
 		State.FLEEING:
@@ -261,8 +301,9 @@ func _follow_path(delta: float, on_reach_state: State) -> void:
 		diff.y = 0
 		
 	var dir = diff.normalized()
-	velocity.x = dir.x * MOVE_SPEED
-	velocity.z = dir.z * MOVE_SPEED
+	var speed_mult = metabolism.move_speed_mult if metabolism else 1.0
+	velocity.x = dir.x * MOVE_SPEED * speed_mult
+	velocity.z = dir.z * MOVE_SPEED * speed_mult
 	
 	# Face movement direction
 	if dir.length_squared() > 0.01:
@@ -432,13 +473,24 @@ func _start_wandering() -> void:
 	_navigate_to(target, State.WANDER)
 
 func _update_needs(delta: float) -> void:
-	hunger += delta * 0.2
+	if metabolism:
+		hunger = clampf((1.0 - (metabolism.current_calories / 2400.0)) * 100.0, 0.0, 100.0)
+	else:
+		hunger += delta * 0.2
+
 	if hunger >= 80.0 and current_state != State.EATING:
 		# Check if kingdom has food
-		if supply_chain and supply_chain.consume_resource("bread", 1):
-			_transition_to(State.EATING)
-		elif hunger >= 100.0:
-			health -= delta * 1.5 # Starvation damage
+		var food_found = false
+		if supply_chain:
+			for food_item in ["bread", "ration_bread", "roast_meat", "fresh_meat", "vegetable_broth", "hearty_stew"]:
+				if supply_chain.consume_resource(food_item, 1):
+					if metabolism:
+						metabolism.ingest_food(food_item)
+					_transition_to(State.EATING)
+					food_found = true
+					break
+		if not food_found and hunger >= 100.0 and not metabolism:
+			health -= delta * 1.5 # Starvation damage fallback
 
 func _transition_to(new_state: State) -> void:
 	if current_state != new_state:

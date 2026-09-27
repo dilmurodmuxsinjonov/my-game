@@ -1389,28 +1389,32 @@ Har bir komponentning hisoblanish qoidalari:
 
 Voxel Lord simulyatsiyasida fuqaroning hayotiyligi va mehnat unumdorligi doimiy ravishda hisoblab boriladigan fiziologik ehtiyojlar tizimiga asoslanadi. Har bir ehtiyoj o'ziga xos dinamik o'zgarish formulasiga ega.
 
-### 18.1. Ochlik Mexanikasi va Sarflanish Tenglamasi (Hunger Drain)
+### 18.1. Ochlik Mexanikasi, TEE/BMR Kaloriyalar Balansi va Sarflanish Tenglamasi
 
-Fuqaroning ochlik darajasi $Hunger \in [0.0, 100.0]$ oralig'ida bo'lib, 0 — to'q, 100 — qattiq ochlikni bildiradi.
+Fuqaroning oziqlanishi va energiya sarfi ko'p qatlamli termodinamik metabolizm modeli (Total Energy Expenditure - TEE) asosida hisoblanadi. Fuqaroning to'liq ochlik holati $Hunger \in [0.0, 100.0]$ hamda faol kaloriyalar zaxirasi $Calories \in [0.0, 15000.0\text{ kcal}]$ orqali boshqariladi. Nominal kunlik bazaviy metabolizm (BMR) $1,800.0\text{ kcal}$ ni tashkil etadi ($75.0\text{ kcal/soat}$ yoki $0.020833\text{ kcal/sekund}$). Maksimal to'yinish chegarasi $15,000.0\text{ kcal}$ bo'lib, bu fuqaroning 8 kunlik to'liq yog' zaxirasini (Adipose reserve) ifodalaydi.
+
+Jami energiya sarfi (TEE) quyidagi universal formula bilan aniqlanadi:
+
+$$TEE = BMR \times ActivityMult(State) + ShiveringBurn$$
 
 $$\frac{d(Hunger)}{dt} = BaseHungerRate \times ActivityMult(State) \times TempMult$$
 
 Bunda:
-- $BaseHungerRate = \frac{100.0}{24 \times 60} \approx 0.0694 \text{ ball/daqiqa}$ (Fuqaro hech narsa qilmasa, 24 soatda to'liq ochiqadi).
+- $BaseHungerRate = \frac{100.0}{24 \times 60} \approx 0.0694 \text{ ball/daqiqa}$ (Fuqaro passiv holatda 24 soatda to'liq ochiqadi).
 - **Faoliyat Multiplikatori ($ActivityMult$):**
-  - Uxlayotganda (`SLEEP`): $0.50\times$
-  - Dam olayotganda / Gurunglashganda (`REST / SOCIALIZE`): $0.80\times$
-  - Oddiy yurishda (`WALK`): $1.15\times$
-  - Og'ir jismoniy mehnatda (Konchilik, Temirchilik, Yuk tashish): $1.60\times$
-  - Jang maydonida yugurish va zarba berishda (`FIGHT / FLEE`): $2.20\times$
-- **Harorat Ko'paytiruvchisi ($TempMult$):**
-  Agar fuqaroning tana harorati $T_{body} < 35.0^\circ\text{C}$ ga tushsa, organizm o'zini isitish uchun kaloriyalarni ko'p yoqadi: $TempMult = 1.30\times$.
+  - Uxlayotganda (`SLEEP`): $0.50\times$ ($37.5\text{ kcal/soat}$)
+  - Dam olayotganda / Gurunglashganda (`REST / SOCIALIZE`): $0.80\times$ ($60.0\text{ kcal/soat}$)
+  - Oddiy yurishda (`WALK`): $1.15\times$ ($86.25\text{ kcal/soat}$)
+  - Og'ir jismoniy mehnatda (Konchilik, Temirchilik, Yuk tashish): $1.60\times$ ($120.0\text{ kcal/soat}$)
+  - Jang maydonida yugurish va zarba berishda (`FIGHT / FLEE`): $2.20\times$ ($165.0\text{ kcal/soat}$)
+- **Titroq Termogenezi ($ShiveringBurn$):**
+  Agar tashqi harorat $T_{ambient} < 10.0^\circ\text{C}$ ga tushsa yoki tana harorati $T_{body} < 35.0^\circ\text{C}$ bo'lsa, organizm o'zini isitish uchun majburiy titrash rejimiga o'tadi va qo'shimcha $+120.0\text{ W}$ issiqlik quvvatini yoqadi ($\approx +103.2\text{ kcal/soat}$, $TempMult = 1.30\times$).
 
 **Ochlik Bosqichlari va Salbiy Ta'sirlari:**
 - $0 – 30$ (**To'q / Sated**): Hech qanday jarima yo'q, ruhiyat barqaror.
 - $31 – 70$ (**Ishtaha Ochilgan / Peckish**): $-5$ Morale, fuqaro tushlik vaqtini kutadi.
 - $71 – 90$ (**Och / Hungry**): $-20$ Morale, ish tezligi $-15\%$. Fuqaro eng yaqin oziq-ovqat omboriga borishni rejalashtiradi.
-- $91 – 100$ (**Ocharchilik / Starving**): $-50$ Morale, ish tezligi $-40\%$. Fuqaro har soatda $2.5\text{ HP}$ salomatligini yo'qotadi va oxir-oqibat hushidan ketib halok bo'ladi.
+- $91 – 100$ (**Ocharchilik / Starving**): $-50$ Morale, ish tezligi $-40\%$. Kaloriya zaxirasi $0.0\text{ kcal}$ ga yetganda, fuqaro har soatda $2.5\text{ HP}$ salomatligini yo'qotadi va hushidan ketib halok bo'ladi.
 
 ---
 
@@ -1483,6 +1487,29 @@ Bunda bazaviy ko'rsatkichlar: $HP_{base} = 25.0$, $Stamina_{base} = 50.0$. Sifat
 | **Shohona Asal Shirinligi (Honey)** | `FOOD_ROYAL_HONEY` | $+20\text{ HP}$ | $+50\text{ Stamina}$ | $+1.0\text{ HP/s}$ | 25 daqiqa |
 
 Ochlik $Hunger > 90$ ga yetganda o'yinchi bir lahzada halok bo'lmaydi, balki uning maksimal salomatligi bazaviy $25\text{ HP}$ ga tushib qoladi va charchoq tez to'planadi.
+
+---
+
+### 18.6. 3 Asosiy Ozuqa Ustuni va Eksponensial Kamayish Kinetikasi (3-Pillar Nutrient Kinetics)
+
+Fuqaroning biologik chidamliligi va salomatligi 3 ta mustaqil makronutrient va vitamin ustuniga (Carbohydrates, Proteins, Vitamins) asoslanadi. Har bir ustun o'zining mustaqil yarim yemirilish davriga ($\tau$) ega:
+
+1. **Uglevodlar (Carbohydrates - $\tau = 18\text{ soat}$):** Mushaklardagi glikogen rezervi. Tez sarflanadi (yarim yemirilish davri 18 o'yin soati). Uglevodlar $20\%$ dan pastga tushganda, **Glikogen Charchog'i (Glycogen Fatigue)** boshlanadi: chidamlilik tiklanishi $-50\%$, mehnat unumdorligi $-30\%$, harakat tezligi $-20\%$ ga pasayadi.
+2. **Oqsillar (Proteins - $\tau = 72\text{ soat}$):** Tana to'qimalari va mushak massasini saqlash ustuni (yarim yemirilish davri 72 o'yin soati / 3 kun). Oqsillar $15\%$ dan pastga tushganda, mushaklar atrofiyasi boshlanadi va tabiiy regeneratsiya nolga tushadi.
+3. **Vitaminlar (Vitamins - $\tau = 120\text{ soat}$):** Immunitet va mikronutrientlar zaxirasi (yarim yemirilish davri 120 o'yin soati / 5 kun). Sabzavotlar, mevalar va tuzlangan karam iste'mol qilmaslik qon tomirlarining mo'rtlashuviga va lavsha kasalligiga sabab bo'ladi.
+
+Eksponensial kamayish qonuniyati:
+
+$$Nutrient(t) = Nutrient_0 \times 2^{-\frac{t}{\tau}}$$
+
+### 18.7. Lavsha / Singa Kasalligi Patogenezi (Scurvy Pathogenesis Stages 0-3)
+
+Fuqaroning vitaminlar darajasi $15\%$ dan pastga tushganda, Scurvy taymeri ishga tushadi va quyidagi 4 klinik bosqichda rivojlanadi:
+
+- **0-Bosqich (Sog'lom / Healthy):** Vitaminlar $\ge 15\%$. Organizm to'liq sog'lom, to'qimalar regeneratsiyasi normal kechadi.
+- **1-Bosqich (Surunkali Lunjlik / Lethargy - 48 soat):** Vitaminlar 48 soat davomida $< 15\%$ bo'lganda yuzaga keladi. Ish tezligi $-20\%$ ga tushadi, tabiiy sog'liq tiklanishi (HP regeneration) to'liq bloklanadi.
+- **2-Bosqich (Spontan Qon Ketish / Spontaneous Bleeding - 96 soat):** Vitaminlar 96 soat davomida $< 15\%$ bo'lganda yuzaga keladi. Milklar qonaydi, mayda qon tomirlari yoriladi. Salomatlik har soatda $-1.0\text{ HP}$ dan yo'qotiladi, mehnat tezligi $-40\%$, harakat tezligi $-25\%$ ga tushadi.
+- **3-Bosqich (Halokatli Gemorragik Shok / Fatal Hemorrhage - 144 soat):** Vitaminlar 144 soat (6 kun) davomida $< 15\%$ bo'lganda ro'y beradi. Qon ketishi ichki a'zolarga o'tadi, salomatlik yo'qotilishi soatiga $-4.0\text{ HP}$ ga yetadi, fuqaro yiqilib hushidan ketadi (`COLLAPSE_FATAL`). Yangi mevalar, sabzavotlar yoki tuzlangan karam berilmasa, 12 soatda o'lim yuz beradi.
 
 ---
 
@@ -2027,6 +2054,18 @@ func can_promote(pop: int, gold: int, prestige: float, castle_score: int) -> boo
 	return pop >= reqs["pop"] and gold >= reqs["gold"] and prestige >= reqs["prestige"] and castle_score >= reqs["castle_score"]
 ```
 
+### 24.5. 5 Asosiy Feodal Ijtimoiy Qatlam Xartiyalari (5 Medieval Social Strata Charters)
+
+Feodal jamiyat 5 ta asosiy qonuniy ijtimoiy qatlamga (`StrataTier`) bo'linadi. Har bir qatlam o'zining rasmiy qirollik xartiyasi, mehnat majburiyatlari, soliq chidamliligi va qo'zg'olon qo'zg'atuvchi omillariga ega:
+
+| Qatlam (Strata) | Rasmiy Xartiya Nomi | Mehnat va Korve Majburiyati | Harbiy Xizmat Kvotasi | Soliq Bardoshligi | Asosiy Huquq va Imtiyozlar | Isyon Triggers (Revolt Triggers) |
+|---|---|---|---|---|---|---|
+| **Krepostnoy Dehqonlar (Serfs)** | Manorial Labor Charter | Haftasiga 3 kun (24.0 soat) lord yerida majburiy korve mehnati | 0 kun (Harbiy xizmatga olinmaydi) | 25% (Undan oshsa isyon) | Yerga biriktirilganlik, o'rmondan quruq o'tin terish, qasrda boshpana | Soliq 25% dan oshganda, ocharchilik (1200 kcal dan kam, 3 kun) yoki korve 4 kundan oshganda (Jakeriya Qo'zg'oloni) |
+| **Erkin Dehqonlar (Yeomen)** | Freehold Yeomanry Charter | 0 soat (Korve mehnati yo'q) | Yiliga 90 kungacha shahar kamonchilar militsiyasi | 20% (Undan oshsa isyon) | Mustaqil allodial yer egaligi, erkin bozor savdosi, shohona sud daxlsizligi | Soliq 20% dan oshganda yoki erkin yer mulki musodara qilinganda (Erkin Dehqonlar Isyoni) |
+| **Gildiya Hunarmandlari (Guild Artisans)** | Craft Guild Charter | 0 soat korve, faqat ustaxona mehnati | 30 kungacha shahar devori mudofaa navbatchiligi | 15% (Bozor boji chidamliligi) | Shahar bozorida maxsus tovarlarni sotish monopoliyasi, shogird tayyorlash, +20% sifat ustamasi | Bozor boji 15% dan oshganda yoki xomashyo monopoliyasi buzilganda (Gildiya Ish Tashlashi) |
+| **Ruhoniylar (Clergy)** | Ecclesiastical Privilege Charter | 0 soat jismoniy korve mehnati | 0 kun (Harbiy qasamyod taqiqlangan) | 0% (To'g'ridan-to'g'ri soliq taqiqlangan) | Cherkov daxlsizligi (Benefit of Clergy), 40 kunlik cherkov panohi, 10% ushr yig'ish, monastir tabobatchiligi | Cherkovga to'g'ridan-to'g'ri soliq solinganda yoki monastir mulki talon-taroj qilinganda (Interdikt va Qarg'ish) |
+| **Feodal Aslzodalar (Nobility)** | Feudal Barony Charter | 0 soat jismoniy korve mehnati | 40 kunlik shaxsiy ritsarlik harbiy xizmati yoki skjutaj to'lovi | 10% (Fevdal skjutaj badali) | Yuqori Adliya (High Justice - o'lim jazosi berish), shaxsiy qurolli gvardiya, saroy qabullari | Skjutaj 10% dan oshganda yoki toj suverenitet huquqlarini noqonuniy tortib olganda (Baronlar Isyoni) |
+
 ---
 
 # 25. TEXNOLOGIYA BOSQICHLARI (4 TECH TIERS & RESEARCH MECHANICS)
@@ -2448,16 +2487,27 @@ Shaxtada quriladigan sun'iy tirgaklarning samaradorlik ko'rsatkichlari:
 | **Tarashlangan Tosh Ustun (Cut Stone Pillar)** | Ohaktosh / Granit bloklar | $7.5\text{ m}$ | $176.7\text{ m}^2$ | $1200\text{ kPa}$ |
 | **Temir Qoplamali Kamar (Iron-Reinforced Arch)**| Temir armatura va tosh ark | $11.0\text{ m}$ | $380.1\text{ m}^2$ | $3500\text{ kPa}$ |
 
-### 32.3. Tog' Bosimi Formulasi (Overburden Pressure)
+### 32.3. Tog' Bosimi Formulasi (Lithostatic Overburden Pressure)
 
 Chuqurlik ortishi bilan qazuv maydoni ustidagi millionlab tonna tog' jinsining gidrostatik litostatik bosimi ortib boradi:
 
-$$P_{overburden} = \rho_{rock} \cdot g \cdot |y| \quad (\text{kPa})$$
+$$P_{overburden} = \rho_{rock} \cdot g \cdot |y| \quad (\text{Pa}) \quad \Longrightarrow \quad P_{kpa} = \frac{\rho_{rock} \cdot g \cdot |y|}{1000.0} \quad (\text{kPa})$$
 
 Bu yerda:
-- $\rho_{rock} \approx 2600\text{ kg/m}^3$ — tog' jinslarining o'rtacha zichligi.
+- $\rho_{rock}$ — tog' jinsining litostatik zichligi (kg/m³).
 - $g = 9.81\text{ m/s}^2$ — erkin tushish tezlanishi.
-- $|y|$ — chuqurlik (metrlarda). Masalan, $-100\text{ m}$ chuqurlikda litostatik bosim $P = 2600 \times 9.81 \times 100 = 2,550,600\text{ Pa} \approx 2550\text{ kPa}$ ($25.5\text{ bar}$) ga yetadi.
+- $|y|$ — chuqurlik (metrlarda). Masalan, $-100\text{ m}$ chuqurlikda granit qatlamidagi bosim $P = \frac{2600 \times 9.81 \times 100}{1000} = 2550.6\text{ kPa}$ ($25.5\text{ bar}$) ga yetadi.
+
+Litostatik jins zichliklari jadvali (`ROCK_DENSITY`):
+
+| Jins Turi (Rock Type) | Geologik Zichlik ($\rho$ kg/m³) | $-50\text{ m}$ dagi Bosim (kPa) | $-150\text{ m}$ dagi Bosim (kPa) | $-300\text{ m}$ dagi Bosim (kPa) |
+|---|---|---|---|---|
+| **Tuproq / Qum / Loy (Soil/Sand)** | $1,600.0\text{ kg/m}^3$ | $784.8\text{ kPa}$ | $2,354.4\text{ kPa}$ | $4,708.8\text{ kPa}$ |
+| **Qumtosh / Ohaktosh (Sandstone/Limestone)** | $2,300.0\text{ kg/m}^3$ | $1,128.2\text{ kPa}$ | $3,384.5\text{ kPa}$ | $6,768.9\text{ kPa}$ |
+| **Tosh / Standart Granit (Stone/Granite)** | $2,600.0\text{ kg/m}^3$ | $1,275.3\text{ kPa}$ | $3,825.9\text{ kPa}$ | $7,651.8\text{ kPa}$ |
+| **Monolit Granit (Monolithic Granite)** | $2,750.0\text{ kg/m}^3$ | $1,348.9\text{ kPa}$ | $4,046.6\text{ kPa}$ | $8,093.3\text{ kPa}$ |
+| **Vulkanik Bazalt (Basalt)** | $2,900.0\text{ kg/m}^3$ | $1,422.5\text{ kPa}$ | $4,267.4\text{ kPa}$ | $8,534.7\text{ kPa}$ |
+| **Tub Qoya (Bedrock)** | $3,000.0\text{ kg/m}^3$ | $1,471.5\text{ kPa}$ | $4,414.5\text{ kPa}$ | $8,829.0\text{ kPa}$ |
 
 ### 32.4. Kaskadli O'pirilish BFS Algoritmi (Cascading Cave-in Algorithm)
 
@@ -2779,19 +2829,27 @@ Bunda:
 
 # 37. TUPROQ UNUMDORLIGI VA ALMASHINLAB EKISH (SOIL FERTILITY & CROP ROTATION)
 
-Voxel Lord: Feudal Realm simulyatsiyasida yer shunchaki bo'sh sirt emas, balki mineral balansga ega tirik resursdir. Har bir shudgorlangan tuproq katagi o'zida N-P-K (Azot, Fosfor, Kaliy) elementlarini saqlaydi.
+Voxel Lord: Feudal Realm simulyatsiyasida yer shunchaki bo'sh sirt emas, balki mineral balansga ega tirik resursdir. Har bir shudgorlangan tuproq katagi o'zida N-P-K (Azot, Fosfor, Kaliy) elementlarini saqlaydi. Ekin hosildorligi va o'sish sur'ati nemis kimyogari Yustus fon Libixning "Minimal omil qonuni" (Liebig's Law of the Minimum) asosida hisoblanadi:
 
-### 37.1. Ozuqa Moddalari Yemirilish Matritsasi (Nutrient Depletion Matrix)
+$$Y = Y_{base} \times \min\left(\frac{N}{N_{req}}, \; \frac{P}{P_{req}}, \; \frac{K}{K_{req}}\right)$$
 
-Har bir hosil yig'ilganda ekin turi tuproqning umumiy unumdorligini va alohida ozuqa elementlarini quyidagi miqdorda kamaytiradi:
+Bu yerda $N, P, K$ — ayni paytdagi tuproq mineral darajalari ($0.0\% - 120.0\%$), $N_{req}, P_{req}, K_{req}$ — ekin turining o'sishi uchun zarur bo'lgan minimal talab chegaralari. Agar birgina element (masalan, Azot) yetishmasa, boshqa elementlar to'kin bo'lsa ham hosil eng tanqis element darajasiga qarab keskin cheklanadi.
 
-| Ekinlar Toifasi | Vakil Ekinlar | Azot (N) Yo'qotilishi | Fosfor (P) Yo'qotilishi | Kaliy (K) Yo'qotilishi | Umumiy Unumdorlik Pasayishi |
-|---|---|---|---|---|---|
-| **Kuchli Don Ekinlari** | Bug'doy, Arpa | $-14.0\%$ | $-8.0\%$ | $-8.0\%$ | **$-10.0\%$** |
-| **Bargli Sabzavotlar** | Karam | $-8.0\%$ | $-6.0\%$ | $-16.0\%$ | **$-10.0\%$** |
-| **Ildizmevalar** | Sholg'om, Sabzi | $-5.0\%$ | $-5.0\%$ | $-5.0\%$ | **$-5.0\%$** |
-| **Sanoat Ekinlari** | Zig'ir, Xmel | $-10.0\%$ | $-10.0\%$ | $-10.0\%$ | **$-10.0\%$** |
-| **Dukkaklilar / Beda** | Mosh, No'xat, Beda | **$+22.0\%$ (Boyitadi!)**| $-2.0\%$ | $-2.0\%$ | **$+6.0\%$ (Tiklaydi!)** |
+### 37.1. 9 Asosiy Ekin NPK Talabi va Yemirilish Matritsasi (9-Crop NPK Depletion & Demand Master Matrix)
+
+Har bir hosil yig'ilganda ekin turi tuproqning umumiy unumdorligini va alohida ozuqa elementlarini quyidagi miqdorda o'zgartiradi (`CROP_NPK_PROFILE`):
+
+| Ekin ID | Ekin Nomi | Azot Talabi ($N_{req}$) | Fosfor Talabi ($P_{req}$) | Kaliy Talabi ($K_{req}$) | $\Delta N$ O'zgarishi | $\Delta P$ O'zgarishi | $\Delta K$ O'zgarishi | Bazaviy Hosil ($Y_{base}$) |
+|---|---|---|---|---|---|---|---|---|
+| `wheat` | Bug'doy (Wheat) | 100.0% | 60.0% | 60.0% | $-14.0\%$ | $-8.0\%$ | $-8.0\%$ | 8 Bog'lam |
+| `barley` | Arpa (Barley) | 80.0% | 60.0% | 50.0% | $-12.0\%$ | $-8.0\%$ | $-6.0\%$ | 7 Bog'lam |
+| `rye` | Kuzgi Javdar (Rye) | 60.0% | 40.0% | 40.0% | $-8.0\%$ | $-5.0\%$ | $-5.0\%$ | 6 Bog'lam |
+| `cabbage` | Karam (Cabbage) | 70.0% | 50.0% | 120.0% | $-8.0\%$ | $-6.0\%$ | $-16.0\%$ | 12 Bosh |
+| `turnip` | Sholg'om (Turnip) | 40.0% | 40.0% | 40.0% | $-5.0\%$ | $-5.0\%$ | $-5.0\%$ | 14 Ildiz |
+| `carrot` | Sabzi (Carrot) | 50.0% | 70.0% | 40.0% | $-6.0\%$ | $-8.0\%$ | $-5.0\%$ | 10 Ildiz |
+| `flax` | Zig'ir (Flax) | 80.0% | 80.0% | 80.0% | $-10.0\%$ | $-10.0\%$ | $-10.0\%$ | 6 Dasta |
+| `hops` | Xmel (Hops) | 90.0% | 80.0% | 90.0% | $-12.0\%$ | $-10.0\%$ | $-12.0\%$ | 10 G'udda |
+| `peas` | Dukkakli No'xat / Beda | 20.0% | 30.0% | 30.0% | **$+22.0\%$ (Azot Fiksatsiyasi!)** | $-2.0\%$ | $-2.0\%$ | 6 Dukkak |
 
 ### 37.2. Monomadaniyat Jazosi (Monoculture Penalty Equation)
 
@@ -2852,7 +2910,28 @@ Bunda:
 | **Tosh Akveduk / Nov (Stone Aqueduct)**| Yo'nilgan tosh + Ohak qorishmasi | 9 Voxel | **$0\%$ (Suv yo'qolmaydi)** | 3.5 m/s |
 | **Shahar Quduqi (Village Well)** | Yog'och g'ildirak + Chuqur tosh shaxta| 12 Voxel (Doira bo'ylab) | Kunlik quvvat: 600 Litr toza suv | Statsionar |
 
-### 38.3. Sug'orish Samarasi va Botqoqlanish Xavfi
+### 38.3. Ochiq Kanallarda Hajm Saqlanishi va Sizib Chiqish Ishqalanishi (Fluid Volume Conservation & Seepage Friction)
+
+Suv gidravlikasi massaning saqlanish qonuniga bo'ysunadi. Har bir voxel katagi maksimal $1.0\text{ m}^3$ suv sig'imiga ega bo'lib, oqim kanallari bo'ylab hajm muvozanati saqlanadi:
+
+$$\frac{dV_{cell}}{dt} = \sum Q_{in} - \sum Q_{out} - Q_{seepage} - Q_{evap}$$
+
+Kanal yuzasi materialining gidravlik ishqalanishi va sizib ketish yo'qotishlari (`SEEPAGE_LOSS_PER_METER`):
+
+| Kanal Turi (`ChannelType`) | Material Tarkibi | Sizib Chiqish Yo'qotilishi (Har metrda) | 10 metrda Jami Yo'qotish | Oqim Tezligi | Gidravlik Samaradorlik |
+|---|---|---|---|---|---|
+| **Ochiq Relyef (Open Air)** | Tabiiy o'tloq va tuproq usti | $0.015\text{ m}^{-1}$ ($1.5\%/\text{m}$) | $-15.0\%$ | $1.0\text{ m/s}$ | Past (Tez so'riladi) |
+| **Oddiy Tuproq Ariq (Dirt Ditch)** | Qazilgan tuproq ariq | $0.008\text{ m}^{-1}$ ($0.8\%/\text{m}$) | $-8.0\%$ | $1.2\text{ m/s}$ | O'rtacha (Dala sug'orish) |
+| **Loy Qoplangan Kanal (Clay Canal)** | Qazilgan ariq + Gil/Loy qoplamasi | $0.002\text{ m}^{-1}$ ($0.2\%/\text{m}$) | $-2.0\%$ | $1.8\text{ m/s}$ | Yuqori (Tranzit kanallar) |
+| **Tosh Akveduk (Stone Aqueduct)** | Yo'nilgan tosh + Ohak qorishmasi | $0.000\text{ m}^{-1}$ ($0.0\%/\text{m}$) | **$0.0\%$ (Mutlaq saqlanadi)** | $3.5\text{ m/s}$ | Maksimal (Shahar akveduki) |
+
+### 38.4. Atrof-muhit Haroratida Suv Muzlashi va Erishi (0°C Ambient Freeze/Thaw)
+
+Harorat $0^\circ\text{C}$ ga yetganda gidravlik tizim faza o'zgarishi rejimiga o'tadi:
+- **Muzlash Jarayoni ($T_{ambient} \le 0.0^\circ\text{C}$):** Suyuq suv voxellari qattiq, ustida yurish mumkin bo'lgan va cho'kich bilan sindiriladigan `BlockType.ICE` bloklariga aylanadi. Muzlashda suv hajmi kengayadi (zichlik nisbati $\rho_{water}/\rho_{ice} = 0.917$, ya'ni $\approx 9\%$ hajm kengayishi). Muzlagan kanallarda suv oqimi to'xtaydi, tegirmon charxpalaklari muzlab qotadi.
+- **Mavsumiy Erish Jarayoni ($T_{ambient} > 0.0^\circ\text{C}$):** Bahor kelishi yoki olov/mash'ala issiqligi ta'sirida muz bloklari yana suyuq suv hajmiga aylanadi ($Volume_{water} = Volume_{ice} \times 0.917$) va kanallarda oqim qayta tiklanadi.
+
+### 38.5. Sug'orish Samarasi va Botqoqlanish Xavfi
 
 - **Optimal Namlik Hududi ($40\% \le Moisture \le 75\%$):** Ekin hosildorligini $+40\%$ ga oshiradi, o'sish vaqtini $15\%$ ga tezlashtiradi.
 - **Kam Suvli Hudud ($Moisture < 30\%$):** Qurg'oqchilik boshlanadi, ekin sarg'ayadi, pishish vaqti $2.0\times$ ga sekinlashadi.
@@ -2906,14 +2985,26 @@ Ashyoning $Freshness$ qiymati $0.0$ ga tushganda, u butunlay ayniydi:
    - $T_{ambient} = 25^\circ\text{C}$ (Yozgi iliq havo): $M_{temp} = 2.00\times$ (Aynish $2\times$ tezlashadi).
    - $T_{ambient} = 35^\circ\text{C}$ (Sahro / Kuchli jazirama issiq): $M_{temp} = 4.00\times$ (Taom $4\times$ tez ayniydi!).
 
-2. **Idish va Saqlash Sig'imi Modifikatori ($M_{container}$):**
-   | Saqlash Joyi / Idish Turi | $M_{container}$ Koeffitsiyenti | Kunlik Zararkunandalar (Sichqon/Hasharot) Xavfi |
-   |---|---|---|
-   | Ochiq Yerda / Ochiq Aravada | $1.50\times$ | $8.0\%$ |
-   | Oddiy Yog'och Quti (Wooden Chest) | $1.00\times$ (Standart) | $3.0\%$ |
-   | Qopqoqli Murtak Bochka / Sopol Xum (Clay Amphora)| $0.60\times$ | $0.5\%$ |
-   | Shamollatiladigan Ko'tarma Don Ombori (Granary) | $0.25\times$ | $0.1\%$ |
-   | Qishki Muz Bloklari Terilgan Tosh Podval (Cold Cellar)| $0.20\times$ | **$0.0\%$ (Mutlaqo xavfsiz)** |
+2. **Nisbiy Havo Namligi Chirish Modifikatori ($M_{rh}$ - Humidity Rot Factor):**
+   $$M_{rh} = 1.0 + 1.5 \times \max\left(0.0, \; RH - 0.60\right)$$
+   - Nisbiy namlik $RH \le 60\%$ ($0.60$) bo'lganda chirish jarayoni kuchaymaydi ($M_{rh} = 1.00\times$).
+   - Nisbiy namlik $RH > 60\%$ dan oshganda zamburug' sporalari va chirish bakteriyalari jadal ko'payadi. Masalan, $RH = 80\%$ bo'lganda $M_{rh} = 1.0 + 1.5 \times 0.20 = 1.30\times$; namlik $RH = 100\%$ (yomg'ir, dim podval) da $M_{rh} = 1.60\times$ gacha tezlashadi.
+
+3. **Idish va Saqlash Sig'imi Modifikatori ($M_{container}$):**
+
+Jami yemirilish tezligi barcha ko'paytiruvchilarning hosilasi orqali hisoblanadi:
+
+$$k = k_0 \times M_{temp} \times M_{rh} \times M_{container}$$
+
+| Saqlash Joyi / Idish Turi | $M_{container}$ Multiplikatori | Samarali Saqlanish Xususiyati | Zararkunandalar Xavfi |
+|---|---|---|---|
+| **Ochiq Havoda / Aravada (Unstored)** | $1.50\times$ | Namlik va quyosh ta'sirida tez ayniydi | $8.0\%$ kunlik xavf |
+| **Yog'och Quti / Savat (Open Crate)** | $0.85\times$ | Shamollatiladi, ammo harorat ta'sirida | $3.0\%$ kunlik xavf |
+| **Loy Qoplangan Xum (Clay Amphora)** | $0.60\times$ | Kislorod va hasharotlardan himoya qiladi | $0.5\%$ kunlik xavf |
+| **Yerosti Tosh Podvali (Underground Cellar)** | $0.40\times$ | Doimiy salqin $4-8^\circ\text{C}$, quyoshsiz qorong'ulik | $0.2\%$ kunlik xavf |
+| **Dudlangan Osma Ombor (Smoked Larder)** | $0.20\times$ | Dud qatlami bakteriyalarni nobud qiladi (5x muddat) | $0.1\%$ kunlik xavf |
+| **Qishki Muzxona Ombri (Icehouse Vault)** | $0.15\times$ | Muz bloklari terilgan gumbaz, doimiy $0-2^\circ\text{C}$ | $0.0\%$ (Mutlaq xavfsiz) |
+| **Galit Tuzlangan Bochka (Salted Barrel)** | $0.10\times$ | Zich tuzlangan qatlam (10x uzoq saqlanish) | $0.0\%$ (Mutlaq xavfsiz) |
 
 ### 40.2. 11 Asosiy Taom Aynish Balans Jadvali (Food Shelf-Life Master Table)
 
@@ -3087,24 +3178,32 @@ Markaziy qal'adan 300–800 metr uzoqlikda joylashgan tog' shaxtalari yoki chuqu
 
 Yo'l infratuzilmasi harakat tezligini va tashish samaradorligini keskin oshiruvchi asosiy omildir. Qurilmagan yerlar vaqt o'tishi bilan fuqarolar yurishi natijasida tabiiy so'qmoqlarga aylanadi, tosh yotqizilgan ko'chalar esa shahar logistikasining tezkor qon tomiridir.
 
-### 44.1. Qoplamalar va Harakat Tezligi Multiplikatorlari
+### 44.1. Qoplamalar, Harakat Tezligi va A* Yo'l Topish Xarajati Multiplikatorlari
 
-| Yo'l Qoplamasi Turi | Tezlik Multiplikatori ($M_{speed}$) | Chidamlilik va Eskirish | Qurilish Xarajatlari (1 Voxel uchun) |
-|---|---|---|---|
-| **Botqoqlik / Chuqur Loy / Qalin Qor** | **$0.70\times$ (Jazo)** | — | Harakatlanish qiyin, charchoq $+50\%$ |
-| **Yovvoyi O'tloq / Shudgorlanmagan Yer**| **$1.00\times$ (Baza)** | Tabiiy bosilish | Bepul (Tabiiy relyef) |
-| **Bosilgan Tuproq Yo'l (Dirt Trail)** | **$1.15\times$** | Yomg'irda loyga aylanadi | Fuqarolar 50 marta yursa o'zi paydo bo'ladi |
-| **Chag'iltosh Yo'l (Gravel Road)** | **$1.25\times$** | O'rtacha eskirish | 2 dona Shag'al + 1 dona Qum |
-| **Tosh Yotqizilgan Ko'cha (Cobblestone Street)**| **$1.40\times$** | Yuqori mustahkamlik | 2 dona Yo'nilgan Tosh (Cobble) |
-| **Qirollik Shoh Ko'chasi (Royal Paved Highway)**| **$1.60\times$** | Eskirmaydi (Mangu) | 2 Taroshlangan Granit + 1 Ohak qorishmasi |
+Logistika realizmi yo'l qoplamasi turiga bog'liq ravishda yuk tashish tezligini va A* graflarining harakat og'irligini belgilaydi (`RoadNetwork`):
 
-### 44.2. Yo'llarning Yemirilishi va Ta'mirlash Mexanikasi
+| Yo'l Qoplamasi Turi (`SurfaceType`) | Tezlik Multiplikatori ($M_{speed}$) | A* Tranzit Xarajati ($Cost = 1/M_{speed}$) | Har 100 kg Yuk Aravasi Eskirishi | Tavsif va Xususiyat |
+|---|---|---|---|---|
+| **Qoplamsiz Loy / Botqoq (`MUD_UNPAVED`)** | **$0.50\times$ ($-50\%$ Og'ir Jazo)** | **$2.00\times$ (Maksimal xarajat)** | $0.00$ (Tabiiy loy) | Yomg'irda transport butunlay sekinlashadi |
+| **Yovvoyi O'tloq / Tabiit Relyef (`WILD_GRASS`)** | **$1.00\times$ (Baza)** | **$1.00\times$ (Baza)** | $0.00$ (Tabiiy sirt) | Yo'lsiz yovvoyi dasht va o'rmonlar |
+| **Bosilgan Tuproq So'qmoq (`DIRT_TRAIL`)** | **$1.15\times$ ($+15\%$ Unumdorlik)** | **$0.8696\times$** | $0.20$ / qatnov | Piyoda fuqarolar 50 marta yursa shakllanadi |
+| **Shag'alli Yo'l (`GRAVEL_ROAD`)** | **$1.25\times$ ($+25\%$ Unumdorlik)** | **$0.8000\times$** | $0.08$ / qatnov | 2 Shag'al + 1 Qum orqali yotqiziladi |
+| **Tosh Yotqizilgan Ko'cha (`COBBLESTONE_PAVED`)**| **$1.40\times$ ($+40\%$ Tezlik Tezlashi)** | **$0.7143\times$** | $0.01$ / qatnov | 2 Yo'nilgan Tosh (Cobble) bloklari |
+| **Qirollik Granit Shox Yo'li (`ROYAL_HIGHWAY`)**| **$1.60\times$ ($+60\%$ Maksimal Tezlik)**| **$0.6250\times$** | $0.00$ (Mangu mustahkam) | 2 Taroshlangan Granit + 1 Ohak qorishmasi |
+
+### 44.2. A* Logistika Traversal Nisbati va Tranzit Xarajati (2.80x Cost Ratio)
+
+Qoplamsiz loy yo'l va pishiq tosh ko'cha orasidagi A* harakatlanish xarajati nisbati qat'iy matematik nisbatga ega:
+
+$$\text{Cost Ratio} = \frac{\text{Cost}(\text{MUD\_UNPAVED})}{\text{Cost}(\text{COBBLESTONE\_PAVED})} = \frac{2.00}{0.7142857} = \mathbf{2.80\times}$$
+
+Bu shuni anglatadiki, aravakash fuqaro yoki savdo karvoni loy so'qmoq bo'ylab to'g'ri chiziqda yurishdan ko'ra, tosh yotqizilgan ko'cha bo'ylab 2.80 barobar aylanib yurishni afzal ko'radi. Bu mexanika shaharda sun'iy aylanma yo'llar va transport magistrallarini to'g'ri rejalashtirishni rag'batlantiradi.
+
+### 44.3. Yo'llarning Yemirilishi va Ta'mirlash Mexanikasi
+
 - Kuchli kuzgi yomg'irlar vaqtida og'ir yuk aravalari o'tgan tuproq yo'llar $10\%$ ehtimol bilan chuqur loyga aylanadi va transport harakatini to'xtatib qo'yadi.
 - Shahar yo'l ustalari (Road Laborers) avtomatik tarzda chuqurlarni shag'al bilan to'ldirib, ko'chalarni tartibga solib turadi.
-
-### 44.3. Karvonlar Yo'nalishini Hisoblash (A* Road Graph Integration)
-Fuqarolar va savdo karvonlari manzilga borishda tekis chiziq bo'ylab emas, balki yo'llar tarmog'i bo'ylab eng kam vaqt sarflanadigan yo'nalishni tanlaydi. Graf qirralarining og'irligi quyidagi formula bo'yicha hisoblanadi:
-$$EdgeCost = \frac{Distance_{voxels}}{M_{speed}}$$
+- Graf qirralarining og'irligi: $EdgeCost = \frac{Distance_{voxels}}{M_{speed}}$.
 
 ---
 
@@ -3300,6 +3399,34 @@ $$M_{rep} = 1.0 - 0.25 \times \left(\frac{Reputation - 50.0}{50.0}\right)$$
 | **Harbiy** | Po'lat Qilich | `weap_steel_sword` | 120 Kumush | 30.0 Kumush | 600.0 Kumush | $\pm 7\%$ |
 | **Harbiy** | Zanjir Sovut | `armor_chainmail` | 110 Kumush | 30.0 Kumush | 550.0 Kumush | $\pm 5\%$ |
 
+### 49.3. 5 Mintaqaviy Bozor Xablari Tarmog'i (5 Regional Market Hubs)
+
+Feodal qirollik hududi yagona statik bozor emas, balki 5 ta o'zaro ixtisoslashgan mintaqaviy bozor xablaridan (`MarketHub`) iborat:
+
+| Xab ID | Xab Nomi | Aholi Soni | Ortiqcha Xomashyo (Surplus) | O'tkir Taqchillik (Deficit) | Savdo Munosabati |
+|---|---|---|---|---|---|
+| `0` | **Hukmdor Poytaxti (Sovereign Settlement)** | 120 fuqaro | O'tin, bug'doy, non, tosh | Ziravorlar, oliy po'lat, ipak | Markaziy balanslangan bozor |
+| `1` | **Shimoliy Tog' Qal'asi (Northern Iron Warlords)** | 180 askar | Temir rudasi, po'lat, qurollar | G'alla, un, oziq-ovqat, sharob | Yuqori qurol eksporti, don importi |
+| `2` | **Dengiz Savdogarlar Ligasi (Coastal Merchant League)** | 250 fuqaro | Osh tuzi, dorivor ziravorlar, mato | Qurilish yog'ochi, qora tosh, non | Tranzit va hashamat xabi |
+| `3` | **Muqaddas Quyosh Monastiri (Holy Sun Order Abbey)** | 90 rohib | Qizil sharob, sham mumi, pergament | Don, go'sht, temir quymalar | Diniy va ma'rifiy xaridlar |
+| `4` | **Dasht Otliqlar Qabilasi (Steppe Horse Clans)** | 140 ko'chmanchi | Zotdor jangovar otlar, charm, go'sht | Qal'a qurollari, metall asboblar | Otliq armiya va xomashyo manbai |
+
+### 49.4. Qish Oxiridagi Qahatchilik Narx Sakrashi (Late-Winter "Hungry Gap" Grain Surge)
+
+Qishning so'nggi 10 kunida (80–90 kunlar) omborlardagi eski oziq-ovqat zaxiralari tugab, yangi bahorgi ko'katlar hali yetilmagan eng xatarli pallada ("Hungry Gap") g'alla mahsulotlari (bug'doy, un, non, arpa) bozorida narxlar sun'iy ravishda $1.80\times - 2.20\times$ ga oshadi:
+
+$$M_{season}(Grain, \text{LateWinter}) \in [1.80, 2.20]$$
+
+Bu davrda don zaxiralarini oldindan to'plagan savdogarlar ulkan foyda ko'radi, zaxirasiz aholi punktlarida esa ommaviy ocharchilik va qaroqchilik boshlanadi.
+
+### 49.5. Valyuta Qadrsizlanishi va Makroiqtisodiy Inflyatsiya (Currency Debasement & Inflation)
+
+Hukmdor zarbxonada kumush tangalarni arzon metallar bilan qadrsizlantirganda (Debasement), muomaladagi ortiqcha tangalar massasi hisobiga tovarlarning bazaviy narxlari chiziqli ravishda inflyatsiyaga uchraydi:
+
+$$\Delta P_{inflation} = \alpha_{infl} \times \left(\frac{Coins_{minted} - Coins_{standard}}{Coins_{standard}}\right) \times P_{base}$$
+
+Bu yerda $\alpha_{infl} = 0.15$. Tangadagi sof kumush miqdori $0.925$ (Sterling standarti) dan pastga tushganda, bozor savdogarlari tovar narxlarini bir kechada oshiradi.
+
 ---
 
 # 50. SAVDO KARVONLARI (TRADE CARAVANS & REGIONAL COMMERCE)
@@ -3335,6 +3462,16 @@ Karvon savdosidan olinadigan sof daromad:
 $$\Pi_{caravan} = \sum_{i} \left(P_{sell}(i) - P_{buy}(i)\right) \times Q_i - \left(Cost_{guards} + Cost_{feed} + Toll_{bridge}\right)$$
 
 Hududlararo arbitraj imkoniyati: Masalan, cho'l biomi shaharlarida yog'och narxi $3.0\times$ qimmat bo'lgani bois, o'rmon hukmdori yog'och eksportidan katta foyda ko'radi.
+
+### 50.4. Karvon Xavfsizlik Riski va Qurolli Soqchilar Eskorti (Caravan Security & Armed Escorts)
+
+Uzoq masofali savdo yo'llarida qaroqchilar pistirmasi xavfi (`TradeCaravan`) yo'l xavflilik indeksi va yollangan soqchilar soniga bog'liq:
+
+$$P_{ambush} = \text{clamp}\left(Risk_{route} \times \left(1.0 - 0.25 \times GuardCount\right), \; 0.05, \; 0.85\right)$$
+
+- Har bir qurolli soqchi (`GuardCount`, har biri 25 kumush tanga) pistirma ehtimolini $-25\%$ ga kamaytiradi.
+- Pistirma yuz berganda karvon yo'qotishi: $LossFraction \in [0.30, 0.70]$.
+- Yollanma eskortlar mavjud bo'lganda, yuklar to'liq himoyalanadi va savdo aylanmasi o'z vaqtida amalga oshiriladi.
 
 ---
 
@@ -3597,24 +3734,37 @@ Agar sovut chidamliligi 0 ga tushsa, uning himoya koeffitsientlari 75% ga zaifla
 
 Voxel Lord feodal simulyatorida barcha o'q-yoy va arbalet snaryadlari real vaqt rejimida 3D fazoda differentsial tenglamalar asosida harakatlanadi. O'qlar to'g'ri chiziq bo'ylab emas, balki tortishish kuchi, havo qarshiligi va shamol siljishi ta'sirida trayektoriya chizadi.
 
-### 56.1. 3D Ballistik Harakat Tenglamalari
+### 56.1. 3D Ballistik Harakat Tenglamalari va Aerodinamik Qarshilik
 
-Godot 4 fizika siklida ($\Delta t = 1/60 \text{ soniya}$) har bir snaryadning tezlanishi va koordinatalari quyidagi tenglamalar bo'yicha hisoblanadi:
+Godot 4 fizika siklida ($\Delta t = 1/60 \text{ soniya}$) har bir snaryadning tezlanishi va koordinatalari differensial havo qarshiligi va barometrik zichlik kamayishi asosida hisoblanadi (`BallisticRealism`):
 
-$$\vec{a}_t = \vec{g} - \frac{1}{2m} \rho C_d A |\vec{v}_{rel}| \vec{v}_{rel}$$
+$$\vec{a}_t = \vec{g} + \vec{a}_d = \vec{g} - \frac{1}{2m} \rho(y) C_d A |\vec{v}_{rel}| \vec{v}_{rel}$$
 
 $$\vec{v}_{rel} = \vec{v}_{projectile} - \vec{v}_{wind}$$
 
-$$\vec{v}_{t+\Delta t} = \vec{v}_t + \vec{a}_t \Delta t$$
+Balandlikka bog'liq barometrik havo zichligi kamayishi:
 
-$$\vec{x}_{t+\Delta t} = \vec{x}_t + \vec{v}_t \Delta t$$
+$$\rho(y) = \rho_0 \exp\left(-\frac{\max(0.0, y)}{H_{scale}}\right)$$
 
-- $\vec{g} = (0, -9.81, 0) \text{ m/s}^2$ — erkin tushish tezlanishi.
-- $\rho = 1.225 \text{ kg/m}^3$ — dengiz sathidagi havoning zichligi.
-- $C_d = 0.045$ — patli o'qning aerodinamik qarshilik koeffitsienti.
-- $A = 0.00012 \text{ m}^2$ — o'qning ko'ndalang kesim yuzasi.
-- $m$ — o'qning massasi (kilogrammda).
-- $\vec{v}_{wind}$ — dinamik ob-havo tizimi tomonidan taqdim etiladigan shamol tezligi vektori.
+Bunda:
+- $\vec{g} = (0, -9.80665, 0) \text{ m/s}^2$ — tortishish tezlanishi.
+- $\rho_0 = 1.225 \text{ kg/m}^3$ — dengiz sathidagi standart havo zichligi ($15^\circ\text{C}$).
+- $H_{scale} = 8500.0\text{ metr}$ — troposfera masshtab balandligi.
+- $C_d$ — snaryad shaklining aerodinamik qarshilik koeffitsienti.
+- $A$ — ko'ndalang kesim yuzasi ($m^2$).
+- $m$ — snaryad massasi ($kg$).
+
+Snaryadlarning aerodinamik profillari jadvali (`PROJECTILE_PROFILES`):
+
+| Snaryad Turi (`projectile_type`) | Massasi ($m$ kg) | Kesim Yuzasi ($A\text{ m}^2$) | Qarshilik ($C_d$) | Zirh Teshish Bonusi | Taktik Maqsadi |
+|---|---|---|---|---|---|
+| **Bodkin O'qi (`bodkin_arrow`)** | $0.050\text{ kg}$ | $0.00015\text{ m}^2$ | $0.045$ | $1.40\times$ | Zanjir va plastinka sovutlarni teshish |
+| **Keng Tig'li O'q (`broadhead_arrow`)** | $0.065\text{ kg}$ | $0.00035\text{ m}^2$ | $0.060$ | $1.00\times$ | Yirtqichlar va zirhsiz piyodalarga jarohat |
+| **Standart Kamon O'qi (`standard_arrow`)** | $0.045\text{ kg}$ | $0.00050\text{ m}^2$ | $0.400$ | $1.20\times$ | Oddiy o'quv va ov kamonlari |
+| **Og'ir Arbalet Bolti (`crossbow_bolt`)** | $0.080\text{ kg}$ | $0.00020\text{ m}^2$ | $0.050$ | $1.60\times$ | Ritsarlar zirhini yaqindan yorib o'tish |
+| **Katapulta Tosh Yadrosi (`catapult_boulder`)**| $40.0\text{ kg}$ | $0.08000\text{ m}^2$ | $0.450$ | $2.50\times$ | Yog'och palisad va minoralarni buzish |
+| **Olovli Qamal Shari (`fire_boulder`)** | $40.0\text{ kg}$ | $0.08000\text{ m}^2$ | $0.450$ | $2.50\times$ | Yog'och tomlar va omborlarni yoqish |
+| **Trebuchet Xarsangi (`trebuchet_stone`)** | $130.0\text{ kg}$ | $0.15000\text{ m}^2$ | $0.470$ | $3.50\times$ | Tosh qal'a devorlarini parchalash |
 
 ### 56.2. Yoy Ipini Tortish va Boshlang'ich Tezlik Formulasi
 
@@ -3863,6 +4013,7 @@ Har bir voxel bloki zarbani qaytarish darajasi (Hardness Tier) va umumiy chidaml
 | Yumshoq Tuproq va Loy (Dirt / Clay) | Tuproq | 80 HP | 1 | 0% | 0.50x |
 | Yog'och Taxta va Xodalar (Timber Planks) | Yog'och | 200 HP | 2 | 85% | 0.80x |
 | Qora Boshbosh Tosh (Cobblestone) | Tosh | 600 HP | 4 | 0% | 1.20x |
+| Pishiq Qizil G'isht (Brick / Stone Bricks) | G'isht | 1,000 HP | 5 | 0% | 1.40x |
 | Yo'nilgan Qal'a G'ishti (Chiseled Stone Brick)| Og'ir Tosh | 1,200 HP | 6 | 0% | 1.60x |
 | Mustahkamlangan Tosh Devor (Reinforced Stone)| Fortifikatsiya | 2,500 HP | 8 | 0% | 2.20x |
 | Quyma Temir Panjara va Darvoza (Iron Portcullis)| Metall | 3,500 HP | 9 | 0% | 3.00x |
@@ -4000,7 +4151,7 @@ Shahardagi inshootlar shunchaki dekoratsiya emas, balki funksional hajm va zichl
 
 Voxel Lord: Feudal Realm arxitekturasi shunchaki vizual bloklar terish emas, balki real statik yuk taqsimoti, bosim qarshiligi va tortishish kuchiga asoslangan qurilish muhandisligi simulyatsiyasidir. Havoda muallaq turuvchi imkonsiz konstruksiyalar yoki tayanchsiz qoldirilgan og'ir tosh tomlar o'z og'irligi ostida halokatli tarzda qulab tushadi.
 
-### 65.1. Strukturaviy Barqarorlik Indeksi ($S_{struct}$)
+### 65.1. Strukturaviy Barqarorlik Indeksi ($S_{struct}$) va Vertikal Bosim Zo'riqishi ($\sigma$)
 
 Har bir voxel bloki o'zining tayanch nuqtasiga (poydevor, ustun yoki yuk ko'taruvchi devor) nisbatan barqarorlik indeksini hisoblab boradi:
 
@@ -4010,39 +4161,72 @@ $$S_{struct} = K_{material} \times \frac{R_{support}}{Span_{unsupported}}$$
 - **$R_{support}$:** Eng yaqin vertikal yuk ko'taruvchi ustun yoki poydevorning effektiv tayanch radiusi.
 - **$Span_{unsupported}$:** Blokning eng yaqin mustahkam vertikal tayanchdan gorizontal uzoqlashish masofasi (Voxel metr hisobida).
 
+Ustunlar va yuk ko'taruvchi vertikal bloklar uchun vertikal siqilish zo'riqishi quyidagi formula orqali hisoblanadi:
+
+$$\sigma = \frac{\sum m}{A}$$
+
+Bu yerda:
+- **$\sigma$:** Vertikal siqilish mexanik zo'riqishi ($\text{kg/m}^2$).
+- **$\sum m$:** Ustun ustiga tushayotgan barcha qavatlar, shiftlar va devorlarning umumiy yig'indi massasi ($\text{kg}$).
+- **$A = 1.0\text{ m}^2$:** Bitta standart $1\times 1\times 1\text{ m}$ voxel ustunining ko'ndalang kesim maydoni.
+
 **Barqarorlik Holatlari:**
 - $S_{struct} \ge 1.0$: To'liq barqaror va xavfsiz konstruksiya. Bino har qanday tashqi tebranishlarga bardosh beradi.
 - $0.75 \le S_{struct} < 1.0$: Zo'riqish holatidagi konstruksiya (Structural Strain). To'sinlar qirsillaydi, tosh oralaridan qum va ohak to'kiladi, qo'shimcha yuk tushsa qulaydi.
 - $S_{struct} < 0.75$: Kritik buzilish chegarasi. Bog'lamlar uziladi va bloklar darhol kaskadli qulash (Cascading Cave-in) fizik rejimiga o'tadi.
 
-### 65.2. Gorizontal Tayanchsiz Masofa Chegaralari Jadvali
+### 65.2. Voxel Massalari va Vertikal Siqilish Chegaralari
 
-Quyidagi jadval 4 ta asosiy qurilish materiali uchun ruxsat etilgan maksimal gorizontal tayanchsiz masofa (Overhang Span) va mexanik ko'rsatkichlarni belgilaydi:
+Qurilish muhandisligi tizimida har bir blok turi o'zining fizik massasiga ega. Yuqori qavatlarning barcha massasi pastki ustunlar bo'ylab ona zaminga uzatiladi:
 
-| Material Nomi | Maksimal Tayanchsiz Masofa | Material Koeffitsienti ($K_{material}$) | Maksimal Vertikal Yuk | Tavsiya Qilingan Ustun Oralig'i |
-|---|---|---|---|---|
-| Yog'och Taxta va Xodalar (Wood) | 5 voxel metr | 1.00 | 450 kg/m | Har 4 voxelda bitta yog'och ustun |
-| Qora Boshbosh Tosh (Cobble) | 3 voxel metr | 0.85 | 1,200 kg/m | Har 2-3 voxelda tosh tayanch |
-| Yo'nilgan Arkasimon Tosh (Chiseled Arch) | 8 voxel metr | 1.45 | 3,800 kg/m | Har 7 voxelda arkali poydevor |
-| Mustahkamlangan Po'lat To'sin (Iron-Beam) | 14 voxel metr | 2.20 | 9,500 kg/m | Har 12 voxelda karkasli quyma ustun |
+| Voxel Materiali | Voxel Massasi ($m_{voxel}$) | Material Zichligi ($\rho$) | Konstruksiya Turi |
+|---|---|---|---|
+| Yog'och va To'sin (Timber) | 500 kg | 500 kg/m3 | Yengil yog'och karkas va oraliq pollar |
+| Yumshoq Tuproq (Dirt) | 1,200 kg | 1,200 kg/m3 | Tabiiy relyef va tuproq qoplamasi |
+| Qum va Shag'al (Sand / Gravel) | 1,600 kg | 1,600 kg/m3 | Sochilib ketuvchi erkin qatlam |
+| Xom Loy G'isht (Brick) | 1,800 kg | 1,800 kg/m3 | Pishiq g'ishtli monolit devorlar |
+| Boshbosh Qora Tosh (Cobblestone) | 2,000 kg | 2,000 kg/m3 | Qishloq mudofaa devorlari |
+| Yo'nilgan Qoya Toshi (Stone) | 2,600 kg | 2,600 kg/m3 | Qal'a minoralari va mustahkam poydevor |
+| Qotishma Cho'yan va Temir (Iron) | 7,800 kg | 7,800 kg/m3 | Og'ir sanoat panjaralari va karkaslar |
 
-### 65.3. Yuk Ko'taruvchi Ustunlar va Poydevor Talablari
+Vertikal ustunlarning maksimal ruxsat etilgan vertikal yuk ko'tarish sig'imi (`COMPRESSIVE_LIMITS_KG`):
 
-1. **Vertikal Bosim Zanjiri (Vertical Load Transfer):**
-   - Bino tomi va yuqori qavatlarining massasi to'g'ridan-to'g'ri vertikal ustunlar (Pillars) orqali pastga — ona zaminga uzatilishi shart.
-   - Bo'shliq yoki oddiy yog'och pol ustiga qurilgan og'ir tosh devorlar pastki polni sindirib pastga tushadi.
-2. **Poydevor Bloklari (Foundation Blocks):**
-   - Poydevor qatlami faqat qattiq tabiiy tosh (Granit, Ohaktosh) yoki mustahkamlangan yo'nilgan tosh poydevordan iborat bo'lishi kerak.
-   - Yumshoq tuproq, loy yoki qum ustiga qurilgan og'ir devorlar poydevor cho'kishi (Foundation Sinking) natijasida bino darz ketishiga va qulashiga sabab bo'ladi.
+| Ustun Materiali | Maksimal Vertikal Yuk ($Capacity_{kg}$) | Ruxsat Etilgan Zo'riqish ($\sigma_{max}$) | Ortiqcha Yuk Natijasi |
+|---|---|---|---|
+| Yog'och Ustun (Timber) | 4,500 kg | 4,500 kg/m2 | To'sinlar sinishi va kaskadli qulash |
+| Qora Tosh Ustun (Cobblestone) | 12,000 kg | 12,000 kg/m2 | Ohak uvalanishi va ustun parchalanishi |
+| Pishiq G'isht Ustun (Brick) | 25,000 kg | 25,000 kg/m2 | Vertikal yoriqlar va qavat cho'kishi |
+| Yo'nilgan Tosh Ustun (Stone) | 38,000 kg | 38,000 kg/m2 | Monolitik bosim portlashi va tosh maydalanishi |
+| Qotishma Temir Karkas (Iron) | 95,000 kg | 95,000 kg/m2 | Egilish deformatsiyasi va bo'g'im uzilishi |
+| Ona Zamin Qoyasi (Bedrock) | 1,000,000,000,000 kg | Cheksiz mustahkam | Buzilmas barqaror tabiiy asos |
 
-### 65.4. Kaskadli Qulash Algoritmi va GPU Zarrachalar Fizikasi (Cascading Cave-In Engine)
+### 65.3. Gorizontal Konsol Osma Chegaralari Jadvali (Cantilever Limits & Buttresses)
 
-Agar dushman qamal trebucheti zarbasi, shaxtadagi portlash yoki yong'in bitta yuk ko'taruvchi markaziy ustunni yo'q qilsa, Godot 4 dvigateli zudlik bilan kenglik bo'yicha qidiruv (Breadth-First Search / BFS) algoritmini ishga tushiradi:
-1. Yo'q qilingan blok atrofidagi barcha qo'shni 6 ta voxel tekshiriladi.
-2. Har bir voxel uchun ona zamin bilan to'g'ridan-to'g'ri bog'langan yuk ko'tarish yo'li mavjudligi aniqlanadi.
-3. Agar bino tomi yoki shiftining biror qismi zamin bilan barqaror bog'lanishini yo'qotsa ($S_{struct} < 0.75$), ushbu voxel guruhi VoxelChunk to'ridan ajratiladi.
-4. **Godot 4 Unumdorlik Modeli (GPU Particles & Rubble Grid):** Yuzlab alohida og'ir `RigidBody3D` fizik obyektlarini yaratish o'rniga (bu CPU fizikasini keskin sekinlashtiradi), tizim GPU zarrachalari (`GPUParticles3D`) orqali tosh va chang to'zonini vizual animatsiya qiladi hamda qulagan hududni bir zumda polga statik vayrona voksellari (`Rubble Voxel Blocks`) ko'rinishida joylashtiradi.
-5. Qulagan bloklar pastki konstruksiyalarga va ostida qolgan qahramon/fuqarolarga maydalovchi maydon zarari (Crushing AOE Damage) yetkazadi.
+Har bir material o'zining gorizontal konsol cho'zilish chegarasiga (`CANTILEVER_LIMITS`) ega. Agar binoning tashqi devoriga tosh kontrfors (Buttress) o'rnatilsa, tayanch ko'tarish quvvati $+3\text{ metr}$ qo'shimcha konsol bonusiga ega bo'ladi:
+
+| Material Nomi | Bazaviy Konsol Chegarasi | Kontrfors Bonusi (+3m Buttress) | Maksimal Xavfsiz Osma Masofasi |
+|---|---|---|---|
+| Sochma Qum va Shag'al (Sand / Gravel) | 0 voxel metr | 0 voxel metr | 0 voxel metr |
+| Yumshoq Tuproq (Dirt) | 1 voxel metr | 0 voxel metr | 1 voxel metr |
+| Yog'och Taxta va To'sin (Timber) | 4 voxel metr | +3 voxel metr | 7 voxel metr |
+| Qora Boshbosh Tosh (Cobblestone) | 5 voxel metr | +3 voxel metr | 8 voxel metr |
+| Pishiq G'isht (Brick) | 6 voxel metr | +3 voxel metr | 9 voxel metr |
+| Yo'nilgan Qoya Toshi (Stone) | 6 voxel metr | +3 voxel metr | 9 voxel metr |
+| Qirqilgan Zangori Tosh (Chiseled Stone) | 8 voxel metr | +3 voxel metr | 11 voxel metr |
+| Mustahkamlangan Temir To'sin (Iron) | 8 voxel metr | +3 voxel metr | 11 voxel metr |
+| Ona Zamin Qatlam Poydevori (Bedrock) | 99,999 voxel metr | 0 voxel metr | Cheksiz barqaror |
+
+### 65.4. Ustun Ortiqcha Yuki (Column Overload) va Kaskadli Qulash Algoritmi (BFS Collapse Engine)
+
+1. **Ortiqcha Yuk Buzilishi (Column Overload Condition):**
+   - Agar ustun ustidagi yig'indi vertikal massa uning nominal yuk ko'tarish chegarasidan oshib ketsa ($\sum m > Capacity_{kg}$), ustun darhol halokatli mexanik deformatsiyaga uchraydi.
+   - Singan ustun o'zining yuk ko'tarish qobiliyatini $0\text{ kg}$ ga tushiradi va unga tayangan barcha shift bloklari pastki qavatlarga zarb bilan qulaydi.
+2. **Kaskadli Qulash Algoritmi (Breadth-First Search / BFS):**
+   - Ustun yo'q qilinganda yoki ortiqcha yuk ostida singanda, dvigatel darhol bog'langan voksellar grafigi bo'ylab BFS to'lqinini ishga tushiradi.
+   - Har bir qo'shni voxel uchun poydevorga olib boruvchi mustahkam yuk zanjiri mavjudligi tekshiriladi.
+   - Agar birorta guruh bloklar poydevor bilan barqaror bog'lanishini yo'qotsa ($S_{struct} < 0.75$), ushbu voxel guruhi VoxelChunk statik to'ridan ajratiladi.
+   - **Godot 4 Unumdorlik Modeli (GPU Particles & Rubble Grid):** Alohida yuzlab og'ir `RigidBody3D` fizik obyektlarini yaratish o'rniga, tizim GPU zarrachalari (`GPUParticles3D`) orqali tosh va chang to'zonini vizual animatsiya qiladi hamda qulagan hududni bir zumda polga statik vayrona voksellari (`Rubble Voxel Blocks`) ko'rinishida joylashtiradi.
+   - Qulagan bloklar pastki konstruksiyalarga va ostida qolgan qahramon/fuqarolarga maydalovchi maydon zarari (Crushing AOE Damage) yetkazadi.
 
 ---
 
@@ -4065,16 +4249,84 @@ Bu tizim tufayli o'yinchi ko'zi bilan qaysi devorga tirgak kerakligini va qayerg
 
 O't va alangalar feodal shaharchaning eng dahshatli ofatlaridan biridir. Chaqmoq urishi, qamal paytidagi olovli o'qlar yoki beparvo fuqaroning pechkadan sochgan cho'g'i butun yog'och mavzelarni sanoqli daqiqalarda kulga aylantirishi mumkin.
 
-### 66.1. Issiqlik Alangalanish Chegaralari (Thermal Ignition Thresholds)
+### 66.1. 3D Hujayrali Avtomat va Furye Issiqlik O'tkazuvchanligi (3D Cellular Automata Fourier Conduction)
 
-Har bir material o'zining termodinamik xususiyatlariga ko'ra o'z-o'zidan yonish haroratiga ($T_{ignite}$) ega:
-- **Somon Tom va Pichanpoya (Thatch & Straw):** 220 daraja C (Juda tez alangalanadi).
-- **Yog'och To'sinlar va Plitalar (Timber Planks):** 300 daraja C (Sekin tutab yonadi, kuchli issiqlik chiqaradi).
-- **Quruq Torf va Ko'mir Ombri (Peat & Coal):** 180 daraja C (Tutunsiz ichki yonish, o'chirish juda qiyin).
-- **Qora Tosh va Ohaktosh G'ishti (Stone & Brick):** Yonmaydi ($T_{ignite} = \infty$).
-- **Temir Panjara va Po'lat Zirhlar (Iron & Steel):** Yonmaydi ($T_{ignite} = \infty$).
+Voxel Lord: Feudal Realm termodinamik dvigateli qattiq jism voksellari orasidagi issiqlik o'tkazuvchanligini uzluksiz Furye tenglamasi asosida hisoblaydi:
 
-### 66.2. Materiallarning Yonuvchanlik Matritsasi
+$$\frac{\partial T}{\partial t} = \alpha \nabla^2 T$$
+
+Diskret $1.0\text{ m}^3$ hajmli 3D hujayrali avtomat (Cellular Automata) panjarasida har bir $\Delta t$ qadami uchun harorat o'zgarishi quyidagi tenglama orqali yechiladi:
+
+$$\Delta T_i = \left(\frac{q_{net}}{C_v \cdot \rho \cdot V}\right) \Delta t$$
+
+Ikki xil qo'shni materiallar tutashgan chegara yuzasida effektiv issiqlik o'tkazuvchanlik koeffitsienti garmonik o'rta qiymat (Harmonic Mean) orqali aniqlanadi:
+
+$$k_{eff} = \frac{2 \cdot k_1 \cdot k_2}{k_1 + k_2}$$
+
+Qo'shni voksellar o'rtasidagi issiqlik oqimi tezligi ($q$):
+
+$$q = k_{eff} \cdot A \cdot \frac{T_1 - T_2}{d}$$
+
+Bu yerda:
+- **$k_{eff}$:** Qo'shni ikki material chegarasidagi effektiv issiqlik o'tkazuvchanlik koeffitsienti ($\text{W/(m}\cdot\text{K)}$).
+- **$A = 1.0\text{ m}^2$:** Voksel qirrasining kontakt yuzasi maydoni.
+- **$d = 1.0\text{ m}$:** Ikki qo'shni voksel markazlari orasidagi masofa.
+- **$C_v$:** Solishtirma issiqlik sig'imi ($\text{J/(kg}\cdot\text{K)}$).
+- **$\rho$:** Material zichligi ($\text{kg/m}^3$).
+- **$V = 1.0\text{ m}^3$:** Standart voksel hajmi.
+
+Materiallarning to'liq termodinamik parametrlari jadvali:
+
+| Material Nomi | Issiqlik O'tkazuvchanligi ($k$, W/(m*K)) | Solishtirma Issiqlik Sig'imi ($C_p$, J/(kg*K)) | Material Zichligi ($\rho$, kg/m3) | Termal Diffuzivlik ($\alpha$, m2/s) |
+|---|---|---|---|---|
+| Temir va Po'lat (Iron) | 50.00 | 450.0 | 7,800.0 | 1.42e-5 |
+| Tabiiy Qoya Toshi (Stone) | 2.50 | 840.0 | 2,600.0 | 1.14e-6 |
+| Pishiq Loy G'isht (Brick) | 0.80 | 900.0 | 1,800.0 | 4.94e-7 |
+| Suyuq Suv (Liquid Water) | 0.60 | 4,184.0 | 1,000.0 | 1.43e-7 |
+| Qattiq Muz (Solid Ice) | 2.22 | 2,090.0 | 917.0 | 1.16e-6 |
+| Qurilish Yog'ochi (Wood / Timber) | 0.15 | 1,700.0 | 500.0 | 1.76e-7 |
+| Somon Tom Qoplamasi (Thatch) | 0.06 | 1,800.0 | 150.0 | 2.22e-7 |
+| Havo Qatlami (Ambient Air) | 0.026 | 1,005.0 | 1.225 | 2.11e-5 |
+
+### 66.2. Mo'ri va Vertikal Konveksiya Tortishish Kuchi (Chimney Stack Draft Convection)
+
+Pechlar, metall eritish domnalari va oshxona kaminlarida issiq gazlar zichlik farqi tufayli vertikal mo'ri bo'ylab yuqoriga intiladi. Gravitatsion konvektiv tortishish tezligi ($v_{draft}$) va bosimlar farqi ($\Delta P$) quyidagi tenglamalar orqali ifodalanadi:
+
+$$v_{draft} = C_d \sqrt{\frac{2 g H \Delta T}{T_{amb}}}$$
+
+$$\Delta P = \rho_{amb} \cdot g \cdot H \cdot \left(1.0 - \frac{T_{amb}}{T_{stack}}\right)$$
+
+Bu yerda:
+- **$C_d = 0.65$:** Mo'rining aerodinamik chiqish koeffitsienti (Discharge Coefficient).
+- **$g = 9.80665\text{ m/s}^2$:** Erkin tushish tezlanishi.
+- **$H$:** Mo'rining vertikal balandligi ($\text{metr}$).
+- **$\Delta T = T_{stack} - T_{amb}$:** Mo'ri ichidagi qizigan gaz va tashqi atmosfera haroratlari farqi ($\text{Kelvin}$). Ushbu formula metallurgiya domna pechlarida $1,400^\circ\text{C}$ gacha bo'lgan o'ta yuqori haroratlarda qat'iy tekshirilgan.
+- **$T_{stack}$:** Mo'ri ichidagi o'rtacha gaz harorati ($\text{Kelvin}$, $T_C + 273.15$).
+- **$T_{amb}$:** Tashqi havo harorati ($\text{Kelvin}$, $T_{amb\_C} + 273.15$).
+- **$\rho_{amb} = 1.225\text{ kg/m}^3$:** Normal atmosfera bosimidagi tashqi havo zichligi.
+
+Agar $H \le 0$ yoki $T_{stack} \le T_{amb}$ bo'lsa, tortishish yuz bermaydi ($v_{draft} = 0$, $\Delta P = 0$) va tutun xona ichiga tarqalib fuqarolarni bo'g'a boshlaydi.
+
+### 66.3. Issiqlik Alangalanish Chegaralari va Shamol Bilan Olov Tarqalishi (Fire Spread CA)
+
+Har bir material o'zining termodinamik xususiyatlariga ko'ra o'z-o'zidan yonish haroratiga ($T_{ignite}$) ega. Voksel harorati ushbu nuqtaga yetganda yonish reaktsiyasi boshlanadi:
+- **Quruq Torf va Ko'mir Ombri (Peat & Coal):** 180 daraja C ($T_{ignite} = 180^\circ\text{C}$).
+- **Xazon va Quruq Barglar (Foliage & Leaves):** 190 daraja C ($T_{ignite} = 190^\circ\text{C}$).
+- **Somon Tom va Pichanpoya (Thatch & Straw):** 220 daraja C ($T_{ignite} = 220^\circ\text{C}$).
+- **Yog'och To'sinlar va Plitalar (Wood & Timber):** 300 daraja C ($T_{ignite} = 300^\circ\text{C}$).
+- **Tosh, G'isht, Suv va Temir:** Yonmaydi ($T_{ignite} = 999,999^\circ\text{C}$).
+
+Yonayotgan voxel blokidan qo'shni voksellarga olov sakrash ehtimoli shamol vektori va havo namligiga qat'iy bog'liq bo'lgan hujayrali avtomat orqali modellashtiriladi:
+
+$$P_{spread} = BaseSpreadRate \times \max\left(0.20, 1.0 + k_w \cdot (\vec{v}_{wind} \cdot \vec{d}_{voxel})\right) \times \max(0.0, 1.0 - Humidity)$$
+
+Bu yerda:
+- **$BaseSpreadRate$:** Somon uchun $0.15 \text{ s}^{-1}$, torf uchun $0.08 \text{ s}^{-1}$, yog'och uchun $0.05 \text{ s}^{-1}$.
+- **$k_w = 0.40$:** Shamol yo'nalishining olov uchqunlarini (Embers) uchirish koeffitsienti.
+- **$\vec{v}_{wind} \cdot \vec{d}_{voxel}$:** Shamol yo'nalishi va maqsadli qo'shni voxel birlik vektori orasidagi skalyar ko'paytma.
+- **$Humidity$:** Havo namligi. Bahorgi jala va yomg'ir paytida ($Humidity \ge 0.85$) olov tarqalishi butunlay to'xtaydi ($P_{spread} = 0.0$).
+
+### 66.4. Materiallarning Yonuvchanlik Matritsasi
 
 | Material Nomi | Yonuvchanlik Darajasi | Yonish Davomiyligi | Chiqaradigan Issiqlik | Tutun Zaharliyligi |
 |---|---|---|---|---|
@@ -4084,18 +4336,7 @@ Har bir material o'zining termodinamik xususiyatlariga ko'ra o'z-o'zidan yonish 
 | Jun va Gazlama Mato (Wool / Cloth) | 75% | 60 soniya | 280 kW/m2 | Bo'g'uvchi zaharli gaz |
 | Tosh va Pishiq G'isht (Stone Masonry) | 0% | 0 soniya | 0 kW/m2 | Tutun chiqarmaydi |
 
-### 66.3. Shamol Tezligi Asosida Olovning Tarqalish Ehtimoli Formulasi
-
-Yonayotgan voxel blokidan qo'shni voxel bloklariga olov sakrash ehtimoli shamol vektori va havo namligiga qat'iy bog'liq:
-
-$$P_{spread} = BaseSpreadRate \times \left(1.0 + k_w \cdot (\vec{v}_{wind} \cdot \vec{d}_{voxel})\right) \times (1.0 - Humidity)$$
-
-- **$BaseSpreadRate$:** Somon uchun $0.15 \text{ s}^{-1}$, yog'och uchun $0.05 \text{ s}^{-1}$.
-- **$k_w = 0.25$:** Shamol yo'nalishining olov uchqunlarini (Embers) uchirish koeffitsienti.
-- **$\vec{v}_{wind} \cdot \vec{d}_{voxel}$:** Shamol yo'nalishi va maqsadli qo'shni voxel vektori orasidagi skalyar ko'paytma. Shamol esayotgan tomondagi binolar 4.0x tezroq yonadi va uchqunlar 12 voxel masofagacha uchib borishi mumkin.
-- **$Humidity$:** Havo namligi. Bahorgi jala va yomg'ir paytida ($Humidity \ge 0.85$) olov tarqalishi deyarli butunlay to'xtaydi.
-
-### 66.4. O't O'chirish Tizimi va Chelaklar Zanjiri AI Protokoli (Bucket Brigade)
+### 66.5. O't O'chirish Tizimi va Chelaklar Zanjiri AI Protokoli (Bucket Brigade)
 
 Shahar hududida olov chiqqanda fuqarolik AI tizimi darhol 0-darajali Favqulodda Holat (Emergency Priority 1,000) rejimiga o'tadi:
 1. **O't O'chiruvchilar Safarbarligi:**
@@ -5646,26 +5887,54 @@ Musiqiy fon 4 ta intensivlik darajasiga (`Intensity Levels`) ega:
 
 # 109. SAN’AT VA GRAFIKA YO‘NALISHI (STYLIZED LOW-POLY PBR ART DIRECTION)
 
-O'yin vizual uslubi — "Stilizatsiyalangan O'rta Asr Realizmi" (Stylized Realistic Voxel Medieval) yo'nalishida yaratilgan.
+O'yin vizual uslubi — "Stilizatsiyalangan O'rta Asr Realizmi" (Stylized Realistic Voxel Medieval) yo'nalishida yaratilgan bo'lib, har bir voxel yuzasi to'liq 6 kanalli PBR triplanar xaritalash, optik chuqurlik va yorug'lik nurlarining ichki tarqalishi bilan boyitilgan.
 
-### 109.1. Geometrik Shakl va Materiallar Falsafasi
-- **Voxel Geometriyasi:** Bloklar $1.0\text{ m}^3$ kubik asosga ega, ammo keskin o'tkir qirralarning oldini olish uchun Custom Vertex Shader orqali burchaklar $2\text{ santimetr}$ nozik qiya faska (bevel) bilan yumshatiladi.
-- **Fizik Asosli Renderlash (PBR Materials):**
-  - *Albedo:* Qo'lda chizilgan toza, iliq va to'yingan ranglar gammasi;
-  - *Roughness:* Loyqa suv ko'lmaklari, silliqlangan marmar pollar va dag'al temir xipchinlarining yorug'lik qaytarishi;
-  - *Metallic:* Temir, po'lat, bronza va oltin elementlarning haqiqiy metall yaltirashi;
-  - *Normal Maps:* Tosh g'ishtlarining yoriqlari, yog'och tolalarining to'lqinlanishi va mato to'qimalarining mikroskopik chuqurligi.
+### 109.1. 6-Kanalli PBR Triplanar Xaritalash va Relyefli Relyatsiya (POM)
 
-### 109.2. Zamonaviy Yorug'lik va Atmosfera Texnologiyalari
-- **SDFGI (Signed Distance Field Global Illumination):** Godot 4.3 ning global yorug'lik tizimi. Yog'och derazalardan xona ichiga tushayotgan quyosh nuri devor va polga urilib, xonaning qorong'i burchaklarini tabiiy iliq yorug'lik bilan to'ldiradi.
-- **Volumetric Tuman (Volumetric Fog):** Tong saharda daryo vodiylari va botqoqliklar ustida quyuq tuman qatlamlari hosil bo'ladi, quyosh nurlari esa daraxt shoxlari orasidan "Xudo nurlari" (God Rays) ko'rinishida o'tadi.
-- **SSAO va Screen-Space Reflections:** Tosh qal'a devorlari tutashgan burchaklarda tabiiy qoramtir soyalar va suv havzalarida osmon aks etishi.
+Bloklar modelining $1.0\text{ m}^3$ kubik panjarasida UV cho'zilishlarini bartaraf etish uchun triplanar proyeksiyalash qo'llaniladi. Voksel yuzasining normal vektori ($\vec{N}$) bo'yicha aralashtirish og'irliklari hisoblanadi:
+
+$$W_i = \frac{|N_i|^p}{|N_x|^p + |N_y|^p + |N_z|^p}, \quad i \in \{x, y, z\}$$
+
+Bu yerda $p = 6.0$ — triplanar qirralarning o'tkir o'tish koeffitsienti, $UV_{scale} = 0.5$.
+
+Har bir material quyidagi 6 ta alohida PBR tekstura kanaliga ega:
+1. **Albedo ($RGB$):** Materialning tabiiy rang pigmentlari va sirt diffuziyasi.
+2. **Normal Map ($XYZ$):** Tangens fazosidagi mikroskopik relyef va tosh/yog'och yoriqlari.
+3. **Roughness ($Grayscale$):** Sirt g'adir-budurligi va yorug'likning oyna kabi qaytish darajasi.
+4. **Metallic ($Grayscale$):** O'tkazgich metall va dielektrik tosh/yog'och chegarasi.
+5. **Ambient Occlusion ($AO$):** Mikroskopik chuqurchalardagi statik soya va atrof yorug'lik to'silishi.
+6. **Height / Displacement ($Grayscale$):** Parallaks nurlanish (Parallax Occlusion Mapping — POM) chuqurligi ($8$ dan $32$ gacha qatlamli raymarching orqali chuqur tosh yoriqlari hisoblanadi).
+
+### 109.2. Organik Materiallar Ichki Nurlanishi (Subsurface Scattering — SSS)
+
+Yorug'lik nurlarining yarim shaffof organik to'qimalarga kirib borishi va ichkaridan sochilib qaytishi uchun maxsus 4 ta SSS profili ishlab chiqilgan:
+
+| Profil ID | Profil Nomi | Transmittans Rangi ($RGB$) | Sochilish Chuqurligi | Optik Tavsifi |
+|---|---|---|---|---|
+| Profil 0 | Maxsus Organik (Custom) | Dinamik sozlanuvchi rang | 0.01 – 2.00 m | Foydalanuvchi belgilagan qatlam |
+| Profil 1 | Fuqaro Terisi (Citizen Skin) | vec4(0.85, 0.25, 0.12) | 0.15 m | Kapillyar qon tomirlarining qizil nurlanishi |
+| Profil 2 | O'simlik Barglari (Foliage) | vec4(0.18, 0.65, 0.15) | 0.08 m | Xlorofill donachalarining zumrad yashil nurlanishi |
+| Profil 3 | Sham Mumi va Yog' (Wax / Tallow) | vec4(0.95, 0.70, 0.35) | 0.25 m | Parafin va qattiq hayvon yog'ining iliq nurlanishi |
+| Profil 4 | Qassobxona Go'shti (Raw Meat) | vec4(0.75, 0.10, 0.08) | 0.12 m | Mioglobin tolalari zich to'q qizil nurlanishi |
+
+### 109.3. Yomg'ir Namligi va Ko'lmaklar To'lqinlanishi (Dynamic Rain Wetness)
+
+Yomg'ir yog'ishi bilan ($rain\_wetness \in [0.0, 1.0]$) sirt parametrlari dinamik o'zgaradi:
+- **G'ovakli Qorayish:** Namlangan materialning albedo yorqinligi pasayadi (tosh va yog'och to'yingan rang oladi).
+- **G'adir-budurlik Pasayishi:** Roughness qiymati $0.05$ gacha tushib, suv yuzasi kabi yaltiraydi.
+- **Ko'lmak To'lqinlari:** Gorizontal yuqoriga qaragan voksellarda ($N_y > 0.60$) protsedural doiraviy ko'lmak to'lqinlari (`puddle ripples`) paydo bo'ladi. To'lqinlar tezligi $2.5$ va masshtabi $3.0$ koeffitsientlar bilan tebranadi.
+
+### 109.4. Qor Qatlami va Termik Erish (Procedural Snow & Thermal Thaw)
+
+Qishki qor yog'ishi qat'iy ravishda sirt nishabligi bilan nazorat qilinadi:
+- **Nishablik Chegarasi:** Qor faqat gorizontal va qiya yuzalarga ($N_y \ge 0.60$) to'planadi. Tik qoyalar va minoraning vertikal devorlarida ($N_y < 0.60$) qor to'planmaydi.
+- **Termik Erish (Thermal Thaw):** Harorat $0.0^\circ\text{C}$ dan oshganda ($ambient\_temp > 0.0$) yoki yaqin atrofda olovli o'choq/domna pechi mavjud bo'lganda, erish koeffitsienti eksponentsial oshadi va qor sirtidan suv bug'lanadi.
 
 ---
 
 # 110. KUN VA TUN SIKLI (PHYSICALLY-BASED SKY SHADER & 24-MINUTE DIURNAL CYCLE)
 
-24 daqiqalik astronomik kun va tun almashinuvi to'liq fizik osmon shaderi (`Procedural Sky Material`) orqali renderlanadi.
+24 daqiqalik astronomik kun va tun almashinuvi to'liq fizik osmon shaderi (`Procedural Sky Material`) va atmosfera boshqaruvchisi (`AtmosphereController`) orqali renderlanadi.
 
 ### 110.1. Sutkalik Yorug'lik va Harorat Fazalari Balans Jadvali
 
@@ -5676,7 +5945,14 @@ O'yin vizual uslubi — "Stilizatsiyalangan O'rta Asr Realizmi" (Stylized Realis
 | **Shom (Dusk)** | 18:00 – 20:00 | $15^\circ \to 0^\circ$ | $2,200\text{ K}$ (Binafsharang-qizil) | $-2^\circ\text{C}$ (Salqinlashuv) | $250\text{ m}$ (Cho'kkan soya) |
 | **Qorong'i Tun (Midnight)** | 22:00 – 03:00 | $-30^\circ \to -60^\circ$ | $9,000\text{ K}$ (To'q ko'k-qora) | $-15^\circ\text{C}$ (Qahraton ayoz) | $25\text{ m}$ (Mash'alasiz qorong'i) |
 
-### 110.2. Tungi Xavf-Xatarlar va Fiziologik Ta'sirlar
+### 110.2. Reley Sochilishi, Mi Fazasi va Xudo Nurlari (Atmospheric Scattering & God Rays)
+
+Atmosfera qatlamida yorug'likning tarqalishi ikkita asosiy fizik qonuniyat orqali simulyatsiya qilinadi:
+1. **Reley Sochilishi (Rayleigh Scattering $\sim \lambda^{-4}$):** Qisqa to'lqin uzunlikdagi moviy nurlar kunduzi havoda kuchli sochilib, moviy osmon gumbazini hosil qiladi. Quyosh ufqqa yaqinlashganda ($0^\circ \le \theta \le 15^\circ$) nurlarning havo bo'ylab o'tish yo'li uzayadi va qizil-oltin to'lqinlar saqlanib qoladi.
+2. **Oldinga Mi Sochilishi (Forward Mie Scattering, $g = 0.78$):** Tuman va chang zarrachalarida yorug'lik nurlari asosan oldinga qarab yo'naltiriladi. Anizotropiya koeffitsienti $g = 0.78$ qilib o'rnatilgan bo'lib, daraxtlar shoxi va qasr kamonchilar tuynuklari orasidan o'tuvchi quyosh nurlarida ajoyib volumetrik nur ustunlari ("God rays") hosil qiladi.
+3. **Volumetrik Tuman Zichligi Modulyatsiyasi:** Tongda volumetrik tuman zichligi eng yuqori darajaga ($0.075\text{ m}^{-1}$) chiqadi, peshinda esa havo qizishi bilan tuman pasayadi ($0.005\text{ m}^{-1}$).
+
+### 110.3. Tungi Xavf-Xatarlar va Fiziologik Ta'sirlar
 - **Sovuq Qahraton:** Tunda harorat keskin tushishi ochiq havoda turgan fuqarolarda gipotermiya xavfini $3.0\times$ oshiradi. Odamlar uyga kirib, pech yonida isinishi shart.
 - **Yirtqichlar va Qaroqchilar Faolligi:** Bo'rilar to'dasi va ayiqlar tunda ovga chiqadi, qaroqchilar esa devorsiz ochiq omborlarga o'g'irlikka kirishga urinadi.
 - **Mash'alalar Zaruriyati:** Mash'alasiz yurgan fuqarolar va askarlarning harakat tezligi $50\%$ ga sekinlashadi va qoqilish ehtimoli ortadi.
@@ -5779,7 +6055,14 @@ Main (Node3D)
 ├── Systems (Node)
 │   ├── GasSimulationSystem (Node)
 │   ├── GreenhouseThermalSystem (Node)
-│   └── DiplomacyManager (Node)
+│   ├── DiplomacyManager (Node)
+│   ├── StructuralIntegrityManager (Node)
+│   ├── ThermodynamicEngine (Node)
+│   ├── FluidHydraulics (Node)
+│   ├── AtmosphereController (Node)
+│   ├── FeudalCharterManager (Node)
+│   ├── MarketEconomyManager (Node)
+│   └── AgronomySoilManager (Node)
 ├── NetworkSync (Node) — Steam P2P host-authoritative paket marshrutizatori
 └── UILayer (CanvasLayer)
     ├── HUD (Control) — tezkor resurslar va asboblar paneli
@@ -5789,7 +6072,7 @@ Main (Node3D)
 
 ### 114.2. Asosiy Autoload Singletonlar (Global Service Registry)
 
-O'yinda 7 ta asosiy tizimli Autoload skriptlari global xizmat sifatida ro'yxatdan o'tgan:
+O'yinda 14 ta asosiy tizimli Autoload skriptlari global xizmat sifatida ro'yxatdan o'tgan:
 
 1. **`GameManager` (`res://scripts/core/game_manager.gd`):** O'yin sessiyasini boshqarish, pauza, simulyatsiya tezligi ($1\times, 2\times, 5\times$), o'yin rejimi (Yagona qirollik yoki Feodal tarqoqlik) va saqlash/yuklash jarayonlarini nazorat qiladi.
 2. **`ChunkManager` (`res://scripts/core/chunk_manager.gd`):** Dunyoning fazoviy venzel matritsasini ($32\times 32\times 32$ blokli chunklar) boshqaradi. O'yinchi atrofidagi $9\times 7\times 9$ faol mintaqani xotirada saqlaydi va fon oqimlarida yangi chunklarni yuklaydi.
@@ -5798,6 +6081,13 @@ O'yinda 7 ta asosiy tizimli Autoload skriptlari global xizmat sifatida ro'yxatda
 5. **`GreenhouseThermalSystem` (`res://scripts/core/greenhouse_thermal_system.gd`):** Issiqxonalarning termodinamik muvozanatini, geotermal bug' quvurlari issiqligini va Tundrada ekinlarni sovuqdan himoyalashni hisoblaydi.
 6. **`NetworkPacketManager` (`res://scripts/network/network_packet_manager.gd`):** Steam P2P orqali uzatiluvchi barcha binar tarmoq paketlarini (`ClientInputPacket`, `VoxelDeltaModify`, `EntitySnapshot`, `CaveInEventPacket`) xom baytlarga o'rash va ochishni amalga oshiradi.
 7. **`DiplomacyManager` (`res://scripts/diplomacy/diplomacy_manager.gd`):** 4 ta feodal fraktsiyalar bilan o'zaro munosabatlar, mavsumiy o'lpon hisob-kitoblari, karvonlar logistikasi va Casus Belli holatlarini boshqaradi.
+8. **`StructuralIntegrityManager` (`res://scripts/world/structural_integrity.gd`):** Bino va konlarning vertikal bosim zo'riqishi ($\sigma = \sum m / A$), materiallar konsol chegaralari (bedrock 99999, stone 6, brick 6, timber 4, iron 8, kontrfors +3m) va ustun ortiqcha yukida kaskadli qulash BFS algoritmini boshqaradi.
+9. **`ThermodynamicEngine` (`res://scripts/world/thermodynamic_engine.gd`):** 3D Furye issiqlik o'tkazuvchanligi hujayrali avtomati, mo'rining tortishish tezligi ($1400^\circ\text{C}$ gacha) va shamol vektoriga bog'langan olov tarqalishini boshqaradi.
+10. **`FluidHydraulics` (`res://scripts/world/fluid_hydraulics.gd`):** Ochiq kanal gidravlikasi, suv massasining saqlanishi, kanal tubi sizilish ishqalanishi va 0°C da muzlash/erish jarayonlarini boshqaradi.
+11. **`AtmosphereController` (`res://scripts/world/atmosphere_controller.gd`):** Sutkalik astronomik kun-tun fazalari, quyosh zeniti, Reley sochilishi, Mi anizotropiyasi ($g=0.78$) va volumetrik nur ustunlarini boshqaradi.
+12. **`FeudalCharterManager` (`res://scripts/economy/feudal_charter_manager.gd`):** 5 ta feodal tabaqa nizomlari, korvee majburiyatlari, soliq chidamliligi va qo'zg'olon xavfini boshqaradi.
+13. **`MarketEconomyManager` (`res://scripts/economy/market_economy_manager.gd`):** 5 ta mintaqaviy bozor markazlarining talab-taklif narxlari ($\gamma=1.25, k_d=0.85$, $0.01$ singularlik himoyasi), kechki qishki g'alla qimmatchiligi va inflyatsiyani boshqaradi.
+14. **`AgronomySoilManager` (`res://scripts/economy/agronomy_soil_manager.gd`):** Libix minimum qonuni bo'yicha NPK tuproq unumdorligi va 4 maydonli almashlab ekish balansini boshqaradi.
 
 ---
 
@@ -6120,6 +6410,454 @@ func calculate_sell_price(buy_price: float, merchant_skill: float = 50.0) -> flo
 	var skill_discount: float = 0.20 * (1.0 - (clampf(merchant_skill, 0.0, 100.0) / 100.0))
 	var raw_sell: float = buy_price * (1.0 - guild_tariff) * (1.0 - skill_discount)
 	return maxf(0.05, raw_sell)
+```
+
+### 115.7. Strukturaviy Barqarorlik va Konsol Chegaralari Menejeri (`res://scripts/world/structural_integrity.gd`)
+
+```gdscript
+class_name StructuralIntegrityManager
+extends RefCounted
+
+## Gorizontal konsol osmalari va vertikal siqilish yuklarini hisoblovchi fizik tizim.
+
+const CANTILEVER_LIMITS: Dictionary = {
+	"bedrock": 99999,
+	"stone": 6,
+	"cobblestone": 5,
+	"brick": 6,
+	"stone_bricks": 6,
+	"timber": 4,
+	"wood": 4,
+	"dirt": 1,
+	"sand": 0,
+	"gravel": 0,
+	"chiseled_stone": 8,
+	"iron": 8
+}
+
+const BUTTRESS_SUPPORT_BONUS: int = 3
+
+const COMPRESSIVE_LIMITS_KG: Dictionary = {
+	"timber": 4500.0,
+	"dirt": 1500.0,
+	"sand": 500.0,
+	"cobblestone": 12000.0,
+	"brick": 25000.0,
+	"stone": 38000.0,
+	"iron": 95000.0,
+	"bedrock": 1e12
+}
+
+const VOXEL_MASS_KG: Dictionary = {
+	"timber": 500.0,
+	"dirt": 1200.0,
+	"sand": 1600.0,
+	"gravel": 1600.0,
+	"cobblestone": 2000.0,
+	"brick": 1800.0,
+	"stone": 2600.0,
+	"iron": 7800.0
+}
+
+func get_cantilever_limit(material: String, has_buttress: bool = false) -> int:
+	var base_limit: int = CANTILEVER_LIMITS.get(material.to_lower(), 1)
+	if has_buttress and base_limit > 0 and base_limit < 90000:
+		return base_limit + BUTTRESS_SUPPORT_BONUS
+	return base_limit
+
+func calculate_compressive_stress(total_mass_kg: float, area_m2: float = 1.0) -> float:
+	return total_mass_kg / max(0.001, area_m2)
+
+func evaluate_column_load(column_material: String, stacked_blocks: Array, area_m2: float = 1.0) -> Dictionary:
+	var mat_key = column_material.to_lower()
+	var total_mass: float = 0.0
+	for b in stacked_blocks:
+		total_mass += VOXEL_MASS_KG.get(str(b).to_lower(), 1000.0)
+	var capacity: float = COMPRESSIVE_LIMITS_KG.get(mat_key, 5000.0)
+	var stress: float = calculate_compressive_stress(total_mass, area_m2)
+	var is_overloaded: bool = total_mass > capacity
+	return {
+		"total_mass_kg": total_mass,
+		"capacity_kg": capacity,
+		"is_overloaded": is_overloaded,
+		"stress_ratio": stress / max(0.01, capacity)
+	}
+```
+
+### 115.8. Termodinamik Furye va Olov Tarqalishi Dvigateli (`res://scripts/world/thermodynamic_engine.gd`)
+
+```gdscript
+class_name ThermodynamicEngine
+extends RefCounted
+
+## 3D Furye issiqlik o'tkazuvchanligi, mo'ri tortishishi va shamolga bog'langan yong'in tarqalishi.
+
+const THERMAL_CONDUCTIVITY: Dictionary = {
+	"iron": 50.0,
+	"stone": 2.5,
+	"brick": 0.8,
+	"wood": 0.15,
+	"thatch": 0.06,
+	"water": 0.60,
+	"ice": 2.22,
+	"air": 0.026
+}
+
+const IGNITION_THRESHOLDS: Dictionary = {
+	"thatch": 220.0,
+	"wood": 300.0,
+	"peat": 180.0,
+	"coal": 180.0,
+	"leaves": 190.0,
+	"stone": 99999.0,
+	"iron": 99999.0
+}
+
+func calculate_conduction_step(temp_a: float, temp_b: float, mat_a: String, mat_b: String, dt: float = 1.0) -> float:
+	var ka = THERMAL_CONDUCTIVITY.get(mat_a.to_lower(), 1.0)
+	var kb = THERMAL_CONDUCTIVITY.get(mat_b.to_lower(), 1.0)
+	var keff = (2.0 * ka * kb) / (ka + kb)
+	var delta_t = temp_a - temp_b
+	return keff * (delta_t / 1.0) * dt
+
+func calculate_chimney_draft_velocity(height_m: float, temp_stack_c: float, temp_amb_c: float, cd: float = 0.65) -> float:
+	if height_m <= 0.0 or temp_stack_c <= temp_amb_c:
+		return 0.0
+	var t_stack_k = temp_stack_c + 273.15
+	var t_amb_k = temp_amb_c + 273.15
+	var delta_t = t_stack_k - t_amb_k
+	return cd * sqrt(2.0 * 9.80665 * height_m * (delta_t / t_amb_k))
+
+func calculate_fire_spread_prob(material: String, wind_vec: Vector3, to_neighbor_dir: Vector3, humidity: float) -> float:
+	if humidity >= 0.85:
+		return 0.0
+	var base_rate = 0.05
+	if "thatch" in material:
+		base_rate = 0.15
+	var dot_wind = wind_vec.normalized().dot(to_neighbor_dir.normalized())
+	var wind_factor = max(0.20, 1.0 + 0.40 * dot_wind)
+	var humidity_factor = max(0.0, 1.0 - humidity)
+	return base_rate * wind_factor * humidity_factor
+```
+
+### 115.9. Gidravlika va Ochiq Kanallar Oqimi Menejeri (`res://scripts/world/fluid_hydraulics.gd`)
+
+```gdscript
+class_name FluidHydraulics
+extends RefCounted
+
+## Konservativ suyuqlik oqimi, sizilish yo'qotishlari va 0 darajali muzlash/erish.
+
+enum ChannelType {
+	OPEN_AIR = 0,
+	DIRT_DITCH = 1,
+	CLAY_CANAL = 2,
+	STONE_AQUEDUCT = 3
+}
+
+const SEEPAGE_LOSS_PER_METER: Dictionary = {
+	ChannelType.OPEN_AIR: 0.015,
+	ChannelType.DIRT_DITCH: 0.008,
+	ChannelType.CLAY_CANAL: 0.002,
+	ChannelType.STONE_AQUEDUCT: 0.0
+}
+
+const FLOW_VELOCITIES: Dictionary = {
+	ChannelType.OPEN_AIR: 1.0,
+	ChannelType.DIRT_DITCH: 1.2,
+	ChannelType.CLAY_CANAL: 1.8,
+	ChannelType.STONE_AQUEDUCT: 3.5
+}
+
+func calculate_delivered_volume(input_volume: float, channel_type: int, distance_m: float) -> float:
+	var loss_rate = SEEPAGE_LOSS_PER_METER.get(channel_type, 0.01)
+	var fraction_retained = max(0.0, 1.0 - (loss_rate * distance_m))
+	return input_volume * fraction_retained
+
+func update_phase_transition(water_vol: float, temp_celsius: float) -> Dictionary:
+	if temp_celsius <= 0.0 and water_vol > 0.0:
+		var ice_vol = water_vol / 0.917
+		return {"state": "frozen", "water": 0.0, "ice": ice_vol}
+	elif temp_celsius > 0.0 and water_vol <= 0.0:
+		return {"state": "liquid", "water": 1.0, "ice": 0.0}
+	return {"state": "stable", "water": water_vol, "ice": 0.0}
+```
+
+### 115.10. Biologik Metabolizm va 3 Ustunli Oziqlanish Komponenti (`res://scripts/entities/metabolism_component.gd`)
+
+```gdscript
+class_name MetabolismComponent
+extends Node
+
+## Fuqarolarning TEE kaloriyalari, 3 ta makro-oziqlanish ustuni va singa xastaligi patogenezi.
+
+var current_calories: float = 2400.0
+var carbs: float = 80.0
+var protein: float = 80.0
+var vitamins: float = 80.0
+var scurvy_stage: int = 0
+var scurvy_timer_hours: float = 0.0
+
+const HALF_LIFE_CARBS_HOURS: float = 18.0
+const HALF_LIFE_PROTEIN_HOURS: float = 72.0
+const HALF_LIFE_VITAMIN_HOURS: float = 120.0
+
+func update_metabolism(delta_hours: float, activity_mult: float, ambient_temp: float) -> void:
+	var bmr = 75.0 * delta_hours
+	var burn = bmr * activity_mult
+	if ambient_temp < 0.0:
+		burn += abs(ambient_temp) * 15.0 * delta_hours
+	current_calories = max(0.0, current_calories - burn)
+
+	carbs *= pow(0.5, delta_hours / HALF_LIFE_CARBS_HOURS)
+	protein *= pow(0.5, delta_hours / HALF_LIFE_PROTEIN_HOURS)
+	vitamins *= pow(0.5, delta_hours / HALF_LIFE_VITAMIN_HOURS)
+
+	if vitamins < 15.0:
+		scurvy_timer_hours += delta_hours
+		if scurvy_timer_hours >= 72.0:
+			scurvy_stage = 3
+		elif scurvy_timer_hours >= 48.0:
+			scurvy_stage = 2
+		elif scurvy_timer_hours >= 24.0:
+			scurvy_stage = 1
+	else:
+		scurvy_timer_hours = 0.0
+		scurvy_stage = 0
+```
+
+### 115.11. Libix Qonuni va Tuproq Agronomiyasi Menejeri (`res://scripts/economy/agronomy_soil_manager.gd`)
+
+```gdscript
+class_name AgronomySoilManager
+extends Node
+
+## NPK tuproq kimyosi, Libixning minimum qonuni va 4 yillik almashlab ekish hisobi.
+
+const CROP_NPK_PROFILE: Dictionary = {
+	"wheat":   {"N_demand": 100.0, "P_demand": 60.0, "K_demand": 60.0,  "dN": 14.0,  "dP": 8.0,  "dK": 8.0,  "base_yield": 8},
+	"barley":  {"N_demand": 80.0,  "P_demand": 60.0, "K_demand": 50.0,  "dN": 12.0,  "dP": 8.0,  "dK": 6.0,  "base_yield": 7},
+	"rye":     {"N_demand": 60.0,  "P_demand": 40.0, "K_demand": 40.0,  "dN": 8.0,   "dP": 5.0,  "dK": 5.0,  "base_yield": 6},
+	"cabbage": {"N_demand": 70.0,  "P_demand": 50.0, "K_demand": 120.0, "dN": 8.0,   "dP": 6.0,  "dK": 16.0, "base_yield": 12},
+	"turnip":  {"N_demand": 40.0,  "P_demand": 40.0, "K_demand": 40.0,  "dN": 5.0,   "dP": 5.0,  "dK": 5.0,  "base_yield": 14},
+	"carrot":  {"N_demand": 50.0,  "P_demand": 70.0, "K_demand": 40.0,  "dN": 6.0,   "dP": 8.0,  "dK": 5.0,  "base_yield": 10},
+	"flax":    {"N_demand": 80.0,  "P_demand": 80.0, "K_demand": 80.0,  "dN": 10.0,  "dP": 10.0, "dK": 10.0, "base_yield": 6},
+	"hops":    {"N_demand": 90.0,  "P_demand": 80.0, "K_demand": 90.0,  "dN": 12.0,  "dP": 10.0, "dK": 12.0, "base_yield": 10},
+	"peas":    {"N_demand": 20.0,  "P_demand": 30.0, "K_demand": 30.0,  "dN": -22.0, "dP": 2.0,  "dK": 2.0,  "base_yield": 6}
+}
+
+func calculate_crop_yield(crop_id: String, n_cur: float, p_cur: float, k_cur: float) -> int:
+	var profile = CROP_NPK_PROFILE.get(crop_id.to_lower(), CROP_NPK_PROFILE["wheat"])
+	var n_ratio = clamp(n_cur / profile["N_demand"], 0.0, 1.0)
+	var p_ratio = clamp(p_cur / profile["P_demand"], 0.0, 1.0)
+	var k_ratio = clamp(k_cur / profile["K_demand"], 0.0, 1.0)
+	var min_factor = min(n_ratio, min(p_ratio, k_ratio))
+	return int(round(float(profile["base_yield"]) * min_factor))
+```
+
+### 115.12. Dinamik Atmosfera va Volumetrik Tuman Nazoratchisi (`res://scripts/world/atmosphere_controller.gd`)
+
+```gdscript
+class_name AtmosphereController
+extends Node
+
+## Sutkalik osmon yoritilishi, Reley sochilishi, Mi anizotropiyasi va volumetrik God rays.
+
+@export var diurnal_time: float = 0.25
+@export var current_mie_anisotropy: float = 0.78
+@export var current_fog_density: float = 0.075
+
+func calculate_sun_elevation(t_day: float) -> float:
+	var hour = t_day * 24.0
+	if hour >= 4.0 and hour <= 20.0:
+		var norm_day = (hour - 4.0) / 16.0
+		return sin(norm_day * PI) * 62.0
+	return -30.0
+
+func calculate_fog_density(hour: float, weather_type: int) -> float:
+	var base_fog = 0.005
+	if hour >= 4.0 and hour <= 8.0:
+		base_fog = 0.075
+	if weather_type == 1:
+		base_fog += 0.065
+	return base_fog
+```
+
+### 115.13. Feodal Tabaqalar Nizomi Menejeri (`res://scripts/economy/feudal_charter_manager.gd`)
+
+```gdscript
+class_name FeudalCharterManager
+extends RefCounted
+
+## 5 ta o'rta asr tabaqa nizomi, korvee majburiyatlari va qo'zg'olon chegaralari.
+
+enum StrataTier { SERF = 0, YEOMAN = 1, GUILD_ARTISAN = 2, CLERGY = 3, NOBILITY = 4 }
+
+const TAX_TOLERANCES: Dictionary = {
+	StrataTier.SERF: 0.25,
+	StrataTier.YEOMAN: 0.35,
+	StrataTier.GUILD_ARTISAN: 0.30,
+	StrataTier.CLERGY: 0.10,
+	StrataTier.NOBILITY: 0.20
+}
+
+const CORVEE_DAYS: Dictionary = {
+	StrataTier.SERF: 3,
+	StrataTier.YEOMAN: 0,
+	StrataTier.GUILD_ARTISAN: 0,
+	StrataTier.CLERGY: 0,
+	StrataTier.NOBILITY: 0
+}
+
+func evaluate_revolt_risk(strata: int, tax_rate: float, food_kcal: float, corvee_days: int) -> bool:
+	var tax_tol = TAX_TOLERANCES.get(strata, 0.20)
+	if tax_rate > tax_tol:
+		return true
+	if strata == StrataTier.SERF:
+		if food_kcal < 1200.0 or corvee_days > 4:
+			return true
+	return false
+```
+
+### 115.14. Transport Ishqalanishi va Yo'llar Tarmoqlari Menejeri (`res://scripts/economy/road_network.gd`)
+
+```gdscript
+class_name RoadNetwork
+extends RefCounted
+
+## Yo'l qoplamasi ishqalanishi (-50% loy jazosi, +40% tosh bonusi, 2.80x A* nisbat).
+
+enum SurfaceType {
+	MUD_UNPAVED = 0,
+	WILD_GRASS = 1,
+	DIRT_TRAIL = 2,
+	GRAVEL_ROAD = 3,
+	COBBLESTONE_PAVED = 4,
+	ROYAL_HIGHWAY = 5
+}
+
+const SPEED_MULTIPLIERS: Dictionary = {
+	SurfaceType.MUD_UNPAVED: 0.50,
+	SurfaceType.WILD_GRASS: 1.00,
+	SurfaceType.DIRT_TRAIL: 1.15,
+	SurfaceType.GRAVEL_ROAD: 1.25,
+	SurfaceType.COBBLESTONE_PAVED: 1.40,
+	SurfaceType.ROYAL_HIGHWAY: 1.60
+}
+
+const COST_MULTIPLIERS: Dictionary = {
+	SurfaceType.MUD_UNPAVED: 2.00,
+	SurfaceType.WILD_GRASS: 1.00,
+	SurfaceType.DIRT_TRAIL: 0.869565,
+	SurfaceType.GRAVEL_ROAD: 0.80,
+	SurfaceType.COBBLESTONE_PAVED: 0.7142857,
+	SurfaceType.ROYAL_HIGHWAY: 0.625
+}
+
+func get_traversal_cost_ratio(surface_a: int, surface_b: int) -> float:
+	var cost_a = COST_MULTIPLIERS.get(surface_a, 1.0)
+	var cost_b = COST_MULTIPLIERS.get(surface_b, 1.0)
+	return cost_a / cost_b
+```
+
+### 115.15. Mintaqaviy Ko'p Bozorli Narxlar Menejeri (`res://scripts/economy/market_economy_manager.gd`)
+
+```gdscript
+class_name MarketEconomyManager
+extends RefCounted
+
+## 5 ta mintaqaviy bozor markazi narxlari, elastiklik va qishki ochlik bo'hroni.
+
+enum MarketHub {
+	SOVEREIGN_SETTLEMENT = 0,
+	NORTHERN_IRON_WARLORDS = 1,
+	COASTAL_MERCHANT_LEAGUE = 2,
+	HOLY_SUN_ORDER_ABBEY = 3,
+	STEPPE_HORSE_CLANS = 4
+}
+
+const K_D: float = 0.85
+const GAMMA: float = 1.25
+
+func calculate_hub_price(base_price: float, stock_target: float, stock_current: float, m_season: float = 1.0) -> float:
+	var safe_target = max(1.0, stock_target)
+	var stock_ratio = (safe_target - stock_current) / safe_target
+	var raw_base = max(0.01, 1.0 + (K_D * stock_ratio))
+	var price = base_price * pow(raw_base, GAMMA) * m_season
+	return clamp(price, 0.20 * base_price, 5.00 * base_price)
+
+func get_hungry_gap_multiplier(day_of_year: int) -> float:
+	if day_of_year >= 310 and day_of_year <= 350:
+		return 2.00
+	elif day_of_year >= 240 and day_of_year <= 270:
+		return 0.65
+	return 1.00
+```
+
+### 115.16. Savdo Karvonlari va Karvon Xavfsizligi Menejeri (`res://scripts/economy/trade_caravan.gd`)
+
+```gdscript
+class_name TradeCaravan
+extends StaticBody3D
+
+## Mintaqalararo savdo karvoni marshruti, qaroqchilar xavfi va soqchilar himoyasi.
+
+var escort_guard_count: int = 2
+var route_distance_m: float = 2500.0
+
+func calculate_ambush_risk(route_danger: float, guard_count: int) -> float:
+	var base_risk = route_danger * 0.40
+	var mitigation = float(guard_count) * 0.15
+	return clamp(base_risk - mitigation, 0.05, 0.85)
+
+func calculate_cargo_loss(cargo_dict: Dictionary, loss_fraction: float) -> Dictionary:
+	var lost: Dictionary = {}
+	for k in cargo_dict.keys():
+		lost[k] = int(float(cargo_dict[k]) * loss_fraction)
+	return lost
+```
+
+### 115.17. To'liq 6-Kanalli PBR Triplanar Shader (`res://assets/shaders/voxel_pbr_complete.gdshader`)
+
+```gdshader
+shader_type spatial;
+render_mode blend_mix, depth_draw_opaque, cull_back, diffuse_burley, specular_schlick_ggx;
+
+uniform sampler2D texture_albedo : source_color, filter_linear_mipmap, repeat_enable;
+uniform sampler2D texture_normal : hint_normal, filter_linear_mipmap, repeat_enable;
+uniform sampler2D texture_roughness : hint_roughness_gray, filter_linear_mipmap, repeat_enable;
+uniform sampler2D texture_metallic : hint_default_black, filter_linear_mipmap, repeat_enable;
+uniform sampler2D texture_ao : hint_default_white, filter_linear_mipmap, repeat_enable;
+uniform sampler2D texture_height : hint_default_black, filter_linear_mipmap, repeat_enable;
+
+uniform float uv_scale = 0.5;
+uniform float triplanar_sharpness = 6.0;
+uniform int sss_profile = 0;
+uniform float rain_wetness = 0.0;
+uniform float snow_accumulation = 0.0;
+uniform float ambient_temp = -5.0;
+
+varying vec3 v_world_pos;
+varying vec3 v_world_normal;
+
+void vertex() {
+	v_world_pos = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz;
+	v_world_normal = normalize((MODEL_MATRIX * vec4(NORMAL, 0.0)).xyz);
+}
+
+void fragment() {
+	vec3 blending = pow(abs(v_world_normal), vec3(triplanar_sharpness));
+	blending /= (blending.x + blending.y + blending.z);
+
+	vec4 alb_x = texture(texture_albedo, v_world_pos.zy * uv_scale);
+	vec4 alb_y = texture(texture_albedo, v_world_pos.xz * uv_scale);
+	vec4 alb_z = texture(texture_albedo, v_world_pos.xy * uv_scale);
+	vec4 base_color = alb_x * blending.x + alb_y * blending.y + alb_z * blending.z;
+
+	ALBEDO = base_color.rgb;
+	ROUGHNESS = mix(0.7, 0.05, rain_wetness);
+	METALLIC = 0.0;
+}
 ```
 
 ---
