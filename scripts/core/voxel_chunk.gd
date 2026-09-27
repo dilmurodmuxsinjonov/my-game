@@ -22,7 +22,7 @@ enum BlockType {
 	COBBLESTONE = 9,
 	PLANKS = 10,
 	WATER = 11,
-	GLASS = 12,
+	ICE = 12,
 	FARMLAND = 13,
 	WHEAT_CROP = 14,
 	COPPER_ORE = 15,
@@ -34,7 +34,8 @@ enum BlockType {
 	WOODEN_GATE = 21,
 	ROCK_SALT_ORE = 22,
 	SILVER_ORE = 23,
-	MINING_RAIL = 24
+	MINING_RAIL = 24,
+	GLASS = 25
 }
 
 # Block properties
@@ -51,7 +52,7 @@ const BLOCK_HARDNESS: Dictionary = {
 	BlockType.COBBLESTONE: 1.4,
 	BlockType.PLANKS: 0.8,
 	BlockType.WATER: 0.0,
-	BlockType.GLASS: 0.3,
+	BlockType.ICE: 1.2,
 	BlockType.FARMLAND: 0.5,
 	BlockType.WHEAT_CROP: 0.1,
 	BlockType.COPPER_ORE: 2.0,
@@ -63,8 +64,74 @@ const BLOCK_HARDNESS: Dictionary = {
 	BlockType.WOODEN_GATE: 1.8,
 	BlockType.ROCK_SALT_ORE: 1.6,
 	BlockType.SILVER_ORE: 2.6,
-	BlockType.MINING_RAIL: 1.0
+	BlockType.MINING_RAIL: 1.0,
+	BlockType.GLASS: 0.3
 }
+
+# Block drop mappings
+const BLOCK_DROPS: Dictionary = {
+	BlockType.AIR: "",
+	BlockType.DIRT: "dirt",
+	BlockType.GRASS: "dirt",
+	BlockType.STONE: "cobblestone",
+	BlockType.WOOD: "logs",
+	BlockType.LEAVES: "sapling",
+	BlockType.IRON_ORE: "iron_ore",
+	BlockType.COAL_ORE: "coal",
+	BlockType.GOLD_ORE: "gold_ore",
+	BlockType.COBBLESTONE: "cobblestone",
+	BlockType.PLANKS: "planks",
+	BlockType.WATER: "",
+	BlockType.ICE: "res_ice_block",
+	BlockType.FARMLAND: "dirt",
+	BlockType.WHEAT_CROP: "wheat",
+	BlockType.COPPER_ORE: "copper_ore",
+	BlockType.STONE_BRICKS: "stone_bricks",
+	BlockType.SUPPORT_BEAM: "support_beam",
+	BlockType.DEEP_GEM_ORE: "gems",
+	BlockType.WOODEN_PALISADE: "wooden_palisade",
+	BlockType.STONE_BATTLEMENT: "stone_battlement",
+	BlockType.WOODEN_GATE: "wooden_gate",
+	BlockType.ROCK_SALT_ORE: "mineral_salt",
+	BlockType.SILVER_ORE: "silver_ore",
+	BlockType.MINING_RAIL: "mining_rail",
+	BlockType.GLASS: "glass_shard"
+}
+
+const BLOCK_DROP_COUNTS: Dictionary = {
+	BlockType.AIR: 0,
+	BlockType.DIRT: 1,
+	BlockType.GRASS: 1,
+	BlockType.STONE: 1,
+	BlockType.WOOD: 1,
+	BlockType.LEAVES: 1,
+	BlockType.IRON_ORE: 1,
+	BlockType.COAL_ORE: 1,
+	BlockType.GOLD_ORE: 1,
+	BlockType.COBBLESTONE: 1,
+	BlockType.PLANKS: 1,
+	BlockType.WATER: 0,
+	BlockType.ICE: 1,
+	BlockType.FARMLAND: 1,
+	BlockType.WHEAT_CROP: 1,
+	BlockType.COPPER_ORE: 1,
+	BlockType.STONE_BRICKS: 1,
+	BlockType.SUPPORT_BEAM: 1,
+	BlockType.DEEP_GEM_ORE: 1,
+	BlockType.WOODEN_PALISADE: 1,
+	BlockType.STONE_BATTLEMENT: 1,
+	BlockType.WOODEN_GATE: 1,
+	BlockType.ROCK_SALT_ORE: 1,
+	BlockType.SILVER_ORE: 1,
+	BlockType.MINING_RAIL: 1,
+	BlockType.GLASS: 1
+}
+
+static func get_block_drop(type: int) -> Dictionary:
+	return {
+		"item": BLOCK_DROPS.get(type, ""),
+		"count": BLOCK_DROP_COUNTS.get(type, 0)
+	}
 
 # Chunk grid coordinate (e.g. (0,0), (1,0))
 var chunk_pos: Vector2i = Vector2i.ZERO
@@ -113,7 +180,7 @@ func is_solid(type: int) -> bool:
 	return type != BlockType.AIR and type != BlockType.WATER and type != BlockType.WHEAT_CROP and type != BlockType.MINING_RAIL
 
 func is_transparent(type: int) -> bool:
-	return type == BlockType.AIR or type == BlockType.WATER or type == BlockType.LEAVES or type == BlockType.GLASS or type == BlockType.WHEAT_CROP or type == BlockType.MINING_RAIL
+	return type == BlockType.AIR or type == BlockType.WATER or type == BlockType.LEAVES or type == BlockType.GLASS or type == BlockType.ICE or type == BlockType.WHEAT_CROP or type == BlockType.MINING_RAIL
 
 func build_mesh() -> void:
 	var surface_tool = SurfaceTool.new()
@@ -210,6 +277,7 @@ func _get_block_color(type: int) -> Color:
 		BlockType.COAL_ORE: return Color(0.22, 0.22, 0.24)
 		BlockType.GOLD_ORE: return Color(0.85, 0.75, 0.25)
 		BlockType.WATER: return Color(0.15, 0.40, 0.80, 0.6)
+		BlockType.ICE: return Color(0.75, 0.88, 0.98, 0.75)
 		BlockType.GLASS: return Color(0.85, 0.92, 0.95, 0.4)
 		BlockType.FARMLAND: return Color(0.35, 0.22, 0.12)
 		BlockType.WHEAT_CROP: return Color(0.82, 0.75, 0.22)
