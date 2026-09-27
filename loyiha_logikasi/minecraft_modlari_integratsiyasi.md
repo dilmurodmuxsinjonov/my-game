@@ -709,6 +709,37 @@ Medieval davrning haqiqiy muhandisligi:
   - **G'ovakli Doma Temirini Zichlash**: 4 zarbada qizigan g'ovakli temir quymasini (`iron_bloom`) sof temir zagotovkaga (`wrought_iron_billet`) aylantiradi.
   - **Sovut Plitalari va Qurollar Yoyish**: 3 zarbada zagotovkani ikkita tekis temir plastinaga (`iron_plate`) yoyadi — qo'l temirchiligiga nisbatan 5 barobar tez va nol inson mehnati bilan!
 
+---
+
+## 25. Georgius Agricola (*De Re Metallica*), Vintage Story & Create Mod Integratsiyasi — Yerosti Kon Muhandisligi: Drenaj Suv Nasosi, Shamollatish Ventilyatori va Shaxta Lebyodkasi (Milestone 36)
+
+### 25.1. Vertikal Zanjirli Sump Drenaj Nasosi (`MineDewateringPump` & `mine_dewatering_pump.glb`) — [De Re Metallica / Vintage Story]
+- **Muammo**: Yerosti konlarining pastki gorizontlarida (chuqurlik $Y \le 16$) grunt suvlari to'xtovsiz sizib chiqadi (inflow: 100 L/min). Agar suv chiqarib tashlanmasa, kon shtolnyasi 20 daqiqada suv ostida qolib, konchilar cho'kadi va qimmatbaho ruda qazib olish to'xtaydi.
+- **Yechim (`MineDewateringPump` & `mine_dewatering_pump.glb`)**:
+  - Suv yig'iladigan chuqur (sump pit) tepasiga o'rnatilgan baland eman portali (headframe), mis chelaklar tizilgan uzluksiz zanjir, tishli yetaklovchi sproket va yuqori yog'och nov (discharge flume).
+  - **Kinetik Quvvat**: 48 SU quvvat talab qiladi (16 RPM minimal).
+  - **Drenaj Qobiliyati**: Daqiqasiga 150 litr suvni yuqori gorizontga yoki drenaj kanaliga haydaydi.
+  - **Natija**: 100 L/min oqib kelayotgan suvga nisbatan sof 50 L/min quritish sur'atini ta'minlab, kon tubini to'liq quruq holda saqlaydi (`is_sump_dry = true`).
+
+### 25.2. Sentrifugali Markazdan Qochma Shaxta Ventilyatori (`MineVentilator` & `mine_ventilator.glb`) — [Vintage Story / Create Mod]
+- **Muammo**: Chuqur shaxta va o'yiqlarda zaharli va portlovchi gazlar (Kon gazi — $CH_4$ metan, bo'g'uvchi gaz — $CO_2$, oltingugurt vodorodi — $H_2S$) to'planadi. Ventilyatsiyasiz konchilar 30 soniyada hushidan ketadi yoki ochiq mash'ala sabab shaxta portlab ketadi.
+- **Yechim (`MineVentilator` & `mine_ventilator.glb`)**:
+  - Shilliqqurt shaklidagi radial korpus (snail-shell casing), radial parraklarga ega bronza turbina, havo so'ruvchi markaziy bo'g'iz va havo haydovchi konus truba.
+  - **Kinetik Quvvat**: 32 SU quvvat va 20 RPM tezlikda ishlaydi.
+  - **Toza Havo Purkash**: Yog'och shamollatish quvurlari bo'ylab 24 metr radiusda soniyasiga 0.75 m³ toza havoni yetkazib beradi.
+  - **Gaz Zararsizlantirish**: Shaxta havosidagi zaharli gazlar konsentratsiyasini 95% ga kamaytiradi (xavfsiz 0.05x darajasiga tushiradi), portlash va dimiqish xavfini butunlay bartaraf etadi.
+
+### 25.3. Og'ir Shaxta Tik Nishi Lebyodkasi (Mining Capstan Winch) (`MiningCapstan` & `mining_capstan.glb`) — [De Re Metallica / Medieval Dynasty]
+- **Muammo**: 30 darajali qiya nishablikda joylashgan shtolnyalardan tonnalab ruda ortilgan vagonetkalarni va og'ir yog'och kreplarni yuqoriga qo'lda ko'tarish favqulodda xavfli bo'lib, arqon uzilishi o'limga olib keladi.
+- **Yechim (`MiningCapstan` & `mining_capstan.glb`)**:
+  - Vertikal eman baraban, pastki bronza konussimon tishli uzatma (bevel gear), xavfsizlik tishli ilmgichi (ratchet and pawl) va po'lat simli trossga ega yo'naltiruvchi g'ildirak.
+  - **Yuk Ko'tarish Quvvati**: 1,500 kg (1.5 tonna) tosh va ruda yuklangan vagonetkalarni 30° nishablik bo'ylab bemalol yuqoriga tortadi.
+  - **Ikki Rejimli Ishlash**:
+    - *Kinetik Drayv*: 40 SU kinetik quvvat bilan 1.0 m/s tezlikda vagonetkalarni avtomatik ko'taradi.
+    - *Qo'lda Aylantirish*: 4 kishilik konchilar brigadasi dastaklarni aylantirganda 0.35 m/s tezlikda ko'taradi.
+  - **Avariyaga Qarshi Xavfsizlik**: Prujinali temir tishli qulf (pawl) uzatma to'xtaganda yukning pastga shiddat bilan qulashiga yo'l qo'ymaydi.
+
+
 
 
 

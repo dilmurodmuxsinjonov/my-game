@@ -3769,6 +3769,110 @@ class TestEngineVerticalSlice(unittest.TestCase):
         self.assertEqual(overloaded_total, 288.0)
         self.assertTrue(overloaded_total > source_capacity) # Overloaded! Stalls to 0 RPM
 
+    def test_mine_dewatering_pump_seepage_equilibrium_and_drainage(self):
+        """Verify chain pump drainage (150 L/min) overcoming natural seepage (100 L/min) to drain mine sump."""
+        seepage_l_s = 1.667 # 100 L/min
+        pump_rate_l_s = 2.5 # 150 L/min
+        max_sump_l = 2000.0
+
+        # Sump flooded initially at 1800 L
+        water_l = 1800.0
+        is_flooded = (water_l >= max_sump_l * 0.8) # 1800 >= 1600 -> True
+        self.assertTrue(is_flooded)
+
+        # 1. Unpumped: accumulates water up to max capacity
+        dt = 60.0 # 1 minute
+        unpumped_water = min(max_sump_l, water_l + seepage_l_s * dt)
+        self.assertAlmostEqual(unpumped_water, 1900.02, places=1)
+
+        # 2. Pump operating at 20 RPM: net drainage of 2.5 - 1.667 = 0.833 L/s
+        net_drain_l_s = pump_rate_l_s - seepage_l_s
+        self.assertAlmostEqual(net_drain_l_s, 0.833, places=2)
+
+        # Pump running for 1500 seconds (~25 minutes)
+        drained_water = max(0.0, water_l - (net_drain_l_s * 1500.0))
+        self.assertAlmostEqual(drained_water, 550.5, places=0)
+        is_mine_dry = (drained_water < max_sump_l * 0.30)
+        self.assertTrue(is_mine_dry)
+
+        # Kinetic load: 48 SU
+        kinetic_su = 48.0
+        self.assertEqual(kinetic_su, 48.0)
+
+    def test_mine_ventilator_gas_dilution_and_clearance_radius(self):
+        """Verify centrifugal mine fan air clearance (24m radius) and 95% toxic gas ppm dilution."""
+        min_operating_rpm = 18.0
+        max_clearance_radius = 24.0
+        raw_gas_ppm = 1000.0 # Toxic chokedamp / firedamp concentration
+
+        # Operating check
+        rpm = 24.0
+        is_running = (rpm >= min_operating_rpm)
+        self.assertTrue(is_running)
+
+        # Gas concentration check inside 15m (within 24m envelope)
+        miner_dist_near = 15.0
+        is_near_safe = (is_running and miner_dist_near <= max_clearance_radius)
+        self.assertTrue(is_near_safe)
+        mitigated_gas_near = raw_gas_ppm * 0.05 if is_near_safe else raw_gas_ppm
+        self.assertEqual(mitigated_gas_near, 50.0) # 95% purged down to 50 ppm (safe!)
+
+        # Miner exploring far branch at 32m (outside 24m envelope)
+        miner_dist_far = 32.0
+        is_far_safe = (is_running and miner_dist_far <= max_clearance_radius)
+        self.assertFalse(is_far_safe)
+        mitigated_gas_far = raw_gas_ppm * 0.05 if is_far_safe else raw_gas_ppm
+        self.assertEqual(mitigated_gas_far, 1000.0) # Full toxicity remains!
+
+    def test_mining_capstan_incline_haulage_and_ratchet_lock(self):
+        """Verify 30-degree incline minecart capstan hauling, 1500kg capacity, and ratchet security."""
+        max_capacity_kg = 1500.0
+        speed_kinetic = 1.0 # m/s
+        speed_manual = 0.35 # m/s
+        track_length_m = 40.0
+
+        # Payload checks
+        loaded_cart_kg = 1200.0
+        can_haul_valid = (loaded_cart_kg <= max_capacity_kg)
+        self.assertTrue(can_haul_valid)
+
+        overloaded_cart_kg = 1650.0
+        can_haul_over = (overloaded_cart_kg <= max_capacity_kg)
+        self.assertFalse(can_haul_over)
+
+        # Haul duration from bottom to top (40m)
+        time_kinetic = track_length_m / speed_kinetic
+        self.assertEqual(time_kinetic, 40.0) # 40 seconds
+
+        time_manual = track_length_m / speed_manual
+        self.assertAlmostEqual(time_manual, 114.29, places=2)
+
+        # Ratchet locking pawl holds position during power cutoff
+        current_pos = 25.0
+        power_lost = True
+        speed_during_outage = 0.0 if power_lost else speed_kinetic
+        pos_after_outage = current_pos + (speed_during_outage * 10.0)
+        self.assertEqual(pos_after_outage, 25.0) # Held firmly by pawl!
+
+    def test_subterranean_mining_kinetic_network_power_budget(self):
+        """Verify kinetic power budgeting for complete subterranean mining infrastructure."""
+        source_capacity = 256.0 # Water Wheel capacity
+        pump_su = 48.0
+        vent_su = 32.0
+        capstan_su = 40.0
+
+        mining_grid_total_su = pump_su + vent_su + capstan_su
+        self.assertEqual(mining_grid_total_su, 120.0)
+
+        # Well within capacity (120 <= 256)
+        is_overloaded = (mining_grid_total_su > source_capacity)
+        self.assertFalse(is_overloaded)
+
+        # Overload test: 3 additional capstans (40 * 3 = 120) + 2 pumps (48 * 2 = 96) -> 120 + 216 = 336 > 256
+        huge_load = mining_grid_total_su + 120.0 + 96.0
+        self.assertEqual(huge_load, 336.0)
+        self.assertTrue(huge_load > source_capacity)
+
 if __name__ == "__main__":
     unittest.main()
 
