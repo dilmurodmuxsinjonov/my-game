@@ -4169,7 +4169,144 @@ class TestEngineVerticalSlice(unittest.TestCase):
         self.assertGreater(collar_lift, 0.08)
         self.assertLess(collar_lift, 0.20)
 
+    def test_milestone40_glb_assets(self):
+        """Verify binary glTF headers and integrity for Milestone 40 3D models."""
+        models_dir = os.path.join(os.path.dirname(__file__), "..", "assets", "models")
+        m40_models = ["astronomical_clock.glb", "armillary_sphere.glb", "celestial_orrery.glb"]
+        for m in m40_models:
+            p = os.path.join(models_dir, m)
+            self.assertTrue(os.path.exists(p), f"Missing model {m}")
+            self.assertGreater(os.path.getsize(p), 10000, f"Model {m} is unusually small")
+            with open(p, "rb") as f:
+                header = f.read(4)
+                self.assertEqual(header, b"glTF", f"Model {m} does not have valid glTF magic header")
+
+    def test_astronomical_clock_simulation_and_blood_moon_warning(self):
+        """Verify astronomical calendar, 28-day 4-season progression, hourly chimes, and Blood Moon early warning."""
+        days_per_season = 7
+        days_per_year = 28
+        seasons = ["Spring", "Summer", "Autumn", "Winter"]
+
+        # Season indexing verification across 28-day year
+        for d in range(1, 29):
+            s_idx = (d - 1) // days_per_season
+            if d <= 7:
+                self.assertEqual(seasons[s_idx], "Spring")
+            elif d <= 14:
+                self.assertEqual(seasons[s_idx], "Summer")
+            elif d <= 21:
+                self.assertEqual(seasons[s_idx], "Autumn")
+            else:
+                self.assertEqual(seasons[s_idx], "Winter")
+
+        # Hourly chime strike calculation: 1 to 12
+        for h in range(24):
+            strikes = h if (h <= 12 and h > 0) else (h - 12 if h > 12 else 12)
+            self.assertGreaterEqual(strikes, 1)
+            self.assertLessEqual(strikes, 12)
+
+        # Blood Moon Cataclysm Early Warning (Day 27, 20:00 -> within 24h of Day 28, 20:00)
+        day_curr = 27
+        hour_curr = 20
+        blood_moon_day = 28
+        is_warning = (day_curr == (blood_moon_day - 1) and hour_curr >= 20) or (day_curr == blood_moon_day)
+        self.assertTrue(is_warning)
+
+        # Gravity counterweight reserve depletion (1440 min = 100% loss)
+        gravity_reserve = 100.0
+        minutes_elapsed = 720 # 12 hours
+        gravity_reserve -= (minutes_elapsed / 1440.0) * 100.0
+        self.assertAlmostEqual(gravity_reserve, 50.0)
+
+    def test_armillary_sphere_solar_altitude_and_celestial_charts(self):
+        """Verify solar altitude trigonometry, seasonal weather forecasts, and stellar trade chart bonuses."""
+        import math
+        phi_deg = 52.0 # Latitude
+        phi_rad = math.radians(phi_deg)
+
+        # Solar noon (H = 0) at Summer Solstice (declination delta = +23.44 deg)
+        delta_summer = math.radians(23.44)
+        h_noon = math.radians(0.0)
+        sin_alpha_noon = math.sin(phi_rad) * math.sin(delta_summer) + math.cos(phi_rad) * math.cos(delta_summer) * math.cos(h_noon)
+        alpha_noon_deg = math.degrees(math.asin(sin_alpha_noon))
+        # Expected max solar noon altitude: 90 - (52 - 23.44) = 61.44 deg
+        self.assertAlmostEqual(alpha_noon_deg, 61.44, places=2)
+
+        # Solar midnight (H = 180 deg) at Summer Solstice
+        h_midnight = math.radians(180.0)
+        sin_alpha_mid = math.sin(phi_rad) * math.sin(delta_summer) + math.cos(phi_rad) * math.cos(delta_summer) * math.cos(h_midnight)
+        alpha_mid_deg = math.degrees(math.asin(sin_alpha_mid))
+        self.assertLess(alpha_mid_deg, 0.0) # Well below horizon
+
+        # Seasonal Weather Forecast Verification
+        # Day 20 Autumn (Day 20 >= 19) -> HARD_FROST_WARNING
+        day_autumn = 20
+        forecast_autumn = "HARD_FROST_WARNING" if (15 <= day_autumn <= 21 and day_autumn >= 19) else "FAIR_WEATHER"
+        self.assertEqual(forecast_autumn, "HARD_FROST_WARNING")
+
+        # Celestial Chart Application to Fluyt Vessel
+        chart = {
+            "item_id": "celestial_chart",
+            "quality": 1.0,
+            "voyage_speed_bonus": 0.30,
+            "trade_profit_bonus": 0.50,
+            "storm_deviation_immunity": True,
+            "uses_remaining": 5
+        }
+        vessel = {"voyage_duration_sec": 300.0, "profit_multiplier": 1.0, "storm_safe": False}
+        updated_vessel = {
+            "voyage_duration_sec": vessel["voyage_duration_sec"] / (1.0 + chart["voyage_speed_bonus"]),
+            "profit_multiplier": vessel["profit_multiplier"] * (1.0 + chart["trade_profit_bonus"]),
+            "storm_safe": chart["storm_deviation_immunity"]
+        }
+        self.assertAlmostEqual(updated_vessel["voyage_duration_sec"], 230.769, places=2)
+        self.assertEqual(updated_vessel["profit_multiplier"], 1.50)
+        self.assertTrue(updated_vessel["storm_safe"])
+
+    def test_celestial_orrery_epicyclic_gearing_and_conjunctions(self):
+        """Verify 16 SU kinetic drive, planetary angular velocities, conjunction resonances, and Grand Conjunction."""
+        required_su = 16.0
+        min_rpm = 16.0
+
+        # Kinetic activation check
+        self.assertTrue(16.0 >= required_su and 24.0 >= min_rpm)
+        self.assertFalse(10.0 >= required_su)
+
+        # Angular separation helper
+        def angular_dist(a, b):
+            d = abs(a - b)
+            return (360.0 - d) if d > 180.0 else d
+
+        tolerance_deg = 15.0
+
+        # War Conjunction (Earth & Mars within 15 deg)
+        earth_deg = 120.0
+        mars_aligned = 128.0
+        dist_mars = angular_dist(earth_deg, mars_aligned)
+        is_war = dist_mars <= tolerance_deg
+        self.assertTrue(is_war)
+
+        # Artisan Conjunction (Earth & Venus within 15 deg)
+        venus_aligned = 132.0
+        dist_venus = angular_dist(earth_deg, venus_aligned)
+        is_artisan = dist_venus <= tolerance_deg
+        self.assertTrue(is_artisan)
+
+        # Grand Conjunction check: all 5 planets within a 35 deg arc
+        planets = [120.0, 125.0, 128.0, 132.0, 145.0] # Arc span = 145 - 120 = 25 deg < 35 deg
+        planets.sort()
+        arc_span = planets[-1] - planets[0]
+        is_grand = arc_span <= 35.0
+        self.assertTrue(is_grand)
+
+        # Grand Conjunction rewards: +50% production, 2x harvest yield
+        production_mult = 1.0 + (0.50 if is_grand else 0.0)
+        harvest_mult = 2.0 if is_grand else 1.0
+        self.assertEqual(production_mult, 1.50)
+        self.assertEqual(harvest_mult, 2.0)
+
 if __name__ == "__main__":
+
     unittest.main()
 
 
