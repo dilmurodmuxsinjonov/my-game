@@ -594,6 +594,38 @@ Medieval davrning haqiqiy muhandisligi:
   - **Kinetik Zirh Teshib O'tish**:
     - Bodkin o'qi 50 m/s tezlikda 62.5 J kinetik energiya va 1.4x penetratsiya koeffitsienti bilan mato kamzulni (gambeson, 20 armor) teshib o'tadi, lekin to'liq po'lat sovutdan (65 armor) aks etib sachrab ketadi.
 
+---
+
+## 21. Create Mod & Vintage Story Integratsiyasi — Kinetik Transmissiya, Vallar, Burchakli Tishli Quti va Mexanik Mufta (Milestone 32)
+
+### 21.1. Graf Asosidagi Kinetik Tarmoq Hal Qiluvchisi (`KineticNetworkManager`) — [Create Mod]
+- **Muammo**: Dastgohlar avval shunchaki passiv radiys bo'yicha quvvatlanar edi, haqiqiy Create Mod kabi jismoniy vallar orqali mexanik zanjir uzatish imkoni yo'q edi.
+- **Yechim (`KineticNetworkManager`)**:
+  - **BFS Kinetik Tarmoq Grafigi**: Suv g'ildiragi yoki shamol tegirmonidan boshlab barcha ulangan vallar, tishli qutilar va dastgohlarni topologik qidiruv orqali aniqlaydi.
+  - **Quvvat va Yuklanish Balansi**: Tarmoqdagi umumiy quvvat $\sum SU_{capacity}$ va iste'molchilar yuki $\sum SU_{consumed}$ hisoblanadi.
+  - **Avtomatik Bloklanish (Overload Stalling)**: Agar sarf quvvatdan oshib ketsa ($\sum SU_{consumed} > \sum SU_{capacity}$), tarmoq bloklanadi, $RPM \to 0.0$ bo'ladi va barcha stanoklar to'xtab, tutun chiqaradi.
+
+### 21.2. Chiziqli Kinetik Val va O'qlar (`DriveShaft` & `drive_shaft.glb`)
+- **Tavsif**: 1x1 venzel o'lchamli sayqallangan quyma po'lat val, ikkala tomonida tishli gardishlar va markazida dub yog'ochli podshipnik kronshteyni (`drive_shaft.glb`).
+- **Xususiyatlari**:
+  - $0$ SU iste'mol qiladi.
+  - 16 metrgacha oraliq tayanchsiz cho'zilishi mumkin.
+  - Devorlar va pollar ichidan o'tkazish uchun yopiq korpusli (`EncasedShaft`) rejimga ega.
+
+### 21.3. 90-Gradusli Konussimon Tishli Quti (`BevelGearbox` & `bevel_gearbox.glb`)
+- **Tavsif**: To'rtta chiqish o'qiga ega, mustahkam quyma temir korpus va ichida 45 gradus burchak ostida tutashuvchi bronza tishli charxlar (`bevel_gearbox.glb`).
+- **Imkoniyatlari**:
+  - Aylanish yo'nalishini $90^\circ$ ga (X o'qidan Y yoki Z o'qlariga) buradi.
+  - **Aylanishni Teskarilash (`Invert`)**: Konveyerlar harakatini yoki kran ko'tarish/tushirish yo'nalishini bir tugma bilan teskarisiga aylantiradi.
+  - Bo'sh harakat friktsiyasi: 4.0 SU.
+
+### 21.4. Mexanik Friktsion Mufta va Richag (`MechanicalClutch` & `mechanical_clutch.glb`)
+- **Tavsif**: Ikkita og'ir quyma temir friktsion disk, po'lat prujina va qo'lda tortiluvchi yog'och richag (`mechanical_clutch.glb`).
+- **Yuk Tashlash (Load Shedding)**:
+  - Richag tortilganda quvvat uzatish uziladi va pastki og'ir zanjir tarmoqdan ajratiladi.
+  - Ortiqcha yuk tufayli to'xtab qolgan tarmoq mufta ajratilishi bilan darhol o'zini tiklaydi va asosiy magistral 24 RPM tezlikda aylanishda davom etadi.
+
+
 
 
 

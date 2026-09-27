@@ -7,6 +7,25 @@
 - Dastlabki Godot prototipi va foydalanuvchining showcase fayllari saqlandi.
 - Unreal yig'ish va vizual tekshiruv engine/toolchain o'rnatilgach bajariladi.
 
+## 2026-09-27 — Milestone 32: Create Mod & Vintage Story Kinetik Transmissiya, Vallar, Burchakli Tishli Quti va Mexanik Mufta (Issue #23)
+- **Graf Asosidagi Kinetik Tarmoq Hal Qiluvchisi (`KineticNetworkManager`)**:
+  - BFS grafigi orqali barcha ulangan manbalar, vallar va dastgohlarni aniqlash.
+  - Quvvat ($\sum SU_{capacity}$) va yuklanish ($\sum SU_{consumed}$) balansini hisoblash.
+  - Yuklanish me'yordan oshganda avtomatik tarmoq bloklanishi (Overload Stalling) va $RPM \to 0.0$ to'xtashi.
+- **Chiziqli Kinetik Val va O'qlar (`DriveShaft` & `drive_shaft.glb`)**:
+  - 1x1 venzel o'lchamli sayqallangan po'lat val, tishli gardishlar va dub podshipnik kronshteyni (`drive_shaft.glb`).
+  - 16 metrgacha oraliq tayanchsiz erkin quvvat uzatish (0 SU sarfi).
+  - Devor va pol ichidan o'tuvchi himoyalangan (`EncasedShaft`) rejim.
+- **90-Gradusli Konussimon Tishli Quti (`BevelGearbox` & `bevel_gearbox.glb`)**:
+  - To'rt tomonlama chiqish o'qlariga ega quyma temir korpus va 45° bronza tishli charxlar (`bevel_gearbox.glb`).
+  - Aylanish yo'nalishini 90 darajaga burish va yo'nalishni teskarilash (`Invert`) imkoniyati.
+- **Mexanik Friktsion Mufta va Richag (`MechanicalClutch` & `mechanical_clutch.glb`)**:
+  - Ikkita friktsion disk va qo'l richagi orqali pastki zanjirlarni uzish va ulash.
+  - Yuk tashlash (Load Shedding): bloklangan tarmoqni zudlik bilan qayta faollashtirish.
+- **Yangi 3D Modellar (Blender 5.2)**: `drive_shaft.glb`, `bevel_gearbox.glb`, `mechanical_clutch.glb` yaratildi (jami **88 ta GLB model**).
+- **Yangi Qirollik Dioramasi**: Barcha 88 ta aktiv ishtirokidagi diorama `assets/showcase_realm.png` da render qilindi va brainga saqlandi.
+- **Avtomatlashgan Testlar**: Jami **116 ta engine testi** (umumiy **173 ta test**) 100% muvaffaqiyat bilan o'tdi.
+
 ## 2026-09-27 — Milestone 31: Vintage Story & Valheim Realistik PBR Teksturalar, Triplanar Sheyder, Konstruktiv Yuk Fizikasi va Atmosfera Realizmi (Issue #21)
 - **Realistik PBR Voksel Teksturalari va Triplanar Sheyder (`voxel_pbr_triplanar.gdshader` & `voxel_atlas_*.png`)**:
   - 12 ta tabiiy blok uchun procedural PBR teksturalar (Albedo, Tangent Normal, Roughness).
