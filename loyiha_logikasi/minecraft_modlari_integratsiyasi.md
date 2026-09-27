@@ -768,6 +768,42 @@ Medieval davrning haqiqiy muhandisligi:
   - **12 dona/sekund Evakuatsiya**: 30 ta rudani atigi 2.5 soniyada to'liq qabul qilish bunkeriga to'kib yuboradi.
   - **120 dona Sig'im va Nov Oqimi**: Sunken bunkerdan daqiqasiga 8 ta ruda tezligida konveyer lentasiga (Milestone 16) yoki to'g'ridan-to'g'ri domna pechi forzonkasiga (Milestone 35) uzluksiz quyiladi.
 
+---
+
+## 27. Anno 1404, Port Royale & Vintage Story Integratsiyasi — O'rta Asr Dengiz Porti va Kema Qurilishi: Slipvey Dok, Port Krani va Flyoyt Savdo Kemasi (Milestone 38)
+
+### 27.1. Sohildagi Kema Qurish Slipvey Doki (`DrydockSlipway` & `drydock_slipway.glb`) — [Anno 1404 / Port Royale]
+- **Muammo**: Dengiz orqali savdo qilish va chet el fraksiyalari bilan yirik yuk ayirboshlash uchun og'ir okean kemalarini quruqlikda bosqichma-bosqich yig'ish va suvga tushirish infratuzilmasi talab etiladi.
+- **Yechim (`DrydockSlipway` & `drydock_slipway.glb`)**:
+  - Dengizga -7° nishablikda tushgan yog'langan yog'och skidlar (greased runners), markaziy kil bloklari, 2 qavatli iskala ko'priklari va smola qaynash o'chog'i.
+  - **4 Bosqichli Kema Qurilishi**:
+    1. *Kil Qo'yish (Keel Laying)*: 8 ta eman xodasi, 4 ta temir plita (60s).
+    2. *Shpangout Qovurg'alar (Rib Framing)*: 16 ta eman xodasi, 8 ta temir plita (90s).
+    3. *Qoplama va Smola Shpaklyovka (Hull Planking & Pitch Caulking)*: 24 ta eman, 6 chelak qora smola, 12 temir list (120s).
+    4. *Yelkan va Rangout (Rigging & Outfitting)*: 8 archa daraxti, 12 ta sifatli yelkan matosi, 6 ta kanop arqon (90s).
+  - **Brigada Multiplikatori**: 4 nafar kema duradgori birgalikda ishlaganda umumiy 360 soniyalik qurilish atigi 144 soniyada (2.5 barobar tez) tugallanib, kema port havzasiga tantanali sirg'alib tushiriladi (`LAUNCHED`).
+
+### 27.2. Tosh Poydevorli Port Jib Krani (`QuaysideCrane` & `quayside_crane.glb`) — [Create Mod / Anno 1404]
+- **Muammo**: Kema tryumidan og'ir yuk bochkalari, tosh bloklari va metall quymalarini qo'lda zambillarda tushirish juda sekin kechib, kema portda 10-15 daqiqa to'xtab qoladi.
+- **Yechim (`QuaysideCrane` & `quayside_crane.glb`)**:
+  - Sakkizburchakli yo'nilgan ohaktosh poydevor (barbette), buriluvchi markaziy eman ustun, 45° qiya strela (jib boom), toshli qarshi yuk qutisi va tishli chig'ir barabani.
+  - **Yuk Ko'tarish Quvvati**: 2,500 kg (2.5 tonna) og'irlikdagi yuk qutilari va bochka palletlarini ko'taradi.
+  - **Kinetik Drayv vs Qo'l Kuchi**: 48 SU kinetik quvvat bilan soniyasiga 1.2 metr tezlikda ko'taradi va 45°/s buriladi (2 ta dok ishchisi bilan 0.4 m/s).
+  - **Port Tranzit Samaradorligi**: Kemaning portda yuk tushirish va qayta yuklash vaqtini 65% ga qisqartiradi (5 daqiqadan 1.75 daqiqaga tushiradi).
+
+### 27.3. Okean Savdo Kemasi Golland Flyoyti (`FluytCargoShip` & `fluyt_cargo_ship.glb`) — [Port Royale / Vintage Story / Anno]
+- **Muammo**: Quruqlikdagi karvonlar ko'pi bilan 8-10 slot yuk tashiydi va yo'lda qaroqchilar hujumiga uchraydi; uzoq Janubiy Xalifalik yoki Ganza Ittifoqiga yirik hajmda ruda, jun va vino eksport qilishning yagona yo'li dengiz karvonlaridir.
+- **Yechim (`FluytCargoShip` & `fluyt_cargo_ship.glb`)**:
+  - Noksimon egri bortli (tumblehome), past cho'kishli mustahkam eman korpusi, baland kema orqa kasri (quarterdeck), to'g'ri to'rtburchakli asosiy yelkanlar, kosoy lotin yelkani (mizzen lateen) va buksprit.
+  - **80 Slotli Katta Tryum**: Metall quymalar, to'qimachilik matolari, tuzlangan baliq va vino bochkalarini xavfsiz tashiydi.
+  - **Yelkan Aerodinamikasi (Points of Sail)**:
+    - *Levintik (In irons, <35°)*: 0 tugun (shamolga qarshi yura olmaydi).
+    - *Beydevind (Close hauled, 35°-70°)*: 55% tezlik (3.6 tugun).
+    - *Galpvind (Beam reach, 70°-110°)*: 90% tezlik (5.85 tugun).
+    - *Bakshtag (Broad reach, 110°-155°)*: 100% maksimal tezlik (6.5 tugun / 3.34 m/s).
+  - **Avtomatlashgan Savdo Marshrutlari**: Uy porti va tashqi bozorlar o'rtasida to'xtovsiz qatnab, har bir to'liq reysdan qirollik xazinasiga 120-150 oltin tanga sof daromad keltiradi.
+
+
 
 
 

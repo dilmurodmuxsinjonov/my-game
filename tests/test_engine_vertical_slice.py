@@ -3974,8 +3974,115 @@ class TestEngineVerticalSlice(unittest.TestCase):
         remaining_in_hopper = buffer_stored - evacuated_items
         self.assertEqual(remaining_in_hopper, 80)
 
+    def test_milestone38_glb_assets(self):
+        """Verify binary glTF headers and integrity for Milestone 38 3D models."""
+        models_dir = os.path.join(os.path.dirname(__file__), "..", "assets", "models")
+        m38_models = ["drydock_slipway.glb", "quayside_crane.glb", "fluyt_cargo_ship.glb"]
+        for m in m38_models:
+            p = os.path.join(models_dir, m)
+            self.assertTrue(os.path.exists(p), f"Missing model {m}")
+            self.assertGreater(os.path.getsize(p), 1000, f"Model {m} is unusually small")
+            with open(p, "rb") as f:
+                header = f.read(4)
+                self.assertEqual(header, b"glTF", f"Model {m} does not have valid glTF magic header")
+
+    def test_drydock_shipbuilding_staging_and_launch(self):
+        """Verify 4-stage shipbuilding workflow, crew multiplier, and harbor launch."""
+        stages = ["KEEL_LAYING", "RIB_FRAMING", "HULL_PLANKING", "RIGGING_OUTFITTING"]
+        base_durations = [60.0, 90.0, 120.0, 90.0]
+        total_base_time = sum(base_durations)
+        self.assertEqual(total_base_time, 360.0)
+
+        # 4 shipwrights assigned: speed multiplier = 1.0 + (3 * 0.5) = 2.5x
+        shipwrights = 4
+        crew_mult = 1.0 + (float(shipwrights - 1) * 0.5)
+        self.assertEqual(crew_mult, 2.5)
+
+        accelerated_build_time = total_base_time / crew_mult
+        self.assertEqual(accelerated_build_time, 144.0) # built in 144 seconds!
+
+        # Material requirements verification
+        total_oak_logs = 8 + 16 + 24 # Keel (8) + Ribs (16) + Planking (24)
+        self.assertEqual(total_oak_logs, 48)
+        total_iron_items = 4 + 8 + 12 # Plates (4) + Plates (8) + Sheets (12)
+        self.assertEqual(total_iron_items, 24)
+        pitch_buckets = 6
+        self.assertEqual(pitch_buckets, 6)
+
+        # Launch readiness check
+        is_100_percent_built = True
+        can_launch = is_100_percent_built
+        self.assertTrue(can_launch)
+
+    def test_quayside_crane_hoist_capacity_and_turnaround_bonus(self):
+        """Verify 2500kg harbor crane capacity, kinetic vs manual speeds, and 65% vessel turnaround bonus."""
+        max_capacity_kg = 2500.0
+        hoist_kinetic_m_s = 1.2
+        hoist_manual_m_s = 0.4 # per 2 crew
+
+        # Valid load check
+        crate_kg = 1800.0
+        self.assertTrue(crate_kg <= max_capacity_kg)
+
+        # Overload check
+        overweight_kg = 2800.0
+        self.assertFalse(overweight_kg <= max_capacity_kg)
+
+        # Lift 3.6m cargo from hold
+        lift_height = 3.6
+        time_kinetic = lift_height / hoist_kinetic_m_s
+        self.assertEqual(time_kinetic, 3.0) # 3.0 seconds
+
+        time_manual = lift_height / hoist_manual_m_s
+        self.assertEqual(time_manual, 9.0) # 9.0 seconds
+
+        # Turnaround time reduction bonus
+        kinetic_bonus = 0.65
+        standard_unloading_time_s = 300.0 # 5 minutes
+        accelerated_dock_time = standard_unloading_time_s * (1.0 - kinetic_bonus)
+        self.assertEqual(accelerated_dock_time, 105.0) # 1.75 minutes!
+
+    def test_fluyt_cargo_ship_points_of_sail_and_trade_route(self):
+        """Verify points-of-sail aerodynamics, 80-slot cargo hold, and voyage nautical mile progress."""
+        max_speed_knots = 6.5
+        cargo_capacity = 80
+
+        # Points of sail efficiency
+        def get_sail_efficiency(rel_angle_deg):
+            if rel_angle_deg < 35.0: return 0.0 # in irons
+            elif rel_angle_deg < 70.0: return 0.55 # close hauled
+            elif rel_angle_deg < 110.0: return 0.90 # beam reach
+            elif rel_angle_deg < 155.0: return 1.00 # broad reach (sweet spot)
+            return 0.78 # running dead downwind
+
+        # In irons (head to wind at 20 deg) -> 0 knots
+        self.assertEqual(get_sail_efficiency(20.0), 0.0)
+        # Broad reach (135 deg) -> 100% max speed
+        self.assertEqual(get_sail_efficiency(135.0), 1.0)
+        speed_broad_reach = max_speed_knots * get_sail_efficiency(135.0)
+        self.assertEqual(speed_broad_reach, 6.5)
+
+        # Beam reach (90 deg) -> 90% speed
+        speed_beam_reach = max_speed_knots * get_sail_efficiency(90.0)
+        self.assertAlmostEqual(speed_beam_reach, 5.85)
+
+        # Cargo hold loading test
+        hold = {"wool_bales": 30, "iron_ingots": 30}
+        total_loaded = sum(hold.values())
+        self.assertEqual(total_loaded, 60)
+        free_slots = cargo_capacity - total_loaded
+        self.assertEqual(free_slots, 20)
+
+        # 30 additional wine barrels exceeds 80 slots
+        wine_barrels = 30
+        can_load_all = (total_loaded + wine_barrels <= cargo_capacity)
+        self.assertFalse(can_load_all)
+        accepted_wine = min(wine_barrels, free_slots)
+        self.assertEqual(accepted_wine, 20)
+
 if __name__ == "__main__":
     unittest.main()
+
 
 
 

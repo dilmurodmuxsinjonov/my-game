@@ -372,9 +372,19 @@ def build_diorama():
     # 98. Trackside Bottom-Dump Hopper Discharge Station
     import_asset("hopper_unloader.glb", (0.2, -1.8, 0.0), rot_z=-145, scale=0.80)
 
+    # 99. Shipbuilding Drydock Slipway
+    import_asset("drydock_slipway.glb", (-5.4, 2.0, 0.0), rot_z=45, scale=0.75)
+
+    # 100. Harbor Quayside Jib Crane
+    import_asset("quayside_crane.glb", (-3.8, 3.8, 0.0), rot_z=-45, scale=0.80)
+
+    # 101. Ocean-Going Fluyt Merchant Cargo Vessel
+    import_asset("fluyt_cargo_ship.glb", (-5.6, 5.8, 0.0), rot_z=-35, scale=0.70)
+
     # Render output path
     output_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "assets"))
     output_path = os.path.join(output_dir, "showcase_realm.png")
+
 
     
     bpy.context.scene.render.filepath = output_path

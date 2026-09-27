@@ -7,6 +7,24 @@
 - Dastlabki Godot prototipi va foydalanuvchining showcase fayllari saqlandi.
 - Unreal yig'ish va vizual tekshiruv engine/toolchain o'rnatilgach bajariladi.
 
+## 2026-09-27 — Milestone 38: Anno 1404, Port Royale & Vintage Story O'rta Asr Dengiz Porti va Kema Qurilishi: Slipvey Dok, Port Krani va Flyoyt Savdo Kemasi (Issue #35)
+- **Sohildagi Kema Qurish Slipvey Doki (`DrydockSlipway` & `drydock_slipway.glb`)**:
+  - Dengizga -7° nishablikdagi moylangan skidlar, kil bloklari, 2 qavatli iskala va smola qozoni (`drydock_slipway.glb`).
+  - 4 bosqichli kema qurilishi: Kil qo'yish (60s), qovurg'a ramkalari (90s), bort qoplash va smolalash (120s), yelkan va outfitting (90s).
+  - 4 nafar kema duradgori birgalikda ishlaganda 360s jarayon atigi 144 soniyada (2.5x tezlik) yakunlanib, kema tantanali suvga tushiriladi (`LAUNCHED`).
+- **Tosh Poydevorli Port Jib Krani (`QuaysideCrane` & `quayside_crane.glb`)**:
+  - Sakkizburchakli ohaktosh poydevor (barbette), buriluvchi eman mast, 45° qiya strela va toshli ballast qutisi (`quayside_crane.glb`).
+  - 2,500 kg (2.5 tonna) ko'tarish quvvati; 48 SU kinetik drayv (1.2 m/s, 45°/s burilish) yoki 2 ta dok ishchisi (0.4 m/s).
+  - Port tranzit samaradorligi: kemalarni yukdan bo'shatish vaqtini 65% ga qisqartiradi (5 daqiqadan 1.75 daqiqaga).
+- **Okean Savdo Kemasi Golland Flyoyti (`FluytCargoShip` & `fluyt_cargo_ship.glb`)**:
+  - Noksimon egri bortli eman korpusi, baland kema orqa kasri, kvadrat va lotin yelkanlar majmuasi (`fluyt_cargo_ship.glb`).
+  - 80 slotli ulkan tryum; shamol burchagiga ko'ra yelkan aerodinamikasi (broad reach da 6.5 tugun / 3.34 m/s).
+  - Chet el savdo portlari (Ganza / Janubiy Xalifalik) bilan avtomatlashgan savdo qatnovlari.
+- **Yangi 3D Modellar (Blender 5.2)**: `drydock_slipway.glb`, `quayside_crane.glb`, `fluyt_cargo_ship.glb` yaratildi (jami **106 ta GLB model**!).
+- **Yangi Qirollik Dioramasi**: Barcha 106 ta aktiv ishtirokidagi diorama `assets/showcase_realm.png` da render qilindi va brainga saqlandi.
+- **Avtomatlashgan Testlar**: Jami **140 ta engine testi** (umumiy **197 ta test**) 100% muvaffaqiyat bilan o'tdi.
+
+
 ## 2026-09-27 — Milestone 37: Create Mod, Railcraft & Vintage Story Shaxta Temiryo'l Logistikasi: Tishli Bug' Parovozi, Temiryo'l Strelkasi va Bunker Tushirgichi (Issue #33)
 - **Tor Koleyli Kichik Shaxta Bug' Parovozi (`MineLocomotive` & `mine_locomotive.glb`)**:
   - Gorizontal silindrik qora temir qozon (boiler), mis bug' gumbazi (steam dome), dastro'mollar (coupling rods) bilan bog'langan 4 ta shpilli g'ildiraklar, ochiq kabina va ko'mir bunkeri (`mine_locomotive.glb`).
