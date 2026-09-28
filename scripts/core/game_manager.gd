@@ -14,10 +14,16 @@ const WorldAssembler = preload("res://scripts/world/world_assembler.gd")
 const SaveSystem = preload("res://scripts/core/save_system.gd")
 const PauseMenu = preload("res://scripts/ui/pause_menu.gd")
 const AudioManager = preload("res://scripts/world/audio_manager.gd")
+const QuestManager = preload("res://scripts/quests/quest_manager.gd")
+const CitizenDialogue = preload("res://scripts/entities/citizen_dialogue.gd")
+const QuestJournal = preload("res://scripts/ui/quest_journal.gd")
 
 var save_system: SaveSystem = null
 var audio_manager: AudioManager = null
 var pause_menu: PauseMenu = null
+var quest_manager: QuestManager = null
+var citizen_dialogue: CitizenDialogue = null
+var quest_journal: QuestJournal = null
 
 var supply_chain: SupplyChain
 var citizens: Array[Citizen] = []
@@ -84,6 +90,7 @@ func _ready() -> void:
 		player.quick_save_requested.connect(_on_quick_save)
 		player.quick_load_requested.connect(_on_quick_load)
 		player.footstep_stepped.connect(_on_player_footstep)
+		player.toggle_journal_requested.connect(_on_toggle_journal)
 		
 		# Position player on top of surface terrain at spawn
 		var spawn_x = 32
@@ -120,6 +127,39 @@ func _ready() -> void:
 	pause_menu.save_requested.connect(_on_menu_save_requested)
 	pause_menu.load_requested.connect(_on_menu_load_requested)
 	pause_menu.settings_applied.connect(_on_settings_applied)
+
+	# Initialize Quest Progression System
+	quest_manager = QuestManager.new()
+	quest_manager.name = "QuestManager"
+	add_child(quest_manager)
+	quest_manager.quest_completed.connect(_on_quest_completed)
+	quest_manager.monarch_title_promoted.connect(_on_monarch_title_promoted)
+	quest_manager.realm_victory_achieved.connect(_on_realm_victory_achieved)
+
+	# Initialize Citizen Dialogue UI
+	citizen_dialogue = get_node_or_null("UI/CitizenDialogue") as CitizenDialogue
+	if not citizen_dialogue:
+		citizen_dialogue = CitizenDialogue.new()
+		citizen_dialogue.name = "CitizenDialogue"
+		var ui_node_d = get_node_or_null("UI")
+		if ui_node_d:
+			ui_node_d.add_child(citizen_dialogue)
+		else:
+			add_child(citizen_dialogue)
+	citizen_dialogue.supply_chain = supply_chain
+
+	# Initialize Quest Journal UI
+	quest_journal = get_node_or_null("UI/QuestJournal") as QuestJournal
+	if not quest_journal:
+		quest_journal = QuestJournal.new()
+		quest_journal.name = "QuestJournal"
+		var ui_node_j = get_node_or_null("UI")
+		if ui_node_j:
+			ui_node_j.add_child(quest_journal)
+		else:
+			add_child(quest_journal)
+	quest_journal.quest_manager = quest_manager
+	quest_journal.supply_chain = supply_chain
 		
 	# Spawn initial workstations, citizens, and trade caravan
 	_spawn_initial_workstations()
@@ -283,6 +323,17 @@ func _on_cycle_district() -> void:
 			WorldAssembler.DistrictType.WILDERNESS_OUTPOSTS: district_key = "WILDERNESS_OUTPOSTS"
 		audio_manager.set_district_ambiance(district_key)
 
+	if quest_manager:
+		match dtype:
+			WorldAssembler.DistrictType.STEAM_AND_FORGE:
+				quest_manager.record_progress("visit_steam_district", 1)
+			WorldAssembler.DistrictType.HARBOR_AND_DOCKS:
+				quest_manager.record_progress("visit_harbor_district", 1)
+			WorldAssembler.DistrictType.OBSERVATORY:
+				quest_manager.record_progress("visit_observatory", 1)
+			WorldAssembler.DistrictType.MINING_RAIL:
+				quest_manager.record_progress("visit_mining_district", 1)
+
 func _on_toggle_ledger() -> void:
 	if royal_ledger:
 		royal_ledger.visible = not royal_ledger.visible
@@ -317,6 +368,8 @@ func _on_role_reassigned(role_name: String, _delta: int) -> void:
 	for c in citizens:
 		if c.current_role != role_enum and c.current_role == Citizen.Role.UNASSIGNED:
 			c.set_role(role_enum, c.position + Vector3(randf_range(-5, 5), 0, randf_range(-5, 5)))
+			if quest_manager:
+				quest_manager.record_progress("reassign_citizen", 1)
 			break
 
 func _on_open_crafting() -> void:
@@ -324,6 +377,12 @@ func _on_open_crafting() -> void:
 		crafting_menu.open_menu(null)
 
 func _on_interact_requested(target: Node3D) -> void:
+	if target is Citizen and citizen_dialogue:
+		var is_winter = (season_manager and season_manager.current_season == SeasonManager.Season.WINTER)
+		citizen_dialogue.open_dialogue(target, is_winter)
+		if audio_manager:
+			audio_manager.play_ui_click()
+		return
 	if (target is Workstation or target is TradeCaravan or target is EnchanterTable or target is CookingPot) and crafting_menu:
 		crafting_menu.open_menu(target)
 
@@ -334,6 +393,8 @@ func _on_war_horn_sounded() -> void:
 		c.on_royal_alarm(is_royal_alarm_active, hearth_pos)
 	if audio_manager:
 		audio_manager.play_war_horn()
+	if quest_manager:
+		quest_manager.record_progress("sound_war_horn", 1)
 		
 	if hud:
 		if is_royal_alarm_active:
@@ -344,6 +405,11 @@ func _on_war_horn_sounded() -> void:
 func _on_item_crafted(recipe_name: String, _item: Dictionary) -> void:
 	if audio_manager:
 		audio_manager.play_craft_success()
+	if quest_manager:
+		var r_low = recipe_name.to_lower()
+		if r_low.contains("ingot") or r_low.contains("iron"):
+			quest_manager.record_progress("smelt_ore", 1)
+			quest_manager.record_progress("craft_iron_item", 1)
 	if hud:
 		hud.show_notification("Crafted %s" % recipe_name)
 
@@ -359,6 +425,13 @@ func _on_player_block_action(action: String, pos: Vector3i, btype: int) -> void:
 				audio_manager.play_pickaxe_hit()
 			if save_system:
 				save_system.register_voxel_modification(pos, 0)
+			if quest_manager:
+				if btype == VoxelChunk.BlockType.WOOD or btype == VoxelChunk.BlockType.PLANKS:
+					quest_manager.record_progress("harvest_wood", 1)
+				elif btype == VoxelChunk.BlockType.STONE or btype == VoxelChunk.BlockType.COBBLESTONE:
+					quest_manager.record_progress("mine_stone", 1)
+				elif btype == VoxelChunk.BlockType.WHEAT_CROP:
+					quest_manager.record_progress("harvest_wheat", 1)
 			if btype == VoxelChunk.BlockType.WHEAT_CROP and agriculture_manager:
 				agriculture_manager.harvest_crop(pos)
 		"till":
@@ -366,6 +439,8 @@ func _on_player_block_action(action: String, pos: Vector3i, btype: int) -> void:
 				audio_manager.play_footstep(AudioManager.SURFACE_MUD)
 			if save_system:
 				save_system.register_voxel_modification(pos, VoxelChunk.BlockType.FARMLAND)
+			if quest_manager:
+				quest_manager.record_progress("till_farmland", 1)
 			if agriculture_manager:
 				agriculture_manager.register_farmland(pos)
 		"plant":
@@ -391,6 +466,8 @@ func _on_raid_spawned(count: int) -> void:
 		hud.show_notification("⚠️ Bandit Raid approaching! %d Raiders spotted!" % count)
 
 func _on_raid_defeated() -> void:
+	if quest_manager:
+		quest_manager.record_progress("repel_bandit", 1)
 	if hud:
 		hud.show_notification("⚔️ Raid Repelled! The Realm is Secure.")
 
@@ -415,6 +492,8 @@ func spawn_trade_caravan() -> void:
 		hud.show_notification("🐪 An Exotic Trade Caravan has arrived in the realm!")
 
 func _on_caravan_traded(item_bought: String, cost: int) -> void:
+	if quest_manager:
+		quest_manager.record_progress("caravan_trade", 1)
 	if hud:
 		hud.show_notification("💰 Traded %s for %d coins with the caravan!" % [item_bought.capitalize(), cost])
 
@@ -492,5 +571,29 @@ func _on_settings_applied(settings_dict: Dictionary) -> void:
 		audio_manager.apply_volume_settings(settings_dict["volume"])
 	if hud:
 		hud.show_notification("⚙️ Settings Applied!")
+
+func _on_toggle_journal() -> void:
+	if quest_journal:
+		quest_journal.toggle_journal()
+		if audio_manager:
+			audio_manager.play_ui_click()
+
+func _on_quest_completed(_quest_id: String, title: String, reward_renown: int) -> void:
+	if hud:
+		hud.show_notification("🏆 DEED ACCOMPLISHED: %s (+%d Renown)!" % [title, reward_renown])
+	if audio_manager:
+		audio_manager.play_craft_success()
+
+func _on_monarch_title_promoted(new_title: String, _total_renown: int) -> void:
+	if hud:
+		hud.show_notification("👑 ROYAL CORONATION! You are now: %s!" % new_title)
+	if audio_manager:
+		audio_manager.play_war_horn()
+
+func _on_realm_victory_achieved(_total_renown: int) -> void:
+	if hud:
+		hud.show_notification("🎉 SUPREME REALM VICTORY! All Feudal Deeds Complete!")
+	if audio_manager:
+		audio_manager.play_war_horn()
 
 

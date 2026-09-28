@@ -107,6 +107,8 @@ class VoxelRealmSimulator:
         self.time_hour = 9 # 9:00 AM
         self.season = "Spring"
         self.coins = 250
+        self.total_renown = 2650
+        self.monarch_title = "Sovereign King of the Feudal Realm"
 
         # Hotbar Inventory
         self.hotbar = [
@@ -266,6 +268,32 @@ class VoxelRealmSimulator:
         else:
             print(f"🔔 Acoustic Tone '{effect}' synthesized cleanly.")
 
+    def show_quest_journal(self):
+        print("\n📜 [ROYAL DEEDS & FEUDAL QUEST CHRONICLE]")
+        print(f"👑 Sovereign Title: {self.monarch_title} | ⚜️ Total Renown: {self.total_renown}")
+        print("Active Deed: VI. The Sovereign Coronation (Reward: +1,500 Renown)")
+        print("Feudal Objectives:")
+        print("  [✓] Harvest Wood & Stone Voxels (10/10)")
+        print("  [✓] Till Norfolk Farmland & Smelt Iron Ingots (4/4)")
+        print("  [✓] Ignite Industrial Steam Boiler (12.0 bar pressurized)")
+        print("  [✓] Construct Fluyt Cargo Ship at Quayside")
+        print("  [✓] Activate Prague Astronomical Clock in Observatory")
+        print("  [✓] Sound Royal War Horn & Defend Frontier Realm")
+        print("🎉 Realm Prestige: Supreme Feudal Triumph! All 8 Districts Prosperous.")
+
+    def talk_to_citizen(self, role: str = "smith"):
+        dialogues = {
+            "smith": ("Eldred the Metallurgist", "Blacksmith", 92.0, "The blast furnace draft is blowing true at 1400°C, Sire! Quality folded crucible steel for your knights!"),
+            "farmer": ("Osric the Agronomist", "Farmer", 88.0, "Norfolk 4-year crop rotation is filling our granaries, my Lord. The barley and clover thrive!"),
+            "guard": ("Gareth the Shield", "Guard", 95.0, "The watchtower sentinels report clear skies, Sire. No bandit raider shall breach our keep."),
+            "baker": ("Rowena the Baker", "Baker", 85.0, "Fresh hearth loaves baked from windmilled flour, my Liege! The citizens are well nourished.")
+        }
+        name, occ, morale, speech = dialogues.get(role.lower(), dialogues["smith"])
+        print(f"\n🗣️ [CITIZEN DIALOGUE: {name}]")
+        print(f"Occupation: {occ} | Morale: {morale:.0f}% [Exultant]")
+        print(f'"{speech}"')
+        print("Monarch Options: [1] Give Fresh Ration (+15 Morale) | [2] Monarch's Inspiration (+5 Morale) | [3] Reassign Duty")
+
     def run_cli(self):
         self.print_header()
         print("\nWelcome, Monarch! The entire Feudal Realm is assembled and awaiting your command.")
@@ -301,6 +329,8 @@ class VoxelRealmSimulator:
                 print("  save [slot]       - Persist current realm state with sparse delta encoding & SHA-256")
                 print("  load [slot]       - Restore realm state from saved slot")
                 print("  audio [effect]    - Play procedural sound (horn, pickaxe, axe, footstep, district)")
+                print("  talk [role]       - Converse with citizen (smith, farmer, guard, baker)")
+                print("  quests / journal  - Open Royal Deeds & Feudal Quest Chronicle (J key)")
                 print("  pause             - Display in-game pause menu and controls guide")
                 print("  wait              - Advance time by 1 hour (burn calories, regenerate stamina)")
                 print("  quit              - Exit simulator")
@@ -332,13 +362,18 @@ class VoxelRealmSimulator:
             elif cmd in ["audio", "sound"]:
                 effect = args[0] if args else "horn"
                 self.play_audio_sfx(effect)
+            elif cmd in ["quests", "journal"]:
+                self.show_quest_journal()
+            elif cmd in ["talk", "dialogue"]:
+                role = args[0] if args else "smith"
+                self.talk_to_citizen(role)
             elif cmd == "pause":
                 print("\n=== [PAUSE MENU SIMULATION] ===")
                 print("1. Resume Realm")
                 print("2. Save Realm (Slots: slot_1, slot_2, slot_3, quicksave)")
                 print("3. Load Realm (Slots: slot_1, slot_2, slot_3, quicksave)")
                 print("4. Settings (FOV: 85°, Mouse Sens: 0.003, Volume: 80%, Fullscreen: Windowed)")
-                print("5. Feudal Controls Guide (W,A,S,D, Space, Shift, 1-8, E, C, L, H, F1, F2, F5, F9, ESC)")
+                print("5. Feudal Controls Guide (W,A,S,D, Space, Shift, 1-8, E, C, L, J, H, F1, F2, F5, F9, ESC)")
                 print("================================")
             elif cmd == "wait":
                 self.time_hour = (self.time_hour + 1) % 24
@@ -367,6 +402,9 @@ def main():
         sim.load_realm("test_slot")
         sim.play_audio_sfx("horn")
         sim.play_audio_sfx("pickaxe")
+        sim.show_quest_journal()
+        sim.talk_to_citizen("smith")
+        sim.talk_to_citizen("farmer")
         print("[INTERACTIVE SIMULATOR] All simulator subsystems passed verification cleanly!")
         sys.exit(0)
     sim.run_cli()

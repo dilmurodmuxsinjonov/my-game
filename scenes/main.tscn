@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://c6v2x8y3k8lm0"]
+[gd_scene load_steps=11 format=3 uid="uid://c6v2x8y3k8lm0"]
 
 [ext_resource type="Script" path="res://scripts/core/game_manager.gd" id="1_gm"]
 [ext_resource type="Script" path="res://scripts/core/voxel_world.gd" id="2_vw"]
@@ -7,6 +7,8 @@
 [ext_resource type="Script" path="res://scripts/ui/royal_ledger.gd" id="5_rl"]
 [ext_resource type="Script" path="res://scripts/ui/crafting_menu.gd" id="6_cm"]
 [ext_resource type="Script" path="res://scripts/ui/pause_menu.gd" id="7_pm"]
+[ext_resource type="Script" path="res://scripts/entities/citizen_dialogue.gd" id="8_cd"]
+[ext_resource type="Script" path="res://scripts/ui/quest_journal.gd" id="9_qj"]
 
 [sub_resource type="Environment" id="Environment_sky"]
 background_mode = 1
@@ -71,3 +73,23 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("7_pm")
+
+[node name="CitizenDialogue" type="Control" parent="UI"]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("8_cd")
+
+[node name="QuestJournal" type="Control" parent="UI"]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("9_qj")

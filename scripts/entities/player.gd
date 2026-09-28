@@ -57,6 +57,7 @@ signal toggle_debug_requested()
 signal toggle_ledger_requested()
 signal target_block_inspected(info: Dictionary)
 signal toggle_pause_requested()
+signal toggle_journal_requested()
 signal quick_save_requested()
 signal quick_load_requested()
 signal footstep_stepped(block_type: int, is_sprinting: bool)
@@ -175,6 +176,8 @@ func _unhandled_input(event: InputEvent) -> void:
 			emit_signal("open_crafting_requested")
 		elif event.keycode == KEY_L and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
 			emit_signal("toggle_ledger_requested")
+		elif event.keycode == KEY_J and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
+			emit_signal("toggle_journal_requested")
 		elif event.keycode == KEY_H and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
 			emit_signal("war_horn_sounded")
 		elif event.keycode == KEY_F1:
@@ -229,7 +232,7 @@ func _inspect_target_voxel() -> void:
 func _check_hovered_interactive() -> void:
 	if raycast and raycast.is_colliding():
 		var col = raycast.get_collider()
-		if col is Workstation or col is TradeCaravan or col is EnchanterTable or col is CookingPot or col is Anvil:
+		if col is Workstation or col is TradeCaravan or col is EnchanterTable or col is CookingPot or col is Anvil or col is Citizen:
 			if hovered_interactive != col:
 				if hovered_interactive and hovered_interactive.has_method("set_prompt_visible"):
 					hovered_interactive.set_prompt_visible(false)
