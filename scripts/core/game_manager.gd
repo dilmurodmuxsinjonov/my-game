@@ -10,12 +10,16 @@ extends Node3D
 @onready var royal_ledger: RoyalLedger = $UI/RoyalLedger
 @onready var crafting_menu: CraftingMenu = $UI/CraftingMenu
 
+const WorldAssembler = preload("res://scripts/world/world_assembler.gd")
+
 var supply_chain: SupplyChain
 var citizens: Array[Citizen] = []
 var workstations: Array[Workstation] = []
 var agriculture_manager: AgricultureManager
 var threat_manager: ThreatManager
 var season_manager: SeasonManager
+var world_assembler: WorldAssembler = null
+var current_district_index: int = 0
 var active_caravans: Array[TradeCaravan] = []
 var caravan_timer: float = 0.0
 var caravan_interval: float = 160.0
@@ -59,6 +63,8 @@ func _ready() -> void:
 		player.interact_requested.connect(_on_interact_requested)
 		player.block_action_performed.connect(_on_player_block_action)
 		player.war_horn_sounded.connect(_on_war_horn_sounded)
+		player.cycle_district_requested.connect(_on_cycle_district)
+		player.toggle_ledger_requested.connect(_on_toggle_ledger)
 		
 		# Position player on top of surface terrain at spawn
 		var spawn_x = 32
@@ -84,6 +90,12 @@ func _ready() -> void:
 	_spawn_initial_workstations()
 	_spawn_initial_citizens()
 	spawn_trade_caravan()
+	
+	# Assemble all 112 3D models across 8 feudal districts
+	world_assembler = WorldAssembler.new(voxel_world, self)
+	world_assembler.name = "WorldAssembler"
+	add_child(world_assembler)
+	world_assembler.assemble_complete_realm()
 	
 	print("[GAME MANAGER] Voxel Lord realm successfully initialized!")
 
@@ -193,11 +205,55 @@ func _process(delta: float) -> void:
 		if hud:
 			hud.update_season_display(season_manager.get_season_name(), current_temp, season_manager.get_weather_name())
 			
+	# Update HUD Realism Debug Info
+	if hud and player:
+		var fps = Engine.get_frames_per_second()
+		var dname = _get_current_district_name(player.global_position)
+		var bname = "Temperate Forest"
+		if voxel_world and voxel_world.biome_manager:
+			var btype = voxel_world.biome_manager.get_biome(int(player.global_position.x), int(player.global_position.z))
+			bname = voxel_world.biome_manager.get_biome_name(btype)
+		hud.update_debug_info(float(fps), player.global_position, dname, bname)
+
 	# Caravan periodic arrival
 	caravan_timer += delta
 	if caravan_timer >= caravan_interval:
 		caravan_timer = 0.0
 		spawn_trade_caravan()
+
+func _on_cycle_district() -> void:
+	if not world_assembler or not player or not voxel_world:
+		return
+	var districts = WorldAssembler.DISTRICT_NAMES.keys()
+	current_district_index = (current_district_index + 1) % districts.size()
+	var dtype = districts[current_district_index]
+	var center = world_assembler.get_district_center(dtype)
+	var surface_y = voxel_world.get_surface_height(int(center.x), int(center.z))
+	player.global_position = Vector3(center.x + 0.5, surface_y + 2.0, center.z + 0.5)
+	var dname = WorldAssembler.DISTRICT_NAMES.get(dtype, "District")
+	if hud:
+		hud.show_notification("⚡ Fast Traveled to: %s" % dname)
+
+func _on_toggle_ledger() -> void:
+	if royal_ledger:
+		royal_ledger.visible = not royal_ledger.visible
+		if royal_ledger.visible:
+			Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+		else:
+			Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+
+func _get_current_district_name(pos: Vector3) -> String:
+	if not world_assembler:
+		return "Unknown Frontier"
+	var closest_dist: float = 99999.0
+	var closest_name: String = "Wilderness Realm"
+	for dtype in WorldAssembler.DISTRICT_CENTERS.keys():
+		var center = WorldAssembler.DISTRICT_CENTERS[dtype]
+		var dist = pos.distance_to(center)
+		if dist < closest_dist:
+			closest_dist = dist
+			closest_name = WorldAssembler.DISTRICT_NAMES[dtype]
+	return closest_name
 
 func _on_role_reassigned(role_name: String, _delta: int) -> void:
 	var role_enum = Citizen.Role.UNASSIGNED

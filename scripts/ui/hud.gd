@@ -13,6 +13,11 @@ var crosshair: Control
 var hotbar_container: HBoxContainer
 var notification_label: Label
 var hotbar_slots: Array[PanelContainer] = []
+var inspect_panel: PanelContainer
+var inspect_label: Label
+var debug_panel: PanelContainer
+var debug_label: Label
+var is_debug_visible: bool = false
 
 var active_slot_index: int = 0
 
@@ -151,6 +156,64 @@ func _create_ui_elements() -> void:
 		
 	_highlight_active_slot(0)
 
+	# 5. Target Block Inspect Tooltip (Center-Bottom, above hotbar)
+	inspect_panel = PanelContainer.new()
+	inspect_panel.name = "InspectPanel"
+	inspect_panel.anchor_left = 0.5
+	inspect_panel.anchor_top = 1.0
+	inspect_panel.anchor_right = 0.5
+	inspect_panel.anchor_bottom = 1.0
+	inspect_panel.offset_left = -220.0
+	inspect_panel.offset_top = -145.0
+	inspect_panel.offset_right = 220.0
+	inspect_panel.offset_bottom = -80.0
+	var sb_inspect = StyleBoxFlat.new()
+	sb_inspect.bg_color = Color(0.1, 0.12, 0.16, 0.88)
+	sb_inspect.border_width_left = 2
+	sb_inspect.border_width_top = 2
+	sb_inspect.border_width_right = 2
+	sb_inspect.border_width_bottom = 2
+	sb_inspect.border_color = Color(0.85, 0.75, 0.45, 0.8)
+	sb_inspect.corner_radius_top_left = 4
+	sb_inspect.corner_radius_top_right = 4
+	sb_inspect.corner_radius_bottom_right = 4
+	sb_inspect.corner_radius_bottom_left = 4
+	inspect_panel.add_theme_stylebox_override("panel", sb_inspect)
+	inspect_panel.visible = false
+	add_child(inspect_panel)
+
+	inspect_label = Label.new()
+	inspect_label.name = "InspectLabel"
+	inspect_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	inspect_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	inspect_label.add_theme_font_size_override("font_size", 13)
+	inspect_panel.add_child(inspect_label)
+
+	# 6. Realism Debug Overlay Panel (Top Right below season, F1 toggle)
+	debug_panel = PanelContainer.new()
+	debug_panel.name = "DebugPanel"
+	debug_panel.anchor_left = 1.0
+	debug_panel.anchor_right = 1.0
+	debug_panel.offset_left = -340.0
+	debug_panel.offset_top = 75.0
+	debug_panel.offset_right = -20.0
+	debug_panel.offset_bottom = 280.0
+	var sb_debug = StyleBoxFlat.new()
+	sb_debug.bg_color = Color(0.06, 0.08, 0.12, 0.92)
+	sb_debug.border_width_left = 1
+	sb_debug.border_width_top = 1
+	sb_debug.border_width_right = 1
+	sb_debug.border_width_bottom = 1
+	sb_debug.border_color = Color(0.4, 0.6, 0.9, 0.7)
+	debug_panel.add_theme_stylebox_override("panel", sb_debug)
+	debug_panel.visible = false
+	add_child(debug_panel)
+
+	debug_label = Label.new()
+	debug_label.name = "DebugLabel"
+	debug_label.add_theme_font_size_override("font_size", 12)
+	debug_panel.add_child(debug_label)
+
 func bind_player(player: Player) -> void:
 	player.health_changed.connect(_on_health_changed)
 	player.stamina_changed.connect(_on_stamina_changed)
@@ -158,6 +221,8 @@ func bind_player(player: Player) -> void:
 	player.warmth_changed.connect(_on_warmth_changed)
 	player.hotbar_slot_changed.connect(_on_hotbar_changed)
 	player.block_action_performed.connect(_on_block_action)
+	player.target_block_inspected.connect(update_inspect_tooltip)
+	player.toggle_debug_requested.connect(toggle_debug_overlay)
 	
 	# Initialize hotbar displays
 	for i in range(player.hotbar.size()):
@@ -230,3 +295,36 @@ func show_notification(msg: String) -> void:
 		notification_label.modulate.a = 1.0
 		var tween = create_tween()
 		tween.tween_property(notification_label, "modulate:a", 0.0, 1.8)
+
+func update_inspect_tooltip(info: Dictionary) -> void:
+	if not inspect_panel or not inspect_label:
+		return
+	if info.is_empty():
+		inspect_panel.visible = false
+		return
+	inspect_panel.visible = true
+	var name_str = info.get("name", "Unknown Block")
+	var pos = info.get("pos", Vector3i.ZERO)
+	var temp = info.get("temperature", 18.0)
+	var stress = info.get("stress_mpa", 0.0)
+	var max_stress = info.get("max_stress_mpa", 15.0)
+	var text_content = "🔍 %s (X:%d, Y:%d, Z:%d)\n🌡️ Temp: %.1f°C | ⚖️ Stress: %.1f / %.1f MPa" % [
+		name_str, pos.x, pos.y, pos.z, temp, stress, max_stress
+	]
+	if info.get("is_soil", false):
+		text_content += "\n🌱 NPK: N:%.0f%% P:%.0f%% K:%.0f%% | 💧 Moist: %.0f%%" % [
+			info.get("nitrogen", 70.0), info.get("phosphorus", 60.0), info.get("potassium", 65.0), info.get("moisture", 75.0)
+		]
+	inspect_label.text = text_content
+
+func toggle_debug_overlay() -> void:
+	is_debug_visible = not is_debug_visible
+	if debug_panel:
+		debug_panel.visible = is_debug_visible
+
+func update_debug_info(fps: float, pos: Vector3, district_name: String, biome_name: String) -> void:
+	if debug_label and is_debug_visible:
+		debug_label.text = "[REALISM DEBUG OVERLAY - F1]\nFPS: %.0f | Monarch: (%.1f, %.1f, %.1f)\nDistrict: %s\nBiome: %s\nControls: [WASD] Move | [Shift] Sprint | [Space] Jump\n[LMB] Mine | [RMB] Place | [E] Interact | [C] Crafting\n[L] Ledger | [H] Horn | [F2] Fast Travel | [ESC] Pause" % [
+			fps, pos.x, pos.y, pos.z, district_name, biome_name
+		]
+
