@@ -132,6 +132,25 @@ class VoxelRealmSimulator:
         self.furnace_lit = False
         self.steam_boiler_pressure = 0.0
 
+        # Royal Heraldry & Castle Decor State
+        self.heraldry = {
+            "kingdom_name": "Valoria",
+            "motto": "In Fide et Virtute",
+            "emblem": "Lion Rampant",
+            "primary": "Or (Gold)",
+            "secondary": "Azure (Royal Blue)",
+            "division": "Quarterly (Four Quarters)",
+        }
+        self.castle_decor = ["throne_sovereign", "war_council_map", "chandelier_crystal"]
+        self.castle_prestige = 110
+        self.castle_buffs = {
+            "realm_morale": 20.0,
+            "renown_per_day": 5.0,
+            "guard_defense_bonus": 0.20,
+            "raid_frequency_reduction": 0.15,
+            "night_crafting_bonus": 0.15,
+        }
+
     def print_header(self):
         print("\n" + "=" * 78)
         print("          VOXEL LORD: FEUDAL REALM - INTERACTIVE PLAYABLE SIMULATOR")
@@ -294,6 +313,51 @@ class VoxelRealmSimulator:
         print(f'"{speech}"')
         print("Monarch Options: [1] Give Fresh Ration (+15 Morale) | [2] Monarch's Inspiration (+5 Morale) | [3] Reassign Duty")
 
+    def show_heraldry(self):
+        h = self.heraldry
+        print("\n🛡️ === ROYAL HERALDRY & COAT OF ARMS ===")
+        print(f"Kingdom: {h['kingdom_name']} | Royal Motto: '{h['motto']}'")
+        print(f"Field: {h['division']}")
+        print(f"Primary Tincture: {h['primary']} | Secondary: {h['secondary']}")
+        print(f"Crest Emblem: {h['emblem']}")
+        print(f"Blazon: Field of {h['division']} {h['primary']} and {h['secondary']}, charged with a {h['emblem']}.")
+        print("Banners: All castle towers and guard uniforms tinted to royal tinctures.")
+
+    def show_castle_customizer(self):
+        print("\n🏰 === MONARCH CASTLE & THRONE ROOM CUSTOMIZER ===")
+        print(f"Castle Prestige: {self.castle_prestige} 👑")
+        print(f"Installed Royal Furnishings ({len(self.castle_decor)} items):")
+        for decor in self.castle_decor:
+            print(f"  • [INSTALLED] {decor.replace('_', ' ').title()}")
+        print("\nActive Imperial Realm Buffs:")
+        for k, v in self.castle_buffs.items():
+            sign = "+" if v > 0 else ""
+            print(f"  ✨ {k}: {sign}{v}")
+
+    def install_furnishing(self, decor_id: str):
+        decor_catalog = {
+            "throne": ("throne_sovereign", 50, {"realm_morale": 15.0, "renown_per_day": 5.0}),
+            "map": ("war_council_map", 35, {"guard_defense_bonus": 0.20, "raid_frequency_reduction": 0.15}),
+            "chandelier": ("chandelier_crystal", 25, {"night_crafting_bonus": 0.15, "realm_morale": 5.0}),
+            "vault": ("treasury_vault_chest", 40, {"tax_efficiency_bonus": 0.15, "gold_capacity_bonus": 500.0}),
+            "table": ("banquet_great_table", 30, {"hunger_drain_reduction": 0.20, "feast_morale_boost": 25.0}),
+            "armor": ("knights_armor_display", 20, {"guard_attack_bonus": 0.15, "garrison_cap_bonus": 4.0}),
+            "armillary": ("astronomers_armillary", 45, {"tech_progress_bonus": 0.25, "caravan_trade_profit": 0.10}),
+        }
+        key = decor_id.lower().strip()
+        if key not in decor_catalog:
+            print(f"Unknown furnishing '{decor_id}'. Options: {', '.join(decor_catalog.keys())}")
+            return
+        full_id, prestige, buffs = decor_catalog[key]
+        if full_id in self.castle_decor:
+            print(f"Furnishing '{full_id}' is already installed in the Throne Room.")
+            return
+        self.castle_decor.append(full_id)
+        self.castle_prestige += prestige
+        for b_name, b_val in buffs.items():
+            self.castle_buffs[b_name] = self.castle_buffs.get(b_name, 0.0) + b_val
+        print(f"✅ Installed {full_id} in Castle Throne Room! (+{prestige} Prestige)")
+
     def run_cli(self):
         self.print_header()
         print("\nWelcome, Monarch! The entire Feudal Realm is assembled and awaiting your command.")
@@ -331,6 +395,9 @@ class VoxelRealmSimulator:
                 print("  audio [effect]    - Play procedural sound (horn, pickaxe, axe, footstep, district)")
                 print("  talk [role]       - Converse with citizen (smith, farmer, guard, baker)")
                 print("  quests / journal  - Open Royal Deeds & Feudal Quest Chronicle (J key)")
+                print("  heraldry          - View royal coat of arms, motto, and tinctures (K key)")
+                print("  castle            - View Throne Room decor and active imperial realm buffs")
+                print("  install <decor>   - Install decor (throne, map, chandelier, vault, table, armor, armillary)")
                 print("  pause             - Display in-game pause menu and controls guide")
                 print("  wait              - Advance time by 1 hour (burn calories, regenerate stamina)")
                 print("  quit              - Exit simulator")
@@ -364,6 +431,15 @@ class VoxelRealmSimulator:
                 self.play_audio_sfx(effect)
             elif cmd in ["quests", "journal"]:
                 self.show_quest_journal()
+            elif cmd in ["heraldry", "crest", "banner"]:
+                self.show_heraldry()
+            elif cmd in ["castle", "throne"]:
+                self.show_castle_customizer()
+            elif cmd == "install":
+                if args:
+                    self.install_furnishing(args[0])
+                else:
+                    print("Usage: install <throne|map|chandelier|vault|table|armor|armillary>")
             elif cmd in ["talk", "dialogue"]:
                 role = args[0] if args else "smith"
                 self.talk_to_citizen(role)
@@ -405,6 +481,11 @@ def main():
         sim.show_quest_journal()
         sim.talk_to_citizen("smith")
         sim.talk_to_citizen("farmer")
+        sim.show_heraldry()
+        sim.show_castle_customizer()
+        sim.install_furnishing("vault")
+        assert "treasury_vault_chest" in sim.castle_decor
+        assert sim.castle_prestige == 150
         print("[INTERACTIVE SIMULATOR] All simulator subsystems passed verification cleanly!")
         sys.exit(0)
     sim.run_cli()

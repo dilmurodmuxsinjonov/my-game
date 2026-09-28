@@ -107,6 +107,16 @@ func save_game(slot_name: String, game_manager: Node) -> bool:
 				"position": [c.position.x, c.position.y, c.position.z] if "position" in c else [32, 12, 32]
 			})
 
+	# 6. Heraldry & Castle Decor Data
+	var heraldry_data: Dictionary = {}
+	var castle_data: Dictionary = {}
+	var rh = game_manager.get("royal_heraldry")
+	if rh and rh.has_method("to_dict"):
+		heraldry_data = rh.to_dict()
+	var cc = game_manager.get("castle_customizer")
+	if cc and cc.has_method("to_dict"):
+		castle_data = cc.to_dict()
+
 	# Assembly of Master Payload
 	var current_time = Time.get_unix_time_from_system()
 	var payload: Dictionary = {
@@ -118,7 +128,9 @@ func save_game(slot_name: String, game_manager: Node) -> bool:
 		"economy": economy_data,
 		"environment": env_data,
 		"voxels_delta": voxels_serialized,
-		"citizens": citizens_data
+		"citizens": citizens_data,
+		"heraldry": heraldry_data,
+		"castle": castle_data
 	}
 
 	var json_str = JSON.stringify(payload, "\t")
@@ -207,6 +219,16 @@ func load_game(slot_name: String, game_manager: Node) -> bool:
 	var env_data = payload.get("environment", {})
 	if "day_timer" in env_data and "day_timer" in game_manager:
 		game_manager.set("day_timer", env_data["day_timer"])
+
+	# 4. Restore Heraldry & Castle Decor
+	if payload.has("heraldry"):
+		var rh_load = game_manager.get("royal_heraldry")
+		if rh_load and rh_load.has_method("from_dict"):
+			rh_load.from_dict(payload["heraldry"])
+	if payload.has("castle"):
+		var cc_load = game_manager.get("castle_customizer")
+		if cc_load and cc_load.has_method("from_dict"):
+			cc_load.from_dict(payload["castle"])
 
 	load_completed.emit(slot_name, true)
 	print("[SAVE SYSTEM] Successfully loaded realm from %s on Day %s!" % [slot_name, payload.get("datetime", "Unknown")])

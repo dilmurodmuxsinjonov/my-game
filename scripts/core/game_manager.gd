@@ -17,6 +17,10 @@ const AudioManager = preload("res://scripts/world/audio_manager.gd")
 const QuestManager = preload("res://scripts/quests/quest_manager.gd")
 const CitizenDialogue = preload("res://scripts/entities/citizen_dialogue.gd")
 const QuestJournal = preload("res://scripts/ui/quest_journal.gd")
+const RoyalHeraldry = preload("res://scripts/entities/royal_heraldry.gd")
+const AtmosphericPostProcess = preload("res://scripts/world/atmospheric_post_process.gd")
+const CastleCustomizer = preload("res://scripts/world/castle_customizer.gd")
+const HeraldryCustomizerUI = preload("res://scripts/ui/heraldry_customizer_ui.gd")
 
 var save_system: SaveSystem = null
 var audio_manager: AudioManager = null
@@ -24,6 +28,10 @@ var pause_menu: PauseMenu = null
 var quest_manager: QuestManager = null
 var citizen_dialogue: CitizenDialogue = null
 var quest_journal: QuestJournal = null
+var royal_heraldry: RoyalHeraldry = null
+var atmospheric_system: AtmosphericPostProcess = null
+var castle_customizer: CastleCustomizer = null
+var heraldry_ui: HeraldryCustomizerUI = null
 
 var supply_chain: SupplyChain
 var citizens: Array[Citizen] = []
@@ -91,6 +99,7 @@ func _ready() -> void:
 		player.quick_load_requested.connect(_on_quick_load)
 		player.footstep_stepped.connect(_on_player_footstep)
 		player.toggle_journal_requested.connect(_on_toggle_journal)
+		player.toggle_heraldry_requested.connect(_on_toggle_heraldry)
 		
 		# Position player on top of surface terrain at spawn
 		var spawn_x = 32
@@ -160,6 +169,32 @@ func _ready() -> void:
 			add_child(quest_journal)
 	quest_journal.quest_manager = quest_manager
 	quest_journal.supply_chain = supply_chain
+
+	# Initialize Royal Heraldry, Castle Decor & Atmospheric Systems
+	royal_heraldry = RoyalHeraldry.new()
+	royal_heraldry.name = "RoyalHeraldry"
+	add_child(royal_heraldry)
+	royal_heraldry.heraldry_changed.connect(_on_heraldry_updated)
+
+	castle_customizer = CastleCustomizer.new()
+	castle_customizer.name = "CastleCustomizer"
+	add_child(castle_customizer)
+
+	atmospheric_system = AtmosphericPostProcess.new()
+	atmospheric_system.name = "AtmosphericPostProcess"
+	add_child(atmospheric_system)
+
+	# Wire up Heraldry UI
+	heraldry_ui = get_node_or_null("UI/HeraldryCustomizerUI") as HeraldryCustomizerUI
+	if not heraldry_ui:
+		heraldry_ui = HeraldryCustomizerUI.new()
+		heraldry_ui.name = "HeraldryCustomizerUI"
+		var ui_node_h = get_node_or_null("UI")
+		if ui_node_h:
+			ui_node_h.add_child(heraldry_ui)
+		else:
+			add_child(heraldry_ui)
+	heraldry_ui.setup(royal_heraldry, castle_customizer, supply_chain)
 		
 	# Spawn initial workstations, citizens, and trade caravan
 	_spawn_initial_workstations()
@@ -273,6 +308,18 @@ func _process(delta: float) -> void:
 		sun_light.light_energy = maxf(0.1, sun_height * 1.2)
 		if audio_manager:
 			audio_manager.set_day_night(sun_height < 0.0)
+
+	# Atmospheric Simulation & Visual Shaders
+	if atmospheric_system and season_manager and player:
+		var env_node = get_node_or_null("WorldEnvironment") as WorldEnvironment
+		var atmo_params = atmospheric_system.evaluate_atmosphere(
+			progress,
+			season_manager.current_season,
+			season_manager.current_weather,
+			player.global_position
+		)
+		if env_node and sun_light:
+			atmospheric_system.apply_to_environment(env_node, sun_light, atmo_params)
 
 	# Thermal climate & seasonal updates
 	if season_manager:
@@ -595,5 +642,17 @@ func _on_realm_victory_achieved(_total_renown: int) -> void:
 		hud.show_notification("🎉 SUPREME REALM VICTORY! All Feudal Deeds Complete!")
 	if audio_manager:
 		audio_manager.play_war_horn()
+
+func _on_toggle_heraldry() -> void:
+	if heraldry_ui:
+		heraldry_ui.toggle_menu()
+		if audio_manager:
+			audio_manager.play_ui_click()
+
+func _on_heraldry_updated(_blazon: String, _pri: Color, _sec: Color) -> void:
+	if hud:
+		hud.show_notification("🛡️ Royal Coat of Arms & Castle Banners Updated!")
+	if audio_manager:
+		audio_manager.play_craft_success()
 
 
