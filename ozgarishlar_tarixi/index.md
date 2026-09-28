@@ -1,5 +1,26 @@
 # O'zgarishlar tarixi
 
+## 2026-09-29 — Milestone 45: Feudal Quest & Progression Ledger, Dynamic Citizen Dialogue, and Monarch Renown System (Issue #52)
+- **6-Bosqichli Tarixiy Feodal Kvestlar Zanjiri (`scripts/quests/quest_manager.gd`)**:
+  - *I. Foundations of the Realm*: Yog'och va tosh bloklarini qazib olish, fuqaroning kasbiy burchini tayinlash (+100 Renown, "Lord of the Frontier" unvoni).
+  - *II. Bread & Iron*: Norfolk ekinzorlarini shudgorlash, oltin bug'doy yetishtirish va domnada temir eritish (+250 Renown, "Baron of the Realm" unvoni).
+  - *III. High-Pressure Industry*: Bug' va og'ir metallurgiya tumanini ziyorat qilish, o'choqni qizdirish, mexanik buyumlar yasash (+450 Renown, "Count of the Trade Lands" unvoni).
+  - *IV. Maritime Trade Fleet*: Dengiz portini ko'zdan kechirish, savdo aravasi bilan ayirboshlash, savdo flotini barpo etish (+700 Renown, "Duke of High Metallurgy" unvoni).
+  - *V. Renaissance Clockwork*: Rasadxonadagi Praga astronomik soatini tekshirish, yerosti kon temiryo'l tarmog'ini o'rganish (+1000 Renown).
+  - *VI. The Sovereign Coronation*: Qirollik jang karnayini chalish, chegara qaroqchilarini daf etish, 2,500 Renown to'plab Oliy Qirollik tojini kiyish va olam g'alabasiga erishish (`realm_victory_achieved`).
+- **Interaktiv Fuqarolar Muloqot Tizimi (`scripts/entities/citizen_dialogue.gd`)**:
+  - Har qanday fuqaroga `E` tugmasini bosganda ochiluvchi feodal dialog oynasi.
+  - 7 ta kasb bo'yicha tarixiy dialoglar (dehqon, o'tinchi, konchi, novvoy, temirchi, soqchi, erkin fuqaro).
+  - Qishki iqlim, ochlik va past ma'naviyat bo'yicha moslashuvchan nutq.
+  - Monarx amallari: "Yangi pishgan non ulashish (+15 Ma'naviyat)", "Monarx Ilhomi (+5 Ma'naviyat)", "Vazifani o'zgartirish".
+- **Qirollik Solnomasi va Kvest Jurnali (`scripts/ui/quest_journal.gd`)**:
+  - `J` tezkor tugmasi orqali ochiluvchi hashamatli qirollik daftari.
+  - Joriy monarx unvoni, umumiy nufuz balli, faol kvest vazifalari `[✓]` va `[○]` ko'rinishida, shuningdek aholi va tumanlar statistikasi.
+- **Standalone Simulyator Yangilanishi (`tools/interactive_play_simulator.py`)**:
+  - Yangi `quests` / `journal` va `talk [smith|farmer|guard|baker]` interaktiv buyruqlari.
+- **Avtomatlashgan Testlar To'plami (`tests/test_quest_dialogue_progression.py`)**:
+  - Jami **350 ta test 100% muvaffaqiyat bilan o'tdi** (0.65s).
+
 ## 2026-09-29 — Milestone 44: Save/Load Persistensiya Tizimi, O'yin Ichidagi Pause & Sozlamalar Menyusi va Dinamik Akustik Atmosfera (Issue #50)
 - **Sparse Delta Voksel Persistensiya va Holatni Saqlash (`scripts/core/save_system.gd`)**:
   - **Sparse Voxel Delta Serialization**: Butun olamning 131,072 ta blokini saqlash o'rniga faqat o'yinchi tomonidan o'zgartirilgan (o'yilgan, qo'yilgan, shudgorlangan) bloklar `modified_voxels` lug'atida kuzatiladi va saqlanadi. Bu fayl hajmini 95%+ ga kamaytiradi (bir necha kilobayt) va saqlash/yuklash tezligini bir zumda amalga oshiradi.
