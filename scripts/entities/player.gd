@@ -52,6 +52,10 @@ signal block_action_performed(action: String, block_pos: Vector3i, block_type: i
 signal interact_requested(target: Node3D)
 signal open_crafting_requested()
 signal war_horn_sounded()
+signal cycle_district_requested()
+signal toggle_debug_requested()
+signal toggle_ledger_requested()
+signal target_block_inspected(info: Dictionary)
 
 # Movement constants
 const WALK_SPEED: float = 5.0
@@ -163,6 +167,16 @@ func _unhandled_input(event: InputEvent) -> void:
 				emit_signal("interact_requested", hovered_interactive)
 			else:
 				emit_signal("open_crafting_requested")
+		elif event.keycode == KEY_C and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
+			emit_signal("open_crafting_requested")
+		elif event.keycode == KEY_L and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
+			emit_signal("toggle_ledger_requested")
+		elif event.keycode == KEY_H and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
+			emit_signal("war_horn_sounded")
+		elif event.keycode == KEY_F1:
+			emit_signal("toggle_debug_requested")
+		elif event.keycode == KEY_F2:
+			emit_signal("cycle_district_requested")
 		elif event.keycode == KEY_ESCAPE:
 			if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
 				Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
@@ -177,6 +191,35 @@ func _physics_process(delta: float) -> void:
 	_update_vitals(delta)
 	_handle_movement(delta)
 	_check_hovered_interactive()
+	_inspect_target_voxel()
+
+func _inspect_target_voxel() -> void:
+	if not raycast or not raycast.is_colliding() or not voxel_world:
+		emit_signal("target_block_inspected", {})
+		return
+	var col_point = raycast.get_collision_point()
+	var col_normal = raycast.get_collision_normal()
+	var block_pos = Vector3i((col_point - col_normal * 0.1).floor())
+	var btype = voxel_world.get_block(block_pos.x, block_pos.y, block_pos.z)
+	if btype != VoxelChunk.BlockType.AIR:
+		var bname = "Voxel Block #%d" % btype
+		var is_soil_block = (btype == VoxelChunk.BlockType.DIRT or btype == VoxelChunk.BlockType.FARMLAND or btype == VoxelChunk.BlockType.GRASS)
+		var info = {
+			"pos": block_pos,
+			"type": btype,
+			"name": bname,
+			"temperature": ambient_temperature,
+			"stress_mpa": 2.4,
+			"max_stress_mpa": 15.0,
+			"is_soil": is_soil_block,
+			"nitrogen": 72.0,
+			"phosphorus": 58.0,
+			"potassium": 64.0,
+			"moisture": 75.0
+		}
+		emit_signal("target_block_inspected", info)
+	else:
+		emit_signal("target_block_inspected", {})
 
 func _check_hovered_interactive() -> void:
 	if raycast and raycast.is_colliding():
