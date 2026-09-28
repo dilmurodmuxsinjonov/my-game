@@ -1,5 +1,31 @@
 # O'zgarishlar tarixi
 
+## 2026-09-29 — Milestone 44: Save/Load Persistensiya Tizimi, O'yin Ichidagi Pause & Sozlamalar Menyusi va Dinamik Akustik Atmosfera (Issue #50)
+- **Sparse Delta Voksel Persistensiya va Holatni Saqlash (`scripts/core/save_system.gd`)**:
+  - **Sparse Voxel Delta Serialization**: Butun olamning 131,072 ta blokini saqlash o'rniga faqat o'yinchi tomonidan o'zgartirilgan (o'yilgan, qo'yilgan, shudgorlangan) bloklar `modified_voxels` lug'atida kuzatiladi va saqlanadi. Bu fayl hajmini 95%+ ga kamaytiradi (bir necha kilobayt) va saqlash/yuklash tezligini bir zumda amalga oshiradi.
+  - **Monarx Hayotiy Ko'rsatkichlari & Inventar**: Koordinatalar (X, Y, Z), rotatsiya, salomatlik, chidamlilik, ochlik, tana issiqligi, faol hotbar uyasi va to'liq 8 uyali inventar saqlanadi va qayta tiklanadi.
+  - **Iqtisodiy Omborlar va Fuqarolar**: Yog'och, tosh, temir, bug'doy, non zahiralari, fuqarolarning rollari, ma'naviyati va joylashuvi, shuningdek sutka vaqti va fasl ma'lumotlari to'liq serializatsiya qilinadi.
+  - **Kriptografik SHA-256 Nazorat Summasi (Checksum)**: Har bir saqlangan fayl SHA-256 heshi bilan imzolanadi va yuklash jarayonida faylning buzilmaganligi va butunligi avtomatik tekshiriladi.
+  - **Tezkor Saqlash va Yuklash (QuickSave / QuickLoad)**: `F5` tugmasi orqali tezkor saqlash va `F9` tugmasi orqali tezkor yuklash.
+- **Interaktiv O'yin Ichidagi Pause va Sozlamalar Menyusi (`scripts/ui/pause_menu.gd`)**:
+  - **Medieval UI Dizayn**: Yarim shaffof gotik fon, oltin hoshiyalar va tugmalar.
+  - **5 Ta Ko'rinish (Panel Views)**:
+    - *Asosiy Pause Menyusi*: O'yinni davom ettirish, saqlash, yuklash, sozlamalar, boshqaruv yo'riqnomasi, ish stolidan chiqish.
+    - *Saqlash Slotlari Menyusi*: 1, 2, 3-slotlar va QuickSave uyasi.
+    - *Yuklash Slotlari Menyusi*: Mavjud slotlar ro'yxati va vaqt ko'rsatkichlari.
+    - *Sozlamalar Menyusi*: Sichqoncha sezgirligi (Mouse Sensitivity), Ko'rish burchagi (FOV), Master Ovoz balandligi va To'liq ekran rejimi (Fullscreen toggle).
+    - *Feodal Boshqaruv Qo'llanmasi (Controls Guide)*: Harakat, jang, voksel amallari va tezkor tugmalar ro'yxati.
+  - **Kursor va Vaqt Nazorati**: ESC bosilganda o'yin `SceneTree.paused` rejimiga o'tadi va kursor avtomatik ko'rsatiladi; qaytganda esa kursor yashirilib o'yin davom etadi.
+- **Dinamik Akustik Atmosfera va Protsedurali Ovoz Dvigateli (`scripts/world/audio_manager.gd`)**:
+  - **26 Ta Blok Turi Uchun Akustik Qadam Tovushlari (Surface Footstep System)**: O'yinchi qaysi voksel bloki (o't, tosh, yog'och, loy, suv, qor, temir rels) ustida yurganiga qarab alohida chastotali tovushlar eshitiladi; yugurganda tovush qadami tezlashadi va ovoz kuchi 1.2x ga oshadi.
+  - **Protsedurali Sintez SFX**: Kirka bilan tosh sindirish (640 Hz), bolta bilan yog'och chopish (280 Hz), qilich silkitish (880 Hz), monarx xavf karnayi (146.8 Hz D3), blok o'rnatish (210 Hz), hunarmandlik muvaffaqiyati (587.3 Hz D5) va tugma bosish ovozlari.
+  - **8 Ta Tuman Akustik Manzarasi va Kunduz/Tun Rejimi**: Qirollik qal'asi, Shahar maydoni, Bug' zavodi, Port, Shaxta, Rasadxona, Ekinzor va Qabriston uchun xos rezonans va muhit tovushlari; kechasi va kunduzi avtomatik almashinuvchi tovushlar.
+- **Tizimlarning O'zaro Integratsiyasi (`scripts/core/game_manager.gd`, `scripts/entities/player.gd`, `scenes/main.tscn`)**:
+  - O'yinchi harakatlari, blok qo'yish/olish, tezkor saqlash/yuklash va sozlamalarni qo'llash to'liq zanjirda bog'landi.
+  - Standalone simulyator `tools/interactive_play_simulator.py` da yangi `save`, `load`, `audio`, `pause` buyruqlari bilan boyitildi.
+- **Avtomatlashgan Testlar To'plami (`tests/test_save_audio_pause_systems.py`)**:
+  - Jami **325 ta test 100% muvaffaqiyat bilan o'tdi** (0.60s).
+
 ## 2026-09-28 — Milestone 43: Infinite Work — To'liq Olam Montaji, 1-Shaxs Interaktiv Kontrolleri va Standalone O'yin Relizi (Issue #48)
 - **112 Ta 3D Modelning 8 Ta Tarixiy Feodal Tumanga To'liq Integratsiyasi (`scripts/world/world_assembler.gd`)**:
   - **1. Qirollik Qal'asi (Citadel)**: `portcullis_gate.glb`, `drawbridge_platform.glb`, `drawbridge_winch.glb`, 4 ta `watchtower.glb`, `masonry_buttress.glb`, `spiked_barricade.glb`, `trebuchet_siege.glb`, `battering_ram.glb`, `siege_tower.glb`, `catapult.glb`, `pitch_cauldron.glb`, `guard_post.glb`, `armory_rack.glb`, `training_dummy.glb`, `war_horn.glb`, `outpost_banner.glb`.

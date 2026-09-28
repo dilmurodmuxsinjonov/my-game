@@ -56,8 +56,12 @@ signal cycle_district_requested()
 signal toggle_debug_requested()
 signal toggle_ledger_requested()
 signal target_block_inspected(info: Dictionary)
+signal toggle_pause_requested()
+signal quick_save_requested()
+signal quick_load_requested()
+signal footstep_stepped(block_type: int, is_sprinting: bool)
 
-# Movement constants
+var step_timer: float = 0.0
 const WALK_SPEED: float = 5.0
 const SPRINT_SPEED: float = 8.5
 const JUMP_VELOCITY: float = 6.0
@@ -177,11 +181,12 @@ func _unhandled_input(event: InputEvent) -> void:
 			emit_signal("toggle_debug_requested")
 		elif event.keycode == KEY_F2:
 			emit_signal("cycle_district_requested")
+		elif event.keycode == KEY_F5:
+			emit_signal("quick_save_requested")
+		elif event.keycode == KEY_F9:
+			emit_signal("quick_load_requested")
 		elif event.keycode == KEY_ESCAPE:
-			if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
-				Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-			else:
-				Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+			emit_signal("toggle_pause_requested")
 
 func _select_slot(index: int) -> void:
 	active_slot = clampi(index, 0, 7)
@@ -286,6 +291,17 @@ func _handle_movement(delta: float) -> void:
 		velocity.z = lerp(velocity.z, 0.0, 14.0 * delta)
 		
 	move_and_slide()
+
+	# Footstep cadence audio tracking
+	if is_on_floor() and Vector2(velocity.x, velocity.z).length() > 0.5:
+		step_timer += delta * (1.5 if is_sprinting else 1.0)
+		if step_timer >= 0.45:
+			step_timer = 0.0
+			var floor_pos = Vector3i((global_position - Vector3(0, 0.5, 0)).floor())
+			var btype = voxel_world.get_block(floor_pos.x, floor_pos.y, floor_pos.z) if voxel_world else 2
+			emit_signal("footstep_stepped", btype, is_sprinting)
+	else:
+		step_timer = 0.0
 
 func _update_vitals(delta: float) -> void:
 	# Passive hunger (1 point per 10 real seconds)
