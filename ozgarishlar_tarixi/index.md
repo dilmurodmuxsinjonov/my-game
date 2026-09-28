@@ -1,5 +1,28 @@
 # O'zgarishlar tarixi
 
+## 2026-09-29 — Milestone 46: Royal Heraldry Customizer, Atmospheric Environment Shaders, and Castle Throne Room Decor Buffs (Issue #54)
+- **Qirollik Geraldikasi va Gerb Tizimi (`scripts/entities/royal_heraldry.gd`)**:
+  - Tarixiy geraldik emblema va ramzlar: Tik Turgan Sher (Lion Rampant), Imperator Burguti (Imperial Eagle), Olovli Ajdaho (Fiery Dragon), Qirollik Bug'usi (Royal Stag), Monarx Toji (Monarch Crown), Liliya Guli (Fleur-de-lis), Chalishtirilgan Qilichlar (Crossed Swords), Oltin Bug'doy Bog'lami (Golden Wheat).
+  - 7 xil feodal bo'yoq (tinctures): Gules (qizil), Azure (ko'k), Or (oltin), Argent (kumush), Sable (qora), Vert (yashil), Purpure (binafsha).
+  - Qalqon bo'linishlari (divisions): Yaxlit maydon (Solid), Vertikal bo'linish (Per Pale), Gorizontal bo'linish (Per Fess), To'rt choraklik (Quarterly), Shevron (Chevron).
+  - Geraldik tavsif blazoni (Blazon generator) va qal'a bayroqlari hamda soqchilar kiyimlarini shohona ranglarga bo'yash.
+- **Atmosfera va Post-Processing Shaders (`scripts/world/atmospheric_post_process.gd`)**:
+  - Hajmiy tuman (Volumetric Fog) zichligi va balandlik qiyaligi: vodiyda quyuq tonggi tuman, tog'larda tiniq havo.
+  - Ob-havoga moslashuvchan yorug'lik va tuman: Ochiq, Bulutli, Yomg'ir (namlik koeffitsienti 0.95), Quyuq tuman, Qor (qirov koeffitsienti 0.90).
+  - Mavsumiy daraxt barglari tusi (Foliage tint): Bahor (och yashil novda), Yoz (to'q zumrad), Kuz (tillorang sariq/olovrang), Qish (oq qirovli sovuq).
+  - Quyosh zenit va ufq gradatsiyalari (Tong, Tush, Shom, Yarim tun).
+- **Taxt Zali va Qal'a Bezaklari (`scripts/world/castle_customizer.gd`)**:
+  - 7 ta shohona feodal mebel va artefaktlar: Oltin Taxt (Morale +15, Renown +5/kun), Harbiy Kengash Xaritasi (Soqchi mudofaasi +20%, Qaroqchilar hujumi -15%), Billur Qandil (Tungi hunarmandlik +15%), Xazina Sandig'i (Soliq samaradorligi +15%, Oltin sig'imi +500), Monarx Ziyofat Stoli (Ochlik kamayishi -20%, Bayram ma'naviyati +25), Ritsar Sovuti (Soqchi hujumi +15%, Garnizon sig'imi +4), Astrolyabiya (Ilmiy izlanish +25%, Karvon foydasi +10%).
+  - Qal'a obro'si (Prestige) va butun saltanat bo'ylab ta'sir qiluvchi passiv bonuslar agregatsiyasi.
+- **Geraldika va Qal'a UI Menyusi (`scripts/ui/heraldry_customizer_ui.gd`)**:
+  - `K` tugmasi orqali ochiluvchi monarx gerbi, shiori, emblemasi va bezaklarini boshqarish oynasi.
+- **Save/Load Persistensiyasiga Integratsiya (`scripts/core/save_system.gd`)**:
+  - Geraldika va o'rnatilgan taxt zali jihozlari tejamkor JSON payloadida saqlanadi va yuklanganda to'liq tiklanadi.
+- **Standalone Simulyator Kengaytmasi (`tools/interactive_play_simulator.py`)**:
+  - Yangi `heraldry`, `castle` va `install <decor>` buyruqlari qo'shildi.
+- **Avtomatlashgan Testlar To'plami (`tests/test_heraldry_atmosphere_castle.py`)**:
+  - Jami **376 ta test 100% muvaffaqiyat bilan o'tdi** (0.59s).
+
 ## 2026-09-29 — Milestone 45: Feudal Quest & Progression Ledger, Dynamic Citizen Dialogue, and Monarch Renown System (Issue #52)
 - **6-Bosqichli Tarixiy Feodal Kvestlar Zanjiri (`scripts/quests/quest_manager.gd`)**:
   - *I. Foundations of the Realm*: Yog'och va tosh bloklarini qazib olish, fuqaroning kasbiy burchini tayinlash (+100 Renown, "Lord of the Frontier" unvoni).

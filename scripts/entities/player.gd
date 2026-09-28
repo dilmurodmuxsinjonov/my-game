@@ -58,6 +58,7 @@ signal toggle_ledger_requested()
 signal target_block_inspected(info: Dictionary)
 signal toggle_pause_requested()
 signal toggle_journal_requested()
+signal toggle_heraldry_requested()
 signal quick_save_requested()
 signal quick_load_requested()
 signal footstep_stepped(block_type: int, is_sprinting: bool)
@@ -178,6 +179,8 @@ func _unhandled_input(event: InputEvent) -> void:
 			emit_signal("toggle_ledger_requested")
 		elif event.keycode == KEY_J and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
 			emit_signal("toggle_journal_requested")
+		elif event.keycode == KEY_K and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
+			emit_signal("toggle_heraldry_requested")
 		elif event.keycode == KEY_H and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
 			emit_signal("war_horn_sounded")
 		elif event.keycode == KEY_F1:
