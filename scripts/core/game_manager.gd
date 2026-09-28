@@ -11,6 +11,13 @@ extends Node3D
 @onready var crafting_menu: CraftingMenu = $UI/CraftingMenu
 
 const WorldAssembler = preload("res://scripts/world/world_assembler.gd")
+const SaveSystem = preload("res://scripts/core/save_system.gd")
+const PauseMenu = preload("res://scripts/ui/pause_menu.gd")
+const AudioManager = preload("res://scripts/world/audio_manager.gd")
+
+var save_system: SaveSystem = null
+var audio_manager: AudioManager = null
+var pause_menu: PauseMenu = null
 
 var supply_chain: SupplyChain
 var citizens: Array[Citizen] = []
@@ -54,6 +61,14 @@ func _ready() -> void:
 	season_manager.season_changed.connect(_on_season_changed)
 	season_manager.weather_changed.connect(_on_weather_changed)
 	
+	# Initialize Audio System
+	audio_manager = AudioManager.new()
+	audio_manager.name = "AudioManager"
+	add_child(audio_manager)
+
+	# Initialize Persistence System
+	save_system = SaveSystem.new()
+	
 	# Wire up player
 	if player:
 		player.voxel_world = voxel_world
@@ -65,6 +80,10 @@ func _ready() -> void:
 		player.war_horn_sounded.connect(_on_war_horn_sounded)
 		player.cycle_district_requested.connect(_on_cycle_district)
 		player.toggle_ledger_requested.connect(_on_toggle_ledger)
+		player.toggle_pause_requested.connect(_on_toggle_pause)
+		player.quick_save_requested.connect(_on_quick_save)
+		player.quick_load_requested.connect(_on_quick_load)
+		player.footstep_stepped.connect(_on_player_footstep)
 		
 		# Position player on top of surface terrain at spawn
 		var spawn_x = 32
@@ -85,6 +104,22 @@ func _ready() -> void:
 		crafting_menu.player = player
 		crafting_menu.supply_chain = supply_chain
 		crafting_menu.item_crafted.connect(_on_item_crafted)
+
+	# Setup Pause & Settings Menu
+	pause_menu = get_node_or_null("UI/PauseMenu") as PauseMenu
+	if not pause_menu:
+		pause_menu = PauseMenu.new()
+		pause_menu.name = "PauseMenu"
+		var ui_node = get_node_or_null("UI")
+		if ui_node:
+			ui_node.add_child(pause_menu)
+		else:
+			add_child(pause_menu)
+	pause_menu.save_system = save_system
+	pause_menu.resume_requested.connect(_on_menu_resumed)
+	pause_menu.save_requested.connect(_on_menu_save_requested)
+	pause_menu.load_requested.connect(_on_menu_load_requested)
+	pause_menu.settings_applied.connect(_on_settings_applied)
 		
 	# Spawn initial workstations, citizens, and trade caravan
 	_spawn_initial_workstations()
@@ -196,6 +231,8 @@ func _process(delta: float) -> void:
 		# Dim sun at night
 		var sun_height = sin(angle_rad)
 		sun_light.light_energy = maxf(0.1, sun_height * 1.2)
+		if audio_manager:
+			audio_manager.set_day_night(sun_height < 0.0)
 
 	# Thermal climate & seasonal updates
 	if season_manager:
@@ -233,6 +270,18 @@ func _on_cycle_district() -> void:
 	var dname = WorldAssembler.DISTRICT_NAMES.get(dtype, "District")
 	if hud:
 		hud.show_notification("⚡ Fast Traveled to: %s" % dname)
+	if audio_manager:
+		var district_key = "CITADEL"
+		match dtype:
+			WorldAssembler.DistrictType.CITADEL: district_key = "CITADEL"
+			WorldAssembler.DistrictType.TOWN_SQUARE: district_key = "TOWN_SQUARE"
+			WorldAssembler.DistrictType.STEAM_AND_FORGE: district_key = "STEAM_AND_FORGE"
+			WorldAssembler.DistrictType.HARBOR_AND_DOCKS: district_key = "HARBOR_AND_DOCKS"
+			WorldAssembler.DistrictType.MINING_RAIL: district_key = "MINING_RAIL"
+			WorldAssembler.DistrictType.OBSERVATORY: district_key = "OBSERVATORY"
+			WorldAssembler.DistrictType.AGRICULTURE_NORFOLK: district_key = "AGRICULTURE_NORFOLK"
+			WorldAssembler.DistrictType.WILDERNESS_OUTPOSTS: district_key = "WILDERNESS_OUTPOSTS"
+		audio_manager.set_district_ambiance(district_key)
 
 func _on_toggle_ledger() -> void:
 	if royal_ledger:
@@ -283,6 +332,8 @@ func _on_war_horn_sounded() -> void:
 	var hearth_pos = Vector3(32, voxel_world.get_surface_height(32, 32), 32) if voxel_world else Vector3(32, 16, 32)
 	for c in citizens:
 		c.on_royal_alarm(is_royal_alarm_active, hearth_pos)
+	if audio_manager:
+		audio_manager.play_war_horn()
 		
 	if hud:
 		if is_royal_alarm_active:
@@ -291,20 +342,37 @@ func _on_war_horn_sounded() -> void:
 			hud.show_notification("📯 ALL CLEAR! Citizens resume daily feudal duties.")
 
 func _on_item_crafted(recipe_name: String, _item: Dictionary) -> void:
+	if audio_manager:
+		audio_manager.play_craft_success()
 	if hud:
 		hud.show_notification("Crafted %s" % recipe_name)
 
 func _on_player_block_action(action: String, pos: Vector3i, btype: int) -> void:
 	match action:
+		"place":
+			if audio_manager:
+				audio_manager.play_block_place()
+			if save_system:
+				save_system.register_voxel_modification(pos, btype)
+		"mine":
+			if audio_manager:
+				audio_manager.play_pickaxe_hit()
+			if save_system:
+				save_system.register_voxel_modification(pos, 0)
+			if btype == VoxelChunk.BlockType.WHEAT_CROP and agriculture_manager:
+				agriculture_manager.harvest_crop(pos)
 		"till":
+			if audio_manager:
+				audio_manager.play_footstep(AudioManager.SURFACE_MUD)
+			if save_system:
+				save_system.register_voxel_modification(pos, VoxelChunk.BlockType.FARMLAND)
 			if agriculture_manager:
 				agriculture_manager.register_farmland(pos)
 		"plant":
+			if audio_manager:
+				audio_manager.play_footstep(AudioManager.SURFACE_GRASS)
 			if agriculture_manager:
 				agriculture_manager.plant_crop(pos, "wheat")
-		"mine":
-			if btype == VoxelChunk.BlockType.WHEAT_CROP and agriculture_manager:
-				agriculture_manager.harvest_crop(pos)
 
 func _on_crop_matured(pos: Vector3i) -> void:
 	# Dispatch available farmer to harvest
@@ -362,4 +430,67 @@ func _on_season_changed(_old_season: SeasonManager.Season, new_season: SeasonMan
 func _on_weather_changed(new_weather: SeasonManager.Weather) -> void:
 	if hud and season_manager:
 		hud.show_notification("🌧️ Weather: %s" % season_manager.get_weather_name(new_weather))
+
+func _on_toggle_pause() -> void:
+	if pause_menu:
+		pause_menu.toggle_pause_menu()
+		if audio_manager:
+			audio_manager.play_ui_click()
+
+func _on_quick_save() -> void:
+	if save_system:
+		var ok = save_system.quick_save(self)
+		if hud:
+			if ok:
+				hud.show_notification("💾 Realm Quick-Saved! (Slot: quicksave)")
+			else:
+				hud.show_notification("⚠️ Quick-Save Failed!")
+		if audio_manager:
+			audio_manager.play_ui_click()
+
+func _on_quick_load() -> void:
+	if save_system:
+		var ok = save_system.quick_load(self)
+		if hud:
+			if ok:
+				hud.show_notification("📂 Realm Quick-Loaded Successfully!")
+			else:
+				hud.show_notification("⚠️ Quick-Load Failed - No Save Found!")
+		if audio_manager:
+			audio_manager.play_ui_click()
+
+func _on_player_footstep(block_type: int, is_sprinting: bool) -> void:
+	if audio_manager:
+		audio_manager.play_footstep_for_block(block_type, is_sprinting)
+
+func _on_menu_resumed() -> void:
+	if audio_manager:
+		audio_manager.play_ui_click()
+
+func _on_menu_save_requested(slot_name: String) -> void:
+	if save_system:
+		var ok = save_system.save_game(slot_name, self)
+		if hud:
+			hud.show_notification("💾 Saved to [%s] (%s)" % [slot_name, "OK" if ok else "FAILED"])
+		if audio_manager:
+			audio_manager.play_ui_click()
+
+func _on_menu_load_requested(slot_name: String) -> void:
+	if save_system:
+		var ok = save_system.load_game(slot_name, self)
+		if hud:
+			hud.show_notification("📂 Loaded from [%s] (%s)" % [slot_name, "OK" if ok else "FAILED"])
+		if audio_manager:
+			audio_manager.play_ui_click()
+
+func _on_settings_applied(settings_dict: Dictionary) -> void:
+	if player and "mouse_sensitivity" in settings_dict:
+		player.MOUSE_SENSITIVITY = settings_dict["mouse_sensitivity"]
+	if player and player.camera and "fov" in settings_dict:
+		player.camera.fov = settings_dict["fov"]
+	if audio_manager and "volume" in settings_dict:
+		audio_manager.apply_volume_settings(settings_dict["volume"])
+	if hud:
+		hud.show_notification("⚙️ Settings Applied!")
+
 
