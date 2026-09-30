@@ -157,6 +157,14 @@ class VoxelRealmSimulator:
         self.garrison_formation = "Shield Wall (Locked Bucklers)"
         self.garrison_guard_count = 6
 
+        # Foreign Diplomacy & Vassalage State
+        self.factions = {
+            "valoria": {"name": "Duchy of Valoria", "ruler": "Grand Duke Alden IV", "opinion": 15.0, "status": "Neutral ⚖️", "vassal": False, "treaties": []},
+            "silvercoast": {"name": "Silvercoast Trade League", "ruler": "High Doge Lorenzo", "opinion": 10.0, "status": "Neutral ⚖️", "vassal": False, "treaties": []},
+            "ashfell": {"name": "Ashfell Mountain Clans", "ruler": "Chieftain Torvold Ironfang", "opinion": -25.0, "status": "Hostile ⚠️", "vassal": False, "treaties": []},
+            "sunken_mire": {"name": "Barony of the Sunken Mire", "ruler": "Baroness Elspeth", "opinion": 0.0, "status": "Neutral ⚖️", "vassal": False, "treaties": []},
+        }
+
     def print_header(self):
         print("\n" + "=" * 78)
         print("          VOXEL LORD: FEUDAL REALM - INTERACTIVE PLAYABLE SIMULATOR")
@@ -417,6 +425,85 @@ class VoxelRealmSimulator:
         self.garrison_formation = formations[matched[0]]
         print(f"⚔️ Squadron Commander: Formed into {self.garrison_formation}!")
 
+    def show_diplomacy(self):
+        print("\n📜 === ROYAL CHANCERY & REALM DIPLOMACY ===")
+        for f_id, f in self.factions.items():
+            treaties_str = ", ".join(f["treaties"]) if f["treaties"] else "None"
+            vassal_str = " [VASSAL FEALTY 👑]" if f["vassal"] else ""
+            print(f"  • {f['name']} ({f['ruler']}){vassal_str}")
+            print(f"    Status: {f['status']} | Opinion: {f['opinion']:+.1f} / 100.0 | Active Treaties: {treaties_str}")
+
+    def send_diplomatic_gift(self, faction_id: str, amount: int = 15):
+        key = faction_id.lower().strip()
+        matched = [k for k in self.factions if key in k]
+        if not matched:
+            print(f"Unknown realm '{faction_id}'. Available: {', '.join(self.factions.keys())}")
+            return
+        f_key = matched[0]
+        f = self.factions[f_key]
+        boost = min(35.0, amount * 1.5)
+        f["opinion"] = min(100.0, f["opinion"] + boost)
+        if f["opinion"] >= 30.0 and "Friendly" not in f["status"]:
+            f["status"] = "Friendly 🕊️"
+        print(f"🎁 Chancery Envoy: Dispatched {amount} tribute to {f['name']} (+{boost:.1f} Opinion -> {f['opinion']:.1f})")
+
+    def sign_diplomatic_treaty(self, faction_id: str, treaty_name: str):
+        key = faction_id.lower().strip()
+        matched = [k for k in self.factions if key in k]
+        if not matched:
+            print(f"Unknown realm '{faction_id}'. Available: {', '.join(self.factions.keys())}")
+            return
+        f_key = matched[0]
+        f = self.factions[f_key]
+        t_key = treaty_name.lower().strip()
+        valid = {"non_aggression": "Non-Aggression Pact", "trade": "Trade Concordat", "alliance": "Defensive League", "vassal": "Vassalage Fealty Charter"}
+        found_t = [k for k in valid if t_key in k]
+        if not found_t:
+            print(f"Unknown treaty '{treaty_name}'. Options: {', '.join(valid.keys())}")
+            return
+        t_title = valid[found_t[0]]
+        if t_title in f["treaties"]:
+            print(f"Treaty '{t_title}' already active with {f['name']}!")
+            return
+        f["treaties"].append(t_title)
+        if "Vassalage" in t_title:
+            f["vassal"] = True
+            f["status"] = "Vassal Fealty 👑"
+            f["opinion"] = min(100.0, f["opinion"] + 25.0)
+        else:
+            f["opinion"] = min(100.0, f["opinion"] + 10.0)
+        print(f"🤝 Chancery Ratification: Ratified {t_title} with {f['name']}!")
+
+    def demand_diplomatic_tribute(self, faction_id: str):
+        key = faction_id.lower().strip()
+        matched = [k for k in self.factions if key in k]
+        if not matched:
+            print(f"Unknown realm '{faction_id}'. Available: {', '.join(self.factions.keys())}")
+            return
+        f_key = matched[0]
+        f = self.factions[f_key]
+        if f["vassal"] or f["opinion"] >= 20.0:
+            self.coins += 40
+            f["opinion"] -= 15.0
+            print(f"👑 Imperial Demands: {f['name']} yielded 40 Gold Coins in tribute! (Opinion -15.0 -> {f['opinion']:.1f})")
+        else:
+            f["opinion"] -= 30.0
+            print(f"⚔️ Insolence: {f['name']} defiantly refused your tribute demands! (Opinion -30.0 -> {f['opinion']:.1f})")
+
+    def declare_diplomatic_war(self, faction_id: str):
+        key = faction_id.lower().strip()
+        matched = [k for k in self.factions if key in k]
+        if not matched:
+            print(f"Unknown realm '{faction_id}'. Available: {', '.join(self.factions.keys())}")
+            return
+        f_key = matched[0]
+        f = self.factions[f_key]
+        f["vassal"] = False
+        f["treaties"].clear()
+        f["opinion"] = -100.0
+        f["status"] = "War ⚔️"
+        print(f"⚔️ HERALD PROCLAMATION: The Crown has declared total WAR upon {f['name']}! All treaties severed.")
+
     def run_cli(self):
         self.print_header()
         print("\nWelcome, Monarch! The entire Feudal Realm is assembled and awaiting your command.")
@@ -459,6 +546,11 @@ class VoxelRealmSimulator:
                 print("  proclaim <edict>  - Proclaim edict (corvee, grain, guild, militia, trade, scholar)")
                 print("  squad             - View garrison squadron status, stance, and formation")
                 print("  formation <name>  - Order formation (wall, wedge, skirmish, square)")
+                print("  diplomacy         - Open Royal Chancery & Foreign Relations (U key)")
+                print("  gift <realm> [amt]- Dispatch diplomatic tribute gift to foreign realm")
+                print("  treaty <r> <type> - Ratify treaty (non_aggression, trade, alliance, vassal)")
+                print("  tribute <realm>   - Demand feudal tribute from vassal or weaker realm")
+                print("  war <realm>       - Declare imperial war and sever all treaties")
                 print("  castle            - View Throne Room decor and active imperial realm buffs")
                 print("  install <decor>   - Install decor (throne, map, chandelier, vault, table, armor, armillary)")
                 print("  pause             - Display in-game pause menu and controls guide")
@@ -512,6 +604,30 @@ class VoxelRealmSimulator:
                     self.set_squadron_formation(args[0])
                 else:
                     print("Usage: formation <wall|wedge|skirmish|square>")
+            elif cmd in ["diplomacy", "chancery", "foreign"]:
+                self.show_diplomacy()
+            elif cmd in ["gift", "envoy"]:
+                if args:
+                    amt = int(args[1]) if len(args) > 1 and args[1].isdigit() else 15
+                    self.send_diplomatic_gift(args[0], amt)
+                else:
+                    print("Usage: gift <valoria|silvercoast|ashfell|sunken_mire> [amount]")
+            elif cmd == "treaty":
+                if args:
+                    t_type = args[1] if len(args) > 1 else "non_aggression"
+                    self.sign_diplomatic_treaty(args[0], t_type)
+                else:
+                    print("Usage: treaty <realm> <non_aggression|trade|alliance|vassal>")
+            elif cmd == "tribute":
+                if args:
+                    self.demand_diplomatic_tribute(args[0])
+                else:
+                    print("Usage: tribute <valoria|silvercoast|ashfell|sunken_mire>")
+            elif cmd == "war":
+                if args:
+                    self.declare_diplomatic_war(args[0])
+                else:
+                    print("Usage: war <valoria|silvercoast|ashfell|sunken_mire>")
             elif cmd == "install":
                 if args:
                     self.install_furnishing(args[0])
@@ -569,6 +685,16 @@ def main():
         sim.show_squadron()
         sim.set_squadron_formation("wedge")
         assert "Shock Wedge" in sim.garrison_formation
+        sim.show_diplomacy()
+        sim.send_diplomatic_gift("valoria", 20)
+        assert sim.factions["valoria"]["opinion"] > 15.0
+        sim.sign_diplomatic_treaty("valoria", "trade")
+        assert "Trade Concordat" in sim.factions["valoria"]["treaties"]
+        sim.demand_diplomatic_tribute("valoria")
+        assert sim.coins >= 140
+        sim.declare_diplomatic_war("ashfell")
+        assert sim.factions["ashfell"]["opinion"] == -100.0
+        assert sim.factions["ashfell"]["status"] == "War ⚔️"
         print("[INTERACTIVE SIMULATOR] All simulator subsystems passed verification cleanly!")
         sys.exit(0)
     sim.run_cli()
