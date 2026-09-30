@@ -1,5 +1,39 @@
 # O'zgarishlar tarixi
 
+## 2026-09-30 — Milestone 52: Royal Spymaster Court Intrigue, Espionage Shadow Network, Counter-Intelligence, and Shadow Council UI (Issue #66)
+- **Qirollik Josuslik va Saroy Fitnalari Boshqaruvi (`scripts/combat/espionage_manager.gd`)**:
+  - 3 ta ixtisoslashgan yashirin agentlar toifasi (Shadow Agents Roster):
+    - *Whispering Tavern Informant (30 oltin, kunlik 2 ta'minot)*: Shahar maydonlari, mayxonalar va chegara postlarida yashirin eshitish, past shubha ko'rsatkichi (+15% stealth).
+    - *Infiltration Sapper & Saboteur (60 oltin, kunlik 4 ta'minot)*: O't qo'yish, dushman qamal battering ramlarini yaroqsiz holga keltirish va o'q-dori omborlarini portlatish (+35% sabotage).
+    - *Shadow Courtier & Master Provocateur (120 oltin, kunlik 8 ta'minot)*: Oliy aristokratik saroylarga suqilib kirish, yolg'on shartnomalar tuzish va ilmiy yozuvlarni o'g'irlash (+45% intel).
+  - 4 ta Yashirin Fitna Operatsiyalari (Covert Intrigue Operations):
+    - *Uncover Military Invasion War Plans*: Dushman harbiy kengashiga kirib, hujum batalonlari yo'nalishi va qamal qurollarini muddatidan oldin aniqlash.
+    - *Spike Battering Rams & Burn Pitch Depots*: Dushman qamal qurollarini yaroqsiz qilib, ularning jangovar qudratini 40% ga qisqartirish va yurishni 60 soniyaga kechiktirish.
+    - *Pilfer Monastic Scriptoria Parchments*: Begona saltanatlar kutubxonalaridan yashirin qo'lyozmalarni o'g'irlab, xazinaga +120 fan va ilmiy tadqiqot ballari qo'shish.
+    - *Sow Dissidence & Bribe Border Troops*: Qo'shni viloyatlarda isyon qo'zg'ab, monarx garnizoniga +3 nafar tajribali chegara soqchilarini qabul qilish.
+  - Ichki Aksil-Josuslik va Zindon So'roqlari (Domestic Counter-Intelligence & Dungeons):
+    - Qal'a xavfsizligi reytingi (Citadel Security Rating 0-100%): har bir yangi agent bilan xavfsizlik +5% ga oshadi.
+    - Zindon hujralariga dushman qotillari va buzg'unchilarini asir olish (Capture).
+    - Zindonda so'roq qilish (Interrogation): yashirin xazinalar va fitnalarni fosh etish (+75 oltin tanga).
+    - Asirlarni elchilar orqali to'lov evaziga topshirish (Ransom: +50 oltin).
+- **Yashirin Kengash va Spymaster UI Interfeysi (`scripts/ui/espionage_ui.gd`)**:
+  - `N` tugmasi orqali ochiluvchi qulay TabContainer interfeysi:
+    - *Shadow Network*: Faol agentlar ro'yxati, tajriba ballari, holati (Ready/On Mission/Captured) va yangi agentlarni yollash paneli.
+    - *Covert Operations*: Valoriya, Ashfell va Silvercoast saltanatlariga qarshi yashirin operatsiyalarni boshlash doskasi va vaqt taymerlari.
+    - *Dungeons & Interrogations*: Qal'a xavfsizligi reytingi, ushlangan josuslar ro'yxati, so'roq qilish va to'lov olish tugmalari.
+- **Monarx Boshqaruvi va Tugmalar (`scripts/entities/player.gd`)**:
+  - `toggle_espionage_requested` signali qo'shildi, `KEY_N` tugmasiga ulandi.
+- **Markaziy Boshqaruv integratsiyasi (`scripts/core/game_manager.gd`)**:
+  - `espionage_manager` va `espionage_ui` tugunlari avtomatik initsializatsiya qilindi va o'zaro signallari ulandi.
+- **Save/Load Persistensiyasiga Integratsiya (`scripts/core/save_system.gd`)**:
+  - Barcha yollangan agentlar, davom etayotgan operatsiyalar, zindondagi asirlar va xavfsizlik reytingi SHA-256 xesh tekshiruvi bilan saqlanadi va yuklanadi.
+- **Asosiy Sahna (`scenes/main.tscn`)**:
+  - `EspionageUI` tuguni CanvasLayer ostiga ulandi (load_steps=18).
+- **Standalone Simulyator Kengaytmasi (`tools/interactive_play_simulator.py`)**:
+  - Yangi `spies`, `recruit`, `infiltrate`, `sweep`, `interrogate`, `ransom` buyruqlari.
+- **Avtomatlashgan Testlar To'plami (`tests/test_espionage_intrigue_systems.py`)**:
+  - 26 ta yangi unit test qo'shildi, butun repozitoriy testlar soni **534 taga yetkazildi (100% yashil, 0 regressions)**.
+
 ## 2026-09-30 — Milestone 51: Monastic Scholastic Scriptoria, Alchemical Transmutation Laboratory, Holy Relic Sanctuaries, and Abbey Library UI (Issue #64)
 - **Monastir Sxolastik Tadqiqotlar va Qo'lyozmalar Tizimi (`scripts/core/monastery_research_system.gd`)**:
   - 6 ta fundamental sxolastik texnologiyalar daraxti (Scriptoria Tech Tree):
