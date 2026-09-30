@@ -1,5 +1,57 @@
 # O'zgarishlar tarixi
 
+## 2026-09-30 — Milestone 51: Monastic Scholastic Scriptoria, Alchemical Transmutation Laboratory, Holy Relic Sanctuaries, and Abbey Library UI (Issue #64)
+- **Monastir Sxolastik Tadqiqotlar va Qo'lyozmalar Tizimi (`scripts/core/monastery_research_system.gd`)**:
+  - 6 ta fundamental sxolastik texnologiyalar daraxti (Scriptoria Tech Tree):
+    - *Norfolk Four-Course Agronomy Genetics*: Ekinlar o'sish tezligiga +25%, tuproq azot (N) va fosfor (P) saqlanishiga +15% unumdorlik.
+    - *Thermodynamic Blast Furnace Flux Catalysts*: Domna pechida eritish tezligiga +30%, tigel po'latidan qurollar yasash imkoni.
+    - *Gravitational Counterweight Ballistics*: Qamal qurollari shikastiga +35%, trebushet uchish masofasini 250 metrgacha kengaytirish.
+    - *Deep Subterranean Geological Surveying*: Kon shaxtalaridan noyob qimmatbaho toshlar va kumush rudasi qazib olishga +25% unum.
+    - *Imperial Artisan Guild Charters*: Hunarmandchilik partiyalari mahsuldorligiga +20%, savdo karvonlari bilan oldi-sotdi narxlariga -15% chegirma.
+    - *Gothic Monastic Vaulting & Flying Buttresses*: Binolar va tomlar sinishi chegarasiga (structural integrity load limit) +30% mustahkamlik.
+  - Monax-kotiblar (Monk Scribes) mehnat taqsimoti (0 dan 10 nafargacha), qo'lyozmalarni ko'chirib yozish orqali passiv fan ballari ishlab chiqarish.
+  - 5 ta Muqaddas Relikviyalar va Mehrhoblar (Holy Relic Sanctuaries):
+    - *Shard of the True Hearth*: Birinchi o'choq uchquni — sovuqdan to'liq immunitet, +15% iliqlik.
+    - *Crown of the First Sovereign*: Birinchi monarx toji — +25% shon-sharaf koeffitsiyenti, qo'shni davlatlar bilan +10 fikr.
+    - *Tome of St. Columba*: Muqaddas qo'lyozma — monastir tadqiqotlari tezligiga +40% ulkan jadallashuv.
+    - *Chalice of Perpetual Abundance*: Baraka kosasi — qishloq xo'jaligi hosildorligiga +20%, fuqarolar ochlik sarfiga -25% tejamkorlik.
+    - *Banner of the Holy Light*: Kumush bayroq — garnizon ruhiyatiga +20%, tungi reydlar ehtimolini -30% pasaytirish.
+  - Monastir Qasr Qo'ng'iroqlari (Abbey Liturgy Bells): Qo'ng'iroq chalinganda barcha fuqarolarga 180 soniya davomida +30% xotirjamlik va ruhiyat (serenity morale boost).
+- **Alkimyo va Transmutatsiya Laboratoriyasi (`scripts/combat/alchemy_laboratory.gd`)**:
+  - 4 ta shifobaxsh va harbiy eliksirlar distillatsiyasi (Alchemical Distillations):
+    - *Elixir of Vitality*: Monarx salomatligini bir zumda +50 HP tiklaydi.
+    - *Elixir of Iron Skin*: 60 soniya davomida jismoniy zirh himoyasiga +40% zarba qaytarish.
+    - *Elixir of the Windstrider*: 60 soniya davomida chopish tezligiga +35% va charchoqsiz harakatlanish.
+    - *Dragon's Breath Volatile Flask*: Dushman qo'shinlariga 60 ballik alanga maydoni (AOE fire damage).
+  - 3 ta Metallurgik Transmutatsiya formulalari (Crucible Transmutations):
+    - *Lead to Silver*: Oddiy tosh va ko'mirdan toza kumush rudasini ajratib olish.
+    - *Iron to Gold*: Soxta temir quymalarini sof oltin tangalarga aylantirish.
+    - *Salt into Philosopher's Catalyst*: Tosh tuzini qimmatbaho marvaridlar va aloxida reagentlarga sublimatsiya qilish.
+  - Buyuk Ish (Magnum Opus) va Falsafa Toshi bosqichlari (4 bosqich):
+    - *Nigredo (Qora erish)*: 1.0x soflik koeffitsiyenti.
+    - *Albedo (Oq tozalanish)*: 1.25x unum koeffitsiyenti.
+    - *Citrinitas (Sariq uyg'onish)*: 1.60x unum koeffitsiyenti.
+    - *Rubedo (Qizil eliksir / Magnum Opus)*: 2.20x transmutatsiya mahsuldorligi!
+  - Alembik va Retorta Harorati Termodinamikasi (har bir tajribada qizish va sovitish).
+- **Monastir va Alkimyo Kutubxonasi UI Interfeysi (`scripts/ui/monastery_ui.gd`)**:
+  - `B` tugmasi orqali ochiluvchi qulay TabContainer interfeysi:
+    - *Skriptoriy*: 6 ta ilmiy texnologiya, progress panellari va monaxlarni biriktirish.
+    - *Alkimyo*: Eliksirlar tayyorlash, metallarni aylantirish va Magnum Opus bosqichini oshirish.
+    - *Mehrhob Relikviyalari*: 3 ta muqaddas slotga relikviyalarni o'rnatish va ne'matlarini ko'rish.
+    - *Qo'ng'iroqxona*: Ibodatxona qo'ng'iroqlarini jaranglatish va butun saltanat ahlini tinchlantirish.
+- **Monarx Boshqaruvi va Tugmalar (`scripts/entities/player.gd`)**:
+  - `toggle_monastery_requested` signali qo'shildi, `KEY_B` tugmasiga ulandi.
+- **Markaziy Boshqaruv integratsiyasi (`scripts/core/game_manager.gd`)**:
+  - `monastery_research_system`, `alchemy_laboratory` va `monastery_ui` avtomatik initsializatsiya qilindi va o'zaro signallari ulandi.
+- **Save/Load Persistensiyasiga Integratsiya (`scripts/core/save_system.gd`)**:
+  - Barcha o'rganilgan texnologiyalar, mehrob relikviyalari, monaxlar, alembik harorati va Falsafa Toshi bosqichlari SHA-256 xesh tekshiruvi bilan to'liq saqlanadi va yuklanadi.
+- **Asosiy Sahna (`scenes/main.tscn`)**:
+  - `MonasteryUI` tuguni CanvasLayer ostiga ulandi (load_steps=17).
+- **Standalone Simulyator Kengaytmasi (`tools/interactive_play_simulator.py`)**:
+  - Yangi `monastery`, `research`, `brew`, `transmute`, `enshrine`, `bells`, `magnum` buyruqlari.
+- **Avtomatlashgan Testlar To'plami (`tests/test_monastery_alchemy_systems.py`)**:
+  - 26 ta yangi unit test qo'shildi, butun repozitoriy testlar soni **508 taga yetkazildi (100% yashil, 0 regressions)**.
+
 ## 2026-09-30 — Milestone 50: Grand Feudal Jousting Tournament, Chivalric Knighthood Feats, Arena Grandstand, and Grand Tournament UI (Issue #62)
 - **Feodal Ritsarlar Turniri va Chivalrik Jasoratlar Tizimi (`scripts/combat/tournament_manager.gd`)**:
   - 4 ta shohona ritsarlik musobaqasi (Knightly Tournament Disciplines):

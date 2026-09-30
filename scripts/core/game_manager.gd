@@ -44,6 +44,9 @@ var foreign_invasion_manager: ForeignInvasionManager = null
 var war_room_ui: WarRoomUI = null
 var tournament_manager: TournamentManager = null
 var tournament_ui: TournamentUI = null
+var monastery_research_system: MonasteryResearchSystem = null
+var alchemy_laboratory: AlchemyLaboratory = null
+var monastery_ui: MonasteryUI = null
 
 var supply_chain: SupplyChain
 var citizens: Array[Citizen] = []
@@ -116,6 +119,7 @@ func _ready() -> void:
 		player.toggle_diplomacy_requested.connect(_on_toggle_diplomacy)
 		player.toggle_war_room_requested.connect(_on_toggle_war_room)
 		player.toggle_tournament_requested.connect(_on_toggle_tournament)
+		player.toggle_monastery_requested.connect(_on_toggle_monastery)
 		
 		# Position player on top of surface terrain at spawn
 		var spawn_x = 32
@@ -298,6 +302,33 @@ func _ready() -> void:
 		else:
 			add_child(tournament_ui)
 	tournament_ui.setup(tournament_manager, supply_chain)
+
+	# Initialize High Scholastic Monastic Order & Scriptoria Tech Tree
+	monastery_research_system = MonasteryResearchSystem.new()
+	monastery_research_system.name = "MonasteryResearchSystem"
+	add_child(monastery_research_system)
+	monastery_research_system.research_completed.connect(_on_monastery_research_completed)
+	monastery_research_system.relic_enshrined.connect(_on_relic_enshrined)
+	monastery_research_system.abbey_bell_rung.connect(_on_abbey_bell_rung)
+
+	# Initialize Alchemical Transmutation Laboratory
+	alchemy_laboratory = AlchemyLaboratory.new()
+	alchemy_laboratory.name = "AlchemyLaboratory"
+	add_child(alchemy_laboratory)
+	alchemy_laboratory.potion_brewed.connect(_on_alchemy_potion_brewed)
+	alchemy_laboratory.metal_transmuted.connect(_on_alchemy_metal_transmuted)
+
+	# Wire up Monastery & Alchemy UI
+	monastery_ui = get_node_or_null("UI/MonasteryUI") as MonasteryUI
+	if not monastery_ui:
+		monastery_ui = MonasteryUI.new()
+		monastery_ui.name = "MonasteryUI"
+		var ui_node_mo = get_node_or_null("UI")
+		if ui_node_mo:
+			ui_node_mo.add_child(monastery_ui)
+		else:
+			add_child(monastery_ui)
+	monastery_ui.setup(monastery_research_system, alchemy_laboratory, supply_chain)
 		
 	# Spawn initial workstations, citizens, and trade caravan
 	_spawn_initial_workstations()
@@ -893,6 +924,48 @@ func _on_chivalric_title_unlocked(new_title: String, _honor: int) -> void:
 		hud.show_notification("🛡️ CHIVALRIC KNIGHTHOOD FEAT! Promoted to: %s!" % new_title)
 	if audio_manager:
 		audio_manager.play_craft_success()
+
+func _on_toggle_monastery() -> void:
+	if monastery_ui:
+		monastery_ui.toggle_monastery_ui()
+		if audio_manager:
+			audio_manager.play_ui_click()
+
+func _on_monastery_research_completed(_tech_id: String, tech_name: String) -> void:
+	if quest_manager:
+		quest_manager.record_progress("complete_research", 1)
+	if hud:
+		hud.show_notification("📜 SCHOLASTIC TRIUMPH: %s researched!" % tech_name)
+	if audio_manager:
+		audio_manager.play_craft_success()
+
+func _on_relic_enshrined(_relic_id: String, relic_name: String, slot: int) -> void:
+	if hud:
+		hud.show_notification("🏛️ CONSECRATED SACRED RELIC: %s enshrined upon Altar %d!" % [relic_name, slot + 1])
+	if audio_manager:
+		audio_manager.play_craft_success()
+
+func _on_abbey_bell_rung(_blessing_name: String) -> void:
+	for c in citizens:
+		if "morale" in c:
+			c.morale = minf(100.0, c.morale + 30.0)
+	if hud:
+		hud.show_notification("🔔 THE ABBEY BELLS TOLL! Divine peace and serenity fill the realm (+30 Morale)!")
+	if audio_manager:
+		audio_manager.play_war_horn()
+
+func _on_alchemy_potion_brewed(_potion_id: String, potion_name: String, _count: int) -> void:
+	if hud:
+		hud.show_notification("🧪 Alchemical Draught Brewed: %s!" % potion_name)
+	if audio_manager:
+		audio_manager.play_craft_success()
+
+func _on_alchemy_metal_transmuted(_formula_id: String, _input_res: String, output_res: String, output_count: int) -> void:
+	if hud:
+		hud.show_notification("🪙 ALCHEMICAL TRANSMUTATION! Created %d %s!" % [output_count, output_res.replace("_", " ").capitalize()])
+	if audio_manager:
+		audio_manager.play_craft_success()
+
 
 
 
