@@ -139,6 +139,12 @@ func save_game(slot_name: String, game_manager: Node) -> bool:
 	if fim and fim.has_method("to_dict"):
 		invasions_data = fim.to_dict()
 
+	# 10. Grand Tournament & Chivalric Knighthood Data
+	var tournament_data: Dictionary = {}
+	var tm = game_manager.get("tournament_manager")
+	if tm and tm.has_method("to_dict"):
+		tournament_data = tm.to_dict()
+
 	# Assembly of Master Payload
 	var current_time = Time.get_unix_time_from_system()
 	var payload: Dictionary = {
@@ -156,7 +162,8 @@ func save_game(slot_name: String, game_manager: Node) -> bool:
 		"decrees": decrees_data,
 		"squadron": squadron_data,
 		"diplomacy": diplomacy_data,
-		"invasions": invasions_data
+		"invasions": invasions_data,
+		"tournament": tournament_data
 	}
 
 	var json_str = JSON.stringify(payload, "\t")
@@ -273,6 +280,10 @@ func load_game(slot_name: String, game_manager: Node) -> bool:
 		var fim_load = game_manager.get("foreign_invasion_manager")
 		if fim_load and fim_load.has_method("from_dict"):
 			fim_load.from_dict(payload["invasions"])
+	if payload.has("tournament"):
+		var tm_load = game_manager.get("tournament_manager")
+		if tm_load and tm_load.has_method("from_dict"):
+			tm_load.from_dict(payload["tournament"])
 
 	load_completed.emit(slot_name, true)
 	print("[SAVE SYSTEM] Successfully loaded realm from %s on Day %s!" % [slot_name, payload.get("datetime", "Unknown")])

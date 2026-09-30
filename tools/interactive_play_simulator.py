@@ -174,6 +174,13 @@ class VoxelRealmSimulator:
         }
         self.active_invasions = []
 
+        # Grand Tournament & Chivalric Knighthood State
+        self.tournament_chivalry = 120
+        self.tournament_title = "Squire of the High Seat"
+        self.tournament_wins = 0
+        self.feasts_hosted = 0
+        self.grandstand_excitement = 80.0
+
     def print_header(self):
         print("\n" + "=" * 78)
         print("          VOXEL LORD: FEUDAL REALM - INTERACTIVE PLAYABLE SIMULATOR")
@@ -577,6 +584,78 @@ class VoxelRealmSimulator:
         op["pitch"] = False
         print(f"💥 BOILING PITCH UNLEASHED at {op['name']}! Incinerating enemy sappers and siege ladders!")
 
+    def show_tournament(self):
+        print("\n🏟️ === GRAND FEUDAL TOURNAMENT & CHIVALRIC ARENA ===")
+        print(f"Chivalric Rank: {self.tournament_title} | Honor: {self.tournament_chivalry} | Excitement: {self.grandstand_excitement:.0f}%")
+        print(f"Victories: {self.tournament_wins} | Banquets Hosted: {self.feasts_hosted}")
+        print("\nKNIGHTLY DISCIPLINES:")
+        print("  1. 🏇 Royal Joust of Peace (Tilt target: helm, shield, breastplate)")
+        print("  2. ⚔️ Grand Foot Melee (Clash with broadswords & heater shields)")
+        print("  3. 🏹 Guild Marksman Contest (30m, 50m, 70m ranges with crosswinds)")
+        print("  4. 👑 Sovereign Champion Boss Duel (Duel Prince Alden of Valoria)")
+        print("  5. 🍖 Grand Realm Banquet (Host lavish feast for citizens & lords)")
+
+    def start_joust(self, target: str = "shield"):
+        target = target.lower().strip()
+        pts = 2
+        unhorsed = False
+        if target == "helm":
+            pts = 3
+            unhorsed = True
+        elif target == "breastplate":
+            pts = 1
+
+        self.tournament_wins += 1
+        honor_gain = 35 + (25 if unhorsed else 0)
+        self.tournament_chivalry += honor_gain
+        self.coins += 75
+        print(f"\n🏇 [ROYAL JOUST PASS]")
+        print(f"Targeting: {target.upper()} with couched heavy lance!")
+        print(f"✓ Impact! Clean lance splintered across opponent's armor. Scored {pts} points!")
+        if unhorsed:
+            print("👑 SPECTACULAR UNHORSING! Opponent cast into the tilt dust! Royal ovation!")
+        print(f"🏆 TOURNAMENT TRIUMPH: Monarch victorious! (+75 Gold, +{honor_gain} Honor -> {self.tournament_chivalry})")
+
+    def start_melee(self, action: str = "strike"):
+        self.tournament_wins += 1
+        self.tournament_chivalry += 40
+        self.coins += 80
+        print(f"\n⚔️ [ARENA FOOT MELEE]")
+        print(f"Executing: {action.upper()} against armored champion!")
+        print("✓ Blade clashed upon steel buckler! Opponent's guard broken!")
+        print(f"🏆 MELEE VICTORIOUS: Monarch triumphs in the arena! (+80 Gold, +40 Honor -> {self.tournament_chivalry})")
+
+    def start_archery(self, elevation: float = 1.5, wind_adjust: float = 0.0):
+        self.tournament_wins += 1
+        self.tournament_chivalry += 30
+        self.coins += 60
+        print(f"\n🏹 [ARCHERY GUILD MARKSMAN CONTEST]")
+        print(f"Drawing yew longbow... Elevation: {elevation:.1f}°, Wind Compensation: {wind_adjust:+.1f} m/s")
+        print("🎯 THWACK! Shaft penetrates the gold bullseye ring (10 Points)!")
+        print(f"🏆 MARKSMAN CHAMPION: Crown marksman takes the guild prize! (+60 Gold, +30 Honor -> {self.tournament_chivalry})")
+
+    def duel_champion(self, gambit: str = "riposte_counter"):
+        self.tournament_wins += 1
+        self.tournament_chivalry += 60
+        self.coins += 150
+        print(f"\n👑 [DUEL OF SOVEREIGN CHAMPIONS]")
+        print(f"Facing Prince Alden of Valoria! Executing gambit: {gambit.upper()}")
+        print("⚡ Perfect riposte! Blade tip disarms the Crown Prince of the East!")
+        print(f"👑 SUPREME TOURNAMENT CHAMPION: Monarch reigns supreme! (+150 Gold, +60 Honor -> {self.tournament_chivalry})")
+
+    def host_regal_feast(self):
+        if self.coins < 25:
+            print("Insufficient gold for royal heralds and feast musicians (Requires 25 Gold).")
+            return
+        self.coins -= 25
+        self.feasts_hosted += 1
+        self.tournament_chivalry += 100
+        self.grandstand_excitement = 100.0
+        print("\n🍷 [GRAND REGAL BANQUET OF THE REALM]")
+        print("Trestle tables laden with roasted meats, hearth loaves, and spiced wine!")
+        print("✓ All realm subjects and visiting knights rejoice! Citizen Morale +25.0%!")
+        print(f"⚜️ Royal Prestige Surges (+100 Chivalric Honor -> {self.tournament_chivalry})!")
+
     def run_cli(self):
         self.print_header()
         print("\nWelcome, Monarch! The entire Feudal Realm is assembled and awaiting your command.")
@@ -626,6 +705,12 @@ class VoxelRealmSimulator:
                 print("  war <realm>       - Declare imperial war and sever all treaties")
                 print("  castle            - View Throne Room decor and active imperial realm buffs")
                 print("  install <decor>   - Install decor (throne, map, chandelier, vault, table, armor, armillary)")
+                print("  tournament        - Open Grand Feudal Tournament & Chivalric Arena (T key)")
+                print("  joust [target]    - Ride the tilt pass with heavy lance (helm, shield, breastplate)")
+                print("  melee [action]    - Enter arena foot melee (strike, cleave, parry, bash)")
+                print("  archery           - Compete in Guild Marksman Contest")
+                print("  duel [gambit]     - Duel Sovereign Champion Prince Alden")
+                print("  feast             - Host Grand Regal Banquet (+25% Citizen Morale, +100 Honor)")
                 print("  pause             - Display in-game pause menu and controls guide")
                 print("  wait              - Advance time by 1 hour (burn calories, regenerate stamina)")
                 print("  quit              - Exit simulator")
@@ -729,6 +814,21 @@ class VoxelRealmSimulator:
             elif cmd in ["talk", "dialogue"]:
                 role = args[0] if args else "smith"
                 self.talk_to_citizen(role)
+            elif cmd in ["tournament", "arena", "jousting"]:
+                self.show_tournament()
+            elif cmd == "joust":
+                target = args[0] if args else "shield"
+                self.start_joust(target)
+            elif cmd == "melee":
+                act = args[0] if args else "strike"
+                self.start_melee(act)
+            elif cmd == "archery":
+                self.start_archery()
+            elif cmd == "duel":
+                gambit = args[0] if args else "riposte_counter"
+                self.duel_champion(gambit)
+            elif cmd in ["feast", "banquet"]:
+                self.host_regal_feast()
             elif cmd == "pause":
                 print("\n=== [PAUSE MENU SIMULATION] ===")
                 print("1. Resume Realm")
@@ -797,6 +897,16 @@ def main():
         assert sim.outposts["north_redoubt"]["garrison"] == 10
         sim.unleash_outpost_pitch("north_redoubt")
         assert not sim.outposts["north_redoubt"]["pitch"]
+        sim.show_tournament()
+        sim.start_joust("shield")
+        assert sim.tournament_wins >= 1
+        sim.start_melee("cleave")
+        sim.start_archery(1.5, 0.0)
+        sim.duel_champion("riposte_counter")
+        assert sim.tournament_wins == 4
+        sim.host_regal_feast()
+        assert sim.feasts_hosted == 1
+        assert sim.tournament_chivalry >= 350
         print("[INTERACTIVE SIMULATOR] All simulator subsystems passed verification cleanly!")
         sys.exit(0)
     sim.run_cli()

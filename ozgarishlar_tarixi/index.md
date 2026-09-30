@@ -1,5 +1,38 @@
 # O'zgarishlar tarixi
 
+## 2026-09-30 — Milestone 50: Grand Feudal Jousting Tournament, Chivalric Knighthood Feats, Arena Grandstand, and Grand Tournament UI (Issue #62)
+- **Feodal Ritsarlar Turniri va Chivalrik Jasoratlar Tizimi (`scripts/combat/tournament_manager.gd`)**:
+  - 4 ta shohona ritsarlik musobaqasi (Knightly Tournament Disciplines):
+    - *Royal Joust of Peace (Nayzalar To'qnashuvi)*: Ritsarlar o'rtasida otda nayza bilan yugurish, 3 ta nishon zonasi (Dubulg'a - xavfli lekin 3 ball va egaridan ag'darish imkoni; Qalqon - ishonchli 2 ball va nayza sinishi; Ko'krak sovuti - 1 ball), zarba vaqti (timing factor 0.3-1.0), 3 ta yugurish davri.
+    - *Grand Foot Melee (Piyoda Ritsarlar Jangi)*: Loy arenada og'ir qilichlar, sekiralar va geraldik qalqonlar bilan jang (Zarbalar: Standard Strike, Heavy Cleave, Parry & Deflect, Shield Bash), chidamlilik va HP nazorati.
+    - *Archery Guild Marksman Contest (Merganlar Gildiyasi Musobaqasi)*: 30m, 50m va 70m masofalardan turib otish, shamol yo'nalishi va tezligini (-5.0 dan +5.0 m/s) kompensatsiya qilish, o'q nishon doiralari (Markaz/Bullseye 10 ball, Ichki doira 7 ball, O'rta doira 5 ball, Tashqi doira 2 ball).
+    - *Duel of Sovereign Champions (Saltanat Oliy Chempionlari Duelo)*: Valoriya valiahd shahzodasi Prince Alden bilan boss jang, taktik gambitlar (Feint & Thrust, Riposte Counter, Defensive Guard), 150 oltin va 60 shon-sharaf mukofoti.
+  - 5 ta afsonaviy chempion botlar (AI Champions Roster): *Sir Roland the Ironclad*, *Lady Gwendolyn the Swift*, *Lord Valerie the Falcon*, *Brother Bartholomew the Steadfast*, *Prince Alden of Valoria*.
+  - Ritsarlik Shon-Sharafi va Darajalari (Chivalric Knighthood Feats):
+    - *Page of the Realm* (0 shon-sharaf).
+    - *Squire of the High Seat* (100 shon-sharaf).
+    - *Knight of the Gilded Spur* (250 shon-sharaf).
+    - *Knight Banneret of the Crown* (500 shon-sharaf).
+    - *Grandmaster of Chivalry & Sovereign Defender* (1000 shon-sharaf).
+  - Arena Tribuna Tikish Tizimi (Grandstand Wagers): Chempionlar yoki monarxga 10, 25, 50 oltin tikish, koeffitsiyentlar (1.5x - 2.5x), g'alaba qozonilganda xazinaga yutuqlarni to'lash.
+  - Buyuk Feodal Ziyofati (Grand Regal Banquet): 15 non va 25 oltin sarflab saltanat ahlini shohona dasturxonga chaqirish, barcha fuqarolarga +25% ruhiyat (morale), +100 shon-sharaf va bayramona kayfiyat.
+- **Grand Tournament UI Interfeysi (`scripts/ui/tournament_ui.gd`)**:
+  - `T` tugmasi orqali ochiluvchi shohona Turnir va Arena interfeysi.
+  - 5 ta qulay bo'lim: Nayzadorlik, Piyoda Jang, Kamonchilik, Chempion Duelo, Tikishlar va Shohona Ziyofat.
+  - Nayza nishoni va vaqtini sozlash, kamon balandligi va shamol burchagini to'g'irlash slayderlari, jang harakatlari tugmalari.
+- **Monarx Boshqaruvi va Tugmalar (`scripts/entities/player.gd`)**:
+  - `toggle_tournament_requested` signali qo'shildi, `KEY_T` tugmasiga ulandi.
+- **Markaziy Boshqaruv integratsiyasi (`scripts/core/game_manager.gd`)**:
+  - `tournament_manager` va `tournament_ui` tugunlari initsializatsiya qilindi, g'alabalar va ziyofat fuqarolar ruhiyatiga ulandi.
+- **Save/Load Persistensiyasiga Integratsiya (`scripts/core/save_system.gd`)**:
+  - Barcha shon-sharaf ballari, unvonlar, g'alabalar va ziyofatlar soni SHA-256 xesh tekshiruvi bilan saqlanadi va yuklanadi.
+- **Asosiy Sahna (`scenes/main.tscn`)**:
+  - `TournamentUI` tuguni CanvasLayer ostiga ulandi (load_steps=16).
+- **Standalone Simulyator Kengaytmasi (`tools/interactive_play_simulator.py`)**:
+  - Yangi `tournament`, `joust`, `melee`, `archery`, `duel`, `feast` buyruqlari.
+- **Avtomatlashgan Testlar To'plami (`tests/test_tournament_jousting_systems.py`)**:
+  - 27 ta yangi unit test qo'shildi, butun repozitoriy testlar soni **482 taga yetkazildi (100% yashil, 0 regressions)**.
+
 ## 2026-09-30 — Milestone 49: Feudal Foreign Invasions, Siege Breaching Engine, Border Outpost Fortifications, and Kingdom War Room UI (Issue #60)
 - **Tashqi Davlatlar Hujumi va Qamal Muhandisligi Tizimi (`scripts/combat/foreign_invasion_manager.gd`)**:
   - Diplomatik munosabatlar URUSH holatiga tushganda qo'shni saltanatlarning muntazam hujum batalonlari yurishi boshlanadi:

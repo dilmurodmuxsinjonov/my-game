@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3 uid="uid://c6v2x8y3k8lm0"]
+[gd_scene load_steps=16 format=3 uid="uid://c6v2x8y3k8lm0"]
 
 [ext_resource type="Script" path="res://scripts/core/game_manager.gd" id="1_gm"]
 [ext_resource type="Script" path="res://scripts/core/voxel_world.gd" id="2_vw"]
@@ -13,6 +13,7 @@
 [ext_resource type="Script" path="res://scripts/ui/decrees_command_ui.gd" id="11_dc"]
 [ext_resource type="Script" path="res://scripts/ui/diplomacy_ui.gd" id="12_du"]
 [ext_resource type="Script" path="res://scripts/ui/war_room_ui.gd" id="13_wu"]
+[ext_resource type="Script" path="res://scripts/ui/tournament_ui.gd" id="14_tu"]
 
 [sub_resource type="Environment" id="Environment_sky"]
 background_mode = 1
@@ -137,4 +138,15 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("13_wu")
+
+[node name="TournamentUI" type="Control" parent="UI"]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("14_tu")
+
 

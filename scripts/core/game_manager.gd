@@ -42,6 +42,8 @@ var diplomacy_system: DiplomacySystem = null
 var diplomacy_ui: DiplomacyUI = null
 var foreign_invasion_manager: ForeignInvasionManager = null
 var war_room_ui: WarRoomUI = null
+var tournament_manager: TournamentManager = null
+var tournament_ui: TournamentUI = null
 
 var supply_chain: SupplyChain
 var citizens: Array[Citizen] = []
@@ -113,6 +115,7 @@ func _ready() -> void:
 		player.toggle_decrees_requested.connect(_on_toggle_decrees)
 		player.toggle_diplomacy_requested.connect(_on_toggle_diplomacy)
 		player.toggle_war_room_requested.connect(_on_toggle_war_room)
+		player.toggle_tournament_requested.connect(_on_toggle_tournament)
 		
 		# Position player on top of surface terrain at spawn
 		var spawn_x = 32
@@ -275,6 +278,26 @@ func _ready() -> void:
 			add_child(war_room_ui)
 	war_room_ui.setup(foreign_invasion_manager, squadron_command, supply_chain)
 	war_room_ui.rally_alarm_requested.connect(_on_war_horn_sounded)
+
+	# Initialize Grand Feudal Tournament & Chivalric Knighthood System
+	tournament_manager = TournamentManager.new()
+	tournament_manager.name = "TournamentManager"
+	add_child(tournament_manager)
+	tournament_manager.tournament_victorious.connect(_on_tournament_victorious)
+	tournament_manager.grand_feast_hosted.connect(_on_grand_feast_hosted)
+	tournament_manager.chivalric_title_unlocked.connect(_on_chivalric_title_unlocked)
+
+	# Wire up Grand Tournament UI
+	tournament_ui = get_node_or_null("UI/TournamentUI") as TournamentUI
+	if not tournament_ui:
+		tournament_ui = TournamentUI.new()
+		tournament_ui.name = "TournamentUI"
+		var ui_node_tr = get_node_or_null("UI")
+		if ui_node_tr:
+			ui_node_tr.add_child(tournament_ui)
+		else:
+			add_child(tournament_ui)
+	tournament_ui.setup(tournament_manager, supply_chain)
 		
 	# Spawn initial workstations, citizens, and trade caravan
 	_spawn_initial_workstations()
@@ -833,5 +856,43 @@ func _on_battalion_routed(_battalion_id: String, casualties: int) -> void:
 		hud.show_notification("⚔️ VICTORY! Hostile invasion battalion routed (%d casualties inflicted)!" % casualties)
 	if audio_manager:
 		audio_manager.play_craft_success()
+
+func _on_toggle_tournament() -> void:
+	if tournament_ui:
+		tournament_ui.toggle_tournament_ui()
+		if audio_manager:
+			audio_manager.play_ui_click()
+
+func _on_tournament_victorious(discipline: String, victor: String, prize_gold: int, honor_awarded: int) -> void:
+	if victor == "Monarch":
+		if supply_chain:
+			supply_chain.add_resource("gold_coins", prize_gold)
+		if quest_manager:
+			quest_manager.record_progress("win_tournament", 1)
+		if hud:
+			hud.show_notification("🏆 TOURNAMENT TRIUMPH! Victorious in %s (+%d Gold, +%d Honor)!" % [discipline.capitalize(), prize_gold, honor_awarded])
+		if audio_manager:
+			audio_manager.play_craft_success()
+	else:
+		if hud:
+			hud.show_notification("⚔️ Match Concluded: %s claimed victory in %s." % [victor, discipline.capitalize()])
+
+func _on_grand_feast_hosted(morale_boost: float, guests_count: int) -> void:
+	for c in citizens:
+		if "morale" in c:
+			c.morale = minf(100.0, c.morale + morale_boost)
+	if quest_manager:
+		quest_manager.record_progress("host_grand_feast", 1)
+	if hud:
+		hud.show_notification("🍷 ROYAL FEAST PROCLAIMED! %d subjects celebrated (+%.0f Morale)!" % [guests_count, morale_boost])
+	if audio_manager:
+		audio_manager.play_craft_success()
+
+func _on_chivalric_title_unlocked(new_title: String, _honor: int) -> void:
+	if hud:
+		hud.show_notification("🛡️ CHIVALRIC KNIGHTHOOD FEAT! Promoted to: %s!" % new_title)
+	if audio_manager:
+		audio_manager.play_craft_success()
+
 
 
