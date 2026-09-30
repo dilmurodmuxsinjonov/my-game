@@ -1,5 +1,31 @@
 # O'zgarishlar tarixi
 
+## 2026-09-30 — Milestone 49: Feudal Foreign Invasions, Siege Breaching Engine, Border Outpost Fortifications, and Kingdom War Room UI (Issue #60)
+- **Tashqi Davlatlar Hujumi va Qamal Muhandisligi Tizimi (`scripts/combat/foreign_invasion_manager.gd`)**:
+  - Diplomatik munosabatlar URUSH holatiga tushganda qo'shni saltanatlarning muntazam hujum batalonlari yurishi boshlanadi:
+    - *Valorian Vanguard Knights*: Zirhli og'ir ritsarlar, qamal devorlarini buzuvchi battering ram (zarba multiplikatori 1.6x), yuqori jangovar qudrat (180 pwr).
+    - *Ashfell Berserkers & Wolf-Raiders*: Shiddatli hujumkor jangchilar, portlovchi qamal bochkalari (explosive kegs), tezkor qamal yurishi.
+    - *Silvercoast Mercenary Arbalests*: Paviza qalqonli professional o'qchilar, og'ir arbaletlar va ballista qurilmalari.
+  - 4 ta strategik chegara istehkomi (Strategic Frontier Outposts):
+    - *Northern Vanguard Redoubt* (Citadel okrugi, 150 HP, 4 soqchi, qaynoq smola qozoni).
+    - *Eastern Coastline Watchtower* (Harbor okrugi, 120 HP, 3 soqchi).
+    - *Western Highlands Bastion* (Mining okrugi, 140 HP, 3 soqchi, qaynoq smola qozoni).
+    - *Southern Frontier Palisade Gate* (Wilderness okrugi, 100 HP, 2 soqchi).
+  - Qamal va Devorlarni Buzish (Siege Breaching): Dushman askarlari va qamal qurollari istehkom devorlariga zarba beradi, 0 HP ga tushganda "Breached & Fallen 💀" holatiga o'tadi.
+  - Qaynoq Smola Qozonlari (Boiling Pitch Cauldrons): 5 ta ko'mir sarflab qizdiriladi va qamal qatnashchilariga 65 AOE olovli halokatli zarba beradi.
+  - Favqulodda Dehqonlar Ko'ngillilar Ligasini To'plash (Peasant Levy): 15 non va 8 temir sarflab chegara qal'asiga +4 jangchi qo'shish.
+- **Qirollik Harbiy Kengash Xonasi va Strategik Xarita UI (`scripts/ui/war_room_ui.gd`)**:
+  - `M` tugmasi orqali ochiluvchi interaktiv Harbiy Kengash Xaritasi (War Room Map).
+  - 4 ta chegara istehkomining tiriklik ko'rsatkichlari (HP), garnizon askarlari soni va smola qurollari holati.
+  - Yaqinlashib kelayotgan dushman batalonlari ro'yxati, yurish progressi va boshliqlarining dosyesi.
+  - Tezkor taktik amallar: soqchilarni jo'natish, ko'ngillilar legiyasini tuzish, qaynoq smolani quyish va butun saltanat bo'ylab `H` karnayini chalish.
+- **Save/Load Persistensiyasiga Integratsiya (`scripts/core/save_system.gd`)**:
+  - Barcha chegara istehkomlari salomatligi, garnizonlari, faol batalonlar holati SHA-256 xesh tekshiruvi bilan saqlanadi va yuklanadi.
+- **Standalone Simulyator Kengaytmasi (`tools/interactive_play_simulator.py`)**:
+  - Yangi `war_room`, `invade`, `reinforce`, `militia`, `pitch` buyruqlari.
+- **Avtomatlashgan Testlar To'plami (`tests/test_invasion_war_room_systems.py`)**:
+  - 26 ta yangi test qo'shildi, repozitoriy testlari soni **455 taga yetkazildi (100% yashil, 0 regressions)**.
+
 ## 2026-09-30 — Milestone 48: Kingdom Diplomacy, Vassal Tributes, Emissary Caravans, and Feudal Treaties UI (Issue #58)
 - **Tashqi Siyosat va Realmlararo Diplomatiya Tizimi (`scripts/core/diplomacy_system.gd`)**:
   - 4 ta mustaqil qo'shni feodal davlatlar:

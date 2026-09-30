@@ -165,6 +165,15 @@ class VoxelRealmSimulator:
             "sunken_mire": {"name": "Barony of the Sunken Mire", "ruler": "Baroness Elspeth", "opinion": 0.0, "status": "Neutral ⚖️", "vassal": False, "treaties": []},
         }
 
+        # Frontier Strategic Outposts & Invasion State
+        self.outposts = {
+            "north_redoubt": {"name": "Northern Vanguard Redoubt", "health": 150.0, "max_health": 150.0, "garrison": 4, "pitch": True, "status": "Defended 🛡️"},
+            "east_watch": {"name": "Eastern Coastline Watchtower", "health": 120.0, "max_health": 120.0, "garrison": 3, "pitch": False, "status": "Defended 🛡️"},
+            "west_bastion": {"name": "Western Highlands Bastion", "health": 140.0, "max_health": 140.0, "garrison": 3, "pitch": True, "status": "Defended 🛡️"},
+            "south_gate": {"name": "Southern Frontier Palisade Gate", "health": 100.0, "max_health": 100.0, "garrison": 2, "pitch": False, "status": "Defended 🛡️"},
+        }
+        self.active_invasions = []
+
     def print_header(self):
         print("\n" + "=" * 78)
         print("          VOXEL LORD: FEUDAL REALM - INTERACTIVE PLAYABLE SIMULATOR")
@@ -504,6 +513,70 @@ class VoxelRealmSimulator:
         f["status"] = "War ⚔️"
         print(f"⚔️ HERALD PROCLAMATION: The Crown has declared total WAR upon {f['name']}! All treaties severed.")
 
+    def show_war_room(self):
+        print("\n⚔️ === ROYAL WAR ROOM & STRATEGIC REALM DEFENSE MAP ===")
+        print("FRONTIER REDOUBTS & OUTPOSTS:")
+        for op_id, op in self.outposts.items():
+            pitch_str = " | Pitch: Armed 🔥" if op["pitch"] else ""
+            print(f"  • {op['name']} [HP: {op['health']:.0f}/{op['max_health']:.0f}] - Garrison: {op['garrison']} guards{pitch_str}")
+            print(f"    Status: {op['status']}")
+
+        print("\nMARCHING INVASION BATTALIONS:")
+        if not self.active_invasions:
+            print("  ✓ No active hostile battalions reported on realm borders.")
+        else:
+            for b in self.active_invasions:
+                print(f"  • {b['leader']} ({b['faction']}) - {b['troops']} troops [Siege: {b['siege']}] -> Marching on {b['target']} (Progress: {b['progress']*100:.0f}%)")
+
+    def trigger_test_invasion(self, faction_id: str = "ashfell"):
+        target = "north_redoubt"
+        leader = "Warlord Torvold Ironfang" if "ash" in faction_id else "Knight Commander Valen"
+        troops = 16
+        siege = "battering_ram"
+        self.active_invasions.append({
+            "leader": leader,
+            "faction": faction_id.capitalize(),
+            "troops": troops,
+            "siege": siege,
+            "target": target,
+            "progress": 0.35
+        })
+        self.outposts[target]["status"] = "Hostiles Approaching ⚠️"
+        print(f"🚨 WAR ALARM: Hostile battalion led by {leader} sighted marching on {self.outposts[target]['name']}!")
+
+    def reinforce_outpost(self, outpost_id: str, guards: int = 2):
+        key = outpost_id.lower().strip()
+        matched = [k for k in self.outposts if key in k]
+        if not matched:
+            print(f"Unknown outpost '{outpost_id}'. Options: {', '.join(self.outposts.keys())}")
+            return
+        op = self.outposts[matched[0]]
+        op["garrison"] += guards
+        print(f"🛡️ Strategic Reinforcement: Dispatched +{guards} Royal Guards to {op['name']} (Garrison: {op['garrison']})")
+
+    def muster_outpost_militia(self, outpost_id: str):
+        key = outpost_id.lower().strip()
+        matched = [k for k in self.outposts if key in k]
+        if not matched:
+            print(f"Unknown outpost '{outpost_id}'. Options: {', '.join(self.outposts.keys())}")
+            return
+        op = self.outposts[matched[0]]
+        op["garrison"] += 4
+        print(f"🌾 Peasant Levy: Mustered +4 Militiamen to {op['name']}! (Garrison: {op['garrison']})")
+
+    def unleash_outpost_pitch(self, outpost_id: str):
+        key = outpost_id.lower().strip()
+        matched = [k for k in self.outposts if key in k]
+        if not matched:
+            print(f"Unknown outpost '{outpost_id}'. Options: {', '.join(self.outposts.keys())}")
+            return
+        op = self.outposts[matched[0]]
+        if not op["pitch"]:
+            print(f"No armed pitch cauldron ready at {op['name']}.")
+            return
+        op["pitch"] = False
+        print(f"💥 BOILING PITCH UNLEASHED at {op['name']}! Incinerating enemy sappers and siege ladders!")
+
     def run_cli(self):
         self.print_header()
         print("\nWelcome, Monarch! The entire Feudal Realm is assembled and awaiting your command.")
@@ -628,6 +701,26 @@ class VoxelRealmSimulator:
                     self.declare_diplomatic_war(args[0])
                 else:
                     print("Usage: war <valoria|silvercoast|ashfell|sunken_mire>")
+            elif cmd in ["warroom", "war_room", "outposts", "defense"]:
+                self.show_war_room()
+            elif cmd == "invade":
+                fac = args[0] if args else "ashfell"
+                self.trigger_test_invasion(fac)
+            elif cmd == "reinforce":
+                if args:
+                    self.reinforce_outpost(args[0])
+                else:
+                    print("Usage: reinforce <north|east|west|south>")
+            elif cmd == "militia":
+                if args:
+                    self.muster_outpost_militia(args[0])
+                else:
+                    print("Usage: militia <north|east|west|south>")
+            elif cmd == "pitch":
+                if args:
+                    self.unleash_outpost_pitch(args[0])
+                else:
+                    print("Usage: pitch <north|west>")
             elif cmd == "install":
                 if args:
                     self.install_furnishing(args[0])
@@ -695,6 +788,15 @@ def main():
         sim.declare_diplomatic_war("ashfell")
         assert sim.factions["ashfell"]["opinion"] == -100.0
         assert sim.factions["ashfell"]["status"] == "War ⚔️"
+        sim.show_war_room()
+        sim.trigger_test_invasion("ashfell")
+        assert len(sim.active_invasions) == 1
+        sim.reinforce_outpost("north_redoubt", 2)
+        assert sim.outposts["north_redoubt"]["garrison"] == 6
+        sim.muster_outpost_militia("north_redoubt")
+        assert sim.outposts["north_redoubt"]["garrison"] == 10
+        sim.unleash_outpost_pitch("north_redoubt")
+        assert not sim.outposts["north_redoubt"]["pitch"]
         print("[INTERACTIVE SIMULATOR] All simulator subsystems passed verification cleanly!")
         sys.exit(0)
     sim.run_cli()
