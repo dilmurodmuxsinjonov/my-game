@@ -1,5 +1,36 @@
 # O'zgarishlar tarixi
 
+## 2026-09-30 — Milestone 48: Kingdom Diplomacy, Vassal Tributes, Emissary Caravans, and Feudal Treaties UI (Issue #58)
+- **Tashqi Siyosat va Realmlararo Diplomatiya Tizimi (`scripts/core/diplomacy_system.gd`)**:
+  - 4 ta mustaqil qo'shni feodal davlatlar:
+    - *Duchy of Valoria* (Valoriya Gersogligi): Harbiy ritsarlik davlati, hukmdor Buyuk Gersog Alden IV, qurol-yarog' va temir eksport qiladi, g'alla va oziq-ovqat talab qiladi.
+    - *Silvercoast Trade League* (Kumush Qirg'oq Savdo Ligasi): Dengiz savdogarlari federatsiyasi, hukmdor Oliy Doj Lorentso, oltin tangalar va vino eksport qiladi, yog'och va qurilish xomashyosi talab qiladi.
+    - *Ashfell Mountain Clans* (Kul Cho'qqisi Tog' Klanlari): Shiddatli bosqinchi jangchilar ittifoqi, dohiy Torvold Temirjag', tog' jinslari va temir ma'danlari eksport qiladi, pivo va oziq-ovqat talab qiladi.
+    - *Barony of the Sunken Mire* (Botqoqlik Baronligi): Chetlashgan agrar va tabobat davlati, baronessa Elspet, dorivor giyohlar va malhamlar eksport qiladi, asbob-uskuna va mehnat qurollari talab qiladi.
+  - 6 xil diplomatik maqom (Relationship Status):
+    - *Urush (WAR)*: Fikr <= -40 (Chegara to'qnashuvlari, embargo, elchilar quvilishi).
+    - *Dushmanona (HOSTILE)*: -40 < Fikr <= -10 (Tense, savdo yopiq).
+    - *Neytral (NEUTRAL)*: -10 < Fikr <= +29 (Boshlang'ich munosabatlar).
+    - *Do'stona (FRIENDLY)*: +30 <= Fikr <= +69 (Ochiq savdo, sovg'alar samarasi yuqori).
+    - *Ittifoqdosh (ALLIED)*: +70 <= Fikr <= +90 (Mudofaa ligasi, qo'shma mudofaa).
+    - *Vassallik Qasamyodi (VASSAL FEALTY)*: +91+ yoki qasamyod qilingan (Muntazam o'lpon to'lash).
+- **Feodal Shartnomalar va O'lpon (Tribute) Tizimi**:
+  - *Non-Aggression Pact* (Hujum qilmaslik pakti, 300 soniya muddat, 25 oltin).
+  - *Trade Concordat* (Erkin savdo konsordiumi, +15% savdo bonusi, passiv fikr o'sishi, 45 oltin).
+  - *Defensive Military League* (Mudofaa harbiy ligasi, hujum paytida ko'makchi qo'shin, 80 oltin).
+  - *Vassalage Fealty Charter* (Doimiy vassallik xartiyasi, 150 oltin, har 80-100 soniyada xazinaga va omborga o'lpon yetkazib berish).
+  - *Favqulodda O'lpon Talab Qilish*: Kuchli armiya orqali boshqa davlatlarni o'lpon berishga majburlash yoki vassallardan muntazam soliq undirish.
+  - *Urush E'lon Qilish va Tinchlik Sulhi*: Urush holatida barcha shartnomalar bekor qilinadi, fikr -100 ga tushadi; harbiy tovon (indemnity) to'lash orqali tinchlikka erishish.
+- **Qirollik Kanselyariyasi va Diplomatiya UI Menyusi (`scripts/ui/diplomacy_ui.gd`)**:
+  - `U` tugmasi orqali ochiluvchi shohona Kanselyariya interfeysi.
+  - 4 ta davlatning gerbi, hukmdori, harbiy va iqtisodiy qudrati, mavjud shartnomalari va diplomatik amallari (Sovg'a yuborish, Shartnoma imzolash, O'lpon talab qilish, Urush e'lon qilish).
+- **Save/Load Persistensiyasiga Integratsiya (`scripts/core/save_system.gd`)**:
+  - Barcha davlatlar fikrlari, faol shartnomalar, qolgan muddatlar va vassal o'lpon taymerlari SHA-256 xesh tekshiruvi bilan saqlanadi va tiklanadi.
+- **Standalone Simulyator Kengaytmasi (`tools/interactive_play_simulator.py`)**:
+  - Yangi `diplomacy`, `gift`, `treaty`, `tribute`, `war` interaktiv buyruqlari.
+- **Avtomatlashgan Testlar To'plami (`tests/test_diplomacy_vassal_systems.py`)**:
+  - 28 ta yangi unit test qo'shildi, repozitoriy testlari soni **429 taga yetkazildi (100% yashil)**.
+
 ## 2026-09-30 — Milestone 47: Monarch Imperial Decrees, Tactical Garrison Squadron Command, and Royal Decrees UI (Issue #56)
 - **Monarx Imperatorlik Farmonlari va Edictlar Tizimi (`scripts/core/royal_decrees.gd`)**:
   - 6 ta tarixiy qirollik farmoni va qonuniy kodekslar:

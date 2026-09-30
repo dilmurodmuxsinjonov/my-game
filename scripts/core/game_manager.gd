@@ -38,6 +38,8 @@ var heraldry_ui: HeraldryCustomizerUI = null
 var royal_decrees: RoyalDecrees = null
 var squadron_command: SquadronCommand = null
 var decrees_ui: DecreesCommandUI = null
+var diplomacy_system: DiplomacySystem = null
+var diplomacy_ui: DiplomacyUI = null
 
 var supply_chain: SupplyChain
 var citizens: Array[Citizen] = []
@@ -107,6 +109,7 @@ func _ready() -> void:
 		player.toggle_journal_requested.connect(_on_toggle_journal)
 		player.toggle_heraldry_requested.connect(_on_toggle_heraldry)
 		player.toggle_decrees_requested.connect(_on_toggle_decrees)
+		player.toggle_diplomacy_requested.connect(_on_toggle_diplomacy)
 		
 		# Position player on top of surface terrain at spawn
 		var spawn_x = 32
@@ -228,6 +231,25 @@ func _ready() -> void:
 			add_child(decrees_ui)
 	decrees_ui.setup(royal_decrees, squadron_command, supply_chain, quest_manager)
 	decrees_ui.rally_requested.connect(_on_squad_rally_requested)
+
+	# Initialize Foreign Diplomacy & Vassalage System
+	diplomacy_system = DiplomacySystem.new()
+	diplomacy_system.name = "DiplomacySystem"
+	add_child(diplomacy_system)
+	diplomacy_system.tribute_received.connect(_on_vassal_tribute_received)
+	diplomacy_system.war_declared.connect(_on_diplomatic_war_declared)
+
+	# Wire up Chancery UI
+	diplomacy_ui = get_node_or_null("UI/DiplomacyUI") as DiplomacyUI
+	if not diplomacy_ui:
+		diplomacy_ui = DiplomacyUI.new()
+		diplomacy_ui.name = "DiplomacyUI"
+		var ui_node_dip = get_node_or_null("UI")
+		if ui_node_dip:
+			ui_node_dip.add_child(diplomacy_ui)
+		else:
+			add_child(diplomacy_ui)
+	diplomacy_ui.setup(diplomacy_system, supply_chain)
 		
 	# Spawn initial workstations, citizens, and trade caravan
 	_spawn_initial_workstations()
@@ -357,6 +379,10 @@ func _process(delta: float) -> void:
 	# Update Royal Decrees timers
 	if royal_decrees:
 		royal_decrees.update_timers(delta)
+
+	# Update Foreign Diplomacy & Vassal Tributes
+	if diplomacy_system:
+		diplomacy_system.process_diplomacy(delta, supply_chain)
 
 	# Thermal climate & seasonal updates
 	if season_manager:
@@ -725,5 +751,27 @@ func _on_squad_rally_requested() -> void:
 			hud.show_notification("📯 Rallied %d Garrison Guards to Monarch!" % count)
 		if audio_manager:
 			audio_manager.play_war_horn()
+
+func _on_toggle_diplomacy() -> void:
+	if diplomacy_ui:
+		diplomacy_ui.toggle_chancery()
+		if audio_manager:
+			audio_manager.play_ui_click()
+
+func _on_vassal_tribute_received(faction_id: String, _resources: Dictionary) -> void:
+	if hud and diplomacy_system:
+		var f = diplomacy_system.get_faction(faction_id)
+		var fname = f.get("name", faction_id)
+		hud.show_notification("👑 Vassal Tribute received from %s!" % fname)
+	if audio_manager:
+		audio_manager.play_craft_success()
+
+func _on_diplomatic_war_declared(faction_id: String, _aggressor: bool) -> void:
+	if hud and diplomacy_system:
+		var f = diplomacy_system.get_faction(faction_id)
+		var fname = f.get("name", faction_id)
+		hud.show_notification("⚔️ WAR DECLARED! %s is now an enemy of the realm!" % fname)
+	if audio_manager:
+		audio_manager.play_war_horn()
 
 
