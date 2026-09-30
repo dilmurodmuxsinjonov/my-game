@@ -204,6 +204,34 @@ class VoxelRealmSimulator:
         self.citadel_security = 65.0
         self.plots_thwarted = 0
 
+        # Feudal Economy, Granary Stockpile & Market Caravan State (Milestone 54)
+        self.stockpile = {
+            "wheat": 40, "flour": 15, "bread": 50, "meat": 20, "cabbage": 15, "onion": 10, "carrot": 10,
+            "sliced_cabbage": 0, "minced_beef": 0, "diced_onion": 0, "cabbage_stew": 0, "shepherd_pie": 0,
+            "rock_salt": 15, "cured_meat": 5, "smoked_meat": 5, "logs": 35, "planks": 20, "stone": 30,
+            "coal": 20, "iron_ore": 12, "copper_ore": 8, "crushed_iron": 0, "crushed_copper": 0,
+            "iron_ingots": 6, "copper_ingot": 0, "steel_ingot": 4, "tools": 10, "weapons": 6,
+            "tin_ore": 4, "tin_ingot": 0, "bronze_ingot": 0, "ceramic_mold": 2, "cast_bronze_blade": 0,
+            "cast_bronze_pickaxe": 0, "raw_wool": 12, "woolen_tunic": 2, "honeycomb": 8, "beeswax": 6,
+            "honey_mead": 2, "beeswax_candle": 4, "iron_bloom": 2, "wrought_iron_ingot": 4
+        }
+        self.quotas = {"bread": 50, "tools": 10, "weapons": 6, "iron_ingots": 20, "steel_ingot": 8}
+        self.quota_modes = {"bread": "until_x", "tools": "until_x", "weapons": "until_x", "iron_ingots": "continuous", "steel_ingot": "until_x"}
+        self.market_caravan = {
+            "active": True,
+            "guild": "Silvercoast Mercantile League",
+            "caravan_master": "Merchant Lord Cassian",
+            "base_prices": {
+                "wheat": 2.0, "flour": 3.5, "bread": 4.5, "meat": 5.0, "cabbage": 2.5, "onion": 2.0,
+                "cured_meat": 8.5, "smoked_meat": 8.0, "cabbage_stew": 6.5, "shepherd_pie": 9.5,
+                "honey_mead": 12.0, "logs": 3.0, "planks": 5.0, "stone": 2.0, "coal": 4.0,
+                "iron_ore": 6.0, "copper_ore": 5.0, "tin_ore": 5.0, "iron_bloom": 8.0,
+                "wrought_iron_ingot": 14.0, "iron_ingots": 15.0, "steel_ingot": 25.0, "bronze_ingot": 18.0,
+                "tools": 20.0, "weapons": 35.0, "raw_wool": 3.0, "woolen_tunic": 24.0,
+                "honeycomb": 4.0, "beeswax": 3.0, "beeswax_candle": 8.0, "rock_salt": 4.0
+            }
+        }
+
 
     def print_header(self):
         print("\n" + "=" * 78)
@@ -310,12 +338,17 @@ class VoxelRealmSimulator:
             "stamina": self.stamina,
             "day": self.day_number,
             "time_hour": self.time_hour,
+            "coins": self.coins,
+            "stockpile": self.stockpile,
+            "quotas": self.quotas,
+            "quota_modes": self.quota_modes,
         }
         raw_str = json.dumps(data, sort_keys=True)
         checksum = hashlib.sha256(raw_str.encode("utf-8")).hexdigest()
         print(f"\n💾 [SAVE REALM PERSISTENCE]")
         print(f"Slot: '{slot}' | Voxel Delta Hash: {checksum[:8]}...")
         print(f"Monarch State: {self.health:.0f} HP, {self.calories:.0f} kcal, Pos: {self.pos}")
+        print(f"Economy Preserved: {len(self.stockpile)} items in stockpile, {self.coins} 💰 Gold.")
         print("✓ Sparse Delta Voxel persistence written successfully.")
         return checksum
 
@@ -323,6 +356,7 @@ class VoxelRealmSimulator:
         print(f"\n📂 [LOAD REALM PERSISTENCE]")
         print(f"Slot: '{slot}' loaded cleanly. Checksum verified: SHA-256 integrity OK.")
         print(f"Restoring Monarch at district: {self.DISTRICTS[self.current_district_key]['name']}.")
+        print("✓ Granary stockpile and guild production quotas restored.")
 
     def play_audio_sfx(self, effect: str = "horn"):
         effect = effect.lower()
@@ -926,6 +960,281 @@ class VoxelRealmSimulator:
         self.coins += p["ransom"]
         print(f"💰 RANSOM RESOLVED: Exchanged {p['id']} with foreign bailiffs for +{p['ransom']} Gold Coins!")
 
+    def show_stockpile(self, category: str = "all"):
+        cat = category.lower().strip()
+        print("\n🌾 === ROYAL FEUDAL GRANARY & WAREHOUSE STOCKPILE ===")
+        total_items = sum(self.stockpile.values())
+        print(f"Total Goods in Store: {total_items} units | Royal Treasury: {self.coins} 💰 Gold Coins")
+
+        groups = {
+            "food": ["wheat", "flour", "bread", "meat", "cabbage", "onion", "carrot", "cured_meat", "smoked_meat", "cabbage_stew", "shepherd_pie", "honey_mead"],
+            "ores": ["iron_ore", "coal", "copper_ore", "tin_ore", "stone", "logs", "rock_salt", "honeycomb", "beeswax", "raw_wool"],
+            "metals": ["iron_bloom", "wrought_iron_ingot", "iron_ingots", "steel_ingot", "copper_ingot", "tin_ingot", "bronze_ingot"],
+            "manufactured": ["tools", "weapons", "planks", "woolen_tunic", "beeswax_candle", "cast_bronze_blade", "cast_bronze_pickaxe"]
+        }
+
+        display_cats = groups.keys() if cat in ["all", ""] else [k for k in groups if cat in k]
+        if not display_cats:
+            print(f"Unknown category '{category}'. Available: all, food, ores, metals, manufactured")
+            return
+
+        for c in display_cats:
+            c_name = c.upper()
+            print(f"\n[{c_name} STOCKPILE]")
+            for item in groups[c]:
+                qty = self.stockpile.get(item, 0)
+                q_target = self.quotas.get(item, "-")
+                q_mode = self.quota_modes.get(item, "-")
+                status = ""
+                if item in self.quotas:
+                    status = f" | Quota: {qty}/{q_target} ({q_mode})"
+                print(f"  • {item.replace('_', ' ').title():<22}: {qty:>4} units{status}")
+
+    def produce_resource(self, recipe: str, amount: int = 1):
+        if amount <= 0:
+            print("Production amount must be positive.")
+            return
+
+        rec = recipe.lower().strip()
+        recipes = {
+            "flour": {
+                "inputs": {"wheat": 1},
+                "outputs": {"flour": 2},
+                "name": "Windmill Grist Milling (Wheat -> 2x Flour)"
+            },
+            "bread": {
+                "inputs": {"flour": 1},
+                "outputs": {"bread": 2},
+                "name": "Communal Hearth Baking (Flour -> 2x Hearth Loaves)"
+            },
+            "bread_wheat": {
+                "inputs": {"wheat": 1},
+                "outputs": {"bread": 2},
+                "name": "Rustic Hearth Baking (Wheat -> 2x Bread)"
+            },
+            "stew": {
+                "inputs": {"cabbage": 1, "meat": 1, "onion": 1},
+                "outputs": {"cabbage_stew": 2},
+                "name": "Feudal Kitchen Cabbage Stew (Cabbage + Beef + Onion -> 2x Stew)"
+            },
+            "pie": {
+                "inputs": {"meat": 1, "onion": 1, "bread": 1},
+                "outputs": {"shepherd_pie": 2},
+                "name": "Tavern Shepherd's Pie (Meat + Onion + Bread -> 2x Pie)"
+            },
+            "salt_meat": {
+                "inputs": {"meat": 1, "rock_salt": 1},
+                "outputs": {"cured_meat": 1},
+                "name": "Salting Trough Curing (Meat + Rock Salt -> Cured Salted Meat)"
+            },
+            "smoke_meat": {
+                "inputs": {"meat": 1, "logs": 1},
+                "outputs": {"smoked_meat": 1},
+                "name": "Smokehouse Curing (Meat + Oak Logs -> Smoked Meat)"
+            },
+            "smelt_bloom": {
+                "inputs": {"iron_ore": 2, "coal": 2},
+                "outputs": {"iron_bloom": 1},
+                "name": "Bloomery Smelting (2x Iron Ore + 2x Coal -> Spongy Iron Bloom)"
+            },
+            "refine_iron": {
+                "inputs": {"iron_bloom": 1},
+                "outputs": {"wrought_iron_ingot": 1},
+                "name": "Trip-Hammer Anvil Forging (Iron Bloom -> Wrought Iron Ingot)"
+            },
+            "smelt_steel": {
+                "inputs": {"wrought_iron_ingot": 1, "coal": 2},
+                "outputs": {"steel_ingot": 1},
+                "name": "Crucible High-Carbon Steel (Wrought Iron + 2x Coal -> Crucible Steel)"
+            },
+            "forge_tools": {
+                "inputs": {"wrought_iron_ingot": 1, "logs": 1},
+                "outputs": {"tools": 1},
+                "name": "Blacksmith Toolcraft (Wrought Iron + Wood -> Sturdy Feudal Tools)"
+            },
+            "forge_weapons": {
+                "inputs": {"steel_ingot": 1, "logs": 1},
+                "outputs": {"weapons": 1},
+                "name": "Armorer Weapon Smithing (Crucible Steel + Wood -> Knight Swords & Spears)"
+            },
+            "cast_bronze": {
+                "inputs": {"copper_ore": 3, "tin_ore": 1},
+                "outputs": {"bronze_ingot": 4},
+                "name": "Bronze Foundry Casting (3x Copper + 1x Tin -> 4x Bronze Ingot)"
+            },
+            "brew_mead": {
+                "inputs": {"honeycomb": 2},
+                "outputs": {"honey_mead": 1},
+                "name": "Abbey Mead Fermentation (2x Honeycomb -> Honey Mead Cask)"
+            },
+            "weave_tunic": {
+                "inputs": {"raw_wool": 4},
+                "outputs": {"woolen_tunic": 1},
+                "name": "Loom Textile Weaving (4x Raw Wool -> Warm Woolen Tunic)"
+            },
+            "candle": {
+                "inputs": {"beeswax": 1},
+                "outputs": {"beeswax_candle": 2},
+                "name": "Chandler Candle Dipping (Beeswax -> 2x Wax Tapers)"
+            }
+        }
+
+        matched = [k for k in recipes if rec in k]
+        if not matched:
+            print(f"Unknown production recipe '{recipe}'.")
+            print("Available recipes: " + ", ".join(recipes.keys()))
+            return
+
+        r_key = matched[0]
+        r_info = recipes[r_key]
+
+        main_out = list(r_info["outputs"].keys())[0]
+        if main_out in self.quotas and self.quota_modes.get(main_out) == "until_x":
+            target = self.quotas[main_out]
+            current = self.stockpile.get(main_out, 0)
+            if current >= target:
+                print(f"⚠️ Quota Reached: Stockpile already contains {current}/{target} {main_out}. Quota mode is 'until_x'. Production halted.")
+                return
+
+        for inp, req in r_info["inputs"].items():
+            total_req = req * amount
+            if self.stockpile.get(inp, 0) < total_req:
+                print(f"❌ Missing materials: Requires {total_req} {inp}, but only have {self.stockpile.get(inp, 0)}.")
+                return
+
+        consumed_str = []
+        for inp, req in r_info["inputs"].items():
+            self.stockpile[inp] -= req * amount
+            consumed_str.append(f"-{req * amount} {inp}")
+
+        produced_str = []
+        for outp, yield_amt in r_info["outputs"].items():
+            self.stockpile[outp] = self.stockpile.get(outp, 0) + (yield_amt * amount)
+            produced_str.append(f"+{yield_amt * amount} {outp}")
+
+        self.stamina = max(10.0, self.stamina - 5.0)
+        self.calories -= 10.0 * amount
+        print(f"\n⚙️ [PRODUCTION PIPELINE: {r_info['name']}]")
+        print(f"Batches processed: {amount}")
+        print(f"Consumed: {', '.join(consumed_str)}")
+        print(f"Produced: {', '.join(produced_str)}")
+        print(f"Current {main_out} stockpile: {self.stockpile[main_out]} units.")
+
+    def calculate_market_price(self, item: str, is_selling: bool = False) -> float:
+        base = self.market_caravan["base_prices"].get(item, 5.0)
+        supply = max(1.0, float(self.stockpile.get(item, 10)))
+        demand = 25.0
+        ratio = demand / supply
+        k_d = 0.85
+        gamma = 1.25
+        mult = 1.0 + k_d * (math.pow(ratio, gamma) - 1.0)
+        mult = max(0.20, min(5.0, mult))
+
+        if self.season == "Winter" and item in ["wheat", "flour", "bread", "meat", "cabbage"]:
+            mult = min(5.0, mult * 1.5)
+
+        price = base * mult
+        if is_selling:
+            price *= 0.85
+        return max(1.0, round(price, 1))
+
+    def show_market(self):
+        c = self.market_caravan
+        print(f"\n⚖️ === TOWN MARKET SQUARE & MERCHANT CARAVAN ===")
+        print(f"Merchant Guild: {c['guild']} | Caravan Master: {c['caravan_master']}")
+        print(f"Monarch Treasury: {self.coins} 💰 Gold Coins | Season: {self.season}")
+        print(f"{'Item':<20} {'Stockpile':>10} {'Buy Price':>12} {'Sell Price':>12}")
+        print("-" * 58)
+        for item in sorted(c["base_prices"].keys()):
+            stock = self.stockpile.get(item, 0)
+            buy_p = self.calculate_market_price(item, is_selling=False)
+            sell_p = self.calculate_market_price(item, is_selling=True)
+            print(f"{item.replace('_', ' ').title():<20} {stock:>10} {buy_p:>10.1f} 💰 {sell_p:>10.1f} 💰")
+        print("\nCommands: buy <item> [amount] | sell <item> [amount]")
+
+    def trade_market(self, action: str, item: str, amount: int = 1):
+        if amount <= 0:
+            print("Trade amount must be positive.")
+            return
+
+        it = item.lower().strip()
+        matched = [k for k in self.market_caravan["base_prices"] if it in k]
+        if not matched:
+            print(f"Market caravan does not trade '{item}'.")
+            return
+        item_key = matched[0]
+
+        if action.lower() == "buy":
+            unit_price = self.calculate_market_price(item_key, is_selling=False)
+            total_cost = int(math.ceil(unit_price * amount))
+            if self.coins < total_cost:
+                print(f"❌ Insufficient treasury gold! Buying {amount}x {item_key} costs {total_cost} 💰, you have {self.coins} 💰.")
+                return
+            self.coins -= total_cost
+            self.stockpile[item_key] = self.stockpile.get(item_key, 0) + amount
+            print(f"🤝 CARAVAN PURCHASE: Bought {amount}x {item_key} for {total_cost} 💰 Gold (-{unit_price:.1f} ea).")
+            print(f"New Stockpile: {self.stockpile[item_key]} | Treasury: {self.coins} 💰 Gold.")
+        elif action.lower() == "sell":
+            if self.stockpile.get(item_key, 0) < amount:
+                print(f"❌ Not enough in stockpile! You only have {self.stockpile.get(item_key, 0)}x {item_key}.")
+                return
+            unit_price = self.calculate_market_price(item_key, is_selling=True)
+            total_revenue = int(math.floor(unit_price * amount))
+            self.stockpile[item_key] -= amount
+            self.coins += total_revenue
+            print(f"🤝 CARAVAN SALE: Sold {amount}x {item_key} to merchants for +{total_revenue} 💰 Gold (+{unit_price:.1f} ea).")
+            print(f"New Stockpile: {self.stockpile[item_key]} | Treasury: {self.coins} 💰 Gold.")
+        else:
+            print(f"Invalid trade action '{action}'. Use 'buy' or 'sell'.")
+
+    def set_production_quota(self, item: str, target: int, mode: str = "until_x"):
+        it = item.lower().strip()
+        matched = [k for k in self.stockpile if it in k]
+        if not matched:
+            print(f"Unknown stockpile item '{item}'.")
+            return
+        item_key = matched[0]
+        valid_modes = ["until_x", "continuous", "paused"]
+        if mode.lower() not in valid_modes:
+            mode = "until_x"
+        self.quotas[item_key] = max(0, target)
+        self.quota_modes[item_key] = mode.lower()
+        print(f"📋 PRODUCTION QUOTA UPDATED: {item_key} target -> {target} units (Mode: {mode.lower()}).")
+
+    def simulate_cellar_spoilage(self, hours: int = 24, container: str = "COLD_CELLAR"):
+        container_factors = {
+            "OPEN_GROUND": 1.50,
+            "WOODEN_CHEST": 1.00,
+            "CLAY_AMPHORA": 0.60,
+            "STILT_GRANARY": 0.25,
+            "COLD_CELLAR": 0.25,
+            "ICEHOUSE_VAULT": 0.10
+        }
+        cont_factor = container_factors.get(container.upper(), 0.25)
+        curr_dist = self.DISTRICTS[self.current_district_key]
+        temp = curr_dist.get("ambient_temp", 15.0)
+        q10_mult = math.pow(2.0, (temp - 15.0) / 10.0)
+        decay_factor = (hours / 120.0) * cont_factor * q10_mult
+
+        spoilage_report = {}
+        perishables = ["meat", "bread", "cabbage", "cabbage_stew"]
+        for p in perishables:
+            count = self.stockpile.get(p, 0)
+            lost = int(math.floor(count * min(0.50, decay_factor)))
+            if lost > 0:
+                self.stockpile[p] -= lost
+                spoilage_report[p] = lost
+
+        print(f"\n❄️ === FOOD PRESERVATION & CELLAR DECAY KINETICS ===")
+        print(f"Elapsed Time: {hours} hours | Storage Type: {container} (Factor: {cont_factor})")
+        print(f"Cellar Ambient Temp: {temp:.1f}°C | Arrhenius Decay Acceleration: {q10_mult:.2f}x")
+        if spoilage_report:
+            print("Perished supplies:")
+            for p, lost in spoilage_report.items():
+                print(f"  🥀 {p.replace('_', ' ').title()}: -{lost} units lost to microbial decay (Remaining: {self.stockpile[p]}).")
+        else:
+            print("✓ Excellent preservation! All provisions remained fresh in cold storage.")
+
     def run_cli(self):
         self.print_header()
         print("\nWelcome, Monarch! The entire Feudal Realm is assembled and awaiting your command.")
@@ -994,6 +1303,13 @@ class VoxelRealmSimulator:
                 print("  sweep             - Run counter-intelligence sweep in Citadel taverns")
                 print("  interrogate       - Interrogate captured foreign infiltrator in dungeons")
                 print("  ransom            - Ransom captive spy to foreign envoys for gold")
+                print("  stockpile [cat]   - Inspect royal granary & warehouse goods (food, ores, metals, manufactured)")
+                print("  produce <recipe> [amt] - Execute craft (flour, bread, stew, pie, salt_meat, smoke_meat, smelt_bloom, refine_iron, smelt_steel, forge_tools, forge_weapons, cast_bronze, brew_mead, weave_tunic, candle)")
+                print("  market            - Open town square market stalls and caravan trading board")
+                print("  buy <item> [amt]  - Purchase goods from caravan merchants using gold coins")
+                print("  sell <item> [amt] - Sell stockpile goods to caravan merchants for gold coins")
+                print("  quota <item> <t>  - Set RimWorld-style 'Do Until X' production quota and mode")
+                print("  spoilage [hrs]    - Simulate cellar preservation & Arrhenius decay kinetics")
                 print("  pause             - Display in-game pause menu and controls guide")
                 print("  wait              - Advance time by 1 hour (burn calories, regenerate stamina)")
                 print("  quit              - Exit simulator")
@@ -1158,6 +1474,39 @@ class VoxelRealmSimulator:
                 self.interrogate_captive()
             elif cmd in ["ransom", "release"]:
                 self.ransom_captive()
+            elif cmd in ["stockpile", "granary", "warehouse", "economy"]:
+                cat = args[0] if args else "all"
+                self.show_stockpile(cat)
+            elif cmd in ["produce", "craft", "cook", "smelt", "forge"]:
+                if args:
+                    amt = int(args[1]) if len(args) > 1 and args[1].isdigit() else 1
+                    self.produce_resource(args[0], amt)
+                else:
+                    print("Usage: produce <recipe> [amount]")
+            elif cmd in ["market", "bazaar", "caravan"]:
+                self.show_market()
+            elif cmd == "buy":
+                if args:
+                    amt = int(args[1]) if len(args) > 1 and args[1].isdigit() else 1
+                    self.trade_market("buy", args[0], amt)
+                else:
+                    print("Usage: buy <item> [amount]")
+            elif cmd == "sell":
+                if args:
+                    amt = int(args[1]) if len(args) > 1 and args[1].isdigit() else 1
+                    self.trade_market("sell", args[0], amt)
+                else:
+                    print("Usage: sell <item> [amount]")
+            elif cmd in ["quota", "threshold"]:
+                if len(args) >= 2 and args[1].isdigit():
+                    mode = args[2] if len(args) > 2 else "until_x"
+                    self.set_production_quota(args[0], int(args[1]), mode)
+                else:
+                    print("Usage: quota <item> <target_amount> [until_x|continuous|paused]")
+            elif cmd in ["spoilage", "cellar", "decay"]:
+                hrs = int(args[0]) if args and args[0].isdigit() else 24
+                cont = args[1] if len(args) > 1 else "COLD_CELLAR"
+                self.simulate_cellar_spoilage(hrs, cont)
             elif cmd == "pause":
                 print("\n=== [PAUSE MENU SIMULATION] ===")
                 print("1. Resume Realm")
@@ -1262,6 +1611,25 @@ def main():
         assert sim.captured_spies[0]["interrogated"]
         sim.ransom_captive()
         assert len(sim.captured_spies) == 0
+        sim.show_stockpile("all")
+        sim.produce_resource("smelt_bloom", 2)
+        assert sim.stockpile["iron_bloom"] >= 2
+        sim.produce_resource("refine_iron", 2)
+        assert sim.stockpile["wrought_iron_ingot"] >= 2
+        sim.produce_resource("smelt_steel", 1)
+        assert sim.stockpile["steel_ingot"] >= 1
+        sim.produce_resource("salt_meat", 2)
+        assert sim.stockpile["cured_meat"] >= 2
+        sim.produce_resource("brew_mead", 1)
+        assert sim.stockpile["honey_mead"] >= 1
+        sim.show_market()
+        sim.trade_market("buy", "wheat", 10)
+        assert sim.stockpile["wheat"] >= 40
+        sim.trade_market("sell", "bread", 5)
+        assert sim.stockpile["bread"] <= 50
+        sim.set_production_quota("tools", 15, "until_x")
+        assert sim.quotas["tools"] == 15
+        sim.simulate_cellar_spoilage(24, "COLD_CELLAR")
         print("[INTERACTIVE SIMULATOR] All simulator subsystems passed verification cleanly!")
         sys.exit(0)
     sim.run_cli()
