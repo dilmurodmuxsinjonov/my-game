@@ -454,12 +454,18 @@ var morale: float = 75.0 # 0.0 to 100.0%
 var tax_rate: float = 0.10 # 10%
 
 func add_resource(item: String, amount: int) -> void:
+	if amount <= 0:
+		return
 	if not inventory.has(item):
 		inventory[item] = 0
 	inventory[item] += amount
 	emit_signal("inventory_updated", item, inventory[item])
 
 func consume_resource(item: String, amount: int) -> bool:
+	if amount < 0:
+		return false
+	if amount == 0:
+		return true
 	if inventory.has(item) and inventory[item] >= amount:
 		inventory[item] -= amount
 		emit_signal("inventory_updated", item, inventory[item])
@@ -468,6 +474,22 @@ func consume_resource(item: String, amount: int) -> bool:
 
 func get_resource(item: String) -> int:
 	return inventory.get(item, 0)
+
+func has_resource(item: String, amount: int = 1) -> bool:
+	if amount <= 0:
+		return true
+	return get_resource(item) >= amount
+
+func get_stockpile_snapshot() -> Dictionary:
+	return inventory.duplicate(true)
+
+func restore_stockpile_snapshot(snapshot: Dictionary) -> void:
+	if snapshot.is_empty():
+		return
+	for item in snapshot.keys():
+		var qty = int(snapshot[item])
+		inventory[item] = qty
+		emit_signal("inventory_updated", item, qty)
 
 func set_quota(item: String, target_amount: int, mode: QuotaMode = QuotaMode.DO_UNTIL_X) -> void:
 	quotas[item] = maxi(0, target_amount)
@@ -582,3 +604,36 @@ func _update_morale(unfed: int, total: int) -> void:
 	morale = lerp(morale, target_morale, 0.2)
 	morale = clamp(morale, 0.0, 100.0)
 	emit_signal("morale_updated", morale)
+
+# ----------------- Persistence -----------------
+func to_dict() -> Dictionary:
+	var q_dict: Dictionary = {}
+	for k in quotas.keys():
+		q_dict[k] = quotas[k]
+	var qm_dict: Dictionary = {}
+	for k in quota_modes.keys():
+		qm_dict[k] = int(quota_modes[k])
+
+	return {
+		"stockpile": get_stockpile_snapshot(),
+		"quotas": q_dict,
+		"quota_modes": qm_dict,
+		"morale": morale,
+		"tax_rate": tax_rate
+	}
+
+func from_dict(data: Dictionary) -> void:
+	if data.is_empty():
+		return
+	if data.has("stockpile"):
+		restore_stockpile_snapshot(data["stockpile"])
+	elif data.has("inventory"):
+		restore_stockpile_snapshot(data["inventory"])
+	if data.has("quotas"):
+		for k in data["quotas"].keys():
+			quotas[k] = int(data["quotas"][k])
+	if data.has("quota_modes"):
+		for k in data["quota_modes"].keys():
+			quota_modes[k] = int(data["quota_modes"][k]) as QuotaMode
+	morale = data.get("morale", 75.0)
+	tax_rate = data.get("tax_rate", 0.10)
