@@ -145,6 +145,18 @@ func save_game(slot_name: String, game_manager: Node) -> bool:
 	if tm and tm.has_method("to_dict"):
 		tournament_data = tm.to_dict()
 
+	# 11. High Monastic Order & Scriptoria Research Data
+	var monastery_data: Dictionary = {}
+	var mrs = game_manager.get("monastery_research_system")
+	if mrs and mrs.has_method("to_dict"):
+		monastery_data = mrs.to_dict()
+
+	# 12. Alchemical Transmutation Laboratory Data
+	var alchemy_data: Dictionary = {}
+	var alab = game_manager.get("alchemy_laboratory")
+	if alab and alab.has_method("to_dict"):
+		alchemy_data = alab.to_dict()
+
 	# Assembly of Master Payload
 	var current_time = Time.get_unix_time_from_system()
 	var payload: Dictionary = {
@@ -163,7 +175,9 @@ func save_game(slot_name: String, game_manager: Node) -> bool:
 		"squadron": squadron_data,
 		"diplomacy": diplomacy_data,
 		"invasions": invasions_data,
-		"tournament": tournament_data
+		"tournament": tournament_data,
+		"monastery": monastery_data,
+		"alchemy": alchemy_data
 	}
 
 	var json_str = JSON.stringify(payload, "\t")
@@ -284,6 +298,14 @@ func load_game(slot_name: String, game_manager: Node) -> bool:
 		var tm_load = game_manager.get("tournament_manager")
 		if tm_load and tm_load.has_method("from_dict"):
 			tm_load.from_dict(payload["tournament"])
+	if payload.has("monastery"):
+		var mrs_load = game_manager.get("monastery_research_system")
+		if mrs_load and mrs_load.has_method("from_dict"):
+			mrs_load.from_dict(payload["monastery"])
+	if payload.has("alchemy"):
+		var alab_load = game_manager.get("alchemy_laboratory")
+		if alab_load and alab_load.has_method("from_dict"):
+			alab_load.from_dict(payload["alchemy"])
 
 	load_completed.emit(slot_name, true)
 	print("[SAVE SYSTEM] Successfully loaded realm from %s on Day %s!" % [slot_name, payload.get("datetime", "Unknown")])

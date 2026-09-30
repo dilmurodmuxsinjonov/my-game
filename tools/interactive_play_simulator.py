@@ -181,6 +181,22 @@ class VoxelRealmSimulator:
         self.feasts_hosted = 0
         self.grandstand_excitement = 80.0
 
+        # High Scholastic Monastic Order & Scriptoria Research State (Milestone 51)
+        self.scholar_points = 0.0
+        self.monk_scribes = 3
+        self.unlocked_techs = []
+        self.current_research = ""
+        self.research_progress = {}
+        self.altar_relics = {0: "true_hearth_shard", 1: "", 2: ""}
+        self.discovered_relics = ["true_hearth_shard", "st_columba_tome", "perpetual_chalice", "first_monarch_crown", "holy_light_banner"]
+        self.abbey_bell_active = False
+
+        # Alchemical Transmutation Laboratory State (Milestone 51)
+        self.alembic_temp = 85.0
+        self.stone_stage = 1  # 1: Nigredo, 2: Albedo, 3: Citrinitas, 4: Rubedo
+        self.brewed_potions = 0
+        self.transmutations = 0
+
     def print_header(self):
         print("\n" + "=" * 78)
         print("          VOXEL LORD: FEUDAL REALM - INTERACTIVE PLAYABLE SIMULATOR")
@@ -656,6 +672,123 @@ class VoxelRealmSimulator:
         print("✓ All realm subjects and visiting knights rejoice! Citizen Morale +25.0%!")
         print(f"⚜️ Royal Prestige Surges (+100 Chivalric Honor -> {self.tournament_chivalry})!")
 
+    def show_monastery(self):
+        stone_names = ["Nigredo (Black Dissolution)", "Albedo (White Purification)", "Citrinitas (Yellow Awakening)", "Rubedo (Magnum Opus)"]
+        stage_name = stone_names[self.stone_stage - 1]
+        print("\n⛪ === MONASTIC SCHOLASTICA & ALCHEMICAL SANCTUARY (KEY_B) ===")
+        print(f"Monk Scribes: {self.monk_scribes} | Scholar Points: {self.scholar_points:.1f} | Current Research: {self.current_research or 'None'}")
+        print(f"Unlocked Technologies: {', '.join(self.unlocked_techs) if self.unlocked_techs else 'None'}")
+        print(f"Altar Relics: [Slot 1: {self.altar_relics.get(0, 'Empty')}] [Slot 2: {self.altar_relics.get(1, 'Empty')}] [Slot 3: {self.altar_relics.get(2, 'Empty')}]")
+        print(f"Abbey Liturgy Bells: {'ACTIVE (+30% Serenity) 🔔' if self.abbey_bell_active else 'Dormant'}")
+        print(f"Alchemical Alembic: {self.alembic_temp:.1f}°C | Magnum Opus Stage: {stage_name}")
+        print(f"Distillations: {self.brewed_potions} elixirs brewed | {self.transmutations} metal transmutations completed")
+        print("\nSCHOLASTIC TECHNOLOGIES:")
+        print("  1. 🌾 norfolk_genetics (Norfolk Four-Course Agronomy Genetics) - Cost: 100")
+        print("  2. 🔥 blast_catalysts (Thermodynamic Blast Furnace Flux Catalysts) - Cost: 150")
+        print("  3. 🎯 counterweight_ballistics (Gravitational Counterweight Ballistics) - Cost: 200")
+        print("  4. 💎 deep_shaft_geology (Deep Subterranean Geological Surveying) - Cost: 180")
+        print("  5. 📜 guild_charters (Imperial Artisan Guild Charters) - Cost: 220")
+        print("  6. 🏛️ sacred_architecture (Gothic Monastic Vaulting) - Cost: 250")
+        print("\nALCHEMICAL TRANSMUTATION CRUCIBLE:")
+        print("  • brew vitality / iron_skin / windstrider / dragons_breath")
+        print("  • transmute silver / gold / catalyst")
+        print("  • magnum (refine philosopher's stone stage)")
+        print("  • bells (ring consecrated abbey bells)")
+
+    def conduct_research(self, tech_key: str):
+        tech_costs = {
+            "norfolk_genetics": 100,
+            "blast_catalysts": 150,
+            "counterweight_ballistics": 200,
+            "deep_shaft_geology": 180,
+            "guild_charters": 220,
+            "sacred_architecture": 250
+        }
+        matched = [k for k in tech_costs if tech_key.lower() in k]
+        if not matched:
+            print(f"Unknown technology '{tech_key}'. Available: {', '.join(tech_costs.keys())}")
+            return
+        t_id = matched[0]
+        if t_id in self.unlocked_techs:
+            print(f"Technology '{t_id}' is already researched and active in the realm!")
+            return
+
+        cost = tech_costs[t_id]
+        self.current_research = t_id
+        cur = self.research_progress.get(t_id, 0.0) + (cost * 0.5 if t_id in self.research_progress else cost)
+        if cur >= cost:
+            self.unlocked_techs.append(t_id)
+            self.research_progress[t_id] = cost
+            self.current_research = ""
+            print(f"📜 SCHOLASTIC TRIUMPH: Completed illumination of '{t_id}'! (+Effects applied to Realm)")
+        else:
+            self.research_progress[t_id] = cur
+            print(f"📖 Scriptorium illuminating '{t_id}': Progress {cur:.0f}/{cost} scholar points.")
+
+    def brew_alchemy_elixir(self, elixir_key: str):
+        key = elixir_key.lower().strip()
+        recipes = {
+            "vitality": ("Elixir of Vitality", "❤️ +50 HP restored"),
+            "iron_skin": ("Elixir of Iron Skin", "🛡️ +40% physical armor mitigation"),
+            "windstrider": ("Elixir of the Windstrider", "💨 +35% sprint velocity"),
+            "dragons_breath": ("Dragon's Breath Volatile Flask", "🔥 60 fire AOE damage")
+        }
+        matched = [k for k in recipes if key in k]
+        if not matched:
+            print(f"Unknown elixir '{elixir_key}'. Available: vitality, iron_skin, windstrider, dragons_breath")
+            return
+        e_key = matched[0]
+        name, effect = recipes[e_key]
+        self.brewed_potions += 1
+        self.alembic_temp = min(350.0, self.alembic_temp + 15.0)
+        if e_key == "vitality":
+            self.health = min(self.max_health, self.health + 50.0)
+        print(f"⚗️ DISTILLATION COMPLETE: Brewed 1x {name}! Effect: {effect}. Alembic temp: {self.alembic_temp:.1f}°C")
+
+    def transmute_alchemy_metal(self, formula_key: str):
+        key = formula_key.lower().strip()
+        transmutes = {
+            "silver": ("Baser Ore into Noble Silver", "+2 Silver Ore"),
+            "gold": ("Great Magnum Transmutation: Iron into Gold", "+25 Gold Coins"),
+            "catalyst": ("Sublimation of Salt into Philosopher's Catalyst", "+1 Gems")
+        }
+        matched = [k for k in transmutes if key in k]
+        if not matched:
+            print(f"Unknown transmutation '{formula_key}'. Available: silver, gold, catalyst")
+            return
+        f_key = matched[0]
+        name, out_desc = transmutes[f_key]
+        self.transmutations += 1
+        self.alembic_temp = min(400.0, self.alembic_temp + 25.0)
+        if f_key == "gold":
+            self.coins += 25
+        print(f"✨ TRANSMUTATION SUCCESSFUL: {name}! Produced: {out_desc}. Alembic temp: {self.alembic_temp:.1f}°C")
+
+    def enshrine_abbey_relic(self, relic_key: str, slot: int = 1):
+        slot_idx = max(0, min(2, slot - 1))
+        matched = [r for r in self.discovered_relics if relic_key.lower() in r]
+        if not matched:
+            print(f"Relic '{relic_key}' not found in discovery inventory. Discovered: {', '.join(self.discovered_relics)}")
+            return
+        r_id = matched[0]
+        for s in list(self.altar_relics.keys()):
+            if self.altar_relics[s] == r_id:
+                self.altar_relics[s] = ""
+        self.altar_relics[slot_idx] = r_id
+        print(f"⛪ SACRED CONSECRATION: Enshrined '{r_id}' on Altar Slot {slot_idx+1}! Realm blessing bestowed.")
+
+    def ring_abbey_bells(self):
+        self.abbey_bell_active = True
+        print("🔔 CLANGOR SANCTUS: Abbey Cathedral Bells ring across the valley! +30% Citizen Serenity bestowed.")
+
+    def refine_philosophers_stone(self):
+        stone_names = ["Nigredo (Black Dissolution)", "Albedo (White Purification)", "Citrinitas (Yellow Awakening)", "Rubedo (Magnum Opus)"]
+        if self.stone_stage >= 4:
+            print(f"💎 MAGNUM OPUS PERFECTED: Already achieved the Great Work (Rubedo / Red Elixir)!")
+            return
+        self.stone_stage += 1
+        print(f"🔴 ALCHEMICAL ELEVATION: Philosopher's Stone refined to Stage {self.stone_stage}: {stone_names[self.stone_stage - 1]}!")
+
     def run_cli(self):
         self.print_header()
         print("\nWelcome, Monarch! The entire Feudal Realm is assembled and awaiting your command.")
@@ -711,6 +844,13 @@ class VoxelRealmSimulator:
                 print("  archery           - Compete in Guild Marksman Contest")
                 print("  duel [gambit]     - Duel Sovereign Champion Prince Alden")
                 print("  feast             - Host Grand Regal Banquet (+25% Citizen Morale, +100 Honor)")
+                print("  monastery / abbey - Open Monastic Scriptoria & Alchemical Sanctum (B key)")
+                print("  research <tech>   - Research scholastic tech (norfolk, blast, ballistics, geology, guild, gothic)")
+                print("  brew <elixir>     - Distill alchemical elixir (vitality, iron_skin, windstrider, dragons_breath)")
+                print("  transmute <metal> - Transmute metals in crucible (silver, gold, catalyst)")
+                print("  enshrine <relic>  - Enshrine holy relic on altar slot (hearth, crown, columba, chalice, banner)")
+                print("  bells             - Ring Abbey Cathedral Bells (+30% Citizen Serenity)")
+                print("  magnum            - Refine Philosopher's Stone stage (Nigredo -> Albedo -> Citrinitas -> Rubedo)")
                 print("  pause             - Display in-game pause menu and controls guide")
                 print("  wait              - Advance time by 1 hour (burn calories, regenerate stamina)")
                 print("  quit              - Exit simulator")
@@ -829,6 +969,33 @@ class VoxelRealmSimulator:
                 self.duel_champion(gambit)
             elif cmd in ["feast", "banquet"]:
                 self.host_regal_feast()
+            elif cmd in ["monastery", "abbey", "scriptoria"]:
+                self.show_monastery()
+            elif cmd == "research":
+                if args:
+                    self.conduct_research(args[0])
+                else:
+                    print("Usage: research <norfolk|blast|ballistics|geology|guild|sacred>")
+            elif cmd == "brew":
+                if args:
+                    self.brew_alchemy_elixir(args[0])
+                else:
+                    print("Usage: brew <vitality|iron_skin|windstrider|dragons_breath>")
+            elif cmd == "transmute":
+                if args:
+                    self.transmute_alchemy_metal(args[0])
+                else:
+                    print("Usage: transmute <silver|gold|catalyst>")
+            elif cmd == "enshrine":
+                if args:
+                    slot = int(args[1]) if len(args) > 1 and args[1].isdigit() else 1
+                    self.enshrine_abbey_relic(args[0], slot)
+                else:
+                    print("Usage: enshrine <hearth|crown|columba|chalice|banner> [slot 1-3]")
+            elif cmd in ["bells", "bell"]:
+                self.ring_abbey_bells()
+            elif cmd in ["magnum", "stone"]:
+                self.refine_philosophers_stone()
             elif cmd == "pause":
                 print("\n=== [PAUSE MENU SIMULATION] ===")
                 print("1. Resume Realm")
@@ -907,6 +1074,19 @@ def main():
         sim.host_regal_feast()
         assert sim.feasts_hosted == 1
         assert sim.tournament_chivalry >= 350
+        sim.show_monastery()
+        sim.conduct_research("norfolk_genetics")
+        assert "norfolk_genetics" in sim.unlocked_techs
+        sim.brew_alchemy_elixir("vitality")
+        assert sim.brewed_potions >= 1
+        sim.transmute_alchemy_metal("gold")
+        assert sim.transmutations >= 1
+        sim.enshrine_abbey_relic("st_columba_tome", 2)
+        assert sim.altar_relics[1] == "st_columba_tome"
+        sim.ring_abbey_bells()
+        assert sim.abbey_bell_active
+        sim.refine_philosophers_stone()
+        assert sim.stone_stage == 2
         print("[INTERACTIVE SIMULATOR] All simulator subsystems passed verification cleanly!")
         sys.exit(0)
     sim.run_cli()
