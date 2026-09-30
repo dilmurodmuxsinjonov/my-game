@@ -65,6 +65,7 @@ var caravan_interval: float = 160.0
 # Game day/night simulation
 var day_timer: float = 0.0
 var day_duration: float = 120.0 # 2 minutes per full day cycle
+var days_elapsed: int = 0
 var sun_light: DirectionalLight3D
 var is_royal_alarm_active: bool = false
 
@@ -353,6 +354,16 @@ func _ready() -> void:
 		else:
 			add_child(espionage_ui)
 	espionage_ui.set_espionage_manager(espionage_manager, supply_chain)
+	espionage_manager.daily_upkeep_processed.connect(_on_espionage_upkeep_processed)
+
+	# Inject Monastery Blessings into Player & Agriculture
+	if player:
+		player.monastery_research_system = monastery_research_system
+	if agriculture_manager:
+		agriculture_manager.monastery_research_system = monastery_research_system
+
+	# Connect all modal windows to unified cursor mode sync
+	_connect_modal_cursor_sync()
 		
 	# Spawn initial workstations, citizens, and trade caravan
 	_spawn_initial_workstations()
@@ -455,9 +466,12 @@ func _spawn_initial_citizens() -> void:
 		citizen.set_role(info["role"], work_target)
 
 func _process(delta: float) -> void:
-	# Day/Night lighting rotation
+	# Day/Night lighting rotation & Day Rollover
 	day_timer += delta
-	var progress = fmod(day_timer, day_duration) / day_duration
+	if day_timer >= day_duration:
+		day_timer -= day_duration
+		_on_day_rollover()
+	var progress = day_timer / day_duration
 	var angle_rad = progress * TAU
 	if sun_light:
 		sun_light.rotation.x = angle_rad - (PI * 0.5)
@@ -554,10 +568,7 @@ func _on_cycle_district() -> void:
 func _on_toggle_ledger() -> void:
 	if royal_ledger:
 		royal_ledger.visible = not royal_ledger.visible
-		if royal_ledger.visible:
-			Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-		else:
-			Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+		_sync_cursor_mode()
 
 func _get_current_district_name(pos: Vector3) -> String:
 	if not world_assembler:
@@ -592,16 +603,19 @@ func _on_role_reassigned(role_name: String, _delta: int) -> void:
 func _on_open_crafting() -> void:
 	if crafting_menu:
 		crafting_menu.open_menu(null)
+		_sync_cursor_mode()
 
 func _on_interact_requested(target: Node3D) -> void:
 	if target is Citizen and citizen_dialogue:
 		var is_winter = (season_manager and season_manager.current_season == SeasonManager.Season.WINTER)
 		citizen_dialogue.open_dialogue(target, is_winter)
+		_sync_cursor_mode()
 		if audio_manager:
 			audio_manager.play_ui_click()
 		return
 	if (target is Workstation or target is TradeCaravan or target is EnchanterTable or target is CookingPot) and crafting_menu:
 		crafting_menu.open_menu(target)
+		_sync_cursor_mode()
 
 func _on_war_horn_sounded() -> void:
 	is_royal_alarm_active = not is_royal_alarm_active
@@ -732,6 +746,7 @@ func _on_weather_changed(new_weather: SeasonManager.Weather) -> void:
 func _on_toggle_pause() -> void:
 	if pause_menu:
 		pause_menu.toggle_pause_menu()
+		_sync_cursor_mode()
 		if audio_manager:
 			audio_manager.play_ui_click()
 
@@ -762,6 +777,7 @@ func _on_player_footstep(block_type: int, is_sprinting: bool) -> void:
 		audio_manager.play_footstep_for_block(block_type, is_sprinting)
 
 func _on_menu_resumed() -> void:
+	_sync_cursor_mode()
 	if audio_manager:
 		audio_manager.play_ui_click()
 
@@ -794,6 +810,7 @@ func _on_settings_applied(settings_dict: Dictionary) -> void:
 func _on_toggle_journal() -> void:
 	if quest_journal:
 		quest_journal.toggle_journal()
+		_sync_cursor_mode()
 		if audio_manager:
 			audio_manager.play_ui_click()
 
@@ -818,6 +835,7 @@ func _on_realm_victory_achieved(_total_renown: int) -> void:
 func _on_toggle_heraldry() -> void:
 	if heraldry_ui:
 		heraldry_ui.toggle_menu()
+		_sync_cursor_mode()
 		if audio_manager:
 			audio_manager.play_ui_click()
 
@@ -830,6 +848,7 @@ func _on_heraldry_updated(_blazon: String, _pri: Color, _sec: Color) -> void:
 func _on_toggle_decrees() -> void:
 	if decrees_ui:
 		decrees_ui.toggle_menu()
+		_sync_cursor_mode()
 		if audio_manager:
 			audio_manager.play_ui_click()
 
@@ -862,6 +881,7 @@ func _on_squad_rally_requested() -> void:
 func _on_toggle_diplomacy() -> void:
 	if diplomacy_ui:
 		diplomacy_ui.toggle_chancery()
+		_sync_cursor_mode()
 		if audio_manager:
 			audio_manager.play_ui_click()
 
@@ -884,6 +904,7 @@ func _on_diplomatic_war_declared(faction_id: String, _aggressor: bool) -> void:
 func _on_toggle_war_room() -> void:
 	if war_room_ui:
 		war_room_ui.toggle_war_room()
+		_sync_cursor_mode()
 		if audio_manager:
 			audio_manager.play_ui_click()
 
@@ -915,6 +936,7 @@ func _on_battalion_routed(_battalion_id: String, casualties: int) -> void:
 func _on_toggle_tournament() -> void:
 	if tournament_ui:
 		tournament_ui.toggle_tournament_ui()
+		_sync_cursor_mode()
 		if audio_manager:
 			audio_manager.play_ui_click()
 
@@ -952,6 +974,7 @@ func _on_chivalric_title_unlocked(new_title: String, _honor: int) -> void:
 func _on_toggle_monastery() -> void:
 	if monastery_ui:
 		monastery_ui.toggle_monastery_ui()
+		_sync_cursor_mode()
 		if audio_manager:
 			audio_manager.play_ui_click()
 
@@ -993,6 +1016,7 @@ func _on_alchemy_metal_transmuted(_formula_id: String, _input_res: String, outpu
 func _on_toggle_espionage() -> void:
 	if espionage_ui:
 		espionage_ui.toggle_visibility()
+		_sync_cursor_mode()
 		if audio_manager:
 			audio_manager.play_ui_click()
 
@@ -1025,6 +1049,63 @@ func _on_prisoner_interrogated(_prisoner_id: String, secrets: String) -> void:
 		hud.show_notification("🔍 DUNGEON INTERROGATION: %s" % secrets)
 	if audio_manager:
 		audio_manager.play_craft_success()
+
+# ----------------- Unified Cursor & Day Rollover Helpers -----------------
+func _connect_modal_cursor_sync() -> void:
+	var modals = [
+		crafting_menu,
+		royal_ledger,
+		quest_journal,
+		citizen_dialogue,
+		heraldry_ui,
+		decrees_ui,
+		diplomacy_ui,
+		war_room_ui,
+		tournament_ui,
+		monastery_ui,
+		espionage_ui,
+		pause_menu
+	]
+	for m in modals:
+		if is_instance_valid(m) and m.has_signal("visibility_changed"):
+			m.visibility_changed.connect(_sync_cursor_mode)
+
+func _sync_cursor_mode() -> void:
+	var any_open = false
+	var modals = [
+		crafting_menu,
+		royal_ledger,
+		quest_journal,
+		citizen_dialogue,
+		heraldry_ui,
+		decrees_ui,
+		diplomacy_ui,
+		war_room_ui,
+		tournament_ui,
+		monastery_ui,
+		espionage_ui,
+		pause_menu
+	]
+	for m in modals:
+		if is_instance_valid(m) and m.visible:
+			any_open = true
+			break
+	if any_open:
+		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	else:
+		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+
+func _on_day_rollover() -> void:
+	days_elapsed += 1
+	if espionage_manager and supply_chain:
+		espionage_manager.process_daily_upkeep(supply_chain)
+
+func _on_espionage_upkeep_processed(total_cost: int, paid_count: int, unpaid_count: int) -> void:
+	if hud:
+		if unpaid_count > 0:
+			hud.show_notification("⚠️ SHADOW RETINUE STRIKE: %d agents unpaid due to empty treasury!" % unpaid_count)
+		elif total_cost > 0:
+			hud.show_notification("🪙 Daily Shadow Retinue Upkeep: Paid %d Gold (%d agents)." % [total_cost, paid_count])
 
 
 
