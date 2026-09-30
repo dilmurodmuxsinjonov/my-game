@@ -68,7 +68,9 @@ func save_game(slot_name: String, game_manager: Node) -> bool:
 
 	# 2. Economy Data
 	var economy_data: Dictionary = {}
-	if supply_chain and supply_chain.has_method("get_stockpile_snapshot"):
+	if supply_chain and supply_chain.has_method("to_dict"):
+		economy_data = supply_chain.to_dict()
+	elif supply_chain and supply_chain.has_method("get_stockpile_snapshot"):
 		economy_data = supply_chain.get_stockpile_snapshot()
 	elif supply_chain:
 		economy_data = {
@@ -273,6 +275,15 @@ func load_game(slot_name: String, game_manager: Node) -> bool:
 	var env_data = payload.get("environment", {})
 	if "day_timer" in env_data and "day_timer" in game_manager:
 		game_manager.set("day_timer", env_data["day_timer"])
+
+	# 3b. Restore Economy & Stockpile
+	if payload.has("economy"):
+		var sc_load = game_manager.get("supply_chain")
+		if sc_load:
+			if sc_load.has_method("from_dict"):
+				sc_load.from_dict(payload["economy"])
+			elif sc_load.has_method("restore_stockpile_snapshot"):
+				sc_load.restore_stockpile_snapshot(payload["economy"])
 
 	# 4. Restore Heraldry & Castle Decor
 	if payload.has("heraldry"):
