@@ -98,6 +98,7 @@ var ambient_temperature: float = 16.0
 # External references
 var voxel_world: VoxelWorld
 var supply_chain: SupplyChain
+var monastery_research_system = null
 var hovered_interactive: Node3D = null
 
 # Hotbar Inventory (8 slots)
@@ -328,8 +329,13 @@ func _handle_movement(delta: float) -> void:
 		step_timer = 0.0
 
 func _update_vitals(delta: float) -> void:
-	# Passive hunger (1 point per 10 real seconds)
-	hunger = minf(max_hunger, hunger + delta * 0.1)
+	var blessings: Dictionary = {}
+	if monastery_research_system and monastery_research_system.has_method("get_active_blessings"):
+		blessings = monastery_research_system.get_active_blessings()
+
+	# Passive hunger (1 point per 10 real seconds, reduced by Perpetual Chalice blessing if active)
+	var hunger_mult = blessings.get("hunger_drain_mult", 1.0)
+	hunger = minf(max_hunger, hunger + delta * 0.1 * hunger_mult)
 	emit_signal("hunger_changed", hunger, max_hunger)
 	
 	# Starvation damage
@@ -341,9 +347,9 @@ func _update_vitals(delta: float) -> void:
 		emit_signal("health_changed", health, max_health)
 		
 	# Thermal warmth loop
-	_update_thermal_balance(delta)
+	_update_thermal_balance(delta, blessings)
 
-func _update_thermal_balance(delta: float) -> void:
+func _update_thermal_balance(delta: float, blessings: Dictionary = {}) -> void:
 	var is_sheltered = false
 	if voxel_world:
 		var head_pos = Vector3i(int(floor(global_position.x)), int(floor(global_position.y + 1.8)), int(floor(global_position.z)))
@@ -367,17 +373,20 @@ func _update_thermal_balance(delta: float) -> void:
 						is_near_heat = true
 						break
 
-	if is_near_heat or ambient_temperature >= 15.0:
+	var effective_temp = ambient_temperature + blessings.get("warmth_bonus", 0.0)
+
+	if is_near_heat or effective_temp >= 15.0:
 		warmth = minf(max_warmth, warmth + delta * 6.0)
-	elif ambient_temperature < 5.0 and not is_sheltered:
-		var cold_severity = maxf(1.0, (5.0 - ambient_temperature) * 0.4)
+	elif effective_temp < 5.0 and not is_sheltered:
+		var cold_severity = maxf(1.0, (5.0 - effective_temp) * 0.4)
 		warmth = maxf(0.0, warmth - delta * cold_severity)
-	elif ambient_temperature < 0.0 and is_sheltered:
+	elif effective_temp < 0.0 and is_sheltered:
 		warmth = maxf(0.0, warmth - delta * 0.5)
 
 	emit_signal("warmth_changed", warmth, max_warmth)
 	
-	if warmth <= 0.0:
+	# Freezing damage unless protected by True Hearth Shard frost immunity
+	if warmth <= 0.0 and not bool(blessings.get("frost_immunity", false)):
 		take_damage(delta * 2.5)
 
 func take_damage(amount: float) -> void:

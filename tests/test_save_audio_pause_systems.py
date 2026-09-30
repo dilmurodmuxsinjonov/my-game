@@ -383,7 +383,10 @@ class TestPauseAndSettingsMenu(unittest.TestCase):
 
     def test_controls_guide_coverage(self):
         """Ensure all required keybindings are documented in controls guide."""
-        documented_keys = ["W", "A", "S", "D", "Shift", "Space", "E", "C", "L", "H", "F1", "F2", "F5", "F9", "ESC"]
+        documented_keys = [
+            "W", "A", "S", "D", "Shift", "Space", "E", "C", "L", "J", "K",
+            "V", "U", "M", "T", "B", "N", "H", "F1", "F2", "F5", "F9", "ESC"
+        ]
         for key in documented_keys:
             self.assertTrue(len(key) > 0)
 
@@ -409,7 +412,7 @@ class TestGameManagerAudioAndPersistenceWiring(unittest.TestCase):
     """Validates GameManager input bindings and signal propagation."""
 
     def test_input_action_hotkeys(self):
-        """Test hotkey mappings: F5=QuickSave, F9=QuickLoad, ESC=PauseMenu."""
+        """Test hotkey mappings: F5=QuickSave, F9=QuickLoad, ESC=PauseMenu, etc."""
         key_actions = {
             "KEY_F5": "quick_save",
             "KEY_F9": "quick_load",
@@ -418,11 +421,21 @@ class TestGameManagerAudioAndPersistenceWiring(unittest.TestCase):
             "KEY_F2": "cycle_district",
             "KEY_H": "war_horn",
             "KEY_L": "royal_ledger",
-            "KEY_C": "crafting_menu"
+            "KEY_C": "crafting_menu",
+            "KEY_J": "quest_journal",
+            "KEY_K": "royal_heraldry",
+            "KEY_V": "royal_decrees",
+            "KEY_U": "diplomacy_system",
+            "KEY_M": "war_room",
+            "KEY_T": "tournament_system",
+            "KEY_B": "monastery_system",
+            "KEY_N": "espionage_system",
         }
         self.assertEqual(key_actions["KEY_F5"], "quick_save")
         self.assertEqual(key_actions["KEY_F9"], "quick_load")
         self.assertEqual(key_actions["KEY_ESCAPE"], "toggle_pause")
+        self.assertEqual(key_actions["KEY_B"], "monastery_system")
+        self.assertEqual(key_actions["KEY_N"], "espionage_system")
 
 
 if __name__ == "__main__":

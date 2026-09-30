@@ -11,6 +11,7 @@ signal operation_launched(op_id: String, target_realm: String, agent_id: String)
 signal operation_resolved(op_id: String, success: bool, outcome_desc: String, rewards: Dictionary)
 signal counter_intel_triggered(threat_title: String, thwarted: bool)
 signal prisoner_interrogated(prisoner_id: String, secrets_revealed: String)
+signal daily_upkeep_processed(total_cost: int, paid_count: int, unpaid_count: int)
 
 # Agent Archetypes Catalog
 var agent_archetypes: Dictionary = {}
@@ -289,19 +290,67 @@ func ransom_prisoner(prisoner_id: String, supply_chain: SupplyChain = null) -> b
 			return true
 	return false
 
+# ----------------- Daily Upkeep & Retinue Maintenance -----------------
+func process_daily_upkeep(supply_chain: SupplyChain = null) -> Dictionary:
+	var total_upkeep_needed: int = 0
+	var paid_count: int = 0
+	var unpaid_count: int = 0
+
+	for agent_id in recruited_agents.keys():
+		var agent = recruited_agents[agent_id]
+		if agent.get("status") == "Captured":
+			continue
+		var atype = agent.get("type", "informant")
+		var arch = agent_archetypes.get(atype, {})
+		var upkeep = arch.get("upkeep_daily", 2)
+		total_upkeep_needed += upkeep
+
+	var current_gold = supply_chain.get_resource("gold_coins") if supply_chain else 0
+	var remaining_gold = current_gold
+
+	for agent_id in recruited_agents.keys():
+		var agent = recruited_agents[agent_id]
+		if agent.get("status") == "Captured":
+			continue
+		var atype = agent.get("type", "informant")
+		var arch = agent_archetypes.get(atype, {})
+		var upkeep = arch.get("upkeep_daily", 2)
+
+		if supply_chain and remaining_gold >= upkeep:
+			supply_chain.consume_resource("gold_coins", upkeep)
+			remaining_gold -= upkeep
+			if agent.get("status") == "Unpaid":
+				agent["status"] = "Ready"
+			paid_count += 1
+		else:
+			if agent.get("status") == "Ready":
+				agent["status"] = "Unpaid"
+			unpaid_count += 1
+
+	var actual_cost_paid = current_gold - remaining_gold
+	daily_upkeep_processed.emit(actual_cost_paid, paid_count, unpaid_count)
+
+	return {
+		"total_cost_needed": total_upkeep_needed,
+		"cost_paid": actual_cost_paid,
+		"paid_count": paid_count,
+		"unpaid_count": unpaid_count,
+		"all_paid": (unpaid_count == 0)
+	}
+
 # ----------------- Persistence -----------------
 func to_dict() -> Dictionary:
 	var agents_copy: Dictionary = {}
 	for k in recruited_agents.keys():
-		agents_copy[k] = dict(recruited_agents[k])
+		agents_copy[k] = recruited_agents[k].duplicate(true)
 
 	var ops_copy: Array = []
 	for op in active_operations:
-		ops_copy.append(dict(op))
+		ops_copy.append(op.duplicate(true))
 
 	var pris_copy: Array = []
 	for p in captured_prisoners:
-		pris_copy.append(dict(p))
+		pris_copy.append(p.duplicate(true))
 
 	return {
 		"recruited_agents": agents_copy,
@@ -320,10 +369,10 @@ func from_dict(data: Dictionary) -> void:
 	recruited_agents = data.get("recruited_agents", {})
 	active_operations.clear()
 	for op in data.get("active_operations", []):
-		active_operations.append(dict(op))
+		active_operations.append(op.duplicate(true))
 	captured_prisoners.clear()
 	for p in data.get("captured_prisoners", []):
-		captured_prisoners.append(dict(p))
+		captured_prisoners.append(p.duplicate(true))
 	citadel_security_rating = data.get("citadel_security_rating", 65.0)
 	court_suspicion = data.get("court_suspicion", 10.0)
 	total_operations_completed = data.get("total_operations_completed", 0)

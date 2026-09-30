@@ -100,7 +100,7 @@ func _create_ui() -> void:
 	_create_button(st_vbox, "↩ BACK", func(): _show_view(main_container))
 
 	# 5. Controls Guide View
-	controls_container = _create_panel("FEUDAL REALM CONTROLS", Vector2(500, 520))
+	controls_container = _create_panel("FEUDAL REALM CONTROLS", Vector2(540, 680))
 	controls_container.visible = false
 	add_child(controls_container)
 	var ct_vbox = controls_container.get_node("VBox")
@@ -121,6 +121,14 @@ func _create_ui() -> void:
 [FEUDAL REALM SHORTCUTS]
   C           - Crafting Recipe Menu
   L           - Royal Ledger & Citizen Assignment
+  J           - Quest Chronicle & Royal Deeds
+  K           - Coat of Arms Heraldry & Castle Decor
+  V           - Imperial Decrees & Garrison Squadron
+  U           - Foreign Diplomacy, Alliances & Vassalage
+  M           - Strategic War Room & Frontier Outposts
+  T           - Grand Feudal Tournament & Knighthood
+  B           - Monastic Scriptoria & Alchemy Lab
+  N           - Royal Spymaster & Shadow Intrigue
   H           - War Horn (Summon Militia)
   F1          - Realism Debug Telemetry Overlay
   F2          - Cycle Fast-Travel Across 8 Districts
