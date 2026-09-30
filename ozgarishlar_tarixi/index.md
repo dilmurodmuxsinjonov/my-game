@@ -1,5 +1,29 @@
 # O'zgarishlar tarixi
 
+## 2026-09-30 — Milestone 47: Monarch Imperial Decrees, Tactical Garrison Squadron Command, and Royal Decrees UI (Issue #56)
+- **Monarx Imperatorlik Farmonlari va Edictlar Tizimi (`scripts/core/royal_decrees.gd`)**:
+  - 6 ta tarixiy qirollik farmoni va qonuniy kodekslar:
+    - *Corvée Mandatory Labor Mandate*: Ishchilar mehnat unumdorligi +30%, ochlik sarfi +20%.
+    - *Imperial Grain Dole & Famine Relief*: Aholiga non va g'alla tarqatish, ochlik sarfi -35%, ma'naviyat +25.
+    - *Artisan Guild Patronage & Subsidies*: Hunarmandlar gildiyasini moliyalashtirish, buyumlar sifati/miqdori +25%, temir eritish tezligi +35%.
+    - *Frontier Militia Levy Conscription*: Mudofaa safiga fuqarolarni jalb qilish, soqchilar mudofaasi +25%, garnizon sig'imi +4.
+    - *Mercantile Free Trade & Toll Exemption*: Boj to'lovlaridan ozod qilish, savdo karvonlari kelishi 35% tezlashadi, xarid narxlari -15%.
+    - *Monastic Scholarly Patronage*: Ilm-fan va monastir tabobatini qo'llab-quvvatlash, ilmiy tadqiqotlar +40%, shifoxona tezligi +50%.
+  - Har bir farmonning davomiylik vaqti (Duration), so'nish taymeri, qirollik obro'si (Renown) va oltin xarajatlari to'liq modellashtirildi.
+- **Taktik Garnizon Bo'linmalari Boshqaruvi (`scripts/combat/squadron_command.gd`)**:
+  - 3 xil taktik holat (Stances): *Defensive Sentinel* (Qal'a va darvozalarni himoyalash), *Aggressive Assault* (Qaroqchilar va qarorgohlarni yanchish), *Monarch Escort* (Monarxning shaxsiy qo'riqchilari bo'lib ergashish).
+  - 4 xil harbiy saf (Formations): *Shield Wall* (Qalqonlar devori, himoya +35%, tezlik -20%), *Shock Wedge* (Hujum pona safi, zarba kuchi +40%, quvib yetish tezligi +10%), *Skirmish Line* (Kamondan o'q uzuvchilarning keng tarqalgan safi, o'q uzish tezligi +25%), *Perimeter Square* (360° to'liq aylanma mudofaa).
+  - Harbiy safdagi askarlarning 3D koordinata siljishlari (`get_formation_offsets`) hisoblab chiqildi.
+  - Jang karnayi (`H`) chalinganda barcha soqchilarni monarx atrofiga to'plash (Rally Call).
+- **Farmonlar va Harbiy Buyruqlar UI Menyusi (`scripts/ui/decrees_command_ui.gd`)**:
+  - `V` tugmasi orqali ochiluvchi imperatorlik qonunlari va garnizon saflarini boshqarish paneli.
+- **Save/Load Persistensiyasiga Integratsiya (`scripts/core/save_system.gd`)**:
+  - Faol farmonlar, qolgan vaqtlar va tanlangan garnizon safi tejamkor JSON delta formatida saqlanadi va yuklanganda to'liq tiklanadi.
+- **Standalone Simulyator Kengaytmasi (`tools/interactive_play_simulator.py`)**:
+  - Yangi `decrees`, `proclaim <edict>`, `squad` va `formation <name>` buyruqlari.
+- **Avtomatlashgan Testlar To'plami (`tests/test_decrees_squadron_systems.py`)**:
+  - Jami **401 ta test 100% muvaffaqiyat bilan o'tdi** (0.72s).
+
 ## 2026-09-29 — Milestone 46: Royal Heraldry Customizer, Atmospheric Environment Shaders, and Castle Throne Room Decor Buffs (Issue #54)
 - **Qirollik Geraldikasi va Gerb Tizimi (`scripts/entities/royal_heraldry.gd`)**:
   - Tarixiy geraldik emblema va ramzlar: Tik Turgan Sher (Lion Rampant), Imperator Burguti (Imperial Eagle), Olovli Ajdaho (Fiery Dragon), Qirollik Bug'usi (Royal Stag), Monarx Toji (Monarch Crown), Liliya Guli (Fleur-de-lis), Chalishtirilgan Qilichlar (Crossed Swords), Oltin Bug'doy Bog'lami (Golden Wheat).
