@@ -151,6 +151,12 @@ class VoxelRealmSimulator:
             "night_crafting_bonus": 0.15,
         }
 
+        # Royal Decrees & Garrison Squadron State
+        self.active_decrees = ["corvee_labor"]
+        self.garrison_stance = "Defensive Sentinel (Hold Gates & Perimeter)"
+        self.garrison_formation = "Shield Wall (Locked Bucklers)"
+        self.garrison_guard_count = 6
+
     def print_header(self):
         print("\n" + "=" * 78)
         print("          VOXEL LORD: FEUDAL REALM - INTERACTIVE PLAYABLE SIMULATOR")
@@ -358,6 +364,59 @@ class VoxelRealmSimulator:
             self.castle_buffs[b_name] = self.castle_buffs.get(b_name, 0.0) + b_val
         print(f"✅ Installed {full_id} in Castle Throne Room! (+{prestige} Prestige)")
 
+    def show_decrees(self):
+        catalog = {
+            "corvee_labor": ("Corvée Mandatory Labor Mandate", "+30% Work Speed, +20% Hunger Drain", 50, 20),
+            "grain_dole_relief": ("Imperial Grain Dole Relief", "-35% Hunger Drain, +25 Morale", 25, 10),
+            "guild_subsidies": ("Artisan Guild Patronage", "+25% Craft Yield, +35% Smelt Speed", 45, 50),
+            "frontier_conscription": ("Frontier Militia Levy", "+25% Guard Defense, +4 Militia Cap", 60, 35),
+            "free_trade_charter": ("Mercantile Free Trade", "-35% Caravan Timer, -15% Trade Prices", 30, 30),
+            "monastic_scholarship": ("Monastic Scholarly Patronage", "+40% Tech Speed, +50% Healing", 75, 60),
+        }
+        print("\n📜 === IMPERIAL FEUDAL EDICTS & DECREES ===")
+        print(f"Monarch Renown: {self.total_renown} ⚜️ | Royal Treasury: {self.coins} 💰")
+        for dec_id, (name, effect, ren, coins) in catalog.items():
+            status = "[ACTIVE - ENACTED]" if dec_id in self.active_decrees else "[READY TO PROCLAIM]"
+            print(f"  • {status} {name} (Renown: {ren}, Coins: {coins})")
+            print(f"    Effect: {effect}")
+
+    def proclaim_decree(self, decree_id: str):
+        key = decree_id.lower().strip()
+        valid = ["corvee_labor", "grain_dole_relief", "guild_subsidies", "frontier_conscription", "free_trade_charter", "monastic_scholarship"]
+        matched = [v for v in valid if key in v]
+        if not matched:
+            print(f"Unknown decree '{decree_id}'. Options: {', '.join(valid)}")
+            return
+        chosen = matched[0]
+        if chosen in self.active_decrees:
+            print(f"Decree '{chosen}' is already active!")
+            return
+        self.active_decrees.append(chosen)
+        print(f"📜 Monarch Proclamation: Decree '{chosen}' is now active across the realm!")
+
+    def show_squadron(self):
+        print("\n⚔️ === GARRISON SQUADRON TACTICAL COMMAND ===")
+        print(f"Garrison Strength: {self.garrison_guard_count} Shielded Guards & Archers")
+        print(f"Tactical Stance: {self.garrison_stance}")
+        print(f"Military Formation: {self.garrison_formation}")
+        print("Formation Modifiers: +35% Shield Defense, -20% Move Speed, +30% Block Chance")
+        print("Rally Status: Guards actively patrolling royal citadel walls.")
+
+    def set_squadron_formation(self, formation_name: str):
+        formations = {
+            "wall": "Shield Wall (Locked Bucklers)",
+            "wedge": "Shock Wedge (Vanguard Charge)",
+            "skirmish": "Skirmish Line (Spread Archers)",
+            "square": "Perimeter Square (360° Bulwark)"
+        }
+        key = formation_name.lower().strip()
+        matched = [k for k in formations if key in k]
+        if not matched:
+            print(f"Unknown formation '{formation_name}'. Options: {', '.join(formations.keys())}")
+            return
+        self.garrison_formation = formations[matched[0]]
+        print(f"⚔️ Squadron Commander: Formed into {self.garrison_formation}!")
+
     def run_cli(self):
         self.print_header()
         print("\nWelcome, Monarch! The entire Feudal Realm is assembled and awaiting your command.")
@@ -396,6 +455,10 @@ class VoxelRealmSimulator:
                 print("  talk [role]       - Converse with citizen (smith, farmer, guard, baker)")
                 print("  quests / journal  - Open Royal Deeds & Feudal Quest Chronicle (J key)")
                 print("  heraldry          - View royal coat of arms, motto, and tinctures (K key)")
+                print("  decrees           - Open Imperial Decrees & Law Proclamations (V key)")
+                print("  proclaim <edict>  - Proclaim edict (corvee, grain, guild, militia, trade, scholar)")
+                print("  squad             - View garrison squadron status, stance, and formation")
+                print("  formation <name>  - Order formation (wall, wedge, skirmish, square)")
                 print("  castle            - View Throne Room decor and active imperial realm buffs")
                 print("  install <decor>   - Install decor (throne, map, chandelier, vault, table, armor, armillary)")
                 print("  pause             - Display in-game pause menu and controls guide")
@@ -435,6 +498,20 @@ class VoxelRealmSimulator:
                 self.show_heraldry()
             elif cmd in ["castle", "throne"]:
                 self.show_castle_customizer()
+            elif cmd in ["decrees", "edicts"]:
+                self.show_decrees()
+            elif cmd == "proclaim":
+                if args:
+                    self.proclaim_decree(args[0])
+                else:
+                    print("Usage: proclaim <corvee|grain|guild|militia|trade|scholar>")
+            elif cmd in ["squad", "garrison"]:
+                self.show_squadron()
+            elif cmd == "formation":
+                if args:
+                    self.set_squadron_formation(args[0])
+                else:
+                    print("Usage: formation <wall|wedge|skirmish|square>")
             elif cmd == "install":
                 if args:
                     self.install_furnishing(args[0])
@@ -486,6 +563,12 @@ def main():
         sim.install_furnishing("vault")
         assert "treasury_vault_chest" in sim.castle_decor
         assert sim.castle_prestige == 150
+        sim.show_decrees()
+        sim.proclaim_decree("guild")
+        assert "guild_subsidies" in sim.active_decrees
+        sim.show_squadron()
+        sim.set_squadron_formation("wedge")
+        assert "Shock Wedge" in sim.garrison_formation
         print("[INTERACTIVE SIMULATOR] All simulator subsystems passed verification cleanly!")
         sys.exit(0)
     sim.run_cli()

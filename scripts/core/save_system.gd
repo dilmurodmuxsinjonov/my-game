@@ -117,6 +117,16 @@ func save_game(slot_name: String, game_manager: Node) -> bool:
 	if cc and cc.has_method("to_dict"):
 		castle_data = cc.to_dict()
 
+	# 7. Royal Decrees & Squadron Command Data
+	var decrees_data: Dictionary = {}
+	var squadron_data: Dictionary = {}
+	var rd = game_manager.get("royal_decrees")
+	if rd and rd.has_method("to_dict"):
+		decrees_data = rd.to_dict()
+	var sq = game_manager.get("squadron_command")
+	if sq and sq.has_method("to_dict"):
+		squadron_data = sq.to_dict()
+
 	# Assembly of Master Payload
 	var current_time = Time.get_unix_time_from_system()
 	var payload: Dictionary = {
@@ -130,7 +140,9 @@ func save_game(slot_name: String, game_manager: Node) -> bool:
 		"voxels_delta": voxels_serialized,
 		"citizens": citizens_data,
 		"heraldry": heraldry_data,
-		"castle": castle_data
+		"castle": castle_data,
+		"decrees": decrees_data,
+		"squadron": squadron_data
 	}
 
 	var json_str = JSON.stringify(payload, "\t")
@@ -229,6 +241,16 @@ func load_game(slot_name: String, game_manager: Node) -> bool:
 		var cc_load = game_manager.get("castle_customizer")
 		if cc_load and cc_load.has_method("from_dict"):
 			cc_load.from_dict(payload["castle"])
+
+	# 5. Restore Decrees & Squadron Command
+	if payload.has("decrees"):
+		var rd_load = game_manager.get("royal_decrees")
+		if rd_load and rd_load.has_method("from_dict"):
+			rd_load.from_dict(payload["decrees"])
+	if payload.has("squadron"):
+		var sq_load = game_manager.get("squadron_command")
+		if sq_load and sq_load.has_method("from_dict"):
+			sq_load.from_dict(payload["squadron"])
 
 	load_completed.emit(slot_name, true)
 	print("[SAVE SYSTEM] Successfully loaded realm from %s on Day %s!" % [slot_name, payload.get("datetime", "Unknown")])

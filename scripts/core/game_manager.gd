@@ -21,6 +21,9 @@ const RoyalHeraldry = preload("res://scripts/entities/royal_heraldry.gd")
 const AtmosphericPostProcess = preload("res://scripts/world/atmospheric_post_process.gd")
 const CastleCustomizer = preload("res://scripts/world/castle_customizer.gd")
 const HeraldryCustomizerUI = preload("res://scripts/ui/heraldry_customizer_ui.gd")
+const RoyalDecrees = preload("res://scripts/core/royal_decrees.gd")
+const SquadronCommand = preload("res://scripts/combat/squadron_command.gd")
+const DecreesCommandUI = preload("res://scripts/ui/decrees_command_ui.gd")
 
 var save_system: SaveSystem = null
 var audio_manager: AudioManager = null
@@ -32,6 +35,9 @@ var royal_heraldry: RoyalHeraldry = null
 var atmospheric_system: AtmosphericPostProcess = null
 var castle_customizer: CastleCustomizer = null
 var heraldry_ui: HeraldryCustomizerUI = null
+var royal_decrees: RoyalDecrees = null
+var squadron_command: SquadronCommand = null
+var decrees_ui: DecreesCommandUI = null
 
 var supply_chain: SupplyChain
 var citizens: Array[Citizen] = []
@@ -100,6 +106,7 @@ func _ready() -> void:
 		player.footstep_stepped.connect(_on_player_footstep)
 		player.toggle_journal_requested.connect(_on_toggle_journal)
 		player.toggle_heraldry_requested.connect(_on_toggle_heraldry)
+		player.toggle_decrees_requested.connect(_on_toggle_decrees)
 		
 		# Position player on top of surface terrain at spawn
 		var spawn_x = 32
@@ -195,6 +202,32 @@ func _ready() -> void:
 		else:
 			add_child(heraldry_ui)
 	heraldry_ui.setup(royal_heraldry, castle_customizer, supply_chain)
+
+	# Initialize Royal Decrees & Garrison Squadron Command
+	royal_decrees = RoyalDecrees.new()
+	royal_decrees.name = "RoyalDecrees"
+	add_child(royal_decrees)
+	royal_decrees.decree_proclaimed.connect(_on_decree_proclaimed)
+	royal_decrees.decree_expired.connect(_on_decree_expired)
+
+	squadron_command = SquadronCommand.new()
+	squadron_command.name = "SquadronCommand"
+	add_child(squadron_command)
+	squadron_command.stance_changed.connect(_on_squad_stance_changed)
+	squadron_command.formation_changed.connect(_on_squad_formation_changed)
+
+	# Wire up Decrees & Military Command UI
+	decrees_ui = get_node_or_null("UI/DecreesCommandUI") as DecreesCommandUI
+	if not decrees_ui:
+		decrees_ui = DecreesCommandUI.new()
+		decrees_ui.name = "DecreesCommandUI"
+		var ui_node_dec = get_node_or_null("UI")
+		if ui_node_dec:
+			ui_node_dec.add_child(decrees_ui)
+		else:
+			add_child(decrees_ui)
+	decrees_ui.setup(royal_decrees, squadron_command, supply_chain, quest_manager)
+	decrees_ui.rally_requested.connect(_on_squad_rally_requested)
 		
 	# Spawn initial workstations, citizens, and trade caravan
 	_spawn_initial_workstations()
@@ -321,6 +354,10 @@ func _process(delta: float) -> void:
 		if env_node and sun_light:
 			atmospheric_system.apply_to_environment(env_node, sun_light, atmo_params)
 
+	# Update Royal Decrees timers
+	if royal_decrees:
+		royal_decrees.update_timers(delta)
+
 	# Thermal climate & seasonal updates
 	if season_manager:
 		var current_temp = season_manager.calculate_current_temperature(progress)
@@ -440,6 +477,8 @@ func _on_war_horn_sounded() -> void:
 		c.on_royal_alarm(is_royal_alarm_active, hearth_pos)
 	if audio_manager:
 		audio_manager.play_war_horn()
+	if squadron_command and player:
+		squadron_command.issue_rally_call(player.global_position, citizens)
 	if quest_manager:
 		quest_manager.record_progress("sound_war_horn", 1)
 		
@@ -654,5 +693,37 @@ func _on_heraldry_updated(_blazon: String, _pri: Color, _sec: Color) -> void:
 		hud.show_notification("🛡️ Royal Coat of Arms & Castle Banners Updated!")
 	if audio_manager:
 		audio_manager.play_craft_success()
+
+func _on_toggle_decrees() -> void:
+	if decrees_ui:
+		decrees_ui.toggle_menu()
+		if audio_manager:
+			audio_manager.play_ui_click()
+
+func _on_decree_proclaimed(_decree_id: String, decree_name: String) -> void:
+	if hud:
+		hud.show_notification("📜 IMPERIAL EDICT PROCLAIMED: %s!" % decree_name)
+	if audio_manager:
+		audio_manager.play_war_horn()
+
+func _on_decree_expired(_decree_id: String, decree_name: String) -> void:
+	if hud:
+		hud.show_notification("⌛ Imperial Edict Expired: %s." % decree_name)
+
+func _on_squad_stance_changed(_new_stance: int, stance_name: String) -> void:
+	if hud:
+		hud.show_notification("🛡️ Garrison Stance: %s" % stance_name)
+
+func _on_squad_formation_changed(_new_form: int, form_name: String) -> void:
+	if hud:
+		hud.show_notification("⚔️ Military Formation: %s" % form_name)
+
+func _on_squad_rally_requested() -> void:
+	if squadron_command and player:
+		var count = squadron_command.issue_rally_call(player.global_position, citizens)
+		if hud:
+			hud.show_notification("📯 Rallied %d Garrison Guards to Monarch!" % count)
+		if audio_manager:
+			audio_manager.play_war_horn()
 
 
