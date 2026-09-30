@@ -12,6 +12,7 @@ signal crop_harvested(pos: Vector3i, yield_data: Dictionary)
 var voxel_world: VoxelWorld
 var supply_chain: SupplyChain
 var soil_manager: AgronomySoilManager
+var monastery_research_system = null
 
 # Position (Vector3i) -> Crop State Dictionary
 # {"crop_type": "wheat", "stage": int, "progress": float, "hydrated": bool}
@@ -131,8 +132,11 @@ func harvest_crop(pos: Vector3i, farmer_skill: int = 1) -> Dictionary:
 		var harvest_res = soil_manager.process_harvest(floor_pos, crop_type, farmer_skill)
 		yield_qty = harvest_res.get("yield", 1)
 		is_blighted = harvest_res.get("blight", false)
-		post_fertility = harvest_res.get("fertility_post", 100.0)
-	
+	if monastery_research_system and monastery_research_system.has_method("get_active_blessings"):
+		var blessings = monastery_research_system.get_active_blessings()
+		if blessings.has("harvest_bonus") and not is_blighted:
+			yield_qty = int(round(yield_qty * blessings["harvest_bonus"]))
+
 	var yield_data = {
 		crop_type: yield_qty,
 		"seeds": 2 if not is_blighted else 0
