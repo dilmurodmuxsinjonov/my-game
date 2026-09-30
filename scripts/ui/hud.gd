@@ -194,10 +194,10 @@ func _create_ui_elements() -> void:
 	debug_panel.name = "DebugPanel"
 	debug_panel.anchor_left = 1.0
 	debug_panel.anchor_right = 1.0
-	debug_panel.offset_left = -340.0
+	debug_panel.offset_left = -400.0
 	debug_panel.offset_top = 75.0
 	debug_panel.offset_right = -20.0
-	debug_panel.offset_bottom = 280.0
+	debug_panel.offset_bottom = 320.0
 	var sb_debug = StyleBoxFlat.new()
 	sb_debug.bg_color = Color(0.06, 0.08, 0.12, 0.92)
 	sb_debug.border_width_left = 1
@@ -324,7 +324,7 @@ func toggle_debug_overlay() -> void:
 
 func update_debug_info(fps: float, pos: Vector3, district_name: String, biome_name: String) -> void:
 	if debug_label and is_debug_visible:
-		debug_label.text = "[REALISM DEBUG OVERLAY - F1]\nFPS: %.0f | Monarch: (%.1f, %.1f, %.1f)\nDistrict: %s\nBiome: %s\nControls: [WASD] Move | [Shift] Sprint | [Space] Jump\n[LMB] Mine | [RMB] Place | [E] Interact | [C] Crafting\n[L] Ledger | [H] Horn | [F2] Fast Travel | [ESC] Pause" % [
+		debug_label.text = "[REALISM DEBUG OVERLAY - F1]\nFPS: %.0f | Monarch: (%.1f, %.1f, %.1f)\nDistrict: %s | Biome: %s\nControls: [WASD] Move | [Shift] Sprint | [Space] Jump\n[LMB] Mine | [RMB] Place | [E] Interact | [C] Craft | [L] Ledger\n[J] Deeds | [K] Heraldry | [V] Decrees | [U] Diplomacy\n[M] War Room | [T] Tourney | [B] Monastery | [N] Espionage\n[H] Horn | [F2] Districts | [F5/F9] Save/Load | [ESC] Pause" % [
 			fps, pos.x, pos.y, pos.z, district_name, biome_name
 		]
 
