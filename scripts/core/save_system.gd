@@ -157,6 +157,12 @@ func save_game(slot_name: String, game_manager: Node) -> bool:
 	if alab and alab.has_method("to_dict"):
 		alchemy_data = alab.to_dict()
 
+	# 13. Royal Spymaster & Shadow Espionage Network Data (Milestone 52)
+	var espionage_data: Dictionary = {}
+	var esp = game_manager.get("espionage_manager")
+	if esp and esp.has_method("to_dict"):
+		espionage_data = esp.to_dict()
+
 	# Assembly of Master Payload
 	var current_time = Time.get_unix_time_from_system()
 	var payload: Dictionary = {
@@ -177,7 +183,8 @@ func save_game(slot_name: String, game_manager: Node) -> bool:
 		"invasions": invasions_data,
 		"tournament": tournament_data,
 		"monastery": monastery_data,
-		"alchemy": alchemy_data
+		"alchemy": alchemy_data,
+		"espionage": espionage_data
 	}
 
 	var json_str = JSON.stringify(payload, "\t")
@@ -306,6 +313,10 @@ func load_game(slot_name: String, game_manager: Node) -> bool:
 		var alab_load = game_manager.get("alchemy_laboratory")
 		if alab_load and alab_load.has_method("from_dict"):
 			alab_load.from_dict(payload["alchemy"])
+	if payload.has("espionage"):
+		var esp_load = game_manager.get("espionage_manager")
+		if esp_load and esp_load.has_method("from_dict"):
+			esp_load.from_dict(payload["espionage"])
 
 	load_completed.emit(slot_name, true)
 	print("[SAVE SYSTEM] Successfully loaded realm from %s on Day %s!" % [slot_name, payload.get("datetime", "Unknown")])

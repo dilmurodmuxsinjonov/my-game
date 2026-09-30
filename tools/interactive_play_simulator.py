@@ -197,6 +197,14 @@ class VoxelRealmSimulator:
         self.brewed_potions = 0
         self.transmutations = 0
 
+        # Royal Spymaster & Shadow Espionage Network State (Milestone 52)
+        self.recruited_spies = {}
+        self.active_covert_ops = []
+        self.captured_spies = []
+        self.citadel_security = 65.0
+        self.plots_thwarted = 0
+
+
     def print_header(self):
         print("\n" + "=" * 78)
         print("          VOXEL LORD: FEUDAL REALM - INTERACTIVE PLAYABLE SIMULATOR")
@@ -789,6 +797,135 @@ class VoxelRealmSimulator:
         self.stone_stage += 1
         print(f"🔴 ALCHEMICAL ELEVATION: Philosopher's Stone refined to Stage {self.stone_stage}: {stone_names[self.stone_stage - 1]}!")
 
+    def show_espionage(self):
+        print("\n🗡️ === ROYAL SPYMASTER & SHADOW COUNCIL (KEY_N) ===")
+        print(f"Citadel Security Rating: {self.citadel_security:.1f}% | Plots Foiled: {self.plots_thwarted}")
+        print(f"Recruited Agents ({len(self.recruited_spies)}):")
+        if not self.recruited_spies:
+            print("  • No shadow agents currently on royal retainer.")
+        else:
+            for a_id, a in self.recruited_spies.items():
+                print(f"  • [{a_id}] {a['name']} ({a['type']}) - Status: {a['status']} in {a['realm'].capitalize()}")
+
+        print(f"Ongoing Operations ({len(self.active_covert_ops)}):")
+        if not self.active_covert_ops:
+            print("  • No active covert operations executing.")
+        else:
+            for op in self.active_covert_ops:
+                print(f"  • {op['name']} in {op['realm'].capitalize()} (Agent: {op['agent']})")
+
+        print(f"Citadel Dungeons ({len(self.captured_spies)} prisoners):")
+        if not self.captured_spies:
+            print("  • Subterranean cells are vacant.")
+        else:
+            for p in self.captured_spies:
+                status = "Interrogated" if p["interrogated"] else "Unbroken"
+                print(f"  • [{p['id']}] {p['name']} - Status: {status} (Ransom: {p['ransom']} Gold)")
+
+    def recruit_shadow_spy(self, archetype_key: str):
+        key = archetype_key.lower().strip()
+        archetypes = {
+            "informant": ("Whispering Tavern Informant", 30),
+            "saboteur": ("Infiltration Sapper & Saboteur", 60),
+            "master_spy": ("Shadow Courtier & Master Provocateur", 120),
+            "spy": ("Shadow Courtier & Master Provocateur", 120)
+        }
+        matched = [k for k in archetypes if key in k]
+        if not matched:
+            print(f"Unknown archetype '{archetype_key}'. Options: informant, saboteur, master_spy")
+            return
+        arch_k = matched[0]
+        name, cost = archetypes[arch_k]
+        if self.coins < cost:
+            print(f"Insufficient treasury coins (Requires {cost} Gold, have {self.coins}).")
+            return
+        self.coins -= cost
+        a_id = f"agent_{len(self.recruited_spies)+1}"
+        self.recruited_spies[a_id] = {
+            "id": a_id,
+            "name": name,
+            "type": arch_k,
+            "status": "Ready",
+            "realm": "citadel"
+        }
+        self.citadel_security = min(100.0, self.citadel_security + 5.0)
+        print(f"🗡️ SHADOW COUNCIL: Recruited {name} [{a_id}] (-{cost} Gold)! Security -> {self.citadel_security:.1f}%.")
+
+    def launch_covert_op(self, op_key: str, realm: str = "ashfell"):
+        ops = {
+            "intel": ("Uncover Military Invasion War Plans", 25),
+            "sabotage": ("Spike Battering Rams & Burn Pitch Depots", 45),
+            "tech": ("Pilfer Monastic Scriptoria Parchments", 60),
+            "revolt": ("Sow Dissidence & Bribe Border Troops", 80)
+        }
+        matched = [k for k in ops if op_key.lower() in k]
+        if not matched:
+            print(f"Unknown operation '{op_key}'. Options: intel, sabotage, tech, revolt")
+            return
+        o_key = matched[0]
+        name, cost = ops[o_key]
+
+        ready_agents = [aid for aid, a in self.recruited_spies.items() if a["status"] == "Ready"]
+        if not ready_agents:
+            print("No ready shadow agents available! Recruit an agent first.")
+            return
+        if self.coins < cost:
+            print(f"Insufficient treasury coins (Requires {cost} Gold).")
+            return
+
+        self.coins -= cost
+        agent_id = ready_agents[0]
+        self.recruited_spies[agent_id]["status"] = "On Mission"
+        self.recruited_spies[agent_id]["realm"] = realm
+        self.active_covert_ops.append({
+            "name": name,
+            "realm": realm,
+            "agent": agent_id
+        })
+        print(f"🎭 COVERT INTRIGUE: Dispatched {agent_id} on '{name}' in {realm.capitalize()} (-{cost} Gold)!")
+        self.active_covert_ops.pop()
+        self.recruited_spies[agent_id]["status"] = "Ready"
+        if o_key == "intel":
+            print(f"✓ Operation Succeeded! Infiltrated {realm.capitalize()} war council: attack plans mapped.")
+        elif o_key == "sabotage":
+            print(f"✓ Operation Succeeded! Burned siege weapon depots in {realm.capitalize()}: enemy power halved.")
+        elif o_key == "tech":
+            self.scholar_points += 120.0
+            print(f"✓ Operation Succeeded! Stole scriptoria treatises from {realm.capitalize()}: +120 Scholar Points!")
+        elif o_key == "revolt":
+            print(f"✓ Operation Succeeded! Incited border rebellion in {realm.capitalize()}: +3 Deserters joined garrison.")
+
+    def trigger_counter_intel_sweep(self):
+        self.plots_thwarted += 1
+        p_id = f"prisoner_{len(self.captured_spies)+1}"
+        self.captured_spies.append({
+            "id": p_id,
+            "name": "Ashfell Clan Infiltrator",
+            "interrogated": False,
+            "ransom": 50
+        })
+        print(f"🛡️ COUNTER-INTELLIGENCE: Foiled enemy sabotage plot in Citadel Tavern! Captured {p_id} into dungeons.")
+
+    def interrogate_captive(self):
+        if not self.captured_spies:
+            print("No captives in citadel dungeons to interrogate.")
+            return
+        p = self.captured_spies[0]
+        if p["interrogated"]:
+            print(f"Prisoner {p['id']} has already revealed all secrets.")
+            return
+        p["interrogated"] = True
+        self.coins += 75
+        print(f"🔍 DUNGEON INTERROGATION: Prisoner {p['id']} cracked! Disclosed concealed gold stash (+75 Gold Coins).")
+
+    def ransom_captive(self):
+        if not self.captured_spies:
+            print("No captives in dungeons to ransom.")
+            return
+        p = self.captured_spies.pop(0)
+        self.coins += p["ransom"]
+        print(f"💰 RANSOM RESOLVED: Exchanged {p['id']} with foreign bailiffs for +{p['ransom']} Gold Coins!")
+
     def run_cli(self):
         self.print_header()
         print("\nWelcome, Monarch! The entire Feudal Realm is assembled and awaiting your command.")
@@ -851,6 +988,12 @@ class VoxelRealmSimulator:
                 print("  enshrine <relic>  - Enshrine holy relic on altar slot (hearth, crown, columba, chalice, banner)")
                 print("  bells             - Ring Abbey Cathedral Bells (+30% Citizen Serenity)")
                 print("  magnum            - Refine Philosopher's Stone stage (Nigredo -> Albedo -> Citrinitas -> Rubedo)")
+                print("  spies / shadow    - Open Royal Spymaster & Shadow Council (N key)")
+                print("  recruit <type>    - Recruit shadow agent (informant, saboteur, master_spy)")
+                print("  infiltrate <op> [r]- Launch covert mission in foreign realm (intel, sabotage, tech, revolt)")
+                print("  sweep             - Run counter-intelligence sweep in Citadel taverns")
+                print("  interrogate       - Interrogate captured foreign infiltrator in dungeons")
+                print("  ransom            - Ransom captive spy to foreign envoys for gold")
                 print("  pause             - Display in-game pause menu and controls guide")
                 print("  wait              - Advance time by 1 hour (burn calories, regenerate stamina)")
                 print("  quit              - Exit simulator")
@@ -996,6 +1139,25 @@ class VoxelRealmSimulator:
                 self.ring_abbey_bells()
             elif cmd in ["magnum", "stone"]:
                 self.refine_philosophers_stone()
+            elif cmd in ["spies", "espionage", "shadow", "spymaster"]:
+                self.show_espionage()
+            elif cmd in ["recruit", "hire_spy"]:
+                if args:
+                    self.recruit_shadow_spy(args[0])
+                else:
+                    print("Usage: recruit <informant|saboteur|master_spy>")
+            elif cmd in ["infiltrate", "op", "covert"]:
+                if args:
+                    realm = args[1] if len(args) > 1 else "ashfell"
+                    self.launch_covert_op(args[0], realm)
+                else:
+                    print("Usage: infiltrate <intel|sabotage|tech|revolt> [valoria|ashfell|silvercoast]")
+            elif cmd in ["sweep", "counter_intel"]:
+                self.trigger_counter_intel_sweep()
+            elif cmd in ["interrogate", "question"]:
+                self.interrogate_captive()
+            elif cmd in ["ransom", "release"]:
+                self.ransom_captive()
             elif cmd == "pause":
                 print("\n=== [PAUSE MENU SIMULATION] ===")
                 print("1. Resume Realm")
@@ -1087,6 +1249,19 @@ def main():
         assert sim.abbey_bell_active
         sim.refine_philosophers_stone()
         assert sim.stone_stage == 2
+        sim.show_espionage()
+        sim.recruit_shadow_spy("informant")
+        assert len(sim.recruited_spies) >= 1
+        sim.launch_covert_op("intel", "ashfell")
+        sim.launch_covert_op("tech", "valoria")
+        assert sim.scholar_points >= 120.0
+        sim.trigger_counter_intel_sweep()
+        assert len(sim.captured_spies) == 1
+        assert sim.plots_thwarted >= 1
+        sim.interrogate_captive()
+        assert sim.captured_spies[0]["interrogated"]
+        sim.ransom_captive()
+        assert len(sim.captured_spies) == 0
         print("[INTERACTIVE SIMULATOR] All simulator subsystems passed verification cleanly!")
         sys.exit(0)
     sim.run_cli()

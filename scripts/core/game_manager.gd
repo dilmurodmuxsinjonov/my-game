@@ -47,6 +47,8 @@ var tournament_ui: TournamentUI = null
 var monastery_research_system: MonasteryResearchSystem = null
 var alchemy_laboratory: AlchemyLaboratory = null
 var monastery_ui: MonasteryUI = null
+var espionage_manager: EspionageManager = null
+var espionage_ui: EspionageUI = null
 
 var supply_chain: SupplyChain
 var citizens: Array[Citizen] = []
@@ -120,6 +122,7 @@ func _ready() -> void:
 		player.toggle_war_room_requested.connect(_on_toggle_war_room)
 		player.toggle_tournament_requested.connect(_on_toggle_tournament)
 		player.toggle_monastery_requested.connect(_on_toggle_monastery)
+		player.toggle_espionage_requested.connect(_on_toggle_espionage)
 		
 		# Position player on top of surface terrain at spawn
 		var spawn_x = 32
@@ -329,6 +332,27 @@ func _ready() -> void:
 		else:
 			add_child(monastery_ui)
 	monastery_ui.setup(monastery_research_system, alchemy_laboratory, supply_chain)
+
+	# Initialize Royal Spymaster & Shadow Intrigue Network (Milestone 52)
+	espionage_manager = EspionageManager.new()
+	espionage_manager.name = "EspionageManager"
+	add_child(espionage_manager)
+	espionage_manager.agent_recruited.connect(_on_espionage_agent_recruited)
+	espionage_manager.operation_resolved.connect(_on_espionage_op_resolved)
+	espionage_manager.counter_intel_triggered.connect(_on_counter_intel_triggered)
+	espionage_manager.prisoner_interrogated.connect(_on_prisoner_interrogated)
+
+	# Wire up Espionage UI
+	espionage_ui = get_node_or_null("UI/EspionageUI") as EspionageUI
+	if not espionage_ui:
+		espionage_ui = EspionageUI.new()
+		espionage_ui.name = "EspionageUI"
+		var ui_node_esp = get_node_or_null("UI")
+		if ui_node_esp:
+			ui_node_esp.add_child(espionage_ui)
+		else:
+			add_child(espionage_ui)
+	espionage_ui.set_espionage_manager(espionage_manager, supply_chain)
 		
 	# Spawn initial workstations, citizens, and trade caravan
 	_spawn_initial_workstations()
@@ -965,6 +989,43 @@ func _on_alchemy_metal_transmuted(_formula_id: String, _input_res: String, outpu
 		hud.show_notification("🪙 ALCHEMICAL TRANSMUTATION! Created %d %s!" % [output_count, output_res.replace("_", " ").capitalize()])
 	if audio_manager:
 		audio_manager.play_craft_success()
+
+func _on_toggle_espionage() -> void:
+	if espionage_ui:
+		espionage_ui.toggle_visibility()
+		if audio_manager:
+			audio_manager.play_ui_click()
+
+func _on_espionage_agent_recruited(_agent_id: String, agent_name: String, _type: String) -> void:
+	if hud:
+		hud.show_notification("🗡️ SHADOW COUNCIL: Recruited %s to royal retainer!" % agent_name)
+	if audio_manager:
+		audio_manager.play_craft_success()
+
+func _on_espionage_op_resolved(_op_id: String, success: bool, outcome_desc: String, _rewards: Dictionary) -> void:
+	if hud:
+		if success:
+			hud.show_notification("🎭 COVERT TRIUMPH: %s" % outcome_desc)
+		else:
+			hud.show_notification("⚠️ COVERT BLUNDER: %s" % outcome_desc)
+	if audio_manager:
+		audio_manager.play_craft_success()
+
+func _on_counter_intel_triggered(threat_title: String, thwarted: bool) -> void:
+	if hud:
+		if thwarted:
+			hud.show_notification("🛡️ COUNTER-INTELLIGENCE: %s" % threat_title)
+		else:
+			hud.show_notification("🚨 SECURITY BREACH: %s" % threat_title)
+	if audio_manager:
+		audio_manager.play_war_horn()
+
+func _on_prisoner_interrogated(_prisoner_id: String, secrets: String) -> void:
+	if hud:
+		hud.show_notification("🔍 DUNGEON INTERROGATION: %s" % secrets)
+	if audio_manager:
+		audio_manager.play_craft_success()
+
 
 
 

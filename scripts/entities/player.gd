@@ -64,6 +64,7 @@ signal toggle_diplomacy_requested()
 signal toggle_war_room_requested()
 signal toggle_tournament_requested()
 signal toggle_monastery_requested()
+signal toggle_espionage_requested()
 signal quick_save_requested()
 signal quick_load_requested()
 signal footstep_stepped(block_type: int, is_sprinting: bool)
@@ -196,6 +197,8 @@ func _unhandled_input(event: InputEvent) -> void:
 			emit_signal("toggle_tournament_requested")
 		elif event.keycode == KEY_B and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
 			emit_signal("toggle_monastery_requested")
+		elif event.keycode == KEY_N and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
+			emit_signal("toggle_espionage_requested")
 		elif event.keycode == KEY_H and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
 			emit_signal("war_horn_sounded")
 		elif event.keycode == KEY_F1:
