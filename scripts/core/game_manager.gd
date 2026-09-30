@@ -40,6 +40,8 @@ var squadron_command: SquadronCommand = null
 var decrees_ui: DecreesCommandUI = null
 var diplomacy_system: DiplomacySystem = null
 var diplomacy_ui: DiplomacyUI = null
+var foreign_invasion_manager: ForeignInvasionManager = null
+var war_room_ui: WarRoomUI = null
 
 var supply_chain: SupplyChain
 var citizens: Array[Citizen] = []
@@ -110,6 +112,7 @@ func _ready() -> void:
 		player.toggle_heraldry_requested.connect(_on_toggle_heraldry)
 		player.toggle_decrees_requested.connect(_on_toggle_decrees)
 		player.toggle_diplomacy_requested.connect(_on_toggle_diplomacy)
+		player.toggle_war_room_requested.connect(_on_toggle_war_room)
 		
 		# Position player on top of surface terrain at spawn
 		var spawn_x = 32
@@ -250,6 +253,28 @@ func _ready() -> void:
 		else:
 			add_child(diplomacy_ui)
 	diplomacy_ui.setup(diplomacy_system, supply_chain)
+
+	# Initialize Strategic Foreign Invasion & Siege Defense Engine
+	foreign_invasion_manager = ForeignInvasionManager.new()
+	foreign_invasion_manager.name = "ForeignInvasionManager"
+	add_child(foreign_invasion_manager)
+	foreign_invasion_manager.invasion_begun.connect(_on_invasion_begun)
+	foreign_invasion_manager.outpost_attacked.connect(_on_outpost_attacked)
+	foreign_invasion_manager.outpost_breached.connect(_on_outpost_breached)
+	foreign_invasion_manager.battalion_routed.connect(_on_battalion_routed)
+
+	# Wire up Royal War Room UI
+	war_room_ui = get_node_or_null("UI/WarRoomUI") as WarRoomUI
+	if not war_room_ui:
+		war_room_ui = WarRoomUI.new()
+		war_room_ui.name = "WarRoomUI"
+		var ui_node_wr = get_node_or_null("UI")
+		if ui_node_wr:
+			ui_node_wr.add_child(war_room_ui)
+		else:
+			add_child(war_room_ui)
+	war_room_ui.setup(foreign_invasion_manager, squadron_command, supply_chain)
+	war_room_ui.rally_alarm_requested.connect(_on_war_horn_sounded)
 		
 	# Spawn initial workstations, citizens, and trade caravan
 	_spawn_initial_workstations()
@@ -383,6 +408,10 @@ func _process(delta: float) -> void:
 	# Update Foreign Diplomacy & Vassal Tributes
 	if diplomacy_system:
 		diplomacy_system.process_diplomacy(delta, supply_chain)
+
+	# Update Strategic Foreign Invasions & Frontier Sieges
+	if foreign_invasion_manager:
+		foreign_invasion_manager.process_invasions(delta, diplomacy_system)
 
 	# Thermal climate & seasonal updates
 	if season_manager:
@@ -773,5 +802,36 @@ func _on_diplomatic_war_declared(faction_id: String, _aggressor: bool) -> void:
 		hud.show_notification("⚔️ WAR DECLARED! %s is now an enemy of the realm!" % fname)
 	if audio_manager:
 		audio_manager.play_war_horn()
+
+func _on_toggle_war_room() -> void:
+	if war_room_ui:
+		war_room_ui.toggle_war_room()
+		if audio_manager:
+			audio_manager.play_ui_click()
+
+func _on_invasion_begun(_battalion_id: String, faction_id: String, target_outpost: String) -> void:
+	if hud and foreign_invasion_manager:
+		var op = foreign_invasion_manager.get_outpost(target_outpost)
+		var op_name = op.get("name", target_outpost)
+		hud.show_notification("🚨 BORDER INVASION! %s battalion marching towards %s!" % [faction_id.capitalize(), op_name])
+	if audio_manager:
+		audio_manager.play_war_horn()
+
+func _on_outpost_attacked(_outpost_id: String, _damage: float, _garrison: int) -> void:
+	pass
+
+func _on_outpost_breached(outpost_id: String) -> void:
+	if hud and foreign_invasion_manager:
+		var op = foreign_invasion_manager.get_outpost(outpost_id)
+		var op_name = op.get("name", outpost_id)
+		hud.show_notification("💀 FORTIFICATION BREACHED! %s has fallen to invaders!" % op_name)
+	if audio_manager:
+		audio_manager.play_war_horn()
+
+func _on_battalion_routed(_battalion_id: String, casualties: int) -> void:
+	if hud:
+		hud.show_notification("⚔️ VICTORY! Hostile invasion battalion routed (%d casualties inflicted)!" % casualties)
+	if audio_manager:
+		audio_manager.play_craft_success()
 
 
