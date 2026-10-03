@@ -269,6 +269,45 @@ class VoxelRealmSimulator:
         self.verdict_history = []
         self.ratified_charters = []
 
+        # Monarch Trauma, Chirurgery & Health State (Milestone 56 - GDD Section 6)
+        self.monarch_level = 5
+        self.monarch_status = "active"  # "active", "incapacitated", "bedridden", "captive"
+        self.trauma_conditions = []
+        self.court_doctor_skill = 15  # Skill_doctor in [0, 50]
+        self.ransom_demanded = 0
+        self.bed_rest_remaining = 0.0  # in game hours
+        self.trauma_history = []
+
+        # Diurnal Schedule & Astronomical Calendar State (Milestone 56 - GDD Section 3)
+        self.simulation_ticks = 9 * 60  # 9:00 AM (540 ticks)
+        self.diurnal_schedule = {
+            "DAWN_MATINS": {"start": 5, "end": 7, "phase": "Dawn & Matins", "prod_mult": 0.8, "desc": "Morning chapel prayer, awakening, and tool preparation."},
+            "MORNING_WORK": {"start": 7, "end": 12, "phase": "Prime Labor", "prod_mult": 1.2, "desc": "Field plowing, forge hammering, and quarry extraction."},
+            "NOON_REPAST": {"start": 12, "end": 13, "phase": "Midday Meal", "prod_mult": 0.5, "desc": "Communal lunch, water break, and draft ox resting."},
+            "AFTERNOON_WORK": {"start": 13, "end": 18, "phase": "Guild Crafting", "prod_mult": 1.1, "desc": "Artisan joinery, weaving, masonry, and trade stalls."},
+            "VESPERS_SUPPER": {"start": 18, "end": 21, "phase": "Tavern & Rest", "prod_mult": 0.6, "desc": "Vespers prayer, tavern ale, song, and family supper."},
+            "NIGHT_SLUMBER": {"start": 21, "end": 5, "phase": "Night Curfew", "prod_mult": 0.0, "desc": "Curfew bells, gate lockup, citizen slumber, and watchmen patrol."}
+        }
+
+        # Demographic Aging & Population Lifecycle State (Milestone 56 - GDD Section 4)
+        self.population_cohorts = {
+            "AGE_INF": {"name": "Infancy (0-3 yrs)", "count": 6, "labor_mult": 0.0, "carry_mult": 0.0, "desc": "Dependent on nursing mothers; pure care burden."},
+            "AGE_CHI": {"name": "Childhood (4-10 yrs)", "count": 9, "labor_mult": 0.2, "carry_mult": 0.2, "desc": "Light chores: egg gathering, poultry scaring, learning catechism."},
+            "AGE_APP": {"name": "Apprentice (11-15 yrs)", "count": 8, "labor_mult": 0.6, "carry_mult": 0.6, "desc": "Guild workshop assistants; +50% skill gain rate."},
+            "AGE_YAD": {"name": "Young Adult (16-34 yrs)", "count": 22, "labor_mult": 1.15, "carry_mult": 1.1, "desc": "Prime military levee, heavy mining, deep forestry, field harvesting."},
+            "AGE_MAT": {"name": "Mature Adult (35-49 yrs)", "count": 18, "labor_mult": 1.2, "carry_mult": 1.0, "desc": "Master craftsmen, bailiffs, senior sergeants, guild masters."},
+            "AGE_ELD": {"name": "Elderly (50-65 yrs)", "count": 7, "labor_mult": 0.85, "carry_mult": 0.85, "desc": "Village aldermen, cloister scribes, senior tutors, court jurors."},
+            "AGE_VEN": {"name": "Venerable (66-80+ yrs)", "count": 3, "labor_mult": 0.35, "carry_mult": 0.4, "desc": "Clan patriarchs/matriarchs; advisory wisdom; Gompertz mortality risk."}
+        }
+        self.demographic_stats = {
+            "total_births": 12,
+            "total_deaths": 4,
+            "immigrants": 6,
+            "emigrants": 1,
+            "housing_capacity": 85,
+            "food_variety": 4
+        }
+
 
     def print_header(self):
         print("\n" + "=" * 78)
@@ -278,8 +317,17 @@ class VoxelRealmSimulator:
 
     def print_hud(self):
         curr_dist = self.DISTRICTS[self.current_district_key]
-        print(f"\n[MONARCH HUD] ❤️ HP: {self.health:.0f}/100 | ⚡ ST: {self.stamina:.0f}/100 | 🍗 Calories: {self.calories:.0f} kcal | 🔥 Warmth: {self.warmth:.1f}°C")
-        print(f"[TIME & REALM] Day {self.day_number} ({self.season}) - {self.time_hour:02d}:00 | Coins: {self.coins} 💰 | Ambient: {curr_dist['ambient_temp']:.1f}°C")
+        phase = self.get_current_diurnal_phase()
+        status_tag = ""
+        if self.monarch_status == "captive":
+            status_tag = f" | 🚨 CAPTIVE (Ransom: {self.ransom_demanded} 💰)"
+        elif self.monarch_status == "bedridden":
+            status_tag = f" | 🛌 BEDRIDDEN ({self.bed_rest_remaining:.1f}h rest left)"
+        elif self.trauma_conditions:
+            status_tag = f" | ⚠️ INJURED ({len(self.trauma_conditions)} trauma)"
+
+        print(f"\n[MONARCH HUD] ❤️ HP: {self.health:.0f}/100 | ⚡ ST: {self.stamina:.0f}/100 | 🍗 Calories: {self.calories:.0f} kcal | 🔥 Warmth: {self.warmth:.1f}°C{status_tag}")
+        print(f"[TIME & REALM] Day {self.day_number} ({self.season}) - {self.time_hour:02d}:00 [{phase['phase']}] | Coins: {self.coins} 💰 | Ambient: {curr_dist['ambient_temp']:.1f}°C")
         print(f"[LOCATION] District: {curr_dist['name']}")
         print(f"[POSITION] Coordinates: (X: {self.pos[0]:.1f}, Y: {self.pos[1]:.1f}, Z: {self.pos[2]:.1f}) | Biome: {curr_dist['biome']}")
         print("-" * 78)
@@ -376,6 +424,16 @@ class VoxelRealmSimulator:
             "day": self.day_number,
             "time_hour": self.time_hour,
             "coins": self.coins,
+            "monarch_level": self.monarch_level,
+            "monarch_status": self.monarch_status,
+            "trauma_conditions": self.trauma_conditions,
+            "court_doctor_skill": self.court_doctor_skill,
+            "ransom_demanded": self.ransom_demanded,
+            "bed_rest_remaining": self.bed_rest_remaining,
+            "trauma_history": self.trauma_history,
+            "simulation_ticks": self.simulation_ticks,
+            "population_cohorts": self.population_cohorts,
+            "demographic_stats": self.demographic_stats,
             "stockpile": self.stockpile,
             "quotas": self.quotas,
             "quota_modes": self.quota_modes,
@@ -1439,6 +1497,293 @@ class VoxelRealmSimulator:
             })
             print(f"⚖️ NEW COURT DOCKET FILED: [{new_id}] {inc[0]} charged with '{inc[1]}'!")
 
+    @staticmethod
+    def calculate_bed_rest_duration(severity: int, doctor_skill: int) -> float:
+        """GDD Section 6.2: T_bed = T_base + (Severity * 4.0 hours) * (1.0 - 0.02 * Skill_doctor)."""
+        t_base = 12.0
+        clamped_sev = max(1, min(5, severity))
+        clamped_skill = max(0, min(50, doctor_skill))
+        skill_factor = max(0.10, 1.0 - 0.02 * clamped_skill)
+        t_bed = t_base + (clamped_sev * 4.0) * skill_factor
+        return round(max(4.0, t_bed), 1)
+
+    @staticmethod
+    def calculate_monarch_ransom(level: int) -> int:
+        """GDD Section 6.4: Ransom = 500 + 20 * Level_player."""
+        clamped_lvl = max(1, level)
+        return int(500 + 20 * clamped_lvl)
+
+    def get_current_diurnal_phase(self) -> dict:
+        """GDD Section 3.1 & 3.2: Returns active diurnal phase based on time_hour."""
+        h = self.time_hour % 24
+        if 5 <= h < 7:
+            key = "DAWN_MATINS"
+        elif 7 <= h < 12:
+            key = "MORNING_WORK"
+        elif 12 <= h < 13:
+            key = "NOON_REPAST"
+        elif 13 <= h < 18:
+            key = "AFTERNOON_WORK"
+        elif 18 <= h < 21:
+            key = "VESPERS_SUPPER"
+        else:
+            key = "NIGHT_SLUMBER"
+        data = self.diurnal_schedule[key].copy()
+        data["key"] = key
+        return data
+
+    def show_monarch_vitals(self):
+        """Displays Monarch physical state, trauma conditions, court doctor skill, and diurnal routine."""
+        phase = self.get_current_diurnal_phase()
+        print("\n" + "=" * 78)
+        print("          👑 MONARCH PHYSIOLOGICAL VITALS & FIELD CHIRURGERY")
+        print("=" * 78)
+        print(f"Monarch Status: {self.monarch_status.upper()} | Sovereign Level: {self.monarch_level}")
+        print(f"Health: {self.health:.1f} / {self.max_health:.1f} HP | Stamina: {self.stamina:.1f} / {self.max_stamina:.1f}")
+        print(f"Calories: {self.calories:.0f} kcal | Warmth: {self.warmth:.1f}°C | Court Doctor Skill: {self.court_doctor_skill}")
+        print(f"Astronomical Time: {self.time_hour:02d}:00 ({phase['phase']}) | Day: {self.day_number} ({self.season})")
+        print(f"Diurnal Rhythm: {phase['desc']} (Labor Multiplier: {phase['prod_mult']:.2f}x)")
+
+        if self.monarch_status == "captive":
+            print(f"\n⚠️ CRITICAL: The Monarch is held captive by rogue highland bandits!")
+            print(f"Ransom Demanded: {self.ransom_demanded} 💰 Gold Coins.")
+            print("Use 'ransom_monarch' to deliver ransom from realm treasury or launch rescue raid.")
+        elif self.monarch_status == "bedridden":
+            print(f"\n🛌 INFIRMARY: Monarch is bedridden in Citadel Quarters.")
+            print(f"Mandatory Bed Rest Remaining: {self.bed_rest_remaining:.1f} game hours.")
+
+        print(f"\nActive Trauma Conditions ({len(self.trauma_conditions)}):")
+        if not self.trauma_conditions:
+            print("  ✓ Pristine Physical Condition - No acute injuries or fractures.")
+        else:
+            for t in self.trauma_conditions:
+                print(f"  - [{t['id']}] {t['name']} (Severity: {t['severity']})")
+                print(f"    Effects: {t['effects']} | Needed Treatment: '{t['treatment_needed']}' | Remaining Rest: {t.get('bed_hours_left', 0):.1f}h")
+
+        if self.trauma_history:
+            print(f"\nMedical & Trauma History ({len(self.trauma_history)} recorded incidents):")
+            for h in self.trauma_history[-3:]:
+                print(f"  • {h}")
+        print("=" * 78)
+
+    def simulate_combat_knockout(self, severity: int = 2, guards_present: bool = True):
+        """GDD Section 6.1: Simulates monarch falling to 0 HP and rescue window."""
+        self.health = 0.0
+        print("\n⚔️ COMBAT TRAUMA: The Monarch has sustained catastrophic injury in battle! (HP = 0)")
+        if not guards_present:
+            self.monarch_status = "captive"
+            self.ransom_demanded = self.calculate_monarch_ransom(self.monarch_level)
+            self.health = 10.0
+            self.trauma_history.append(f"Day {self.day_number}: Captured in wild skirmish without guard escort. Ransom {self.ransom_demanded} Gold demanded.")
+            print("🚨 RESCUE FAILED: No friendly guards were nearby to defend the fallen Monarch!")
+            print(f"Hostile raiders dragged the Sovereign into captivity. Demand: {self.ransom_demanded} 💰 Gold Coins.")
+            return
+
+        print("🛡️ GUARD RESCUE: Royal Men-at-Arms rushed forward, formed a protective shield wall, and evacuated the Sovereign!")
+        self.monarch_status = "bedridden"
+        self.health = 25.0
+        bed_duration = self.calculate_bed_rest_duration(severity, self.court_doctor_skill)
+        self.bed_rest_remaining = max(self.bed_rest_remaining, bed_duration)
+
+        trauma_types = {
+            1: {"id": "TRAUMA_CONCUSSION", "name": "Cranial Concussion", "effects": "Aql -25%, blurred vision, disoriented", "treatment_needed": "valerian"},
+            2: {"id": "TRAUMA_BROKEN_RIBS", "name": "Fractured Ribs", "effects": "Stamina -40%, running prohibited", "treatment_needed": "bone_splint"},
+            3: {"id": "TRAUMA_FLESH_WOUND", "name": "Deep Arterial Laceration", "effects": "Max HP -30%, bleeding, fever risk", "treatment_needed": "honey_dressing"},
+        }
+        chosen = trauma_types.get(severity, trauma_types[2])
+        existing_ids = [t["id"] for t in self.trauma_conditions]
+        if chosen["id"] not in existing_ids:
+            condition = {
+                "id": chosen["id"],
+                "name": chosen["name"],
+                "severity": severity,
+                "bed_hours_left": bed_duration,
+                "effects": chosen["effects"],
+                "treatment_needed": chosen["treatment_needed"]
+            }
+            self.trauma_conditions.append(condition)
+            self.trauma_history.append(f"Day {self.day_number}: Suffered {chosen['name']} (Severity {severity}). Prescribed {bed_duration:.1f}h bed rest.")
+            print(f"🏥 DIAGNOSIS: {chosen['name']} confirmed. Prescribed Bed Rest: {bed_duration:.1f} hours.")
+            print(f"Surgical Remedy Required: '{chosen['treatment_needed']}'.")
+
+    def treat_monarch_trauma(self, remedy: str):
+        """GDD Section 6.3: Court chirurgeon applies remedies to heal active trauma."""
+        remedy = remedy.lower().strip()
+        print(f"\n🩺 COURT CHIRURGEON: Applying medical remedy '{remedy}'...")
+        if not self.trauma_conditions:
+            print("The Monarch has no active traumatic conditions requiring surgery.")
+            return
+
+        matched = None
+        for t in self.trauma_conditions:
+            if t["treatment_needed"] == remedy or remedy in t["treatment_needed"]:
+                matched = t
+                break
+
+        if not matched:
+            print(f"Remedy '{remedy}' does not match any current trauma condition! Available needs:")
+            for t in self.trauma_conditions:
+                print(f"  - {t['name']}: requires '{t['treatment_needed']}'")
+            return
+
+        self.trauma_conditions.remove(matched)
+        if matched["id"] == "TRAUMA_CONCUSSION":
+            self.bed_rest_remaining = max(0.0, self.bed_rest_remaining - 4.0)
+            print("✓ Valeriana tincture soothes brain swelling. Mental clarity restored; bed rest reduced by 4.0h.")
+        elif matched["id"] == "TRAUMA_BROKEN_RIBS":
+            self.bed_rest_remaining = max(0.0, self.bed_rest_remaining - 6.0)
+            print("✓ Bone splint and bone marrow broth applied. Rib cage stabilized; breathing eased.")
+        elif matched["id"] == "TRAUMA_FLESH_WOUND":
+            self.bed_rest_remaining = max(0.0, self.bed_rest_remaining - 8.0)
+            scar = {"id": "TRAUMA_BATTLE_SCAR", "name": "Honorable Battle Scar", "severity": 1, "effects": "Charisma +5 (Fear/Respect), Agility -3", "treatment_needed": "none"}
+            if not any(t["id"] == "TRAUMA_BATTLE_SCAR" for t in self.trauma_conditions):
+                self.trauma_conditions.append(scar)
+            self.total_renown += 50
+            print("✓ Chirurgeon sutured deep laceration with silk thread and honey antiseptic dressing.")
+            print("✓ Wound healed into a permanent Honorable Battle Scar (+5 Charisma, +50 Renown)!")
+
+        self.trauma_history.append(f"Day {self.day_number}: Treated {matched['name']} with {remedy}.")
+        if not any(t["id"] != "TRAUMA_BATTLE_SCAR" for t in self.trauma_conditions) and self.bed_rest_remaining <= 0:
+            self.monarch_status = "active"
+            self.health = self.max_health
+            print("🎉 FULL RECOVERY: Monarch has healed completely and returned to active governance!")
+
+    def pay_monarch_ransom(self) -> bool:
+        """GDD Section 6.4: Ransoms captured monarch from enemy raiders."""
+        if self.monarch_status != "captive":
+            print("\nThe Monarch is not held in captivity. No ransom required.")
+            return False
+
+        if self.coins < self.ransom_demanded:
+            print(f"\n❌ INSUFFICIENT FUNDS: Treasury holds {self.coins} 💰 Gold Coins, but ransom is {self.ransom_demanded} 💰 Gold Coins!")
+            return False
+
+        self.coins -= self.ransom_demanded
+        cost = self.ransom_demanded
+        self.monarch_status = "active"
+        self.health = 35.0
+        self.crown_authority = max(0.0, self.crown_authority - 5.0)
+        self.trauma_history.append(f"Day {self.day_number}: Paid {cost} Gold ransom. Monarch repatriated to Citadel.")
+        self.ransom_demanded = 0
+        print(f"\n💰 RANSOM DELIVERED: Paid {cost} Gold Coins to bandit emissaries.")
+        print(f"Monarch safely returned under cavalry escort! Health restored to 35.0 HP.")
+        print(f"Crown Authority penalty: -5.0% (Current Authority: {self.crown_authority:.1f}%).")
+        return True
+
+    def advance_diurnal_time(self, hours: int = 1):
+        """GDD Section 3.1 & 3.2: Advances astronomical time, updates seasons, and processes recovery."""
+        hours = max(1, hours)
+        old_hour = self.time_hour
+        self.time_hour = (self.time_hour + hours) % 24
+        days_passed = (old_hour + hours) // 24
+        self.day_number += days_passed
+        self.simulation_ticks += hours * 60
+
+        # Update seasons (7 days = 1 season)
+        seasons = ["Spring", "Summer", "Autumn", "Winter"]
+        season_idx = ((self.day_number - 1) // 7) % 4
+        self.season = seasons[season_idx]
+
+        # Bed rest recovery progression
+        if self.monarch_status == "bedridden":
+            self.bed_rest_remaining = max(0.0, self.bed_rest_remaining - hours)
+            for t in self.trauma_conditions:
+                if "bed_hours_left" in t:
+                    t["bed_hours_left"] = max(0.0, t["bed_hours_left"] - hours)
+            
+            # Check if healed
+            acute_traumas = [t for t in self.trauma_conditions if t["id"] != "TRAUMA_BATTLE_SCAR"]
+            if self.bed_rest_remaining <= 0 and not acute_traumas:
+                self.monarch_status = "active"
+                self.health = self.max_health
+                print("\n✨ RECOVERY NOTIFICATION: Monarch has completed bed rest and resumed active duties!")
+
+        # Calorie and stamina adjustments
+        phase = self.get_current_diurnal_phase()
+        cal_burn = 40.0 * hours if phase["key"] == "NIGHT_SLUMBER" else 75.0 * hours
+        self.calories = max(200.0, self.calories - cal_burn)
+        self.stamina = min(self.max_stamina, self.stamina + 20.0 * hours)
+
+        print(f"\n⏳ DIURNAL TIME ADVANCED: +{hours} hour(s) -> {self.time_hour:02d}:00 on Day {self.day_number} ({self.season}).")
+        print(f"Current Phase: {phase['phase']} (Productivity: {phase['prod_mult']:.2f}x).")
+        if self.monarch_status == "bedridden":
+            print(f"Bed Rest Progress: {self.bed_rest_remaining:.1f} hours remaining.")
+
+    def show_demographics(self):
+        """GDD Section 4.1: Displays population census across 7 demographic age cohorts."""
+        total_pop = sum(c["count"] for c in self.population_cohorts.values())
+        workforce = sum(c["count"] for k, c in self.population_cohorts.items() if k in ["AGE_YAD", "AGE_MAT"])
+        print("\n" + "=" * 78)
+        print("          👥 FEUDAL DEMOGRAPHIC AGING & COHORT POPULATION CENSUS")
+        print("=" * 78)
+        print(f"Total Realm Citizens: {total_pop} | Prime Workforce: {workforce} citizens")
+        print(f"Housing Capacity: {self.demographic_stats['housing_capacity']} | Occupancy: {total_pop / self.demographic_stats['housing_capacity'] * 100:.1f}%")
+        print(f"Nutritional Variety: {self.demographic_stats['food_variety']}/5 food types | Citizen Hunger: {100.0 - (self.calories / 25.0):.1f}%")
+        print(f"Balance Equation: ΔPop = (Births: {self.demographic_stats['total_births']} + Immig: {self.demographic_stats['immigrants']}) - (Deaths: {self.demographic_stats['total_deaths']} + Emig: {self.demographic_stats['emigrants']})")
+        print("\nDemographic Age Cohorts (GDD Section 4):")
+        print(f"{'Cohort ID':<10} | {'Cohort Name':<24} | {'Count':<6} | {'Labor Multiplier':<18} | {'Physiological Role'}")
+        print("-" * 78)
+        for k, c in self.population_cohorts.items():
+            print(f"{k:<10} | {c['name']:<24} | {c['count']:<6} | {c['labor_mult']:<18.2f}x | {c['desc'][:30]}...")
+        print("=" * 78)
+
+    def simulate_demographics(self, seasons: int = 1):
+        """GDD Section 4.2: Simulates seasonal cohort aging, Gompertz mortality, and natural fertility."""
+        seasons = max(1, seasons)
+        print(f"\n📈 DEMOGRAPHIC SIMULATION: Simulating demographic turnover across {seasons} season(s)...")
+        total_pop = sum(c["count"] for c in self.population_cohorts.values())
+        
+        # Natural births condition: food_variety >= 3, housing available
+        births = 0
+        if self.demographic_stats["food_variety"] >= 3 and total_pop < self.demographic_stats["housing_capacity"]:
+            prime_parents = self.population_cohorts["AGE_YAD"]["count"] + self.population_cohorts["AGE_MAT"]["count"]
+            births = max(1, int(prime_parents * 0.08 * seasons))
+            self.population_cohorts["AGE_INF"]["count"] += births
+            self.demographic_stats["total_births"] += births
+
+        # Natural deaths: Gompertz-Makeham risk for Venerable (66+) and elderly
+        venerable = self.population_cohorts["AGE_VEN"]["count"]
+        elderly = self.population_cohorts["AGE_ELD"]["count"]
+        deaths = 0
+        if venerable > 0:
+            ven_deaths = min(venerable, max(1, int(venerable * 0.25 * seasons)))
+            self.population_cohorts["AGE_VEN"]["count"] -= ven_deaths
+            deaths += ven_deaths
+        if elderly > 5 and seasons >= 2:
+            eld_deaths = min(elderly, 1)
+            self.population_cohorts["AGE_ELD"]["count"] -= eld_deaths
+            deaths += eld_deaths
+        self.demographic_stats["total_deaths"] += deaths
+
+        # Cohort transitions (aging upward)
+        grad_inf = min(self.population_cohorts["AGE_INF"]["count"], max(1, int(self.population_cohorts["AGE_INF"]["count"] * 0.2 * seasons)))
+        self.population_cohorts["AGE_INF"]["count"] -= grad_inf
+        self.population_cohorts["AGE_CHI"]["count"] += grad_inf
+
+        grad_chi = min(self.population_cohorts["AGE_CHI"]["count"], max(1, int(self.population_cohorts["AGE_CHI"]["count"] * 0.15 * seasons)))
+        self.population_cohorts["AGE_CHI"]["count"] -= grad_chi
+        self.population_cohorts["AGE_APP"]["count"] += grad_chi
+
+        grad_app = min(self.population_cohorts["AGE_APP"]["count"], max(1, int(self.population_cohorts["AGE_APP"]["count"] * 0.15 * seasons)))
+        self.population_cohorts["AGE_APP"]["count"] -= grad_app
+        self.population_cohorts["AGE_YAD"]["count"] += grad_app
+
+        grad_yad = min(self.population_cohorts["AGE_YAD"]["count"], max(1, int(self.population_cohorts["AGE_YAD"]["count"] * 0.08 * seasons)))
+        self.population_cohorts["AGE_YAD"]["count"] -= grad_yad
+        self.population_cohorts["AGE_MAT"]["count"] += grad_yad
+
+        grad_mat = min(self.population_cohorts["AGE_MAT"]["count"], max(1, int(self.population_cohorts["AGE_MAT"]["count"] * 0.06 * seasons)))
+        self.population_cohorts["AGE_MAT"]["count"] -= grad_mat
+        self.population_cohorts["AGE_ELD"]["count"] += grad_mat
+
+        grad_eld = min(self.population_cohorts["AGE_ELD"]["count"], max(1, int(self.population_cohorts["AGE_ELD"]["count"] * 0.05 * seasons)))
+        self.population_cohorts["AGE_ELD"]["count"] -= grad_eld
+        self.population_cohorts["AGE_VEN"]["count"] += grad_eld
+
+        new_total = sum(c["count"] for c in self.population_cohorts.values())
+        print(f"Demographic Results -> Births: +{births}, Deaths: -{deaths}, Net Population: {new_total} citizens.")
+        print(f"Cohort Transition Verified: Infants {self.population_cohorts['AGE_INF']['count']}, Young Adults {self.population_cohorts['AGE_YAD']['count']}, Venerable Elders {self.population_cohorts['AGE_VEN']['count']}.")
+
     def run_cli(self):
         self.print_header()
         print("\nWelcome, Monarch! The entire Feudal Realm is assembled and awaiting your command.")
@@ -1518,6 +1863,13 @@ class VoxelRealmSimulator:
                 print("  judge <id> <v>    - Deliver verdict: acquit, pillory, fine, ordeal, gallows")
                 print("  charter <type>    - Ratify legal charter: magna, leet, assize, sanctuary")
                 print("  patrol / crime    - Deploy town watchmen and bailiffs on anti-crime patrol")
+                print("  vitals / health   - View Monarch vitals, trauma conditions, doctor skill & diurnal rhythm")
+                print("  injure [sev] [solo]- Simulate combat knockout trauma (severity 1-3, optional 'solo' for captivity)")
+                print("  heal <remedy>     - Apply chirurgeon remedy (valerian, bone_splint, honey_dressing)")
+                print("  ransom_monarch    - Pay gold ransom to bandit kidnappers to liberate captive Sovereign")
+                print("  advance [hrs]     - Advance diurnal clock by N hours (updates daytime phases & recovery)")
+                print("  census / pop      - View feudal demographic census across 7 biological age cohorts")
+                print("  simulate_pop [s]  - Simulate cohort turnover, Gompertz mortality & natural births")
                 print("  pause             - Display in-game pause menu and controls guide")
                 print("  wait              - Advance time by 1 hour (burn calories, regenerate stamina)")
                 print("  quit              - Exit simulator")
@@ -1729,6 +2081,27 @@ class VoxelRealmSimulator:
                     print("Usage: charter <magna|leet|assize|sanctuary>")
             elif cmd in ["crime", "patrol", "bailiff"]:
                 self.simulate_crime_patrol()
+            elif cmd in ["vitals", "health", "injuries", "doctor"]:
+                self.show_monarch_vitals()
+            elif cmd in ["knockout", "injure", "trauma"]:
+                sev = int(args[0]) if args and args[0].isdigit() else 2
+                guards = args[1].lower() != "solo" if len(args) > 1 else True
+                self.simulate_combat_knockout(sev, guards_present=guards)
+            elif cmd in ["heal_monarch", "chirurgeon", "treat", "heal"]:
+                if args:
+                    self.treat_monarch_trauma(args[0])
+                else:
+                    print("Usage: heal <valerian|bone_splint|honey_dressing>")
+            elif cmd in ["ransom_monarch", "pay_ransom"]:
+                self.pay_monarch_ransom()
+            elif cmd in ["advance", "time", "tick"]:
+                hrs = int(args[0]) if args and args[0].isdigit() else 1
+                self.advance_diurnal_time(hrs)
+            elif cmd in ["census", "demographics", "pop", "population"]:
+                self.show_demographics()
+            elif cmd in ["simulate_pop", "sim_pop", "age_pop"]:
+                seasons = int(args[0]) if args and args[0].isdigit() else 1
+                self.simulate_demographics(seasons)
             elif cmd == "pause":
                 print("\n=== [PAUSE MENU SIMULATION] ===")
                 print("1. Resume Realm")
@@ -1862,6 +2235,25 @@ def main():
         assert "leet" in sim.ratified_charters
         sim.simulate_crime_patrol()
         assert len(sim.active_dockets) >= 1
+        sim.show_monarch_vitals()
+        dur = sim.calculate_bed_rest_duration(2, sim.court_doctor_skill)
+        assert 4.0 <= dur <= 32.0
+        r_cost = sim.calculate_monarch_ransom(5)
+        assert r_cost == 600
+        phase = sim.get_current_diurnal_phase()
+        assert "phase" in phase
+        sim.simulate_combat_knockout(2, guards_present=True)
+        assert sim.monarch_status == "bedridden"
+        assert len(sim.trauma_conditions) == 1
+        sim.treat_monarch_trauma("bone_splint")
+        sim.advance_diurnal_time(15)
+        sim.simulate_combat_knockout(3, guards_present=False)
+        assert sim.monarch_status == "captive"
+        assert sim.ransom_demanded == 600
+        assert sim.pay_monarch_ransom()
+        assert sim.monarch_status == "active"
+        sim.show_demographics()
+        sim.simulate_demographics(1)
         print("[INTERACTIVE SIMULATOR] All simulator subsystems passed verification cleanly!")
         sys.exit(0)
     sim.run_cli()
