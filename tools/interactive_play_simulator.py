@@ -232,6 +232,43 @@ class VoxelRealmSimulator:
             }
         }
 
+        # Feudal Manor Leet Court & Judicial System State (Milestone 55)
+        self.crime_rate = 14.0  # percentage [0.0, 100.0]
+        self.unrest = 10.0      # percentage [0.0, 100.0]
+        self.crown_authority = 72.0  # [0.0, 100.0]
+        self.public_order = 86.0     # [0.0, 100.0]
+        self.active_dockets = [
+            {
+                "id": "CASE-101",
+                "accused": "Bartholomew the Mill Hand",
+                "charge": "Granary Theft (Stole 12 sacks of milled flour)",
+                "evidence": "Found hiding flour sacks beneath floorboards near Town Hall",
+                "severity": 2,
+                "guilt_prob": 0.90,
+                "status": "Awaiting Verdict"
+            },
+            {
+                "id": "CASE-102",
+                "accused": "Giles the Merchant Guildsman",
+                "charge": "Tax Evasion & Smuggling Unstamped Wool",
+                "evidence": "Concealed 8 bolts of woolen cloth to bypass royal tollgate",
+                "severity": 2,
+                "guilt_prob": 0.80,
+                "status": "Awaiting Verdict"
+            },
+            {
+                "id": "CASE-103",
+                "accused": "Roger of the Mire",
+                "charge": "Seditious Libel & Plotting with Ashfell Clans",
+                "evidence": "Intercepted encrypted parchment in tavern endorsing highland raid",
+                "severity": 4,
+                "guilt_prob": 0.95,
+                "status": "Awaiting Verdict"
+            }
+        ]
+        self.verdict_history = []
+        self.ratified_charters = []
+
 
     def print_header(self):
         print("\n" + "=" * 78)
@@ -342,13 +379,20 @@ class VoxelRealmSimulator:
             "stockpile": self.stockpile,
             "quotas": self.quotas,
             "quota_modes": self.quota_modes,
+            "crime_rate": self.crime_rate,
+            "unrest": self.unrest,
+            "crown_authority": self.crown_authority,
+            "public_order": self.public_order,
+            "active_dockets": self.active_dockets,
+            "verdict_history": self.verdict_history,
+            "ratified_charters": self.ratified_charters,
         }
         raw_str = json.dumps(data, sort_keys=True)
         checksum = hashlib.sha256(raw_str.encode("utf-8")).hexdigest()
         print(f"\n💾 [SAVE REALM PERSISTENCE]")
         print(f"Slot: '{slot}' | Voxel Delta Hash: {checksum[:8]}...")
         print(f"Monarch State: {self.health:.0f} HP, {self.calories:.0f} kcal, Pos: {self.pos}")
-        print(f"Economy Preserved: {len(self.stockpile)} items in stockpile, {self.coins} 💰 Gold.")
+        print(f"Economy & Justice Preserved: {len(self.stockpile)} items, Crown Authority: {self.crown_authority:.1f}%, {self.coins} 💰 Gold.")
         print("✓ Sparse Delta Voxel persistence written successfully.")
         return checksum
 
@@ -356,7 +400,7 @@ class VoxelRealmSimulator:
         print(f"\n📂 [LOAD REALM PERSISTENCE]")
         print(f"Slot: '{slot}' loaded cleanly. Checksum verified: SHA-256 integrity OK.")
         print(f"Restoring Monarch at district: {self.DISTRICTS[self.current_district_key]['name']}.")
-        print("✓ Granary stockpile and guild production quotas restored.")
+        print("✓ Granary stockpile, guild production quotas, and judicial court dockets restored.")
 
     def play_audio_sfx(self, effect: str = "horn"):
         effect = effect.lower()
@@ -1235,6 +1279,166 @@ class VoxelRealmSimulator:
         else:
             print("✓ Excellent preservation! All provisions remained fresh in cold storage.")
 
+    def calculate_crown_authority(self) -> float:
+        base = 50.0
+        prestige_bonus = 0.05 * float(self.castle_prestige)
+        morale_avg = min(100.0, max(0.0, 75.0 + self.castle_buffs.get("realm_morale", 0.0)))
+        morale_bonus = 0.20 * morale_avg
+        crime_penalty = 0.25 * self.crime_rate
+        unrest_penalty = 0.30 * self.unrest
+        val = base + prestige_bonus + morale_bonus - crime_penalty - unrest_penalty
+        self.crown_authority = max(0.0, min(100.0, round(val, 1)))
+        return self.crown_authority
+
+    def show_court(self):
+        auth = self.calculate_crown_authority()
+        print("\n⚖️ === HIGH MAGISTRATE & FEUDAL MANOR LEET COURT ===")
+        print(f"Crown Sovereign Authority: {auth:.1f}% [A_crown] | Public Order: {self.public_order:.1f}%")
+        print(f"Realm Crime Index: {self.crime_rate:.1f}% | Civil Unrest: {self.unrest:.1f}% | Treasury: {self.coins} 💰 Gold Coins")
+        if self.ratified_charters:
+            print(f"Ratified Charters & Assizes: {', '.join([c.title() for c in self.ratified_charters])}")
+        
+        print("\n[ACTIVE JUDICIAL DOCKETS]")
+        if not self.active_dockets:
+            print("  • No pending trials. The realm rests in tranquil order.")
+        else:
+            for case in self.active_dockets:
+                sev_icons = "⚠️" * case.get("severity", 1)
+                print(f"  [{case['id']}] {case['accused']} - Severity: {case.get('severity', 1)} {sev_icons}")
+                print(f"    Charge   : {case['charge']}")
+                print(f"    Evidence : {case['evidence']}")
+                print(f"    Guilt Est: {int(case.get('guilt_prob', 0.8) * 100)}% | Status: {case['status']}")
+
+        if self.verdict_history:
+            print(f"\nRecent Recorded Verdicts ({len(self.verdict_history)} total):")
+            for h in self.verdict_history[-3:]:
+                print(f"  • {h['id']}: {h['accused']} -> {h['verdict']} ({h['summary']})")
+
+        print("\nCommands: judge <case_id> <acquit|pillory|fine|ordeal|gallows> | charter <magna|leet|assize|sanctuary> | crime")
+
+    def deliver_verdict(self, case_id: str, verdict: str):
+        c_id = case_id.upper().strip()
+        v_type = verdict.lower().strip()
+        valid_verdicts = ["acquit", "pillory", "fine", "ordeal", "gallows"]
+        if v_type not in valid_verdicts:
+            print(f"Unknown verdict '{verdict}'. Available: acquit, pillory, fine, ordeal, gallows")
+            return
+
+        matched = [c for c in self.active_dockets if c_id in c["id"].upper()]
+        if not matched:
+            print(f"Docket '{case_id}' not found in active court registry.")
+            return
+
+        case = matched[0]
+        self.active_dockets.remove(case)
+
+        summary = ""
+        if v_type == "acquit":
+            self.unrest = max(0.0, self.unrest - 3.0)
+            if case.get("guilt_prob", 0.5) > 0.8:
+                self.crime_rate = min(100.0, self.crime_rate + 2.5)
+                summary = "Pardoned with leniency; slight emboldening of petty thieves."
+            else:
+                summary = "Justly acquitted; citizens praise the Crown's righteousness."
+            print(f"⚖️ ROYAL ACQUITTAL: {case['accused']} was acquitted of all charges! {summary}")
+        elif v_type == "pillory":
+            self.crime_rate = max(0.0, self.crime_rate - 4.5)
+            self.public_order = min(100.0, self.public_order + 5.0)
+            self.unrest = max(0.0, self.unrest - 2.0)
+            summary = "Sentenced to 24h locked in market square pillory."
+            print(f"🪵 PILLORY SENTENCE: {case['accused']} placed in public village stocks! (+5.0% Public Order, -4.5% Crime).")
+        elif v_type == "fine":
+            fine_amount = case.get("severity", 2) * 25
+            self.coins += fine_amount
+            self.crime_rate = max(0.0, self.crime_rate - 3.0)
+            self.public_order = min(100.0, self.public_order + 3.0)
+            summary = f"Levied {fine_amount} Gold Coins fine paid into Royal Treasury."
+            print(f"💰 JUDICIAL AMERCEMENT: {case['accused']} fined {fine_amount} 💰 Gold Coins! Added to Treasury.")
+        elif v_type == "ordeal":
+            self.public_order = min(100.0, self.public_order + 6.0)
+            self.unrest = max(0.0, self.unrest - 4.0)
+            self.scholar_points += 25.0
+            summary = "Sacred Trial by Ordeal invoked under Monastic benediction."
+            print(f"⛪ SACRED TRIAL BY ORDEAL: The Holy Church conducted ordeal upon {case['accused']}! (+6.0% Public Order, +25 Scholar Points).")
+        elif v_type == "gallows":
+            self.crime_rate = max(0.0, self.crime_rate - 8.0)
+            self.public_order = min(100.0, self.public_order + 8.0)
+            self.unrest = max(0.0, self.unrest - 5.0)
+            summary = "Capital execution by hanging on castle gallows."
+            print(f"🪢 CAPITAL PUNISHMENT: {case['accused']} executed on the gallows! Feudal treason crushed (-8.0% Crime, +8.0% Public Order).")
+
+        self.verdict_history.append({
+            "id": case["id"],
+            "accused": case["accused"],
+            "verdict": v_type.upper(),
+            "summary": summary
+        })
+        new_auth = self.calculate_crown_authority()
+        print(f"Crown Sovereign Authority recalibrated to: {new_auth:.1f}%.")
+
+    def issue_legal_charter(self, charter_key: str):
+        charters = {
+            "magna": ("Magna Carta Libertatum", 60, "Imperial Feudal Charter (+15 Vassal Opinion, +10 Public Order, -5 Unrest)", {"public_order": 10.0, "unrest": -5.0}),
+            "leet": ("Manor Leet Court Jurisdiction", 40, "Empowers local magistrates (-8 Crime Rate, +6 Crown Authority)", {"crime_rate": -8.0}),
+            "assize": ("Assize of Bread and Ale", 30, "Weights, measures & grain purity regulation (+10 Public Order, -5 Crime)", {"public_order": 10.0, "crime_rate": -5.0}),
+            "sanctuary": ("Benefit of Clergy & Church Sanctuary", 25, "Monastic legal immunity (+15 Monastic Piety, -10 Unrest)", {"unrest": -10.0, "public_order": 5.0})
+        }
+        key = charter_key.lower().strip()
+        matched = [k for k in charters if key in k]
+        if not matched:
+            print(f"Unknown charter '{charter_key}'. Options: magna, leet, assize, sanctuary")
+            return
+        c_id = matched[0]
+        name, cost, desc, mods = charters[c_id]
+
+        if c_id in self.ratified_charters:
+            print(f"Charter '{name}' is already ratified by royal wax seal.")
+            return
+
+        if self.coins < cost:
+            print(f"Insufficient royal treasury funds! Requires {cost} 💰 Gold Coins.")
+            return
+
+        self.coins -= cost
+        self.ratified_charters.append(c_id)
+        for stat, val in mods.items():
+            if stat == "public_order":
+                self.public_order = min(100.0, max(0.0, self.public_order + val))
+            elif stat == "unrest":
+                self.unrest = min(100.0, max(0.0, self.unrest + val))
+            elif stat == "crime_rate":
+                self.crime_rate = min(100.0, max(0.0, self.crime_rate + val))
+
+        self.calculate_crown_authority()
+        print(f"\n📜 ROYAL CHARTER RATIFIED: {name} (-{cost} 💰 Gold Coins)!")
+        print(f"Details: {desc}")
+        print(f"Updated Status -> Crown Authority: {self.crown_authority:.1f}%, Public Order: {self.public_order:.1f}%, Crime: {self.crime_rate:.1f}%.")
+
+    def simulate_crime_patrol(self):
+        self.crime_rate = max(2.0, self.crime_rate - 3.5)
+        self.public_order = min(100.0, self.public_order + 3.0)
+        print(f"\n🛡️ BAILIFF PATROL: Watchmen patrolled town square and harbor alleys!")
+        print(f"Crime suppressed to {self.crime_rate:.1f}% | Public Order elevated to {self.public_order:.1f}%.")
+        
+        if len(self.active_dockets) < 5:
+            new_id = f"CASE-{100 + len(self.verdict_history) + len(self.active_dockets) + 1}"
+            incidents = [
+                ("Wulfric the Woodcutter", "Poaching deer in royal game preserve", "Found venison haunches concealed in cart", 2, 0.85),
+                ("Godfrey the Cooper", "Watered beer & false measure in tavern", "Bailiff test ale hydrometer discrepancy", 1, 0.90),
+                ("Edmund the Scribe", "Clipping silver edges off realm coins", "Found metal shavings and iron shears in cellar", 3, 0.95),
+            ]
+            inc = incidents[len(self.active_dockets) % len(incidents)]
+            self.active_dockets.append({
+                "id": new_id,
+                "accused": inc[0],
+                "charge": inc[1],
+                "evidence": inc[2],
+                "severity": inc[3],
+                "guilt_prob": inc[4],
+                "status": "Awaiting Verdict"
+            })
+            print(f"⚖️ NEW COURT DOCKET FILED: [{new_id}] {inc[0]} charged with '{inc[1]}'!")
+
     def run_cli(self):
         self.print_header()
         print("\nWelcome, Monarch! The entire Feudal Realm is assembled and awaiting your command.")
@@ -1310,6 +1514,10 @@ class VoxelRealmSimulator:
                 print("  sell <item> [amt] - Sell stockpile goods to caravan merchants for gold coins")
                 print("  quota <item> <t>  - Set RimWorld-style 'Do Until X' production quota and mode")
                 print("  spoilage [hrs]    - Simulate cellar preservation & Arrhenius decay kinetics")
+                print("  court             - Open High Magistrate Manor Leet Court (Law & Justice)")
+                print("  judge <id> <v>    - Deliver verdict: acquit, pillory, fine, ordeal, gallows")
+                print("  charter <type>    - Ratify legal charter: magna, leet, assize, sanctuary")
+                print("  patrol / crime    - Deploy town watchmen and bailiffs on anti-crime patrol")
                 print("  pause             - Display in-game pause menu and controls guide")
                 print("  wait              - Advance time by 1 hour (burn calories, regenerate stamina)")
                 print("  quit              - Exit simulator")
@@ -1507,6 +1715,20 @@ class VoxelRealmSimulator:
                 hrs = int(args[0]) if args and args[0].isdigit() else 24
                 cont = args[1] if len(args) > 1 else "COLD_CELLAR"
                 self.simulate_cellar_spoilage(hrs, cont)
+            elif cmd in ["court", "justice", "magistrate", "leet"]:
+                self.show_court()
+            elif cmd in ["judge", "verdict", "sentence"]:
+                if len(args) >= 2:
+                    self.deliver_verdict(args[0], args[1])
+                else:
+                    print("Usage: judge <case_id> <acquit|pillory|fine|ordeal|gallows>")
+            elif cmd in ["charter", "ratify", "law"]:
+                if args:
+                    self.issue_legal_charter(args[0])
+                else:
+                    print("Usage: charter <magna|leet|assize|sanctuary>")
+            elif cmd in ["crime", "patrol", "bailiff"]:
+                self.simulate_crime_patrol()
             elif cmd == "pause":
                 print("\n=== [PAUSE MENU SIMULATION] ===")
                 print("1. Resume Realm")
@@ -1630,6 +1852,16 @@ def main():
         sim.set_production_quota("tools", 15, "until_x")
         assert sim.quotas["tools"] == 15
         sim.simulate_cellar_spoilage(24, "COLD_CELLAR")
+        sim.show_court()
+        sim.deliver_verdict("CASE-101", "pillory")
+        assert len(sim.verdict_history) >= 1
+        sim.deliver_verdict("CASE-102", "fine")
+        sim.deliver_verdict("CASE-103", "gallows")
+        assert len(sim.active_dockets) == 0
+        sim.issue_legal_charter("leet")
+        assert "leet" in sim.ratified_charters
+        sim.simulate_crime_patrol()
+        assert len(sim.active_dockets) >= 1
         print("[INTERACTIVE SIMULATOR] All simulator subsystems passed verification cleanly!")
         sys.exit(0)
     sim.run_cli()
