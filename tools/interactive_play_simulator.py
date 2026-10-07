@@ -337,6 +337,50 @@ class VoxelRealmSimulator:
         self.citizen_morale = 80.0
         self._saved_slots = {}
 
+        # Mortuary, Gravedigger & Consecrated Cemetery State (Milestone 58 - GDD 93-96)
+        self.unburied_corpses = []
+        self.gravedigger_appointed = False
+        self.gravedigger_name = "Brother Barnaby"
+        self.mortuary_shed_built = True
+        self.morgue_cart_capacity = 4
+        self.coffin_inventory = {
+            "linen_shroud": 3,
+            "wooden_coffin": 2,
+            "stone_sarcophagus": 1,
+        }
+        self.cemetery = {
+            "name": "St. Jude's Consecrated Memorial Graveyard",
+            "total_plots": 60,
+            "occupied_plots": 8,
+            "serenity_aura_active": True,
+            "consecrated_by_priest": True,
+            "graves": [
+                {
+                    "grave_id": "GRAVE-101",
+                    "citizen_name": "Aldous the Pioneer",
+                    "years": "Age 58",
+                    "profession": "Master Stonecutter",
+                    "headstone_type": "stone_sarcophagus",
+                    "sanctified": True,
+                    "epitaph": "Aldous the Pioneer (Age 58)\nProfession: Master Stonecutter\nAchievement: Hewed 2,400 ashlar blocks for the Citadel foundations\nCause: Winter Chills & Natural Age\n'Xotirang qalbimizda mangu yashaydi, ey saltanatimiz bunyodkori.'"
+                },
+                {
+                    "grave_id": "GRAVE-102",
+                    "citizen_name": "Godwin the Archer",
+                    "years": "Age 31",
+                    "profession": "Marksman Veteran",
+                    "headstone_type": "wooden_cross",
+                    "sanctified": True,
+                    "epitaph": "Godwin the Archer (Age 31)\nProfession: Marksman Veteran\nAchievement: Repelled barbarian raid on North Redoubt with 18 hits\nCause: Slain in Glorious Defense of Realm\n'Xotirang qalbimizda mangu yashaydi, ey saltanatimiz bunyodkori.'"
+                }
+            ]
+        }
+        self.scavengers_active = {
+            "circling_crows": 0,
+            "wolf_pack_threat": False
+        }
+        self.escheat_treasury_collected = 0
+
 
     def print_header(self):
         print("\n" + "=" * 78)
@@ -359,6 +403,10 @@ class VoxelRealmSimulator:
             status_tag += " | ☣️ MIASMA"
         if self.active_epidemic:
             status_tag += f" | ☠️ {self.active_epidemic.upper()} ({self.sir_state['I']:.0f} sick)"
+        if self.unburied_corpses:
+            status_tag += f" | ⚰️ {len(self.unburied_corpses)} UNBURIED"
+        if self.scavengers_active.get("wolf_pack_threat"):
+            status_tag += " | 🐺 WOLF PACK"
 
         print(f"\n[MONARCH HUD] ❤️ HP: {self.health:.0f}/100 | ⚡ ST: {self.stamina:.0f}/100 | 🍗 Calories: {self.calories:.0f} kcal | 🔥 Warmth: {self.warmth:.1f}°C{status_tag}")
         print(f"[TIME & REALM] Day {self.day_number} ({self.season}) - {self.time_hour:02d}:00 [{phase['phase']}] | Coins: {self.coins} 💰 | Ambient: {curr_dist['ambient_temp']:.1f}°C")
@@ -492,6 +540,12 @@ class VoxelRealmSimulator:
             "quarantine_edict_active": self.quarantine_edict_active,
             "quarantine_measures": self.quarantine_measures,
             "epidemic_history": self.epidemic_history,
+            "unburied_corpses": self.unburied_corpses,
+            "gravedigger_appointed": self.gravedigger_appointed,
+            "coffin_inventory": self.coffin_inventory,
+            "cemetery": self.cemetery,
+            "scavengers_active": self.scavengers_active,
+            "escheat_treasury_collected": self.escheat_treasury_collected,
         }
         raw_str = json.dumps(data, sort_keys=True)
         import copy
@@ -538,6 +592,12 @@ class VoxelRealmSimulator:
             self.plague_doctor_appointed = data.get("plague_doctor_appointed", self.plague_doctor_appointed)
             self.quarantine_edict_active = data.get("quarantine_edict_active", self.quarantine_edict_active)
             self.quarantine_measures = list(data.get("quarantine_measures", self.quarantine_measures))
+            self.unburied_corpses = copy.deepcopy(data.get("unburied_corpses", self.unburied_corpses))
+            self.gravedigger_appointed = data.get("gravedigger_appointed", self.gravedigger_appointed)
+            self.coffin_inventory = copy.deepcopy(data.get("coffin_inventory", self.coffin_inventory))
+            self.cemetery = copy.deepcopy(data.get("cemetery", self.cemetery))
+            self.scavengers_active = copy.deepcopy(data.get("scavengers_active", self.scavengers_active))
+            self.escheat_treasury_collected = data.get("escheat_treasury_collected", self.escheat_treasury_collected)
         print(f"\n📂 [LOAD REALM PERSISTENCE]")
         print(f"Slot: '{slot}' loaded cleanly. Checksum verified: SHA-256 integrity OK.")
         print(f"Restoring Monarch at district: {self.DISTRICTS[self.current_district_key]['name']}.")
@@ -2101,6 +2161,250 @@ class VoxelRealmSimulator:
         print(f"Cured: {cured:.0f} sick citizens restored to health! Active sick remaining: {self.sir_state['I']:.0f}.")
         print("✓ Mortality suppressed; epidemic collapse imminent!")
 
+    def get_corpse_decomposition_stage(self, hours: float) -> tuple:
+        """GDD Section 93.1: Returns (stage_key, morale_penalty, description)."""
+        if hours < 6.0:
+            return ("fresh", -15.0, "Fresh Corpse (Pale color, flies gathering, no miasma yet).")
+        elif hours < 24.0:
+            return ("putrefaction", -30.0, "Putrefaction & Bloating (Green discoloration, +10 Filth/h, circling crows).")
+        elif hours < 48.0:
+            return ("liquefaction", -45.0, "Active Liquefaction (Exposed bones, +25 Filth/h, wolf scavengers attracted).")
+        else:
+            return ("skeleton", -60.0, "Contaminated Skeleton (Toxic bio-hazard, groundwater poisoned, restless spirit danger).")
+
+    def generate_procedural_epitaph(self, name: str, age: int, profession: str, achievement: str, cause: str, headstone: str = "wooden_cross") -> str:
+        """GDD Section 95.2: Generates a procedural 4-line historical epitaph."""
+        monument_titles = {
+            "wooden_cross": "Humble Wooden Cross",
+            "limestone_headstone": "Carved Limestone Headstone",
+            "stone_sarcophagus": "Regal Marble Sarcophagus"
+        }
+        title = monument_titles.get(headstone, "Memorial Stone")
+        verse = "'Xotirang qalbimizda mangu yashaydi, ey saltanatimiz bunyodkori.'"
+        epitaph = (
+            f"[{title}] {name} (Age {age})\n"
+            f"Profession: {profession}\n"
+            f"Achievement: {achievement}\n"
+            f"Cause: {cause}\n"
+            f"{verse}"
+        )
+        return epitaph
+
+    def register_deceased_citizen(self, name: str, age: int, profession: str, cause: str, achievement: str, estate_gold: int = 15, has_heirs: bool = True):
+        """GDD Section 93: Registers a new unburied deceased citizen in the realm."""
+        corpse_id = f"CORPSE-{len(self.unburied_corpses) + len(self.cemetery['graves']) + 1}"
+        corpse = {
+            "id": corpse_id,
+            "citizen_name": name,
+            "age": age,
+            "profession": profession,
+            "cause_of_death": cause,
+            "achievement": achievement,
+            "hours_unburied": 0.0,
+            "stage": "fresh",
+            "estate_gold": estate_gold,
+            "has_heirs": has_heirs
+        }
+        self.unburied_corpses.append(corpse)
+        print(f"\n⚰️ CITIZEN DECEASED: {name} ({profession}, Age {age}) has passed away ({cause})!")
+        print(f"Location: Unburied in municipal quarters. Priority: Dispatch Gravedigger before decomposition begins.")
+
+    def appoint_gravedigger(self):
+        """GDD Section 94.1: Appoints Brother Barnaby as the Municipal Undertaker & Gravedigger."""
+        self.gravedigger_appointed = True
+        self.total_renown += 50
+        print(f"\n⛏️ MUNICIPAL UNDERTAKER: Appointed {self.gravedigger_name} to oversee mortuary logistics!")
+        print("Equipment: 2-wheeled Morgue Cart with black linen tarp & consecrated burial spades.")
+        print("✓ Corpses collected promptly; visual citizen trauma and open street rotting prevented.")
+
+    def craft_coffin(self, coffin_type: str = "wooden_coffin") -> bool:
+        """GDD Section 94.2: Crafts burial caskets at guild workshops."""
+        coffin_type = coffin_type.lower().strip()
+        recipes = {
+            "linen_shroud": {"name": "Linen Shroud", "cost": 10, "desc": "60% miasma block (+5 Morale solace)"},
+            "wooden_coffin": {"name": "Wooden Coffin", "cost": 20, "desc": "100% miasma block (+15 Morale solace)"},
+            "stone_sarcophagus": {"name": "Stone Sarcophagus", "cost": 45, "desc": "Permanent preservation (+35 Morale royal memorial)"}
+        }
+        if coffin_type not in recipes:
+            print("Unknown coffin type! Available: 'linen_shroud', 'wooden_coffin', 'stone_sarcophagus'.")
+            return False
+
+        rec = recipes[coffin_type]
+        if self.coins < rec["cost"]:
+            print(f"Insufficient funds! Crafting a {rec['name']} requires {rec['cost']} 💰 Gold Coins.")
+            return False
+
+        self.coins -= rec["cost"]
+        self.coffin_inventory[coffin_type] += 1
+        print(f"\n🪵 CASKET CRAFTED: Manufactured 1x {rec['name']} in undertaker workshop (-{rec['cost']} 💰 Gold)!")
+        print(f"Specification: {rec['desc']} | Current Stock: {self.coffin_inventory[coffin_type]}.")
+        return True
+
+    def collect_and_bury_corpse(self, corpse_id: str, coffin_type: str = "wooden_coffin") -> bool:
+        """GDD Section 94.3: Gravedigger collects and buries corpse in Consecrated Cemetery."""
+        matching = [c for c in self.unburied_corpses if c["id"].lower() == corpse_id.lower() or c["citizen_name"].lower() == corpse_id.lower()]
+        if not matching:
+            print(f"No unburied corpse found matching identifier '{corpse_id}'.")
+            return False
+
+        corpse = matching[0]
+        if self.cemetery["occupied_plots"] >= self.cemetery["total_plots"]:
+            print("⚠️ CEMETERY FULL: St. Jude's Consecrated Graveyard has no remaining burial plots!")
+            print("Recommendation: Expand graveyard perimeter or construct subterranean ossuary crypts.")
+            return False
+
+        # Select coffin or shroud
+        headstone = "wooden_cross"
+        if coffin_type in self.coffin_inventory and self.coffin_inventory[coffin_type] > 0:
+            self.coffin_inventory[coffin_type] -= 1
+            if coffin_type == "stone_sarcophagus":
+                headstone = "stone_sarcophagus"
+            elif coffin_type == "wooden_coffin":
+                headstone = "limestone_headstone"
+            else:
+                headstone = "wooden_cross"
+        else:
+            print(f"Notice: No {coffin_type} in stock. Burying with simple consecrated earth and humble cross.")
+            headstone = "wooden_cross"
+
+        # Inheritance & Escheat Law (GDD Section 96)
+        gold_note = ""
+        if not corpse["has_heirs"] and corpse["estate_gold"] > 0:
+            self.coins += corpse["estate_gold"]
+            self.escheat_treasury_collected += corpse["estate_gold"]
+            gold_note = f" | 👑 Crown Escheat Law: Collected {corpse['estate_gold']} 💰 unclaimed gold into Royal Treasury"
+        elif corpse["has_heirs"]:
+            gold_note = f" | 📜 Estate: {corpse['estate_gold']} 💰 gold distributed to surviving heirs"
+
+        # Generate epitaph
+        epitaph = self.generate_procedural_epitaph(
+            name=corpse["citizen_name"],
+            age=corpse["age"],
+            profession=corpse["profession"],
+            achievement=corpse["achievement"],
+            cause=corpse["cause_of_death"],
+            headstone=headstone
+        )
+
+        grave_entry = {
+            "grave_id": f"GRAVE-{self.cemetery['occupied_plots'] + 101}",
+            "citizen_name": corpse["citizen_name"],
+            "years": f"Age {corpse['age']}",
+            "profession": corpse["profession"],
+            "headstone_type": headstone,
+            "sanctified": self.cemetery["consecrated_by_priest"],
+            "epitaph": epitaph
+        }
+        self.cemetery["graves"].append(grave_entry)
+        self.cemetery["occupied_plots"] += 1
+        self.unburied_corpses.remove(corpse)
+        self.filth_level = max(0.0, self.filth_level - 5.0)
+
+        # Clear scavengers if no more corpses
+        if not self.unburied_corpses:
+            self.scavengers_active["circling_crows"] = 0
+            self.scavengers_active["wolf_pack_threat"] = False
+
+        print(f"\n🕊️ FUNERAL COMPLETED: {corpse['citizen_name']} laid to rest in {self.cemetery['name']}!")
+        print(f"Monument: {grave_entry['headstone_type'].replace('_', ' ').title()}{gold_note}.")
+        print("✓ Grave sanctified with holy rite; deceased soul rests in eternal feudal serenity.")
+        return True
+
+    def sanctify_cemetery_ground(self) -> bool:
+        """GDD Section 94.3: Priest sprinkles Holy Water and recites liturgical rites (Anti-Necromancy)."""
+        self.cemetery["consecrated_by_priest"] = True
+        self.cemetery["serenity_aura_active"] = True
+        for g in self.cemetery["graves"]:
+            g["sanctified"] = True
+        self.total_renown += 40
+        print(f"\n⛪ CEMETERY CONSECRATED: Abbey Priest blessed {self.cemetery['name']} with Holy Water!")
+        print("✓ Anti-Necromancy Ward active: Graves protected against Blood Moon undead awakenings!")
+        print("✓ Serenity Aura engaged: +10 Morale radiating across town within 60-meter radius.")
+        return True
+
+    def simulate_decomposition_step(self, hours: int = 1):
+        """GDD Section 93: Advances decomposition kinetics, scavenger attractions, and miasma hazards."""
+        hours = max(1, hours)
+        if not self.unburied_corpses:
+            self.scavengers_active["circling_crows"] = 0
+            self.scavengers_active["wolf_pack_threat"] = False
+            return
+
+        for c in self.unburied_corpses:
+            c["hours_unburied"] += hours
+            stage_key, morale_pen, desc = self.get_corpse_decomposition_stage(c["hours_unburied"])
+            c["stage"] = stage_key
+
+            # Accumulate filth based on decomposition stage
+            if stage_key == "putrefaction":
+                self.filth_level = min(100.0, self.filth_level + 10.0 * (hours / 6.0))
+            elif stage_key == "liquefaction":
+                self.filth_level = min(100.0, self.filth_level + 25.0 * (hours / 6.0))
+            elif stage_key == "skeleton":
+                self.filth_level = min(100.0, self.filth_level + 35.0 * (hours / 6.0))
+
+        # Check miasma threshold
+        if self.filth_level > 70.0:
+            self.miasma_active = True
+
+        # Scavenger checks
+        crows_count = len([c for c in self.unburied_corpses if c["hours_unburied"] >= 6.0])
+        self.scavengers_active["circling_crows"] = min(12, crows_count * 3)
+        old_wolves = self.scavengers_active["wolf_pack_threat"]
+        self.scavengers_active["wolf_pack_threat"] = any(c["hours_unburied"] >= 24.0 for c in self.unburied_corpses)
+
+        if not old_wolves and self.scavengers_active["wolf_pack_threat"]:
+            print("\n🐺 SCAVENGER INFILTRATION: Wild highland wolf pack scented rotting carcasses!")
+            print("Warning: Hungry predators roaming outskirts; citizens and livestock under attack!")
+
+        # Civic unrest if > 3 unburied corpses
+        if len(self.unburied_corpses) > 3:
+            self.unrest = min(100.0, self.unrest + 10.0)
+            print(f"\n⚠️ CIVIC CRISIS: {len(self.unburied_corpses)} unburied corpses lying in public squares!")
+            print("Citizens decry the Crown as 'Accursed Tyrant'! Piety collapsed, emigration surge imminent.")
+
+    def show_mortuary_and_cemeteries(self):
+        """Displays full telemetry on unburied corpses, morgue caskets, and consecrated cemetery."""
+        print("\n" + "=" * 78)
+        print("          ⚰️ FEUDAL MORTUARY, GRAVEDIGGER & CONSECRATED CEMETERY")
+        print("=" * 78)
+        gd_status = f"✓ Appointed ({self.gravedigger_name})" if self.gravedigger_appointed else "❌ No Gravedigger (Unattended Corpses)"
+        print(f"Municipal Undertaker: {gd_status} | Morgue Cart: 4-Corpse Capacity (Black Linen Tarp)")
+        print(f"Casket Stockpile: Linen Shrouds: {self.coffin_inventory['linen_shroud']} | Wooden Coffins: {self.coffin_inventory['wooden_coffin']} | Stone Sarcophagi: {self.coffin_inventory['stone_sarcophagus']}")
+        print(f"Escheat Law Royal Treasury Revenue: {self.escheat_treasury_collected} 💰 Gold Coins")
+
+        print("\n" + "-" * 78)
+        print(f"🏛️ {self.cemetery['name'].upper()}")
+        print("-" * 78)
+        aura_str = "✓ ACTIVE (+10 Morale within 60m)" if self.cemetery["serenity_aura_active"] else "❌ INACTIVE"
+        sanc_str = "✓ CONSECRATED (Anti-Necromancy Ward)" if self.cemetery["consecrated_by_priest"] else "⚠️ UNHALLOWED GROUND"
+        free_plots = self.cemetery["total_plots"] - self.cemetery["occupied_plots"]
+        print(f"Burial Plots: {self.cemetery['occupied_plots']} / {self.cemetery['total_plots']} Occupied ({free_plots} Free Plots)")
+        print(f"Serenity Aura: {aura_str} | Priest Sanctification: {sanc_str}")
+
+        print("\nRecent Memorial Graves & Epitaphs:")
+        for g in self.cemetery["graves"][-3:]:
+            s_icon = "✝️" if g["sanctified"] else "⚠️"
+            print(f"  {s_icon} [{g['grave_id']}] {g['citizen_name']} ({g['years']}) - {g['headstone_type']}")
+
+        print("\n" + "-" * 78)
+        print(f"⚠️ UNBURIED CORPSES & DECOMPOSITION TELEMETRY ({len(self.unburied_corpses)} corpses)")
+        print("-" * 78)
+        if not self.unburied_corpses:
+            print("  ✓ Pristine Sanitation: No unburied deceased citizens in city quarters.")
+        else:
+            print(f"Corpse ID   | Citizen Name              | Age | Hours  | Stage          | Miasma / Hazard")
+            print("-" * 78)
+            for c in self.unburied_corpses:
+                _, _, desc = self.get_corpse_decomposition_stage(c["hours_unburied"])
+                print(f"{c['id']:<11} | {c['citizen_name']:<25} | {c['age']:<3} | {c['hours_unburied']:<6.1f} | {c['stage'].upper():<14} | {desc[:25]}...")
+
+        if self.scavengers_active["circling_crows"] > 0:
+            print(f"🦅 Circling Crows: {self.scavengers_active['circling_crows']} crows circling overhead above decomposing flesh.")
+        if self.scavengers_active["wolf_pack_threat"]:
+            print("🐺 Scavenger Threat: Wild Wolf Pack actively prowling town perimeter!")
+        print("=" * 78)
+
     def run_cli(self):
         self.print_header()
         print("\nWelcome, Monarch! The entire Feudal Realm is assembled and awaiting your command.")
@@ -2195,6 +2499,13 @@ class VoxelRealmSimulator:
                 print("  outbreak [type]   - Trigger infectious disease epidemic (bubonic_plague, dysentery, etc.)")
                 print("  sim_disease [hrs] - Advance differential SIR epidemic dynamics and bacterial filth drift")
                 print("  panacea           - Administer miraculous Sovereign Panacea Elixir (cures 60% active infected)")
+                print("  corpses / morgue  - View unburied corpses, decomposition stages & Consecrated Cemetery")
+                print("  bury <id> [coffin]- Dispatch Gravedigger to bury corpse (linen_shroud, wooden_coffin, stone_sarcophagus)")
+                print("  gravedigger       - Appoint Municipal Undertaker Brother Barnaby (+Morgue Cart)")
+                print("  craft_coffin <t>  - Craft casket in guild workshop (linen_shroud, wooden_coffin, stone_sarcophagus)")
+                print("  consecrate        - Have Abbey Priest sanctify cemetery with Holy Water (Anti-Necromancy)")
+                print("  epitaphs          - Read all memorial grave markers and procedurally generated epitaphs")
+                print("  sim_rot [hrs]     - Advance decomposition kinetics, scavenger attractions & miasma hazards")
                 print("  pause             - Display in-game pause menu and controls guide")
                 print("  wait              - Advance time by 1 hour (burn calories, regenerate stamina)")
                 print("  quit              - Exit simulator")
@@ -2449,6 +2760,30 @@ class VoxelRealmSimulator:
                 self.simulate_epidemic_step(hrs)
             elif cmd in ["panacea", "cure_plague", "miracle_cure"]:
                 self.administer_panacea()
+            elif cmd in ["corpses", "morgue", "mortuary", "cemetery", "graveyard"]:
+                self.show_mortuary_and_cemeteries()
+            elif cmd in ["bury", "inter"]:
+                if args:
+                    coffin = args[1] if len(args) > 1 else "wooden_coffin"
+                    self.collect_and_bury_corpse(args[0], coffin)
+                else:
+                    print("Usage: bury <corpse_id> [linen_shroud|wooden_coffin|stone_sarcophagus]")
+            elif cmd in ["gravedigger", "undertaker"]:
+                self.appoint_gravedigger()
+            elif cmd in ["craft_coffin", "coffin"]:
+                c_type = args[0] if args else "wooden_coffin"
+                self.craft_coffin(c_type)
+            elif cmd in ["consecrate", "sanctify"]:
+                self.sanctify_cemetery_ground()
+            elif cmd in ["epitaphs", "epitaph"]:
+                print("\n=== CONSECRATED MEMORIAL GRAVE MARKERS & EPITAPHS ===")
+                for g in self.cemetery["graves"]:
+                    print(f"\n[{g['grave_id']}] {g['citizen_name']} ({g['years']}) - {g['headstone_type']}")
+                    print(g["epitaph"])
+                print("=====================================================")
+            elif cmd in ["sim_rot", "decompose", "decay_corpses"]:
+                hrs = int(args[0]) if args and args[0].isdigit() else 6
+                self.simulate_decomposition_step(hrs)
             elif cmd == "pause":
                 print("\n=== [PAUSE MENU SIMULATION] ===")
                 print("1. Resume Realm")
@@ -2634,6 +2969,37 @@ def main():
         sim.load_realm("test_sanitation_slot")
         assert sim.plague_doctor_appointed is True
         assert "board_houses" in sim.quarantine_measures
+        # Milestone 58: Gravedigger Mortuary Logistics & Consecrated Cemetery Verification
+        sim.show_mortuary_and_cemeteries()
+        stage_k, pen, _ = sim.get_corpse_decomposition_stage(2.0)
+        assert stage_k == "fresh" and pen == -15.0
+        stage_k, pen, _ = sim.get_corpse_decomposition_stage(12.0)
+        assert stage_k == "putrefaction" and pen == -30.0
+        stage_k, pen, _ = sim.get_corpse_decomposition_stage(30.0)
+        assert stage_k == "liquefaction" and pen == -45.0
+        stage_k, pen, _ = sim.get_corpse_decomposition_stage(50.0)
+        assert stage_k == "skeleton" and pen == -60.0
+        sim.appoint_gravedigger()
+        assert sim.gravedigger_appointed is True
+        old_coffins = sim.coffin_inventory["wooden_coffin"]
+        sim.craft_coffin("wooden_coffin")
+        assert sim.coffin_inventory["wooden_coffin"] == old_coffins + 1
+        sim.register_deceased_citizen("Aldous Smith", 45, "Blacksmith", "Fever", "Forged 500 blades", 25, has_heirs=False)
+        assert len(sim.unburied_corpses) == 1
+        cid = sim.unburied_corpses[0]["id"]
+        old_crown_coins = sim.coins
+        sim.collect_and_bury_corpse(cid, "wooden_coffin")
+        assert len(sim.unburied_corpses) == 0
+        assert sim.coins == old_crown_coins + 25  # Escheat law inheritance collected
+        assert sim.escheat_treasury_collected >= 25
+        assert sim.cemetery["occupied_plots"] >= 9
+        sim.sanctify_cemetery_ground()
+        assert sim.cemetery["consecrated_by_priest"] is True
+        h_mort = sim.save_realm("test_mortuary_slot")
+        assert len(h_mort) == 64
+        sim.load_realm("test_mortuary_slot")
+        assert sim.gravedigger_appointed is True
+        assert sim.cemetery["consecrated_by_priest"] is True
         print("[INTERACTIVE SIMULATOR] All simulator subsystems passed verification cleanly!")
         sys.exit(0)
     sim.run_cli()
