@@ -308,6 +308,35 @@ class VoxelRealmSimulator:
             "food_variety": 4
         }
 
+        # Municipal Sanitation & Epidemiology State (Milestone 57 - GDD Sections 74-77)
+        self.filth_level = 22.0  # [0.0, 100.0]
+        self.waste_rate = 0.05   # kg/hour per citizen
+        self.dung_rate = 0.25    # kg/hour per livestock
+        self.livestock_count = 14
+        self.miasma_active = False
+        self.street_sweepers_count = 2
+        self.cesspool_fill = 28.0  # [0.0, 100.0]
+        self.compost_fertilizer_stock = 4  # barrels
+        self.pest_control_cats = 6
+        self.stone_drainage_active = True
+        self.aqueduct_clean_water = True
+
+        # SIR Differential Epidemiology State
+        total_citizens = sum(c["count"] for c in self.population_cohorts.values())
+        self.sir_state = {
+            "S": float(total_citizens),
+            "I": 0.0,
+            "R": 0.0,
+            "deaths": 0
+        }
+        self.active_epidemic = None  # None, "dysentery", "influenza", "typhus", "bubonic_plague", "pneumonic_plague"
+        self.plague_doctor_appointed = False
+        self.quarantine_edict_active = False
+        self.quarantine_measures = []
+        self.epidemic_history = []
+        self.citizen_morale = 80.0
+        self._saved_slots = {}
+
 
     def print_header(self):
         print("\n" + "=" * 78)
@@ -325,6 +354,11 @@ class VoxelRealmSimulator:
             status_tag = f" | 🛌 BEDRIDDEN ({self.bed_rest_remaining:.1f}h rest left)"
         elif self.trauma_conditions:
             status_tag = f" | ⚠️ INJURED ({len(self.trauma_conditions)} trauma)"
+
+        if self.miasma_active:
+            status_tag += " | ☣️ MIASMA"
+        if self.active_epidemic:
+            status_tag += f" | ☠️ {self.active_epidemic.upper()} ({self.sir_state['I']:.0f} sick)"
 
         print(f"\n[MONARCH HUD] ❤️ HP: {self.health:.0f}/100 | ⚡ ST: {self.stamina:.0f}/100 | 🍗 Calories: {self.calories:.0f} kcal | 🔥 Warmth: {self.warmth:.1f}°C{status_tag}")
         print(f"[TIME & REALM] Day {self.day_number} ({self.season}) - {self.time_hour:02d}:00 [{phase['phase']}] | Coins: {self.coins} 💰 | Ambient: {curr_dist['ambient_temp']:.1f}°C")
@@ -444,8 +478,24 @@ class VoxelRealmSimulator:
             "active_dockets": self.active_dockets,
             "verdict_history": self.verdict_history,
             "ratified_charters": self.ratified_charters,
+            "filth_level": self.filth_level,
+            "miasma_active": self.miasma_active,
+            "street_sweepers_count": self.street_sweepers_count,
+            "cesspool_fill": self.cesspool_fill,
+            "compost_fertilizer_stock": self.compost_fertilizer_stock,
+            "pest_control_cats": self.pest_control_cats,
+            "stone_drainage_active": self.stone_drainage_active,
+            "aqueduct_clean_water": self.aqueduct_clean_water,
+            "sir_state": self.sir_state,
+            "active_epidemic": self.active_epidemic,
+            "plague_doctor_appointed": self.plague_doctor_appointed,
+            "quarantine_edict_active": self.quarantine_edict_active,
+            "quarantine_measures": self.quarantine_measures,
+            "epidemic_history": self.epidemic_history,
         }
         raw_str = json.dumps(data, sort_keys=True)
+        import copy
+        self._saved_slots[slot] = copy.deepcopy(data)
         checksum = hashlib.sha256(raw_str.encode("utf-8")).hexdigest()
         print(f"\n💾 [SAVE REALM PERSISTENCE]")
         print(f"Slot: '{slot}' | Voxel Delta Hash: {checksum[:8]}...")
@@ -454,11 +504,45 @@ class VoxelRealmSimulator:
         print("✓ Sparse Delta Voxel persistence written successfully.")
         return checksum
 
-    def load_realm(self, slot: str = "quicksave"):
+    def load_realm(self, slot: str = "quicksave") -> bool:
+        import copy
+        if slot in self._saved_slots:
+            data = copy.deepcopy(self._saved_slots[slot])
+            self.current_district_key = data.get("district", self.current_district_key)
+            self.pos = list(data.get("pos", self.pos))
+            self.health = data.get("health", self.health)
+            self.calories = data.get("calories", self.calories)
+            self.stamina = data.get("stamina", self.stamina)
+            self.day_number = data.get("day", self.day_number)
+            self.time_hour = data.get("time_hour", self.time_hour)
+            self.coins = data.get("coins", self.coins)
+            self.monarch_level = data.get("monarch_level", self.monarch_level)
+            self.monarch_status = data.get("monarch_status", self.monarch_status)
+            self.trauma_conditions = list(data.get("trauma_conditions", self.trauma_conditions))
+            self.court_doctor_skill = data.get("court_doctor_skill", self.court_doctor_skill)
+            self.ransom_demanded = data.get("ransom_demanded", self.ransom_demanded)
+            self.bed_rest_remaining = data.get("bed_rest_remaining", self.bed_rest_remaining)
+            self.stockpile = copy.deepcopy(data.get("stockpile", self.stockpile))
+            self.quotas = copy.deepcopy(data.get("quotas", self.quotas))
+            self.crime_rate = data.get("crime_rate", self.crime_rate)
+            self.unrest = data.get("unrest", self.unrest)
+            self.crown_authority = data.get("crown_authority", self.crown_authority)
+            self.public_order = data.get("public_order", self.public_order)
+            self.filth_level = data.get("filth_level", self.filth_level)
+            self.miasma_active = data.get("miasma_active", self.miasma_active)
+            self.street_sweepers_count = data.get("street_sweepers_count", self.street_sweepers_count)
+            self.cesspool_fill = data.get("cesspool_fill", self.cesspool_fill)
+            self.compost_fertilizer_stock = data.get("compost_fertilizer_stock", self.compost_fertilizer_stock)
+            self.sir_state = copy.deepcopy(data.get("sir_state", self.sir_state))
+            self.active_epidemic = data.get("active_epidemic", self.active_epidemic)
+            self.plague_doctor_appointed = data.get("plague_doctor_appointed", self.plague_doctor_appointed)
+            self.quarantine_edict_active = data.get("quarantine_edict_active", self.quarantine_edict_active)
+            self.quarantine_measures = list(data.get("quarantine_measures", self.quarantine_measures))
         print(f"\n📂 [LOAD REALM PERSISTENCE]")
         print(f"Slot: '{slot}' loaded cleanly. Checksum verified: SHA-256 integrity OK.")
         print(f"Restoring Monarch at district: {self.DISTRICTS[self.current_district_key]['name']}.")
         print("✓ Granary stockpile, guild production quotas, and judicial court dockets restored.")
+        return True
 
     def play_audio_sfx(self, effect: str = "horn"):
         effect = effect.lower()
@@ -1784,6 +1868,239 @@ class VoxelRealmSimulator:
         print(f"Demographic Results -> Births: +{births}, Deaths: -{deaths}, Net Population: {new_total} citizens.")
         print(f"Cohort Transition Verified: Infants {self.population_cohorts['AGE_INF']['count']}, Young Adults {self.population_cohorts['AGE_YAD']['count']}, Venerable Elders {self.population_cohorts['AGE_VEN']['count']}.")
 
+    @staticmethod
+    def calculate_reproduction_number(beta: float, gamma: float, mu: float) -> float:
+        """GDD Section 75.1: R_0 = beta / (gamma + mu)."""
+        if beta <= 0.0 or (gamma + mu) <= 0.0:
+            return 0.0
+        return round(beta / (gamma + mu), 2)
+
+    @staticmethod
+    def calculate_filth_delta(population: int, livestock: int, sweepers: int) -> float:
+        """GDD Section 76.1: d(Filth)/dt = Pop * WasteRate + Livestock * DungRate - SweeperCapacity."""
+        pop_waste = max(0, population) * 0.05
+        dung_waste = max(0, livestock) * 0.25
+        sweeper_cap = max(0, sweepers) * (35 * 0.05)  # 1.75 filth/hour
+        delta = pop_waste + dung_waste - sweeper_cap
+        return round(delta, 2)
+
+    def show_sanitation(self):
+        """Displays municipal sanitation, waste kinetics, plague alerts and SIR metrics."""
+        total_pop = sum(c["count"] for c in self.population_cohorts.values())
+        filth_delta = self.calculate_filth_delta(total_pop, self.livestock_count, self.street_sweepers_count)
+
+        print("\n" + "=" * 78)
+        print("          🧹 MUNICIPAL SANITATION, WASTE DYNAMICS & EPIDEMIOLOGY")
+        print("=" * 78)
+        print(f"Municipal Filth Index: {self.filth_level:.1f} / 100.0 (Hourly Drift: {'+' if filth_delta >= 0 else ''}{filth_delta:.2f})")
+        miasma_str = "☣️ ACTIVE (Morale -20, Vermin Swarms)" if self.miasma_active else "✓ CLEAR (Clean Air)"
+        print(f"Miasma Status: {miasma_str} (Threshold: Filth > 70.0)")
+        print(f"Sanitation Crew: {self.street_sweepers_count} Street Sweepers | Rat Catchers: {self.pest_control_cats} Domestic Cats/Terriers")
+        print(f"Town Latrine Cesspool: {self.cesspool_fill:.1f}% capacity | Mature Organic Compost: {self.compost_fertilizer_stock} Barrels")
+        drainage_str = "✓ Operational (-20% waterborne risk)" if self.stone_drainage_active else "❌ Blocked"
+        aqueduct_str = "✓ Mountain Spring Flowing (Pure Water)" if self.aqueduct_clean_water else "❌ Contaminated"
+        print(f"Stone Drainage: {drainage_str} | Mountain Aqueduct: {aqueduct_str}")
+
+        print("\n" + "-" * 78)
+        print("          ☠️ SIR EPIDEMIOLOGY & TRANSMISSION DYNAMICS (GDD 75 & 77)")
+        print("-" * 78)
+        ep_name = self.active_epidemic.upper() if self.active_epidemic else "NONE (HEALTHY CITIZENRY)"
+        doc_str = "✓ Appointed (Dr. Corvus with Beak Mask & Waxed Cloak)" if self.plague_doctor_appointed else "❌ None"
+        quar_str = ", ".join(self.quarantine_measures) if self.quarantine_measures else "None"
+        print(f"Active Contagion: {ep_name} | High Plague Doctor: {doc_str}")
+        print(f"Quarantine Edicts: {quar_str}")
+
+        if self.active_epidemic:
+            disease_params = {
+                "bubonic_plague": (0.45, 0.05, 0.15),
+                "pneumonic_plague": (0.85, 0.03, 0.35),
+                "dysentery": (0.30, 0.12, 0.04),
+                "influenza": (0.40, 0.15, 0.02),
+                "typhus": (0.35, 0.08, 0.08)
+            }
+            base_b, g, m = disease_params.get(self.active_epidemic, (0.40, 0.10, 0.10))
+            eff_b = base_b * (1.0 + self.filth_level / 100.0)
+            if self.plague_doctor_appointed:
+                eff_b *= 0.40
+            if self.quarantine_measures:
+                eff_b *= 0.50
+            if self.stone_drainage_active and self.active_epidemic == "dysentery":
+                eff_b *= 0.30
+            r0 = self.calculate_reproduction_number(eff_b, g, m)
+            status_desc = "🚨 EXPONENTIAL SPREAD (R0 > 1.0)" if r0 > 1.0 else "🛡️ CONTAINED / DECLINING (R0 < 1.0)"
+            print(f"Transmission Rate (β): {eff_b:.3f} | Recovery (γ): {g:.2f} | Mortality (μ): {m:.2f}")
+            print(f"Basic Reproduction Number (R_0): {r0:.2f} -> {status_desc}")
+
+        print(f"SIR Demographics -> Susceptible (S): {self.sir_state['S']:.0f} | Infected (I): {self.sir_state['I']:.0f} | Immune (R): {self.sir_state['R']:.0f} | Plague Deaths: {self.sir_state['deaths']}")
+        if self.epidemic_history:
+            print("\nRecent Epidemic Chronicle:")
+            for h in self.epidemic_history[-3:]:
+                print(f"  • {h}")
+        print("=" * 78)
+
+    def sweep_streets(self):
+        """Dispatches municipal street sweepers to scrub town thoroughfares and gather manure."""
+        prev = self.filth_level
+        self.filth_level = max(0.0, round(self.filth_level - 18.0, 1))
+        self.compost_fertilizer_stock += 1
+        if self.filth_level < 70.0 and self.miasma_active:
+            self.miasma_active = False
+            print("💨 MIASMA DISPERSED: Fresh sea breezes purge the stench from the town square!")
+        print(f"\n🧹 STREET SWEEPERS: Dispatched sweepers across cobbles and market alleyways!")
+        print(f"Filth Index reduced: {prev:.1f} -> {self.filth_level:.1f} (-18.0).")
+        print(f"Collected biomass transformed into +1 Organic Compost Fertilizer (Total: {self.compost_fertilizer_stock} barrels).")
+
+    def clean_cesspool(self):
+        """Empties town latrine cesspools to prevent groundwater contamination."""
+        prev = self.cesspool_fill
+        self.cesspool_fill = 5.0
+        self.compost_fertilizer_stock += 2
+        print(f"\n🚽 CESSPOOL SANITATION: Night soil scavengers emptied municipal latrine pits!")
+        print(f"Cesspool capacity restored: {prev:.1f}% -> 5.0%.")
+        print(f"Sludge processed into +2 High-Yield Fertilizer Barrels (+25% farm yield bonus).")
+        print("✓ Groundwater aquifer protected; waterborne dysentery hazard neutralized.")
+
+    def appoint_plague_doctor(self):
+        """Appoints Dr. Corvus as royal plague doctor with beak mask and waxed leather cloak."""
+        self.plague_doctor_appointed = True
+        self.total_renown += 75
+        self.citizen_morale = min(100.0, self.citizen_morale + 15.0)
+        self.epidemic_history.append(f"Day {self.day_number}: Appointed High Plague Doctor with Beak Mask and Waxed Leather Cloak.")
+        print(f"\n🦅 THE PLAGUE DOCTOR: Appointed Dr. Corvus to oversee royal disease containment!")
+        print("Apparel: Protective Beak Mask filled with camphor, lavender, and mint.")
+        print("Garb: Heavy Waxed Leather Cloak (impervious to plague fleas) & Wooden Exam Cane.")
+        print("✓ Contagion transmission factor (β) slashed by -60.0% across all districts!")
+        print("✓ Reassurance in royal medicine restores +15 Morale to the populace.")
+
+    def enact_black_quarantine(self, measure: str):
+        """Enacts emergency quarantine protocols from GDD Section 77.2."""
+        measure = measure.lower().strip()
+        measures_map = {
+            "board_houses": ("Board Up Infected Houses", "Painted Red Cross on contaminated doors; 14-day forced family isolation (-40% transmission)."),
+            "houses": ("Board Up Infected Houses", "Painted Red Cross on contaminated doors; 14-day forced family isolation (-40% transmission)."),
+            "armed_cordon": ("Armed Sanitary Cordon", "Sealed town portcullis gates with heavy crossbowmen; caravans halted (-50% external transmission)."),
+            "cordon": ("Armed Sanitary Cordon", "Sealed town portcullis gates with heavy crossbowmen; caravans halted (-50% external transmission)."),
+            "sanitary_pyres": ("Sanitary Pyres", "Incinerated infected bedding, apparel, and straw corpses in lime pyres outside walls (-30% filth)."),
+            "pyres": ("Sanitary Pyres", "Incinerated infected bedding, apparel, and straw corpses in lime pyres outside walls (-30% filth).")
+        }
+        if measure not in measures_map:
+            print("Unknown quarantine measure! Available: 'board_houses', 'armed_cordon', 'sanitary_pyres'.")
+            return
+
+        canonical_key = "board_houses" if "house" in measure else ("armed_cordon" if "cordon" in measure else "sanitary_pyres")
+        name, desc = measures_map[measure]
+        if canonical_key not in self.quarantine_measures:
+            self.quarantine_measures.append(canonical_key)
+            self.quarantine_edict_active = True
+            if canonical_key == "sanitary_pyres":
+                self.filth_level = max(0.0, self.filth_level - 15.0)
+            self.epidemic_history.append(f"Day {self.day_number}: Enacted {name}.")
+            print(f"\n🛡️ BLACK QUARANTINE ENACTED: {name}!")
+            print(f"Protocol: {desc}")
+        else:
+            print(f"Quarantine measure '{name}' is already actively enforced.")
+
+    def trigger_outbreak(self, disease: str = "bubonic_plague"):
+        """GDD Section 75 & 77: Triggers a pathogenic epidemic outbreak in the city."""
+        disease = disease.lower().strip()
+        valid = ["bubonic_plague", "pneumonic_plague", "dysentery", "influenza", "typhus"]
+        if disease not in valid:
+            disease = "bubonic_plague"
+
+        total_citizens = sum(c["count"] for c in self.population_cohorts.values())
+        init_infected = max(2, int(total_citizens * 0.08))
+        self.sir_state["I"] = float(init_infected)
+        self.sir_state["S"] = max(0.0, float(total_citizens - init_infected))
+        self.sir_state["R"] = 0.0
+        self.active_epidemic = disease
+        self.epidemic_history.append(f"Day {self.day_number}: Outbreak of {disease.upper()} emerged in town quarters ({init_infected} infected).")
+        print(f"\n☠️ OUTBREAK REPORT: An infectious outbreak of {disease.upper()} has erupted!")
+        print(f"Initial Patients: {init_infected} citizens infected | Susceptible: {self.sir_state['S']:.0f}.")
+        print("Recommendation: Appoint Plague Doctor, sweep streets, and enforce quarantine protocols immediately!")
+
+    def simulate_epidemic_step(self, hours: int = 1):
+        """Simulates differential SIR transmission and filth accumulation over time."""
+        hours = max(1, hours)
+        total_pop = sum(c["count"] for c in self.population_cohorts.values())
+
+        # Accumulate filth
+        f_delta = self.calculate_filth_delta(total_pop, self.livestock_count, self.street_sweepers_count)
+        self.filth_level = max(0.0, min(100.0, self.filth_level + f_delta * (hours / 4.0)))
+        if self.filth_level > 70.0:
+            self.miasma_active = True
+
+        # If no active disease, chance of spontaneous outbreak if filth > 80
+        if not self.active_epidemic:
+            if self.filth_level > 80.0:
+                print("\n⚠️ SANITATION CRISIS: Filth reached catastrophic levels! Disease spontaneously sparked.")
+                self.trigger_outbreak("bubonic_plague")
+            else:
+                return
+
+        disease_params = {
+            "bubonic_plague": (0.45, 0.05, 0.15),
+            "pneumonic_plague": (0.85, 0.03, 0.35),
+            "dysentery": (0.30, 0.12, 0.04),
+            "influenza": (0.40, 0.15, 0.02),
+            "typhus": (0.35, 0.08, 0.08)
+        }
+        base_b, g, m = disease_params.get(self.active_epidemic, (0.40, 0.10, 0.10))
+
+        eff_b = base_b * (1.0 + self.filth_level / 100.0)
+        if self.plague_doctor_appointed:
+            eff_b *= 0.40
+        if self.quarantine_measures:
+            eff_b *= 0.50
+        if self.stone_drainage_active and self.active_epidemic == "dysentery":
+            eff_b *= 0.30
+
+        dt = hours * 0.10
+        s, i, r = self.sir_state["S"], self.sir_state["I"], self.sir_state["R"]
+        n = max(1.0, s + i + r)
+
+        new_inf = eff_b * (s * i / n) * dt
+        new_inf = min(s, new_inf)
+        new_rec = g * i * dt
+        new_rec = min(i, new_rec)
+        new_dead = m * i * dt
+        new_dead = min(i - new_rec, new_dead)
+
+        self.sir_state["S"] = max(0.0, s - new_inf)
+        self.sir_state["I"] = max(0.0, i + new_inf - new_rec - new_dead)
+        self.sir_state["R"] = r + new_rec
+        self.sir_state["deaths"] += int(new_dead)
+        self.demographic_stats["total_deaths"] += int(new_dead)
+
+        r0 = self.calculate_reproduction_number(eff_b, g, m)
+        print(f"\n⏳ EPIDEMIOLOGY TICK (+{hours}h): {self.active_epidemic.upper()} (R_0 = {r0:.2f})")
+        print(f"SIR Tracking -> Susceptible: {self.sir_state['S']:.1f}, Active Sick: {self.sir_state['I']:.1f}, Recovered: {self.sir_state['R']:.1f}, Deaths: +{int(new_dead)}.")
+
+        if self.sir_state["I"] < 0.5:
+            print(f"🎉 CONTAGION QUELLED: {self.active_epidemic.upper()} has been extinguished from the realm!")
+            self.epidemic_history.append(f"Day {self.day_number}: {self.active_epidemic.upper()} successfully eradicated.")
+            self.active_epidemic = None
+            self.sir_state["I"] = 0.0
+
+    def administer_panacea(self):
+        """Administers Miracle Panacea (GDD 74.2: Saffron + Spirit + Sulfur) to heal 60% of infected."""
+        if not self.active_epidemic or self.sir_state["I"] <= 0:
+            print("\nThere are no active plague victims requiring the Miracle Panacea.")
+            return
+
+        if self.coins < 25:
+            print(f"\nInsufficient funds! Distilling Miracle Panacea requires 25 💰 Gold Coins.")
+            return
+
+        self.coins -= 25
+        active_inf = self.sir_state["I"]
+        cured = round(active_inf * 0.60, 1)
+        self.sir_state["I"] = max(0.0, active_inf - cured)
+        self.sir_state["R"] += cured
+        self.total_renown += 50
+        print(f"\n✨ MIRACLE PANACEA DISTILLED: Administered golden sulfur-saffron panacea to quarantined patients!")
+        print(f"Cured: {cured:.0f} sick citizens restored to health! Active sick remaining: {self.sir_state['I']:.0f}.")
+        print("✓ Mortality suppressed; epidemic collapse imminent!")
+
     def run_cli(self):
         self.print_header()
         print("\nWelcome, Monarch! The entire Feudal Realm is assembled and awaiting your command.")
@@ -1870,6 +2187,14 @@ class VoxelRealmSimulator:
                 print("  advance [hrs]     - Advance diurnal clock by N hours (updates daytime phases & recovery)")
                 print("  census / pop      - View feudal demographic census across 7 biological age cohorts")
                 print("  simulate_pop [s]  - Simulate cohort turnover, Gompertz mortality & natural births")
+                print("  sanitation / filth- View municipal sanitation, filth metrics, cesspool fill & SIR epidemiology")
+                print("  sweep_streets     - Order municipal sweepers to clean streets (-18 Filth, +Compost)")
+                print("  cesspool          - Drain municipal cesspool night soil into organic fertilizer barrels")
+                print("  doctor_plague     - Appoint Corvus Beak-Masked Plague Doctor (-60% SIR beta transmission)")
+                print("  quarantine <type> - Enact Black Plague quarantine protocol: boards, cordon, pyres")
+                print("  outbreak [type]   - Trigger infectious disease epidemic (bubonic_plague, dysentery, etc.)")
+                print("  sim_disease [hrs] - Advance differential SIR epidemic dynamics and bacterial filth drift")
+                print("  panacea           - Administer miraculous Sovereign Panacea Elixir (cures 60% active infected)")
                 print("  pause             - Display in-game pause menu and controls guide")
                 print("  wait              - Advance time by 1 hour (burn calories, regenerate stamina)")
                 print("  quit              - Exit simulator")
@@ -2029,7 +2354,10 @@ class VoxelRealmSimulator:
                 else:
                     print("Usage: infiltrate <intel|sabotage|tech|revolt> [valoria|ashfell|silvercoast]")
             elif cmd in ["sweep", "counter_intel"]:
-                self.trigger_counter_intel_sweep()
+                if args and args[0] in ["streets", "street", "city", "filth", "waste"]:
+                    self.sweep_streets()
+                else:
+                    self.trigger_counter_intel_sweep()
             elif cmd in ["interrogate", "question"]:
                 self.interrogate_captive()
             elif cmd in ["ransom", "release"]:
@@ -2102,6 +2430,25 @@ class VoxelRealmSimulator:
             elif cmd in ["simulate_pop", "sim_pop", "age_pop"]:
                 seasons = int(args[0]) if args and args[0].isdigit() else 1
                 self.simulate_demographics(seasons)
+            elif cmd in ["sanitation", "filth", "hygiene", "miasma"]:
+                self.show_sanitation()
+            elif cmd in ["sweep_streets", "clean_streets", "street_sweep", "clean_filth"]:
+                self.sweep_streets()
+            elif cmd in ["cesspool", "drain_cesspool", "night_soil"]:
+                self.clean_cesspool()
+            elif cmd in ["doctor_plague", "plague_doctor", "appoint_doctor"]:
+                self.appoint_plague_doctor()
+            elif cmd in ["quarantine", "cordon", "pyres"]:
+                measure = args[0] if args else "board_houses"
+                self.enact_black_quarantine(measure)
+            elif cmd in ["outbreak", "epidemic", "pestilence"]:
+                disease = args[0] if args else "bubonic_plague"
+                self.trigger_outbreak(disease)
+            elif cmd in ["sim_disease", "simulate_epidemic", "plague_tick"]:
+                hrs = int(args[0]) if args and args[0].isdigit() else 4
+                self.simulate_epidemic_step(hrs)
+            elif cmd in ["panacea", "cure_plague", "miracle_cure"]:
+                self.administer_panacea()
             elif cmd == "pause":
                 print("\n=== [PAUSE MENU SIMULATION] ===")
                 print("1. Resume Realm")
@@ -2254,6 +2601,39 @@ def main():
         assert sim.monarch_status == "active"
         sim.show_demographics()
         sim.simulate_demographics(1)
+        # Milestone 57: Feudal Pestilence, Sanitation, & Epidemiology Verification
+        sim.show_sanitation()
+        r0 = sim.calculate_reproduction_number(0.45, 0.05, 0.15)
+        assert abs(r0 - 2.25) < 0.001, "R0 must equal beta / (gamma + mu)"
+        f_delta = sim.calculate_filth_delta(100, 20, 4)
+        assert f_delta == (100 * 0.05 + 20 * 0.25 - 4 * 1.75)
+        old_filth = sim.filth_level
+        sim.sweep_streets()
+        assert sim.filth_level <= old_filth
+        assert sim.compost_fertilizer_stock >= 1
+        sim.clean_cesspool()
+        assert sim.cesspool_fill == 5.0
+        assert sim.compost_fertilizer_stock >= 3
+        sim.appoint_plague_doctor()
+        assert sim.plague_doctor_appointed is True
+        sim.enact_black_quarantine("board_houses")
+        sim.enact_black_quarantine("armed_cordon")
+        sim.enact_black_quarantine("sanitary_pyres")
+        assert "board_houses" in sim.quarantine_measures
+        assert "armed_cordon" in sim.quarantine_measures
+        assert "sanitary_pyres" in sim.quarantine_measures
+        sim.trigger_outbreak("bubonic_plague")
+        assert sim.active_epidemic == "bubonic_plague"
+        assert sim.sir_state["I"] > 0
+        old_infected = sim.sir_state["I"]
+        sim.administer_panacea()
+        assert sim.sir_state["I"] < old_infected
+        sim.simulate_epidemic_step(4)
+        h_san = sim.save_realm("test_sanitation_slot")
+        assert len(h_san) == 64
+        sim.load_realm("test_sanitation_slot")
+        assert sim.plague_doctor_appointed is True
+        assert "board_houses" in sim.quarantine_measures
         print("[INTERACTIVE SIMULATOR] All simulator subsystems passed verification cleanly!")
         sys.exit(0)
     sim.run_cli()
